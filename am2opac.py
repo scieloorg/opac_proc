@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
 
-# import os
 import sys
 import textwrap
 import optparse
@@ -10,7 +9,6 @@ import logging.config
 from lxml import etree
 from StringIO import StringIO
 from uuid import uuid4
-# from datetime import timedelta
 
 import requests
 
