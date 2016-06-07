@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Application
+*.py.template
+
 # Distribution / packaging
 .Python
 env/
