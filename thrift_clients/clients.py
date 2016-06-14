@@ -66,6 +66,22 @@ class ArticleMeta(object):
 
             offset += 1000
 
+    def get_journal(self, code, collection=None):
+        try:
+            journal = self.client.get_journal(code=code, collection=collection)
+
+            jjournal = json.loads(journal)
+
+            xjournal = Journal(jjournal)
+
+            logger.info('Journal loaded: %s_%s' % (collection, code))
+
+            return xjournal
+
+        except:
+            msg = 'Error retrieving journal: %s_%s' % (collection, code)
+            raise ServerError(msg)
+
     def exists_article(self, code, collection):
         try:
             return self.client.exists_article(
