@@ -9,6 +9,8 @@ import logging.config
 from lxml import etree
 from StringIO import StringIO
 from uuid import uuid4
+import multiprocessing
+from multiprocessing import Pool
 
 import requests
 
@@ -22,10 +24,13 @@ from thrift_clients import clients
 import config
 import utils
 
+articlemeta = clients.ArticleMeta(config.ARTICLE_META_THRIFT_URL,
+                                  config.ARTICLE_META_THRIFT_PORT)
+
 logger = logging.getLogger(__name__)
 
 
-def _config_logging(logging_level='INFO', logging_file=None):
+def config_logging(logging_level='INFO', logging_file=None):
 
     allowed_levels = {
         'DEBUG': logging.DEBUG,
@@ -52,111 +57,29 @@ def _config_logging(logging_level='INFO', logging_file=None):
     return logger
 
 
-class AM2Opac(object):
-    """
-    Process to load data from Article Meta to MongoDB using OPAC Schema v1.
-    """
+def process_collection(collection):
 
-    usage = """\
-    %prog -f (full) load all data from Article Meta OR -d (distinct) only
-    difference between endpoints.
+    m_collection = models.Collection()
+    m_collection._id = str(uuid4().hex)
+    m_collection.acronym = collection.acronym
+    m_collection.name = collection.name
 
-    This process collects all Journal, Issues, Articles in the Article meta
-    http://articlemeta.scielo.org and load in MongoDB using OPAC Schema.
+    m_collection.license = 'BY/3.0'
 
-    With this process it is possible to process all data or only difference
-    between MongoDb and Article Meta, use pcitations -h to verify the options
-    list.
-    """
+    return m_collection.save()
 
-    parser = optparse.OptionParser(
-        textwrap.dedent(usage), version="prog 0.1 - beta")
 
-    parser.add_option('-f', '--full', action='store_true',
-                      help='Update all Journals, Issues and Articles')
+def process_journal(issn_collection):
 
-    parser.add_option('-r', '--rebuild_index', action='store_true',
-                      help='This will remove all data in MongoDB and load all Journals, Issues and Articles')
+    issn, collection = issn_collection
 
-    parser.add_option(
-        '--from_date',
-        '-b',
-        default=config.FROM_DATE,
-        help='From processing date (YYYY-MM-DD). Default (%s)' % config.FROM_DATE
-    )
+    connect(**config.MONGODB_SETTINGS)
 
-    parser.add_option(
-        '--logging_file',
-        '-o',
-        help='Full path to the log file'
-    )
+    try:
+        journal = articlemeta.get_journal(collection=collection, code=issn)
 
-    parser.add_option(
-        '-c', '--collection',
-        dest='collection',
-        default=None,
-        help='use the acronym of the collection eg.: spa, scl, col.')
+        logger.info("Adicionando journal %s" % journal.title)
 
-    parser.add_option(
-        '--logging_level',
-        '-l',
-        default='DEBUG',
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help='Logging level'
-    )
-
-    def __init__(self, argv):
-        self.started = None
-        self.finished = None
-
-        self.options, self.args = self.parser.parse_args(argv)
-
-        _config_logging(self.options.logging_level, self.options.logging_file)
-
-        self.articlemeta = clients.ArticleMeta('articlemeta.scielo.org', 11720)
-
-        self.m_conn = connect(**config.MONGODB_SETTINGS)
-
-    def _duration(self):
-        """
-        Return datetime process duration
-        """
-        return self.finished - self.started
-
-    def _trydate(self, str_date):
-        """
-        Try to convert like string date to datetime.
-
-        Possibilities: 2010, 2010-10, 2010-1-2
-        """
-        list_date = str_date.split('-')
-
-        if len(list_date) == 1:
-            return datetime.datetime.strptime(str_date, '%Y')
-        elif len(list_date) == 2:
-            return datetime.datetime.strptime(str_date, '%Y-%M')
-        elif len(list_date) == 3:
-            return datetime.datetime.strptime(str_date, '%Y-%M-%d')
-
-    def _transform_collection(self, collection):
-        """
-        Transform ``articlemeta.thrift.collection`` to ``opac_scielo.Collection``.
-        param: collection is the acronym of collection.
-        """
-
-        m_collection = models.Collection()
-        m_collection._id = str(uuid4().hex)
-        m_collection.acronym = collection.acronym
-        m_collection.name = collection.name
-
-        m_collection.license = 'BY/3.0'
-
-        return m_collection
-
-    def _transform_journal(self, journal):
-        """
-        Transform ``xylose.scielodocument.Journal`` to ``opac_scielo.Journal``.
-        """
         m_journal = models.Journal()
 
         # We have to define which id will be use to legacy journals.
@@ -218,14 +141,14 @@ class AM2Opac(object):
             timeline.status = status[1]
 
             # Corrigir datetime
-            timeline.since = self._trydate(status[0])
+            timeline.since = utils.trydate(status[0])
             timelines.append(timeline)
 
         m_journal.timeline = timelines
         m_journal.short_title = journal.abbreviated_title
         m_journal.index_at = journal.wos_citation_indexes
-        m_journal.updated = self._trydate(journal.update_date)
-        m_journal.created = self._trydate(journal.creation_date)
+        m_journal.updated = utils.trydate(journal.update_date)
+        m_journal.created = utils.trydate(journal.creation_date)
         m_journal.copyrighter = journal.copyrighter
         if journal.publisher_country:
             m_journal.publisher_country = journal.publisher_country[1]
@@ -243,14 +166,22 @@ class AM2Opac(object):
 
             m_journal.other_titles = other_titles
 
-        return m_journal
+        m_journal.save()
+    except Exception as e:
+        logger.error("Error %s" % e)
 
-    def _transform_issue(self, issue):
-        """
-        Transform ``xylose.scielodocument.issue`` to ``opac_scielo.Issue``.
-        """
+
+def process_issue(issn_collection):
+
+    issn, collection = issn_collection
+
+    connect(**config.MONGODB_SETTINGS)
+
+    for issue in articlemeta.issues(collection=collection, issn=issn):
 
         m_issue = models.Issue()
+
+        logger.info("Adicionando issue: %s - %s" % (issn, issue.label))
 
         # We have to define which id will be use to legacy journals.
         _id = str(uuid4().hex)
@@ -285,19 +216,18 @@ class AM2Opac(object):
 
         m_issue.pid = issue.publisher_id
 
-        return m_issue
+        m_issue.save()
 
-    def _get_rsps(self, pid):
-        """
-        Get the XML from rsps.
-        """
-        return requests.get('%sapi/v1/article/?code=%s&format=xmlrsps' % (config.ARTICLE_META_URL, pid),
-                            timeout=10)
 
-    def _transform_article(self, article):
-        """
-        Transform ``xylose.scielodocument.article`` to ``opac_scielo.Article``.
-        """
+def process_article(issn_collection):
+
+    issn, collection = issn_collection
+
+    connect(**config.MONGODB_SETTINGS)
+
+    for article in articlemeta.articles(collection=collection, issn=issn):
+
+        logger.info("Adicionando artigo: %s" % article.publisher_id)
 
         m_article = models.Article()
 
@@ -321,8 +251,6 @@ class AM2Opac(object):
             logger.error("Erro: %s" % e)
 
         m_article.title = article.original_title()
-
-        # Corrigir é necessário cadastrarmos todos as seções com todos os idiomas
 
         if article.translated_section():
             translated_sections = []
@@ -351,7 +279,7 @@ class AM2Opac(object):
         try:
             m_article.order = int(article.order)
         except ValueError as e:
-            logger.warning('Invalid order: %s-%s' % (e, article.publisher_id))
+            logger.error('Invalid order: %s-%s' % (e, article.publisher_id))
 
         htmls = []
 
@@ -367,7 +295,7 @@ class AM2Opac(object):
 
             m_article.abstract = article.original_abstract()
 
-            rsps_article = self._get_rsps(article.publisher_id).content
+            rsps_article = utils.get_rsps(article.publisher_id).content
 
             if article.authors:
                 m_article.authors = ['%s, %s' % (author['surname'], author['given_names']) for author in article.authors]
@@ -394,116 +322,153 @@ class AM2Opac(object):
 
         except Exception as e:
             logger.error("Erro inexperado: %s, %s" % (article.publisher_id, e))
-            raise
+            continue
 
         m_article.htmls = htmls
 
         m_article.pid = article.publisher_id
 
-        return m_article
+        m_article.save()
 
-    def _bulk(self):
 
-        models.Collection.objects.all().delete()
-        models.Journal.objects.all().delete()
-        models.Issue.objects.all().delete()
-        models.Article.objects.all().delete()
+def process_last_issue():
 
-        logger.info("Get collection %s." % self.options.collection)
+    connect(**config.MONGODB_SETTINGS)
 
-        # Collection
-        for col in self.articlemeta.collections():
-            if col.acronym == self.options.collection:
-                self._transform_collection(col).save()
+    # Get last issue for each Journal
+    for journal in models.Journal.objects.all():
 
-        logger.info('Get all journals...')
+        logger.info("Get last issue for journal: %s" % journal.title)
 
-        # Journal
-        for journal in self.articlemeta.journals(collection=self.options.collection):
-            journal = self._transform_journal(journal).save()
+        issue = models.Issue.objects.filter(journal=journal).order_by('-year', '-order').first()
+        issue_count = models.Issue.objects.filter(journal=journal).count()
 
-            logger.info("Journal %s-%s" % (journal.scielo_issn, journal.title_iso))
+        last_issue = articlemeta.get_issue(code=issue.pid)
 
-        logger.info('Get all issues...')
+        m_last_issue = models.LastIssue()
+        m_last_issue.volume = last_issue.volume
+        m_last_issue.number = last_issue.number
+        m_last_issue.year = last_issue.publication_date[:4]
+        m_last_issue.start_month = last_issue.start_month
+        m_last_issue.end_month = last_issue.end_month
+        m_last_issue.iid = issue.iid
+        m_last_issue.bibliographic_legend = '%s. vol.%s no.%s %s %s./%s. %s' % (issue.journal.title_iso, issue.volume, issue.number, issue.journal.publisher_state, issue.start_month, issue.end_month, issue.year)
 
-        # Issue
-        for issue in self.articlemeta.issues(collection=self.options.collection):
-            if issue.is_press_release:
-                continue
-            self._transform_issue(issue).save()
+        if last_issue.sections:
+            sections = []
+            for code, items in last_issue.sections.iteritems():
+                if items:
+                    for k, v in items.iteritems():
+                        section = models.TranslatedSection()
+                        section.name = v
+                        section.language = k
+                sections.append(section)
 
-        # Get last issue for each Journal
-        for journal in models.Journal.objects.all():
+            m_last_issue.sections = sections
 
-            logger.info('Get last issue for journal: %s' % journal.title)
+        journal.last_issue = m_last_issue
+        journal.issue_count = issue_count
+        journal.save()
 
-            issue = models.Issue.objects.filter(journal=journal).order_by('-year', '-order').first()
-            issue_count = models.Issue.objects.filter(journal=journal).count()
 
-            last_issue = self.articlemeta.get_issue(code=issue.pid)
+def bulk(options, pool):
 
-            m_last_issue = models.LastIssue()
-            m_last_issue.volume = last_issue.volume
-            m_last_issue.number = last_issue.number
-            m_last_issue.year = last_issue.publication_date[:4]
-            m_last_issue.start_month = last_issue.start_month
-            m_last_issue.end_month = last_issue.end_month
-            m_last_issue.iid = issue.iid
-            m_last_issue.bibliographic_legend = '%s. vol.%s no.%s %s %s./%s. %s' % (issue.journal.title_iso, issue.volume, issue.number, issue.journal.publisher_state, issue.start_month, issue.end_month, issue.year)
+    connect(**config.MONGODB_SETTINGS)
 
-            if last_issue.sections:
-                sections = []
-                for code, items in last_issue.sections.iteritems():
-                    if items:
-                        for k, v in items.iteritems():
-                            section = models.TranslatedSection()
-                            section.name = v
-                            section.language = k
-                    sections.append(section)
+    logger.info('Remove Collections...')
+    models.Collection.objects.all().delete()
+    logger.info('Remove Journals...')
+    models.Journal.objects.all().delete()
+    logger.info('Remove Issues...')
+    models.Issue.objects.all().delete()
+    logger.info('Remove Articles...')
+    models.Article.objects.all().delete()
 
-                m_last_issue.sections = sections
+    # Collection
+    for col in articlemeta.collections():
+        if col.acronym == options.collection:
+            logger.info("Adicionado a coleção %s" % options.collection)
+            process_collection(col)
 
-            journal.last_issue = m_last_issue
-            journal.issue_count = issue_count
-            journal.save()
+    # Get the number of ISSNs
+    issns = [(journal.scielo_issn, options.collection) for journal in articlemeta.journals(collection=options.collection)]
 
-        # Article
-        logger.info('Get all articles...')
+    issns_list = utils.split_list(issns, options.process)
 
-        for article in self.articlemeta.articles(collection=self.options.collection):
-            try:
-                m_article = self._transform_article(article).save()
+    for pissns in issns_list:
+        logger.info("Enviando para processamento os issns: %s " % pissns)
+        pool.map(process_journal, pissns)
+        pool.map(process_issue, pissns)
+        pool.map(process_article, pissns)
 
-                logger.info("Artigo salvo com sucesso: PID: %s, _id: %s" % (article.publisher_id, m_article._id))
+    logger.info("Cadastrando os últimos fascículos...")
 
-            except Exception as e:
-                logger.warning("Erro inexperado: %s" % e)
-                continue
+    process_last_issue()
 
-    def run(self):
-        """
-        Run the Loaddata switching between full and incremental indexation
-        """
 
-        self.started = datetime.datetime.now()
+def run(options, pool):
 
-        logger.info('Load Data from Article Meta to MongoDB')
+    started = datetime.datetime.now()
 
-        if self.options.full:
-            logger.info('You have selected full processing... this will take a while')
+    logger.info('Load Data from Article Meta to MongoDB')
 
-            self._bulk()
+    bulk(options, pool)
 
-        self.finished = datetime.datetime.now()
+    finished = datetime.datetime.now()
 
-        logger.info("Total processing time: %s sec." % self._duration())
+    logger.info("Total processing time: %s sec." % str(finished - started))
 
 
 def main(argv=sys.argv[1:]):
+    """
+    Process to load data from Article Meta to MongoDB using OPAC Schema v1.
+    """
 
-    command = AM2Opac(argv)
+    usage = """\
+    %prog This process collects all Journal, Issues, Articles in the Article meta
+    http://articlemeta.scielo.org and load in MongoDB using OPAC Schema.
 
-    return command.run()
+    With this process it is possible to process all data or
+    use pcitations -h to verify the options list.
+    """
+
+    parser = optparse.OptionParser(
+        textwrap.dedent(usage), version="version: 1.0")
+
+    parser.add_option(
+        '--logging_file',
+        '-o',
+        help='Full path to the log file'
+    )
+
+    parser.add_option(
+        '-c', '--collection',
+        dest='collection',
+        default=None,
+        help='Use the acronym of the collection eg.: spa, scl, col.')
+
+    parser.add_option(
+        '-p', '--num_process',
+        dest='process',
+        default=multiprocessing.cpu_count(),
+        help='Number of processes, we recommend using the number of available processors, default=number of processors')
+
+    parser.add_option(
+        '--logging_level',
+        '-l',
+        default='DEBUG',
+        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+        help='Logging level'
+    )
+
+    options, args = parser.parse_args(argv)
+
+    config_logging(options.logging_level, options.logging_file)
+
+    pool = Pool(options.process)
+
+    return run(options, pool)
+
 
 if __name__ == '__main__':
     main(sys.argv)

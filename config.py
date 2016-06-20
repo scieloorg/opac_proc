@@ -10,6 +10,9 @@ XML_CSS = "/static/css/style_article_html.css"
 
 ARTICLE_META_URL = 'http://articlemeta.scielo.org/'
 
+ARTICLE_META_THRIFT_URL = 'articlemeta.scielo.org'
+ARTICLE_META_THRIFT_PORT = 11720
+
 APP_URL = 'http://homolog.opac.scielo.org'
 
 MONGODB_DBNAME = os.environ.get('OPAC_MONGO_DB_DBNAME', 'opac')
