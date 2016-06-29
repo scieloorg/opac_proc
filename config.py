@@ -6,8 +6,6 @@ from datetime import timedelta
 
 FROM_DATE = (datetime.datetime.now()-timedelta(60)).isoformat()[:10]
 
-XML_CSS = "/static/css/style_article_html.css"
-
 ARTICLE_META_URL = 'http://articlemeta.scielo.org/'
 
 ARTICLE_META_THRIFT_URL = 'articlemeta.scielo.org'

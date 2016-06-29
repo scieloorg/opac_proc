@@ -6,8 +6,6 @@ import textwrap
 import optparse
 import datetime
 import logging.config
-from lxml import etree
-from StringIO import StringIO
 from uuid import uuid4
 import multiprocessing
 from multiprocessing import Pool
@@ -322,7 +320,7 @@ def process_article(issn_collection):
             continue
 
         m_article.htmls = htmls
-        m_article.htmls = pdfs
+        m_article.pdfs = pdfs
 
         m_article.pid = article.publisher_id
 
