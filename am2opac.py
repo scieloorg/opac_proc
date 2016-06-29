@@ -12,9 +12,6 @@ from uuid import uuid4
 import multiprocessing
 from multiprocessing import Pool
 
-import requests
-
-import packtools
 from mongoengine import connect
 
 from opac_schema.v1 import models
@@ -282,6 +279,7 @@ def process_article(issn_collection):
             logger.error('Invalid order: %s-%s' % (e, article.publisher_id))
 
         htmls = []
+        pdfs = []
 
         try:
             m_article.doi = article.doi
@@ -295,36 +293,36 @@ def process_article(issn_collection):
 
             m_article.abstract = article.original_abstract()
 
-            rsps_article = utils.get_rsps(article.publisher_id).content
-
             if article.authors:
                 m_article.authors = ['%s, %s' % (author['surname'], author['given_names']) for author in article.authors]
 
-            xml = etree.parse(StringIO(rsps_article))
-
-            for lang, output in packtools.HTMLGenerator.parse(xml, valid_only=False, css=config.XML_CSS):
-                source = etree.tostring(output, encoding="utf-8",
-                                        method="html", doctype=u"<!DOCTYPE html>")
-
-                # media = os.environ.get('OPAC_MEDIA_ROOT', '../webapp/media/')
-                # fp = open(media + 'files/%s-%s.html' % (lang, article.publisher_id), 'w')
-                # fp.write(str(output))
-                # fp.close()
-
-                resource = models.Resource()
-                resource._id = str(uuid4().hex)
-                resource.type = 'html'
-                resource.language = lang
-                resource.url = '%s/media/files/%s-%s.html' % (config.APP_URL, lang, article.publisher_id)
-                resource.save()
-
-                htmls.append(resource)
+            if article.fulltexts():
+                for text, val in article.fulltexts().items():
+                    if text == 'html':
+                        for lang, url in val.items():
+                            resource = models.Resource()
+                            resource._id = str(uuid4().hex)
+                            resource.type = 'html'
+                            resource.language = lang
+                            resource.url = url
+                            resource.save()
+                            htmls.append(resource)
+                    if text == 'pdf':
+                        for lang, url in val.items():
+                            resource = models.Resource()
+                            resource._id = str(uuid4().hex)
+                            resource.type = 'pdf'
+                            resource.language = lang
+                            resource.url = url
+                            resource.save()
+                            pdfs.append(resource)
 
         except Exception as e:
             logger.error("Erro inexperado: %s, %s" % (article.publisher_id, e))
             continue
 
         m_article.htmls = htmls
+        m_article.htmls = pdfs
 
         m_article.pid = article.publisher_id
 
@@ -375,14 +373,18 @@ def bulk(options, pool):
 
     connect(**config.MONGODB_SETTINGS)
 
-    logger.info('Remove Collections...')
+    logger.info('Removendo Collections...')
     models.Collection.objects.all().delete()
-    logger.info('Remove Journals...')
+    logger.info('Removendo Journals...')
     models.Journal.objects.all().delete()
-    logger.info('Remove Issues...')
+    logger.info('Removendo Issues...')
     models.Issue.objects.all().delete()
-    logger.info('Remove Articles...')
+    logger.info('Removendo Articles...')
     models.Article.objects.all().delete()
+    logger.info('Removendo Articles...')
+    models.Article.objects.all().delete()
+    logger.info('Removendo Resources...')
+    models.Resource.objects.all().delete()
 
     # Collection
     for col in articlemeta.collections():
@@ -395,7 +397,7 @@ def bulk(options, pool):
 
     issns_list = utils.split_list(issns, options.process)
 
-    for pissns in issns_list:
+    for i, pissns in enumerate(issns_list):
         logger.info("Enviando para processamento os issns: %s " % pissns)
         pool.map(process_journal, pissns)
         pool.map(process_issue, pissns)

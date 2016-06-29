@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import datetime
-import requests
 
 import config
 
@@ -20,14 +19,6 @@ def trydate(str_date):
         return datetime.datetime.strptime(str_date, '%Y-%M')
     elif len(list_date) == 3:
         return datetime.datetime.strptime(str_date, '%Y-%M-%d')
-
-
-def get_rsps(pid):
-    """
-    Get the XML from rsps.
-    """
-    return requests.get('%sapi/v1/article/?code=%s&format=xmlrsps' % (config.ARTICLE_META_URL, pid),
-                        timeout=10)
 
 
 def split_list(li, col):
