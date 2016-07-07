@@ -59,8 +59,6 @@ def process_collection(collection):
     m_collection.acronym = collection.acronym
     m_collection.name = collection.name
 
-    m_collection.license = 'BY/3.0'
-
     return m_collection.save()
 
 
@@ -102,20 +100,6 @@ def process_journal(issn_collection):
         m_journal.scielo_issn = journal.scielo_issn
         m_journal.print_issn = journal.print_issn
         m_journal.acronym = journal.acronym
-
-        # Create Use License
-        if journal.permissions:
-            ulicense = models.UseLicense()
-            ulicense.license_code = journal.permissions['id']
-            ulicense.reference_url = journal.permissions['url']
-
-            # Atualmente no Site SciELO existe um texto criado por nos para a
-            # lincença, irei manter vazio e montamos o texto no template com tag
-            # {% trans %} para tradução.
-            # IMPORTANTE: O chave text no Xylose retorna sempre ``None``.
-            ulicense.disclaimer = None
-
-            m_journal.use_licenses = ulicense
 
         m_journal.title = journal.title
         m_journal.title_iso = journal.abbreviated_iso_title
