@@ -19,8 +19,9 @@ from thrift_clients import clients
 import config
 import utils
 
-articlemeta = clients.ArticleMeta(config.ARTICLE_META_THRIFT_URL,
-                                  config.ARTICLE_META_THRIFT_PORT)
+articlemeta = clients.ArticleMeta(
+    config.ARTICLE_META_THRIFT_DOMAIN,
+    config.ARTICLE_META_THRIFT_PORT)
 
 logger = logging.getLogger(__name__)
 
@@ -355,18 +356,35 @@ def bulk(options, pool):
 
     connect(**config.MONGODB_SETTINGS)
 
-    logger.info('Removendo Collections...')
-    models.Collection.objects.all().delete()
-    logger.info('Removendo Journals...')
-    models.Journal.objects.all().delete()
-    logger.info('Removendo Issues...')
-    models.Issue.objects.all().delete()
-    logger.info('Removendo Articles...')
-    models.Article.objects.all().delete()
-    logger.info('Removendo Articles...')
-    models.Article.objects.all().delete()
-    logger.info('Removendo Resources...')
-    models.Resource.objects.all().delete()
+    if models.Collection.objects.count() > 0:
+        logger.info('Removendo Collections...')
+        models.Collection.objects.all().delete()
+    else:
+        logger.info('No tem Collections')
+
+    if models.Journal.objects.count() > 0:
+        logger.info('Removendo Journals...')
+        models.Journal.objects.all().delete()
+    else:
+        logger.info('No tem Journals')
+
+    if models.Issue.objects.count() > 0:
+        logger.info('Removendo Issues...')
+        models.Issue.objects.all().delete()
+    else:
+        logger.info('No tem Issue')
+
+    if models.Article.objects.count() > 0:
+        logger.info('Removendo Articles...')
+        models.Article.objects.all().delete()
+    else:
+        logger.info('No tem Articles')
+
+    if models.Resource.objects.count() > 0:
+        logger.info('Removendo Resources...')
+        models.Resource.objects.all().delete()
+    else:
+        logger.info('No tem Resources')
 
     # Collection
     for col in articlemeta.collections():
@@ -392,6 +410,18 @@ def bulk(options, pool):
 
 def run(options, pool):
 
+    logger.debug('Collection a recuperar: %s' % options.collection)
+    logger.debug('Articles Meta API: %s, at port: %s', config.ARTICLE_META_THRIFT_DOMAIN, config.ARTICLE_META_THRIFT_PORT)
+    if config.MONGODB_USER and config.MONGODB_PASS:
+        logger.debug('Target mongo db: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
+    else:
+        logger.debug('Target mongo db: mongo://{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
+
+    logger.debug('Log level: %s', options.logging_level)
+    logger.debug('Log file: %s', options.logging_file)
+    logger.debug('Numero de processadores: %s', options.process)
+
+
     started = datetime.datetime.now()
 
     logger.info('Load Data from Article Meta to MongoDB')
@@ -405,48 +435,48 @@ def run(options, pool):
 
 def main(argv=sys.argv[1:]):
     """
-    Process to load data from Article Meta to MongoDB using OPAC Schema v1.
+    Process to load data from Article Meta to MongoDB using OPAC Schema
     """
 
     usage = """\
     %prog This process collects all Journal, Issues, Articles in the Article meta
     http://articlemeta.scielo.org and load in MongoDB using OPAC Schema.
-
-    With this process it is possible to process all data or
-    use pcitations -h to verify the options list.
     """
 
     parser = optparse.OptionParser(
         textwrap.dedent(usage), version="version: 1.0")
 
+    # logger
     parser.add_option(
         '--logging_file',
         '-o',
-        help='Full path to the log file'
-    )
+        default=config.OPAC_PROC_LOG_FILE_PATH,
+        help='Full path to the log file')
 
+    parser.add_option(
+        '--logging_level',
+        '-l',
+        default=config.OPAC_PROC_LOG_LEVEL,
+        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+        help='Logging level')
+ 
+    # collection
     parser.add_option(
         '-c', '--collection',
         dest='collection',
-        default=None,
+        default=config.OPAC_PROC_COLLECTION,
         help='Use the acronym of the collection eg.: spa, scl, col.')
 
+    # processors
     parser.add_option(
         '-p', '--num_process',
         dest='process',
         default=multiprocessing.cpu_count(),
         help='Number of processes, we recommend using the number of available processors, default=number of processors')
 
-    parser.add_option(
-        '--logging_level',
-        '-l',
-        default='DEBUG',
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help='Logging level'
-    )
-
     options, args = parser.parse_args(argv)
 
+    # apply logger configuration
     config_logging(options.logging_level, options.logging_file)
 
     pool = Pool(options.process)

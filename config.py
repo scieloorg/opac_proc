@@ -4,21 +4,44 @@ import os
 import datetime
 from datetime import timedelta
 
-FROM_DATE = (datetime.datetime.now()-timedelta(60)).isoformat()[:10]
+HERE = os.path.dirname(os.path.abspath(__file__))
 
-ARTICLE_META_URL = 'http://articlemeta.scielo.org/'
+# log level
+OPAC_PROC_LOG_LEVEL =  os.environ.get('OPAC_PROC_LOG_LEVEL', 'INFO')
+# caminho absoluto (default) para o arquivo de log
+OPAC_PROC_LOG_FILE_PATH_DEFAULT = '%s/logs/%s.log' % (
+    HERE, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 
-ARTICLE_META_THRIFT_URL = 'articlemeta.scielo.org'
-ARTICLE_META_THRIFT_PORT = 11720
+# caminho absoluto para o arquivo de log
+OPAC_PROC_LOG_FILE_PATH = os.environ.get(
+    'OPAC_PROC_LOG_FILE_PATH', 
+    OPAC_PROC_LOG_FILE_PATH_DEFAULT)
 
-APP_URL = 'http://homolog.opac.scielo.org'
+# host e porta para conectar na API Thrift do Article meta
+ARTICLE_META_THRIFT_DOMAIN = os.environ.get(
+    'OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN', 
+    'articlemeta.scielo.org')
+ARTICLE_META_THRIFT_PORT = int(os.environ.get(
+    'OPAC_PROC_ARTICLE_META_THRIFT_PORT', 
+    11720))
 
-MONGODB_DBNAME = os.environ.get('OPAC_MONGO_DB_DBNAME', 'opac')
-MONGODB_HOST = os.environ.get('OPAC_MONGO_PORT_27017_TCP_ADDR', 'localhost')
-MONGODB_PORT = os.environ.get('OPAC_MONGO_PORT_27017_TCP_PORT', 27017)
+# coleção a ser processada
+OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')
+
+
+# host, porta e credenciais para conectar ao MongoDB
+MONGODB_NAME = os.environ.get('OPAC_PROC_MONGODB_NAME', 'opac')
+MONGODB_HOST = os.environ.get('OPAC_PROC_MONGODB_HOST', 'localhost')
+MONGODB_PORT = os.environ.get('OPAC_PROC_MONGODB_PORT', 27017)
+MONGODB_USER = os.environ.get('OPAC_PROC_MONGODB_USER', None)
+MONGODB_PASS = os.environ.get('OPAC_PROC_MONGODB_PASS', None)
 
 MONGODB_SETTINGS = {
-    'db': MONGODB_DBNAME,
+    'db': MONGODB_NAME,
     'host': MONGODB_HOST,
     'port': int(MONGODB_PORT),
 }
+
+if MONGODB_USER and MONGODB_PASS:
+    MONGODB_SETTINGS['username'] = MONGODB_USER
+    MONGODB_SETTINGS['password'] = MONGODB_PASS
