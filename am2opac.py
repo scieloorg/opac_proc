@@ -38,7 +38,7 @@ def config_logging(logging_level='INFO', logging_file=None):
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-    logger.setLevel(allowed_levels.get(logging_level, 'INFO'))
+    logger.setLevel(allowed_levels.get(logging_level, config.OPAC_PROC_LOG_LEVEL))
 
     if logging_file:
         hl = logging.FileHandler(logging_file, mode='a')
@@ -148,7 +148,8 @@ def process_journal(issn_collection):
 
         m_journal.save()
     except Exception as e:
-        logger.error("Error %s" % e)
+        logger.error("Exception %s. Processando Journal (ISSN: %s, Collection: %s)" % (
+            str(e), issn, collection))
 
 
 def process_issue(issn_collection):
@@ -178,7 +179,7 @@ def process_issue(issn_collection):
             journal = models.Journal.objects.get(scielo_issn=issue.journal.scielo_issn)
             m_issue.journal = journal
         except Exception as e:
-            logger.warning("Erro get journal with ISSN: %s, TraceBack: %s" % (issue.journal.scielo_issn, str(e)))
+            logger.warning("Erro obtendo journal com ISSN: %s, Exception: %s" % (issue.journal.scielo_issn, str(e)))
 
         m_issue.volume = issue.volume
         m_issue.number = issue.number
@@ -219,7 +220,7 @@ def process_article(issn_collection):
             issue = models.Issue.objects.get(pid=article.issue.publisher_id)
             m_article.issue = issue
         except DoesNotExist as e:
-            logger.warning("Article without issue %s" % str(article.publisher_id))
+            logger.warning("Artigo SEM issue. publisher_id: %s" % str(article.publisher_id))
         except Exception as e:
             logger.error("Erro ao tentar acessar o atributo issue do artigo: %s, Erro %s" % (str(article.publisher_id), e))
 
@@ -301,7 +302,7 @@ def process_article(issn_collection):
                             pdfs.append(resource)
 
         except Exception as e:
-            logger.error("Erro inexperado: %s, %s" % (article.publisher_id, e))
+            logger.error("Erro inesperado: %s, %s" % (article.publisher_id, e))
             continue
 
         m_article.htmls = htmls
@@ -319,7 +320,7 @@ def process_last_issue():
     # Get last issue for each Journal
     for journal in models.Journal.objects.all():
 
-        logger.info("Get last issue for journal: %s" % journal.title)
+        logger.info("Recuperando last issue do journal: %s" % journal.title)
 
         issue = models.Issue.objects.filter(journal=journal).order_by('-year', '-order').first()
         issue_count = models.Issue.objects.filter(journal=journal).count()
@@ -354,42 +355,15 @@ def process_last_issue():
 
 def bulk(options, pool):
 
-    connect(**config.MONGODB_SETTINGS)
-
-    if models.Collection.objects.count() > 0:
-        logger.info('Removendo Collections...')
-        models.Collection.objects.all().delete()
-    else:
-        logger.info('No tem Collections')
-
-    if models.Journal.objects.count() > 0:
-        logger.info('Removendo Journals...')
-        models.Journal.objects.all().delete()
-    else:
-        logger.info('No tem Journals')
-
-    if models.Issue.objects.count() > 0:
-        logger.info('Removendo Issues...')
-        models.Issue.objects.all().delete()
-    else:
-        logger.info('No tem Issue')
-
-    if models.Article.objects.count() > 0:
-        logger.info('Removendo Articles...')
-        models.Article.objects.all().delete()
-    else:
-        logger.info('No tem Articles')
-
-    if models.Resource.objects.count() > 0:
-        logger.info('Removendo Resources...')
-        models.Resource.objects.all().delete()
-    else:
-        logger.info('No tem Resources')
+    db = connect(**config.MONGODB_SETTINGS)
+    db_name = config.MONGODB_SETTINGS['db']
+    db.drop_database(db_name)
+    logger.info("Banco de dado (%s) removido completamente!" % db_name)
 
     # Collection
     for col in articlemeta.collections():
         if col.acronym == options.collection:
-            logger.info("Adicionado a coleção %s" % options.collection)
+            logger.info("Adicionado a coleção: %s" % options.collection)
             process_collection(col)
 
     # Get the number of ISSNs
@@ -398,7 +372,7 @@ def bulk(options, pool):
     issns_list = utils.split_list(issns, options.process)
 
     for i, pissns in enumerate(issns_list):
-        logger.info("Enviando para processamento os issns: %s " % pissns)
+        logger.info("Enviando para processamento os issns: %s" % pissns)
         pool.map(process_journal, pissns)
         pool.map(process_issue, pissns)
         pool.map(process_article, pissns)
@@ -410,37 +384,38 @@ def bulk(options, pool):
 
 def run(options, pool):
 
-    logger.debug('Collection a recuperar: %s' % options.collection)
+    logger.info('Coleção alvo: %s' % options.collection)
     logger.debug('Articles Meta API: %s, at port: %s', config.ARTICLE_META_THRIFT_DOMAIN, config.ARTICLE_META_THRIFT_PORT)
     if config.MONGODB_USER and config.MONGODB_PASS:
-        logger.debug('Target mongo db: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
+        logger.debug('Conexão e credenciais do banco: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
     else:
-        logger.debug('Target mongo db: mongo://{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
+        logger.debug('Conexão sem credenciais do banco: mongo://{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
 
     logger.debug('Log level: %s', options.logging_level)
     logger.debug('Log file: %s', options.logging_file)
     logger.debug('Numero de processadores: %s', options.process)
 
-
     started = datetime.datetime.now()
-
-    logger.info('Load Data from Article Meta to MongoDB')
+    logger.info('Inicialização o processo: %s', started)
 
     bulk(options, pool)
 
     finished = datetime.datetime.now()
+    logger.info('Finalização do processo: %s', finished)
 
-    logger.info("Total processing time: %s sec." % str(finished - started))
+    elapsed_time = str(finished - started)
+    logger.info("Tempo total de processamento: %s sec." % elapsed_time)
 
 
 def main(argv=sys.argv[1:]):
     """
-    Process to load data from Article Meta to MongoDB using OPAC Schema
+    Processo para carregar dados desde o Article Meta para o MongoDB usado pelo OPAC
     """
 
     usage = """\
-    %prog This process collects all Journal, Issues, Articles in the Article meta
-    http://articlemeta.scielo.org and load in MongoDB using OPAC Schema.
+    %prog Este processamento coleta todos os Journal, Issues, Articles do Article meta,
+    de uma determinada coleção, armazenando estes dados em um banco MongoDB,
+    que serão exposto pelo OPAC.
     """
 
     parser = optparse.OptionParser(
@@ -451,7 +426,7 @@ def main(argv=sys.argv[1:]):
         '--logging_file',
         '-o',
         default=config.OPAC_PROC_LOG_FILE_PATH,
-        help='Full path to the log file')
+        help='Caminho absoluto do log file')
 
     parser.add_option(
         '--logging_level',
@@ -459,13 +434,13 @@ def main(argv=sys.argv[1:]):
         default=config.OPAC_PROC_LOG_LEVEL,
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         help='Logging level')
- 
+
     # collection
     parser.add_option(
         '-c', '--collection',
         dest='collection',
         default=config.OPAC_PROC_COLLECTION,
-        help='Use the acronym of the collection eg.: spa, scl, col.')
+        help='Acronimo da coleção. Por exemplo: spa, scl, col.')
 
     # processors
     parser.add_option(

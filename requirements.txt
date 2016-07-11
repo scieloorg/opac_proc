@@ -1,0 +1,5 @@
+thriftpy
+mongoengine
+-e git+https://git@github.com/scieloorg/opac_schema@v2.10#egg=opac_schema
+-e git+https://github.com/scieloorg/xylose@1.2.3#egg=xylose
+
