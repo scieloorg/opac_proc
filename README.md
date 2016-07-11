@@ -18,7 +18,7 @@ docker pull scieloorg/opac_proc
 ```
 
 
-### Build
+### docker build
 
 Se você quer contruir a imagem localmente, execute:
 
@@ -27,7 +27,7 @@ docker build -t opac_proc .
 ```
 
 
-### Run
+### docker run
 
 Neste exemplo vamos a executar o processamento sobre a coleção com acorônimo: ``spa``, mepeando o volume ``/app/logs`` ao diretorio local: ``/tmp/opac_proc_logs/``.
 Também indicamos como acessar a instância do MongoDB para escrever os dados (localhost:27017) e que queremos utilzar o banco: ``opac_test``.
@@ -65,3 +65,14 @@ Existem outros parametros de configuração, veja a continuação.
 O arquivo de log fica armazendo na pasta ``/app/logs/``. O nome do arquivo é a data de execução com formato: ``YYYY-MM-DD.log``.
 
 O diretorio de armazenamento do logs, esta disponível como volume (ver exemplo de docker run acima).
+
+
+### rodar com docker-compose:
+
+Editar/ajustar os parâmetros no arquivo ``docker-compose.yml`` e executar
+
+```
+docker-compose up
+```
+
+**OBS**: sempre vai recuparar a imagem de: ``scieloorg/opac_proc``, para rodar com a instância local, troque: ``image: scieloorg/opac_proc`` por: ``build: .``

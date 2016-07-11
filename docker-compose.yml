@@ -1,0 +1,32 @@
+version: '2'
+
+networks:
+   opac-network:
+    external: true
+
+services:
+
+    opac_mongo:
+        image: mongo
+        restart: always
+        ports:
+          - "27017:27017"
+        hostname: opac-mongo
+        networks:
+            - opac-network
+
+    opac_proc:
+        image: scieloorg/opac_proc
+        restart: on-failure:3
+        volumes:
+            - /tmp/opac_proc_logs:/app/logs
+        links:
+            - opac_mongo:opac-mongo
+        environment:
+            - OPAC_PROC_COLLECTION=spa
+            - OPAC_PROC_MONGODB_HOST=opac-mongo
+            - OPAC_PROC_MONGODB_PORT=27017
+            - OPAC_PROC_MONGODB_NAME=opac_db
+            - OPAC_PROC_LOG_LEVEL=DEBUG
+        networks:
+            - opac-network
