@@ -101,6 +101,7 @@ def process_journal(issn_collection):
         m_journal.scielo_issn = journal.scielo_issn
         m_journal.print_issn = journal.print_issn
         m_journal.acronym = journal.acronym
+        m_journal.previous_title = journal.previous_title
 
         m_journal.title = journal.title
         m_journal.title_iso = journal.abbreviated_iso_title
@@ -412,42 +413,42 @@ def main(argv=sys.argv[1:]):
     Processo para carregar dados desde o Article Meta para o MongoDB usado pelo OPAC
     """
 
-    usage = """\
+    usage = u"""\
     %prog Este processamento coleta todos os Journal, Issues, Articles do Article meta,
     de uma determinada coleção, armazenando estes dados em um banco MongoDB,
     que serão exposto pelo OPAC.
     """
 
     parser = optparse.OptionParser(
-        textwrap.dedent(usage), version="version: 1.0")
+        textwrap.dedent(usage), version=u"version: 1.0")
 
     # logger
     parser.add_option(
         '--logging_file',
         '-o',
         default=config.OPAC_PROC_LOG_FILE_PATH,
-        help='Caminho absoluto do log file')
+        help=u'Caminho absoluto do log file')
 
     parser.add_option(
         '--logging_level',
         '-l',
         default=config.OPAC_PROC_LOG_LEVEL,
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help='Logging level')
+        help=u'Logging level')
 
     # collection
     parser.add_option(
         '-c', '--collection',
         dest='collection',
         default=config.OPAC_PROC_COLLECTION,
-        help='Acronimo da coleção. Por exemplo: spa, scl, col.')
+        help=u'Acronimo da coleção. Por exemplo: spa, scl, col.')
 
     # processors
     parser.add_option(
         '-p', '--num_process',
         dest='process',
         default=multiprocessing.cpu_count(),
-        help='Number of processes, we recommend using the number of available processors, default=number of processors')
+        help=u'Number of processes, we recommend using the number of available processors, default=number of processors')
 
     options, args = parser.parse_args(argv)
 
