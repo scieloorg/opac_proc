@@ -80,7 +80,9 @@ class ArticleMeta(object):
 
         except:
             msg = 'Error retrieving journal: %s_%s' % (collection, code)
-            raise ServerError(msg)
+            # raise ServerError(msg)
+            logger.error(msg)
+            pass
 
     def exists_article(self, code, collection):
         try:
@@ -90,7 +92,9 @@ class ArticleMeta(object):
             )
         except:
             msg = 'Error checking if document exists: %s_%s' % (collection, code)
-            raise ServerError(msg)
+            # raise ServerError(msg)
+            logger.error(msg)
+            pass
 
     def set_doaj_id(self, code, collection, doaj_id):
         try:
@@ -101,7 +105,9 @@ class ArticleMeta(object):
             )
         except:
             msg = 'Error senting doaj id for document: %s_%s' % (collection, code)
-            raise ServerError(msg)
+            # raise ServerError(msg)
+            logger.error(msg)
+            pass
 
     def document(self, code, collection, replace_journal_metadata=True, fmt='xylose'):
         try:
@@ -113,7 +119,9 @@ class ArticleMeta(object):
             )
         except:
             msg = 'Error retrieving document: %s_%s' % (collection, code)
-            raise ServerError(msg)
+            # raise ServerError(msg)
+            logger.error(msg)
+            pass
 
         jarticle = None
         try:
@@ -186,7 +194,9 @@ class ArticleMeta(object):
 
                 except:
                     msg = 'Error retrieving issue: %s_%s' % (collection, identifier)
-                    raise ServerError(msg)
+                    # raise ServerError(msg)
+                    logger.error(msg)
+                    pass
 
             offset += 1000
 
@@ -202,7 +212,9 @@ class ArticleMeta(object):
 
         except:
             msg = 'Error retrieving issue: %s_%s' % (collection, identifier)
-            raise ServerError(msg)
+            # raise ServerError(msg)
+            logger.error(msg)
+            pass
 
     def articles(self, collection=None, issn=None, from_date=None, until_date=None):
 
@@ -228,6 +240,8 @@ class ArticleMeta(object):
 
                 except:
                     msg = 'Error retrieving issue: %s_%s' % (collection, identifier)
-                    raise ServerError(msg)
+                    # raise ServerError(msg)
+                    logger.error(msg)
+                    pass
 
             offset += 1000
