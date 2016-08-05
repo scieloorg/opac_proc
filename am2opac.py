@@ -323,39 +323,40 @@ def process_last_issue(issn):
     # Get last issue for each Journal
     journal = models.Journal.objects.get(scielo_issn=issn)
 
-    logger.info("Recuperando last issue do journal: %s" % journal.title)
-
+    logger.info(u"Recuperando último fascículo journal: %s" % journal.title)
 
     issue = models.Issue.objects.filter(journal=journal).order_by('-year', '-order').first()
     issue_count = models.Issue.objects.filter(journal=journal).count()
 
-    last_issue = articlemeta.get_issue(code=issue.pid)
+    if issue:
+        last_issue = articlemeta.get_issue(code=issue.pid)
 
-    m_last_issue = models.LastIssue()
-    m_last_issue.volume = last_issue.volume
-    m_last_issue.number = last_issue.number
-    m_last_issue.year = last_issue.publication_date[:4]
-    m_last_issue.start_month = last_issue.start_month
-    m_last_issue.end_month = last_issue.end_month
-    m_last_issue.iid = issue.iid
-    m_last_issue.bibliographic_legend = '%s. vol.%s no.%s %s %s./%s. %s' % (issue.journal.title_iso, issue.volume, issue.number, issue.journal.publisher_state, issue.start_month, issue.end_month, issue.year)
+        m_last_issue = models.LastIssue()
+        m_last_issue.volume = last_issue.volume
+        m_last_issue.number = last_issue.number
+        m_last_issue.year = last_issue.publication_date[:4]
+        m_last_issue.start_month = last_issue.start_month
+        m_last_issue.end_month = last_issue.end_month
+        m_last_issue.iid = issue.iid
+        m_last_issue.bibliographic_legend = '%s. vol.%s no.%s %s %s./%s. %s' % (issue.journal.title_iso, issue.volume, issue.number, issue.journal.publisher_state, issue.start_month, issue.end_month, issue.year)
 
-    if last_issue.sections:
-        sections = []
-        for code, items in last_issue.sections.iteritems():
-            if items:
-                for k, v in items.iteritems():
-                    section = models.TranslatedSection()
-                    section.name = v
-                    section.language = k
-            sections.append(section)
+        if last_issue.sections:
+            sections = []
+            for code, items in last_issue.sections.iteritems():
+                if items:
+                    for k, v in items.iteritems():
+                        section = models.TranslatedSection()
+                        section.name = v
+                        section.language = k
+                sections.append(section)
 
-        m_last_issue.sections = sections
+            m_last_issue.sections = sections
 
-    journal.last_issue = m_last_issue
-    journal.issue_count = issue_count
-    journal.save()
-
+        journal.last_issue = m_last_issue
+        journal.issue_count = issue_count
+        journal.save()
+    else:
+        logger.info(u"Impossível recuperar o último fascículo para o períodico: %s" % journal.title)
 
 def bulk(options, pool):
 
