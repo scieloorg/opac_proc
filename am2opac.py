@@ -318,6 +318,8 @@ def process_article(issn_collection):
 
 def process_last_issue(issn):
 
+    logger.info("Cadastrando os últimos fascículos...")
+
     connect(**config.MONGODB_SETTINGS)
 
     # Get last issue for each Journal
@@ -381,8 +383,6 @@ def bulk(options, pool):
         pool.map(process_journal, pissns)
         pool.map(process_issue, pissns)
         pool.map(process_article, pissns)
-
-    logger.info("Cadastrando os últimos fascículos...")
 
 
 def run(options, pool):
