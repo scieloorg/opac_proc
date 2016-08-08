@@ -360,6 +360,7 @@ def process_last_issue(issn):
     else:
         logger.info(u"Impossível recuperar o último fascículo para o períodico: %s" % journal.title)
 
+
 def bulk(options, pool):
 
     db = connect(**config.MONGODB_SETTINGS)
