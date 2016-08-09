@@ -282,8 +282,9 @@ def process_article(issn_collection):
             m_article.created = datetime.datetime.now()
             m_article.updated = datetime.datetime.now()
 
-            m_article.languages = article.languages()
             m_article.original_language = article.original_language()
+
+            m_article.languages = list(set(article.languages() + m_article.abstract_languages))
 
             m_article.abstract = article.original_abstract()
 
