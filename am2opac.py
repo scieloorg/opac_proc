@@ -402,7 +402,7 @@ def run(options, pool):
     else:
         logger.debug(u'Conexão sem credenciais do banco: mongo://{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
 
-    logger.debug(u'Categoria do log: %s', options.logging_level)
+    logger.debug(u'Nível do log: %s', options.logging_level)
     logger.debug(u'Arquivo de log: %s', options.logging_file)
     logger.debug(u'Número de processadores: %s', options.process)
 
@@ -443,13 +443,13 @@ def main(argv=sys.argv[1:]):
         default=config.OPAC_PROC_LOG_FILE_PATH,
         help=u'Caminho absoluto do log file')
 
-    # Categoria do log
+    # Nível do log
     parser.add_option(
         '--logging_level',
         '-l',
         default=config.OPAC_PROC_LOG_LEVEL,
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help=u'Categoria do log')
+        help=u'Nível do log')
 
     # Coleção
     parser.add_option(
