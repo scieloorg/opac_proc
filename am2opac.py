@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import sys
+import signal
 import textwrap
 import optparse
 import datetime
@@ -24,6 +25,9 @@ articlemeta = clients.ArticleMeta(
     config.ARTICLE_META_THRIFT_PORT)
 
 logger = logging.getLogger(__name__)
+
+def init_worker():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 
 def config_logging(logging_level='INFO', logging_file=None):
@@ -72,7 +76,7 @@ def process_journal(issn_collection):
     try:
         journal = articlemeta.get_journal(collection=collection, code=issn)
 
-        logger.info("Adicionando journal %s" % journal.title)
+        logger.info(u"Adicionando journal %s" % journal.title)
 
         m_journal = models.Journal()
 
@@ -149,7 +153,7 @@ def process_journal(issn_collection):
 
         m_journal.save()
     except Exception as e:
-        logger.error("Exception %s. Processando Journal (ISSN: %s, Collection: %s)" % (
+        logger.error(u"Exception %s. Processando Journal (ISSN: %s, Collection: %s)" % (
             str(e), issn, collection))
 
 
@@ -163,7 +167,7 @@ def process_issue(issn_collection):
 
         m_issue = models.Issue()
 
-        logger.info("Adicionando issue: %s - %s" % (issn, issue.label))
+        logger.info(u"Adicionando issue: %s - %s" % (issn, issue.label))
 
         # We have to define which id will be use to legacy journals.
         _id = str(uuid4().hex)
@@ -180,7 +184,7 @@ def process_issue(issn_collection):
             journal = models.Journal.objects.get(scielo_issn=issue.journal.scielo_issn)
             m_issue.journal = journal
         except Exception as e:
-            logger.warning("Erro obtendo journal com ISSN: %s, Exception: %s" % (issue.journal.scielo_issn, str(e)))
+            logger.warning(u"Erro obtendo journal com ISSN: %s, Exception: %s" % (issue.journal.scielo_issn, str(e)))
 
         m_issue.volume = issue.volume
         m_issue.number = issue.number
@@ -211,7 +215,7 @@ def process_article(issn_collection):
 
     for article in articlemeta.articles(collection=collection, issn=issn):
 
-        logger.info("Adicionando artigo: %s" % article.publisher_id)
+        logger.info(u"Adicionando artigo: %s" % article.publisher_id)
 
         m_article = models.Article()
 
@@ -223,18 +227,21 @@ def process_article(issn_collection):
             issue = models.Issue.objects.get(pid=article.issue.publisher_id)
             m_article.issue = issue
         except DoesNotExist as e:
-            logger.warning("Artigo SEM issue. publisher_id: %s" % str(article.publisher_id))
+            logger.warning(u"Artigo SEM issue. publisher_id: %s" % str(article.publisher_id))
         except Exception as e:
-            logger.error("Erro ao tentar acessar o atributo issue do artigo: %s, Erro %s" % (str(article.publisher_id), e))
+            logger.error(u"Erro ao tentar acessar o atributo issue do artigo: %s, Erro %s" % (str(article.publisher_id), e))
 
         try:
             journal = models.Journal.objects.get(
                 scielo_issn=article.journal.scielo_issn)
             m_article.journal = journal
         except Exception as e:
-            logger.error("Erro: %s" % e)
+            logger.error(u"Erro: %s" % e)
 
         m_article.title = article.original_title()
+
+        if article.translated_abstracts():
+            m_article.abstract_languages = article.translated_abstracts().keys()
 
         if article.translated_section():
             translated_sections = []
@@ -263,7 +270,7 @@ def process_article(issn_collection):
         try:
             m_article.order = int(article.order)
         except ValueError as e:
-            logger.error('Invalid order: %s-%s' % (e, article.publisher_id))
+            logger.error(u'Ordenação inválida: %s-%s' % (e, article.publisher_id))
 
         htmls = []
         pdfs = []
@@ -305,7 +312,7 @@ def process_article(issn_collection):
                             pdfs.append(resource)
 
         except Exception as e:
-            logger.error("Erro inesperado: %s, %s" % (article.publisher_id, e))
+            logger.error(u"Erro inesperado: %s, %s" % (article.publisher_id, e))
             continue
 
         m_article.htmls = htmls
@@ -366,12 +373,12 @@ def bulk(options, pool):
     db = connect(**config.MONGODB_SETTINGS)
     db_name = config.MONGODB_SETTINGS['db']
     db.drop_database(db_name)
-    logger.info("Banco de dado (%s) removido completamente!" % db_name)
+    logger.info(u"Banco de dado (%s) removido completamente!" % db_name)
 
     # Collection
     for col in articlemeta.collections():
         if col.acronym == options.collection:
-            logger.info("Adicionado a coleção: %s" % options.collection)
+            logger.info(u"Adicionado a coleção: %s" % options.collection)
             process_collection(col)
 
     # Get the number of ISSNs
@@ -380,7 +387,7 @@ def bulk(options, pool):
     issns_list = utils.split_list(issns, options.process)
 
     for i, pissns in enumerate(issns_list):
-        logger.info("Enviando para processamento os issns: %s" % pissns)
+        logger.info(u"Enviando para processamento os issns: %s" % pissns)
         pool.map(process_journal, pissns)
         pool.map(process_issue, pissns)
         pool.map(process_article, pissns)
@@ -388,27 +395,31 @@ def bulk(options, pool):
 
 def run(options, pool):
 
-    logger.info('Coleção alvo: %s' % options.collection)
-    logger.debug('Articles Meta API: %s, at port: %s', config.ARTICLE_META_THRIFT_DOMAIN, config.ARTICLE_META_THRIFT_PORT)
+    logger.info(u'Coleção alvo: %s' % options.collection)
+    logger.debug(u'Articles Meta API: %s, at port: %s', config.ARTICLE_META_THRIFT_DOMAIN, config.ARTICLE_META_THRIFT_PORT)
     if config.MONGODB_USER and config.MONGODB_PASS:
-        logger.debug('Conexão e credenciais do banco: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
+        logger.debug(u'Conexão e credenciais do banco: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
     else:
-        logger.debug('Conexão sem credenciais do banco: mongo://{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
+        logger.debug(u'Conexão sem credenciais do banco: mongo://{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
 
-    logger.debug('Log level: %s', options.logging_level)
-    logger.debug('Log file: %s', options.logging_file)
-    logger.debug('Numero de processadores: %s', options.process)
+    logger.debug(u'Categoria do log: %s', options.logging_level)
+    logger.debug(u'Arquivo de log: %s', options.logging_file)
+    logger.debug(u'Número de processadores: %s', options.process)
 
     started = datetime.datetime.now()
-    logger.info('Inicialização o processo: %s', started)
+    logger.info(u'Inicialização o processo: %s', started)
 
     bulk(options, pool)
 
     finished = datetime.datetime.now()
-    logger.info('Finalização do processo: %s', finished)
+    logger.info(u'Finalização do processo: %s', finished)
 
     elapsed_time = str(finished - started)
-    logger.info("Tempo total de processamento: %s sec." % elapsed_time)
+    logger.info(u"Tempo total de processamento: %s sec." % elapsed_time)
+
+    logger.info(U"Processamento finalizado com sucesso.")
+    pool.close()
+    pool.join()
 
 
 def main(argv=sys.argv[1:]):
@@ -425,43 +436,47 @@ def main(argv=sys.argv[1:]):
     parser = optparse.OptionParser(
         textwrap.dedent(usage), version=u"version: 1.0")
 
-    # logger
+    # Arquivo de log
     parser.add_option(
         '--logging_file',
         '-o',
         default=config.OPAC_PROC_LOG_FILE_PATH,
         help=u'Caminho absoluto do log file')
 
+    # Categoria do log
     parser.add_option(
         '--logging_level',
         '-l',
         default=config.OPAC_PROC_LOG_LEVEL,
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        help=u'Logging level')
+        help=u'Categoria do log')
 
-    # collection
+    # Coleção
     parser.add_option(
         '-c', '--collection',
         dest='collection',
         default=config.OPAC_PROC_COLLECTION,
         help=u'Acronimo da coleção. Por exemplo: spa, scl, col.')
 
-    # processors
+    # Número de processos
     parser.add_option(
         '-p', '--num_process',
         dest='process',
         default=multiprocessing.cpu_count(),
-        help=u'Number of processes, we recommend using the number of available processors, default=number of processors')
+        help=u'Número de processadores, o recomendado é utilizar a quantidade de processadores disponíveis na máquina.')
 
     options, args = parser.parse_args(argv)
 
-    # apply logger configuration
     config_logging(options.logging_level, options.logging_file)
 
-    pool = Pool(options.process)
+    pool = Pool(options.process, init_worker)
 
-    return run(options, pool)
-
+    try:
+        return run(options, pool)
+    except KeyboardInterrupt:
+        logger.info(u"Processamento interrompido pelo usuário.")
+        pool.terminate()
+        pool.join()
 
 if __name__ == '__main__':
     main(sys.argv)
