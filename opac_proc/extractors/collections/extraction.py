@@ -1,72 +1,65 @@
 # coding: utf-8
-from __future__ import unicode_literals
-from opac_proc.extractors.source_clients.thrift import am_clients
-from opac_proc.datastore.mongodb_connector import get_db_connection
-from opac_proc.datastore.models.collection import Collection
 import logging
-import config
+from datetime import datetime
+
+from opac_proc.datastore.extract.models import ExtractCollection
+from opac_proc.extractors.base import BaseExtractor
 
 
 logger = logging.getLogger(__name__)
 
 
-class CExtactor(object):
-    """docstring for CExtactor"""
+class ColectionExtactor(BaseExtractor):
     acronym = None
-    db = None
-    raw_data = []
-    articlemeta = None
+    children_ids = []
 
-    extract_attributes = [
-        # atributos a serem extraidos
-        'code',
-        'name',
-        'acronym',
-    ]
+    model_class = ExtractCollection
+    model_name = 'ExtractCollection'
 
     def __init__(self, acronym):
+        super(ColectionExtactor, self).__init__()
         self.acronym = acronym
-        self.db = get_db_connection()
-        self.articlemeta = am_clients.ArticleMeta(
-            config.ARTICLE_META_THRIFT_DOMAIN,
-            config.ARTICLE_META_THRIFT_PORT)
 
     def extract(self):
         """
         Conecta com a fonte (AM) e extrai todos os dados (coleção).
-        -> método: get_raw_data para obter os resultados do extract
-        -> método: save() para salvar
-        -> método: to_python() para retornar os dados coletados como objetos pytho (dict/lists)
         """
-        for col in self.articlemeta.collections():
-            if col.acronym == self.acronym:
+        super(ColectionExtactor, self).extract()
+        logger.info(u'Inicia ColectionExtactor.extract(%s) %s' % (self.acronym, datetime.now()))
+
+        cols = self.articlemeta.collections()
+        for col in cols:
+            if col['acronym'] == self.acronym:
                 logger.info(u"Adicionado a coleção: %s" % self.acronym)
-                self.raw_data.append(col)
+                print u"Adicionado a coleção: %s" % self.acronym
+                self._raw_data = col
                 break
 
-    def filter_raw_data(self):
-        return 'TODO!'
+        if not self._raw_data:
+            msg = u"Não foi possível recuperar a Coleção (acronym: %s). A informação é vazía" % self.acronym
+            logger.error(msg)
+            raise Exception(msg)
 
-    @property
-    def get_raw_data(self):
-        """
-        Retorna a todos os dados coletados de forma crúa (objetos thrift)
-        """
-        return self.raw_data
+        logger.info(u'Extração de ISSNs da coleção: %s - %s' % (self.acronym, datetime.now()))
+        # recuperamos os identificadores ISSNs
+        journals_ids = self.articlemeta.get_journal_identifiers(collection=self.acronym)
+        for issn in journals_ids:
+            issues_ids = self.articlemeta.get_issues_identifiers(collection=self.acronym, issn=issn)
+            articles_ids = self.articlemeta.get_article_identifiers(collection=self.acronym, issn=issn)
 
-    def save(self):
-        """"
-        Salva os dados coletados no datastore (mongo)
-        """
+            self.children_ids.append({
+                'issn': issn,
+                'issues_ids': [id for id in issues_ids],
+                'articles_ids': [id for id in articles_ids],
+            })
 
-        try:
-            if self.raw_data:
-                c = Collection()
-                c.acronym = raw_data.acronym
-                c.name = raw_data.name
-            else:
-                logger.error("Não foi possível salvar a Coleção (acronym: %s). A informação é vazía" % self.acronym)
-        except Exception, e:
-            logger.error("Não foi possível salvar a Coleção (acronym: %s). %s" % (self.acronym, str(e)))
-            raise e
+        logger.info(u'Extraidos %s ISSNs da coleção: %s - %s' % (len(self.children_ids), self.acronym, datetime.now()))
 
+        if not self.children_ids:
+            msg = u"Não foi possível recuperar os ISSNs da Coleção (acronym: %s). A informação é vazía" % self.acronym
+            logger.error(msg)
+            raise Exception(msg)
+        else:
+            # atualizo self.metadata para que self.children_ids seja salvo junto com self.raw_data no save()
+            self.metadata['children_ids'] = self.children_ids
+        logger.info(u'Fim ColectionExtactor.extract(%s) %s' % (self.acronym, datetime.now()))

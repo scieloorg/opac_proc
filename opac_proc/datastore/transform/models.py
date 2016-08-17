@@ -15,7 +15,7 @@ from mongoengine import (
 )
 
 
-class BaseExtractionMixin(object):
+class BaseTransformMixin(object):
 
     # # campos relacionados a transformação
     transform_start_at = DateTimeField()
@@ -34,7 +34,7 @@ class BaseExtractionMixin(object):
         return not self.extraction_complete
 
     @property
-    def has_transform_error(self):
+    def has_errors(self):
         """
         Retorna True se o documento poduziu algum error
         na fase de transformação.
@@ -61,17 +61,25 @@ class BaseExtractionMixin(object):
         self.loading_error_msg = ''
 
 
-class ExtractCollection(BaseExtractionMixin, BaseDynamicDocument):
-    pass
+class TransformCollection(BaseTransformMixin, DynamicDocument):
+    meta = {
+        'collection': 't_collection'
+    }
 
 
-class ExtractJournal(BaseExtractionMixin, BaseDynamicDocument):
-    pass
+class TransformJournal(BaseTransformMixin, DynamicDocument):
+    meta = {
+        'collection': 't_collection'
+    }
 
 
-class Issue(BaseExtractionMixin, BaseDynamicDocument):
-    pass
+class TransformIssue(BaseTransformMixin, DynamicDocument):
+    meta = {
+        'collection': 't_collection'
+    }
 
 
-class Article(BaseExtractionMixin, BaseDynamicDocument):
-    pass
+class TransformArticle(BaseTransformMixin, DynamicDocument):
+    meta = {
+        'collection': 't_collection'
+    }

@@ -7,7 +7,7 @@ import logging
 from datetime import date
 
 from thriftpy.rpc import make_client
-from xylose.scielodocument import Article, Journal, Issue
+# from xylose.scielodocument import Article, Journal, Issue
 
 LIMIT = 1000
 
@@ -45,7 +45,7 @@ class ArticleMeta(object):
         )
         return client
 
-    def journals(self, collection=None, issn=None):
+    def get_journal_identifiers(self, collection=None, issn=None, from_date=None, until_date=None):
         offset = 0
         while True:
             identifiers = self.client.get_journal_identifiers(collection=collection, issn=issn, limit=LIMIT, offset=offset)
@@ -53,118 +53,12 @@ class ArticleMeta(object):
                 raise StopIteration
 
             for identifier in identifiers:
-
-                journal = self.client.get_journal(
-                    code=identifier.code[0], collection=identifier.collection)
-
-                jjournal = json.loads(journal)
-
-                xjournal = Journal(jjournal)
-
-                logger.info('Journal loaded: %s_%s' % (identifier.collection, identifier.code))
-
-                yield xjournal
+                yield identifier.code[0]
 
             offset += 1000
 
-    def get_journal(self, code, collection=None):
-        try:
-            journal = self.client.get_journal(code=code, collection=collection)
-
-            jjournal = json.loads(journal)
-
-            xjournal = Journal(jjournal)
-
-            logger.info('Journal loaded: %s_%s' % (collection, code))
-
-            return xjournal
-
-        except:
-            msg = 'Error retrieving journal: %s_%s' % (collection, code)
-            logger.error(msg)
-
-    def exists_article(self, code, collection):
-        try:
-            return self.client.exists_article(
-                code,
-                collection
-            )
-        except:
-            msg = 'Error checking if document exists: %s_%s' % (collection, code)
-            logger.error(msg)
-
-    def set_doaj_id(self, code, collection, doaj_id):
-        try:
-            article = self.client.set_doaj_id(
-                code,
-                collection,
-                doaj_id
-            )
-        except:
-            msg = 'Error senting doaj id for document: %s_%s' % (collection, code)
-            logger.error(msg)
-
-    def document(self, code, collection, replace_journal_metadata=True, fmt='xylose'):
-        try:
-            article = self.client.get_article(
-                code=code,
-                collection=collection,
-                replace_journal_metadata=True,
-                fmt=fmt
-            )
-        except:
-            msg = 'Error retrieving document: %s_%s' % (collection, code)
-            logger.error(msg)
-
-        jarticle = None
-        try:
-            jarticle = json.loads(article)
-        except:
-            msg = 'Fail to load JSON when retrienving document: %s_%s' % (collection, code)
-            logger.error(msg)
-            raise ServerError(msg)
-
-        if not jarticle:
-            logger.warning('Document not found for : %s_%s' % (collection, code))
-            return None
-
-        if fmt == 'xylose':
-            xarticle = Article(jarticle)
-            logger.info('Document loaded: %s_%s' % (collection, code))
-            return xarticle
-        else:
-            logger.info('Document loaded: %s_%s' % (collection, code))
-            return article
-
-    def documents(self, collection=None, issn=None, from_date=None,
-                  until_date=None, fmt='xylose'):
+    def get_issues_identifiers(self, collection=None, issn=None, from_date=None, until_date=None):
         offset = 0
-        while True:
-            identifiers = self.client.get_article_identifiers(
-                collection=collection, issn=issn, from_date=from_date,
-                until_date=until_date, limit=LIMIT, offset=offset)
-
-            if len(identifiers) == 0:
-                raise StopIteration
-
-            for identifier in identifiers:
-                document = self.document(
-                    code=identifier.code,
-                    collection=identifier.collection,
-                    replace_journal_metadata=True,
-                    fmt=fmt
-                )
-                yield document
-
-            offset += 1000
-
-    def collections(self):
-        return [i for i in self.client.get_collection_identifiers()]
-
-    def issues(self, collection=None, issn=None, from_date=None, until_date=None):
-
-        offset = 0
-
         while True:
             identifiers = self.client.get_issue_identifiers(
                 collection=collection, issn=issn, from_date=from_date,
@@ -174,37 +68,12 @@ class ArticleMeta(object):
                 raise StopIteration
 
             for identifier in identifiers:
-                try:
-                    issue = self.client.get_issue(
-                        code=identifier.code,
-                        collection=identifier.collection,
-                        replace_journal_metadata=True,
-                    )
-                    yield Issue(json.loads(issue))
-                except:
-                    msg = 'Error retrieving issue: %s_%s' % (collection, identifier)
-                    logger.error(msg)
+                yield identifier.code
 
             offset += 1000
 
-    def get_issue(self, code, collection=None):
-        try:
-            issue = self.client.get_issue(
-                code=code,
-                collection=collection,
-                replace_journal_metadata=True,
-            )
-
-            return Issue(json.loads(issue))
-
-        except:
-            msg = 'Error retrieving issue: %s_%s' % (collection, identifier)
-            logger.error(msg)
-
-    def articles(self, collection=None, issn=None, from_date=None, until_date=None):
-
+    def get_article_identifiers(self, collection=None, issn=None, from_date=None, until_date=None):
         offset = 0
-
         while True:
             identifiers = self.client.get_article_identifiers(
                 collection=collection, issn=issn, from_date=from_date,
@@ -214,19 +83,93 @@ class ArticleMeta(object):
                 raise StopIteration
 
             for identifier in identifiers:
-                try:
-                    article = self.client.get_article(
-                        code=identifier.code,
-                        collection=identifier.collection,
-                        replace_journal_metadata=True,
-                    )
-
-                    yield Article(json.loads(article))
-
-                except:
-                    msg = 'Error retrieving issue: %s_%s' % (collection, identifier)
-                    # raise ServerError(msg)
-                    logger.error(msg)
-                    pass
+                yield identifier.code
 
             offset += 1000
+
+    def get_journal(self, code, collection):
+        try:
+            journal = self.client.get_journal(
+                code=code,
+                collection=collection)
+        except Exception, e:
+            msg = 'Error retrieving journal: %s_%s. Exception: %s' % (
+                collection, code, str(e))
+            logger.error(msg)
+            raise ServerError(msg)
+        else:
+            jjournal = None
+            try:
+                jjournal = json.loads(journal)
+                logger.info('Journal loaded: %s_%s' % (collection, code))
+            except Exception, e:
+                msg = 'Fail to load JSON when retrienving Journal: %s_%s. Exception: %s' % (
+                    collection, code, str(e))
+                logger.error(msg)
+                raise Exception(msg)
+            else:
+                return jjournal
+
+    def get_issue(self, code, collection):
+        try:
+            issue = self.client.get_issue(
+                code=code,
+                collection=collection,
+                replace_journal_metadata=True)
+        except Exception, e:
+            msg = 'Error retrieving Issue: %s_%s. Exception: %s' % (
+                collection, code, str(e))
+            logger.error(msg)
+            raise ServerError(msg)
+        else:
+            jissue = None
+            try:
+                jissue = json.loads(issue)
+                logger.info('Issue loaded: %s_%s' % (collection, code))
+            except Exception, e:
+                msg = 'Fail to load JSON when retrienving Issue: %s_%s. Exception: %s' % (
+                    collection, code, str(e))
+                logger.error(msg)
+                raise Exception(msg)
+            else:
+                return jissue
+
+    def get_article(self, code, collection):
+        try:
+            article = self.client.get_article(
+                code=code,
+                collection=collection,
+                replace_journal_metadata=True,
+                fmt='xylose')
+        except Exception, e:
+            msg = 'Error retrieving Article: %s_%s. Exception: %s' % (
+                collection, code, str(e))
+            logger.error(msg)
+            raise ServerError(msg)
+        else:
+            jarticle = None
+            try:
+                jarticle = json.loads(article)
+            except Exception, e:
+                msg = 'Fail to load JSON when retrienving Article: %s_%s. Exception: %s' % (
+                    collection, code, str(e))
+                logger.error(msg)
+                raise Exception(msg)
+            else:
+                return jarticle
+
+    def collections(self):
+        try:
+            collections_list = []
+            for collection in self.client.get_collection_identifiers():
+                collections_list.append({
+                    'code': collection.code,
+                    'name': collection.name,
+                    'acronym': collection.acronym,
+                })
+            return collections_list
+        except Exception, e:
+            msg = 'Error retrieving Collections. Exception: %s' % (e)
+            logger.error(msg)
+            raise ServerError(msg)
+        # return [i for i in self.client.get_collection_identifiers()]

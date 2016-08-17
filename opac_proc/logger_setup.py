@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 import logging
 
 import logging.config
+import config
+logger = logging.getLogger(__name__)
 
 
 def config_logging(logging_level='INFO', logging_file=None):

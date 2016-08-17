@@ -34,7 +34,7 @@ class BaseLoadMixin(object):
         return not self.loading_complete
 
     @property
-    def has_loading_error(self):
+    def has_errors(self):
         """
         Retorna True se o documento poduziu algum error
         na fase de carga.
@@ -55,17 +55,25 @@ class BaseLoadMixin(object):
         self.loading_error_msg = ''
 
 
-class ExtractCollection(BaseLoadMixin, BaseDynamicDocument):
-    pass
+class LoadCollection(BaseLoadMixin, DynamicDocument):
+    meta = {
+        'collection': 'l_collection'
+    }
 
 
-class ExtractJournal(BaseLoadMixin, BaseDynamicDocument):
-    pass
+class LoadJournal(BaseLoadMixin, DynamicDocument):
+    meta = {
+        'collection': 'l_journal'
+    }
 
 
-class Issue(BaseLoadMixin, BaseDynamicDocument):
-    pass
+class LoadIssue(BaseLoadMixin, DynamicDocument):
+    meta = {
+        'collection': 'l_issue'
+    }
 
 
-class Article(BaseLoadMixin, BaseDynamicDocument):
-    pass
+class LoadArticle(BaseLoadMixin, DynamicDocument):
+    meta = {
+        'collection': 'l_article'
+    }

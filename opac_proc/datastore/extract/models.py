@@ -12,6 +12,7 @@ from mongoengine import (
     ReferenceField,
     BooleanField,
     URLField,
+    DynamicDocument
 )
 
 
@@ -33,7 +34,7 @@ class BaseExtractionMixin(object):
         return not self.transform_complete
 
     @property
-    def has_extraction_error(self):
+    def has_errors(self):
         """
         Retorna True se o documento poduziu algum error
         na fase de extração.
@@ -44,7 +45,7 @@ class BaseExtractionMixin(object):
             return False
 
     # reset:
-    def reset_for_extraction(self):
+    def reset(self):
         """
         Restaura os campos de controle do documento
         ao ponto anterior à extração
@@ -55,17 +56,27 @@ class BaseExtractionMixin(object):
         self.extraction_error_msg = ''
 
 
-class ExtractCollection(BaseExtractionMixin, BaseDynamicDocument):
-    pass
+class ExtractCollection(BaseExtractionMixin, DynamicDocument):
+    acronym = StringField(required=True, unique=True)
+
+    meta = {
+        'collection': 'e_collection'
+    }
 
 
-class ExtractJournal(BaseExtractionMixin, BaseDynamicDocument):
-    pass
+class ExtractJournal(BaseExtractionMixin, DynamicDocument):
+    meta = {
+        'collection': 'e_journal'
+    }
 
 
-class Issue(BaseExtractionMixin, BaseDynamicDocument):
-    pass
+class ExtractIssue(BaseExtractionMixin, DynamicDocument):
+    meta = {
+        'collection': 'e_issue'
+    }
 
 
-class Article(BaseExtractionMixin, BaseDynamicDocument):
-    pass
+class ExtractArticle(BaseExtractionMixin, DynamicDocument):
+    meta = {
+        'collection': 'e_article'
+    }
