@@ -1,4 +1,4 @@
-thriftpy
+thriftpy==0.3.8
 mongoengine
 -e git+https://git@github.com/scieloorg/opac_schema@v2.12#egg=opac_schema
 -e git+https://github.com/scieloorg/xylose@1.15.5#egg=xylose
