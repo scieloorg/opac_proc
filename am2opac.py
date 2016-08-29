@@ -198,8 +198,6 @@ def process_issue(issn_collection):
         m_issue.label = issue.label
         m_issue.order = issue.order
 
-        m_issue.bibliographic_legend = '%s. vol.%s no.%s %s %s./%s. %s' % (issue.journal.abbreviated_title, issue.volume, issue.number, issue.journal.publisher_state, issue.start_month, issue.end_month, issue.publication_date[:4])
-
         m_issue.pid = issue.publisher_id
 
         m_issue.save()
@@ -320,6 +318,9 @@ def process_article(issn_collection):
         m_article.pdfs = pdfs
 
         m_article.pid = article.publisher_id
+        m_article.fpage = article.start_page
+        m_article.lpage = article.end_page
+        m_article.elocation = article.elocation
 
         m_article.save()
 
@@ -348,7 +349,6 @@ def process_last_issue(issn):
         m_last_issue.start_month = last_issue.start_month
         m_last_issue.end_month = last_issue.end_month
         m_last_issue.iid = issue.iid
-        m_last_issue.bibliographic_legend = '%s. vol.%s no.%s %s %s./%s. %s' % (issue.journal.title_iso, issue.volume, issue.number, issue.journal.publisher_state, issue.start_month, issue.end_month, issue.year)
 
         if last_issue.sections:
             sections = []
