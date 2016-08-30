@@ -1,4 +1,5 @@
 thriftpy
 mongoengine
+-e git+https://git@github.com/scieloorg/legendarium@v1.0#egg=legendarium
 -e git+https://git@github.com/scieloorg/opac_schema@v2.13#egg=opac_schema
 -e git+https://github.com/scieloorg/xylose@1.15.5#egg=xylose
