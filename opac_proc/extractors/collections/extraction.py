@@ -4,6 +4,7 @@ from datetime import datetime
 
 from opac_proc.datastore.extract.models import ExtractCollection
 from opac_proc.extractors.base import BaseExtractor
+from opac_proc.extractors.decorators import update_metadata
 
 
 logger = logging.getLogger(__name__)
@@ -20,18 +21,16 @@ class ColectionExtactor(BaseExtractor):
         super(ColectionExtactor, self).__init__()
         self.acronym = acronym
 
+    @update_metadata
     def extract(self):
         """
         Conecta com a fonte (AM) e extrai todos os dados (coleção).
         """
-        super(ColectionExtactor, self).extract()
+        # super(ColectionExtactor, self).extract()
         logger.info(u'Inicia ColectionExtactor.extract(%s) %s' % (self.acronym, datetime.now()))
-
-        cols = self.articlemeta.collections()
-        for col in cols:
+        for col in self.articlemeta.collections():
             if col['acronym'] == self.acronym:
                 logger.info(u"Adicionado a coleção: %s" % self.acronym)
-                print u"Adicionado a coleção: %s" % self.acronym
                 self._raw_data = col
                 break
 

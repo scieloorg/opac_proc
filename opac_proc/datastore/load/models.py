@@ -1,79 +1,33 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
-from mongoengine import (
-    DynamicDocument,
-    StringField,
-    IntField,
-    DateTimeField,
-    ListField,
-    EmbeddedDocumentField,
-    EmbeddedDocumentListField,
-    ReferenceField,
-    BooleanField,
-    URLField,
-)
+from mongoengine import DynamicDocument, signals
+from opac_proc.datastore.base_mixin import BaseMixin
 
 
-class BaseLoadMixin(object):
-
-    # campos relacionados a carga
-    loading_start_at = DateTimeField()
-    loading_finish_at = DateTimeField()
-    loading_complete = BooleanField(required=True, default=False)
-    loading_error_msg = StringField()
-
-    # soft delete
-    is_deleted = BooleanField(required=True, default=False)
-
-    @property
-    def is_loading(self):
-        """
-        Retorna True se o documento esta em fase de carga
-        """
-        return not self.loading_complete
-
-    @property
-    def has_errors(self):
-        """
-        Retorna True se o documento poduziu algum error
-        na fase de carga.
-        """
-        if hasattr(self, 'loading_error_msg'):
-            return self.loading_error_msg.strip() == ""
-        else:
-            return False
-
-    def reset_for_loading(self):
-        """
-        Restaura os campos de controle do documento
-        ao ponto anterior à carga
-        """
-        self.loading_start_at = None
-        self.loading_finish_at = None
-        self.loading_complete = False
-        self.loading_error_msg = ''
-
-
-class LoadCollection(BaseLoadMixin, DynamicDocument):
+class LoadCollection(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'l_collection'
     }
+signals.pre_save.connect(LoadCollection.pre_save, sender=LoadCollection)
 
 
-class LoadJournal(BaseLoadMixin, DynamicDocument):
+class LoadJournal(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'l_journal'
     }
+signals.pre_save.connect(LoadJournal.pre_save, sender=LoadJournal)
 
 
-class LoadIssue(BaseLoadMixin, DynamicDocument):
+class LoadIssue(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'l_issue'
     }
+signals.pre_save.connect(LoadIssue.pre_save, sender=LoadIssue)
 
 
-class LoadArticle(BaseLoadMixin, DynamicDocument):
+class LoadArticle(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'l_article'
     }
+signals.pre_save.connect(LoadArticle.pre_save, sender=LoadArticle)

@@ -30,7 +30,7 @@ OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')
 
 
 # host, porta e credenciais para conectar ao MongoDB
-MONGODB_NAME = os.environ.get('OPAC_PROC_MONGODB_NAME', 'opac')
+MONGODB_NAME = os.environ.get('OPAC_PROC_MONGODB_NAME', 'opac_proc')
 MONGODB_HOST = os.environ.get('OPAC_PROC_MONGODB_HOST', 'localhost')
 MONGODB_PORT = os.environ.get('OPAC_PROC_MONGODB_PORT', 27017)
 MONGODB_USER = os.environ.get('OPAC_PROC_MONGODB_USER', None)
@@ -45,3 +45,21 @@ MONGODB_SETTINGS = {
 if MONGODB_USER and MONGODB_PASS:
     MONGODB_SETTINGS['username'] = MONGODB_USER
     MONGODB_SETTINGS['password'] = MONGODB_PASS
+
+
+# host, porta e credenciais para conectar ao MongoDB do OPAC webapp
+OPAC_MONGODB_NAME = os.environ.get('OPAC_MONGODB_NAME', 'opac')
+OPAC_MONGODB_HOST = os.environ.get('OPAC_MONGODB_HOST', 'localhost')
+OPAC_MONGODB_PORT = os.environ.get('OPAC_MONGODB_PORT', 27017)
+OPAC_MONGODB_USER = os.environ.get('OPAC_MONGODB_USER', None)
+OPAC_MONGODB_PASS = os.environ.get('OPAC_MONGODB_PASS', None)
+
+OPAC_MONGODB_SETTINGS = {
+    'db': OPAC_MONGODB_NAME,
+    'host': OPAC_MONGODB_HOST,
+    'port': int(OPAC_MONGODB_PORT),
+}
+
+if OPAC_MONGODB_USER and OPAC_MONGODB_PASS:
+    OPAC_MONGODB_SETTINGS['username'] = OPAC_MONGODB_USER
+    OPAC_MONGODB_SETTINGS['password'] = OPAC_MONGODB_PASS

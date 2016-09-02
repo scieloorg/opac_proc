@@ -19,9 +19,9 @@ class BaseExtractor(object):
     model_name = ''     # definir no __init__ da sublcasse
 
     metadata = {
-        'extraction_start_time': None,
-        'extraction_finish_at': None,
-        'extraction_complete': False,
+        'process_start_at': None,
+        'process_finish_at': None,
+        'process_completed': True,
     }
 
     def __init__(self):
@@ -40,8 +40,10 @@ class BaseExtractor(object):
             model_name = 'foo'
 
             def __init__(self, args, kwargs):
+                super(FooExtractor, self).__init__()
                 # seu codigo aqui ...
 
+            @update_metadata   <---- IMPORANTE !!!
             def extract(self):
                 super(FooExtractor, self).extract()
                 # seu codigo aqui ...
@@ -50,20 +52,28 @@ class BaseExtractor(object):
                 # implmementar só se for algo deferente
 
         """
-        self.metadata['extraction_start_time'] = datetime.now()
         # Deve implementar a extração na subclase,
         # invocando este metodo como mostra a docstring
+        raise NotImplemented
 
     def save(self):
-        """"
+        """
         Salva os dados coletados no datastore (mongo)
         """
-        if not self.model_class or not self.model_name:
+        if self.metadata['is_locked']:
+            msg = u"atributos metadata['is_locked'] indica que o processamento não finalizou corretamente."
+            logger.error(msg)
+            raise Exception(msg)
+        elif self.model_class is None or self.model_name is None:
             msg = u"atributos model_class ou model_name não forma definidos na subclasse"
             logger.error(msg)
             raise Exception(msg)
+        elif self.metadata['process_start_at'] is None:
+            msg = u"não foi definida o timestamp de inicio, você definiu/invocou o metodo: extract() na subclasse?"
+            logger.error(msg)
+            raise Exception(msg)
         elif not self._raw_data:
-            msg = u"os dados coletados estão vazios, você definiu/invocou o metodo: extract()? na subclasse?"
+            msg = u"os dados coletados estão vazios, você definiu/invocou o metodo: extract() na subclasse?"
             logger.error(msg)
             raise Exception(msg)
         elif not isinstance(self._raw_data, dict):
@@ -72,8 +82,6 @@ class BaseExtractor(object):
             raise Exception(msg)
         else:
             # atualizamos as datas no self.metadata
-            self.metadata['extraction_finish_at'] = datetime.now()
-            self.metadata['extraction_complete'] = True
             self._raw_data.update(**self.metadata)
             # salvamos no mongo
             try:
@@ -82,6 +90,6 @@ class BaseExtractor(object):
                 return obj
             except Exception, e:
                 msg = u"Não foi possível salvar %s. Exeção: %s" % (
-                    self.model_name, e.messaage)
+                    self.model_name, e.message)
                 logger.error(msg)
                 raise Exception(msg)

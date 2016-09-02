@@ -35,7 +35,7 @@ def run(collection_acronym):
     db = get_db_connection()
     db_name = config.MONGODB_SETTINGS['db']
     db.drop_database(db_name)
-    print "banco de dados removido!"
+    print "banco de dados %s removido!" % db_name
     coll_extractor = ColectionExtactor(collection_acronym)
     coll_extractor.extract()
     print "Fim da coleta da Coleção"

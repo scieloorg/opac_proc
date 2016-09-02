@@ -1,11 +1,19 @@
 # coding: utf-8
 from __future__ import unicode_literals
 import logging
-from mongoengine import connect
+from mongoengine import connect, register_connection
 
 import config
 
 logger = logging.getLogger(__name__)
+
+
+def get_opac_proc_db_name():
+    return config.MONGODB_NAME
+
+
+def get_opac_webapp_db_name():
+    return config.OPAC_MONGODB_NAME
 
 
 def get_db_connection():
@@ -18,6 +26,19 @@ def get_db_connection():
     except Exception, e:   # melhorar captura da Exceção
         logger.error("Não é possível conectar com banco de dados mongo", str(e))
     else:
-        db_name = config.MONGODB_SETTINGS['db']
+        db_name = get_opac_proc_db_name()
         logger.info("Conexão establecida com banco: %s!" % db_name)
         return db
+
+
+def register_connections():
+    logger.debug('Registrando conexão - {db}: mongo://{host}:{port}/{db}'.format(
+        **config.MONGODB_SETTINGS))
+
+    opac_proc_db_name = get_opac_proc_db_name()
+    register_connection(opac_proc_db_name, opac_proc_db_name)
+
+    logger.debug('Registrando conexão - {db}: mongo://{host}:{port}/{db}'.format(
+        **config.OPAC_MONGODB_SETTINGS))
+    opac_db_name = get_opac_webapp_db_name()
+    register_connection(opac_db_name, opac_db_name)

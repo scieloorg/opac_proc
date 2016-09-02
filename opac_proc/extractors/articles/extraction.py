@@ -4,6 +4,7 @@ from datetime import datetime
 
 from opac_proc.datastore.extract.models import ExtractArticle
 from opac_proc.extractors.base import BaseExtractor
+from opac_proc.extractors.decorators import update_metadata
 
 
 logger = logging.getLogger(__name__)
@@ -21,13 +22,13 @@ class ArticleExtactor(BaseExtractor):
         self.acronym = acronym
         self.article_id = article_id
 
+    @update_metadata
     def extract(self):
         """
         Conecta com a fonte (AM) e extrai todos os dados (Article).
         """
-        super(ArticleExtactor, self).extract()
-        logger.info(u'Inicia ArticleExtactor.extract(%s) %s' % (self.acronym, datetime.now()))
-        self.extraction_start_time = datetime.now()
+        logger.info(u'Inicia ArticleExtactor.extract(%s) %s' % (
+            self.acronym, datetime.now()))
 
         article = self.articlemeta.get_article(collection=self.acronym, code=self.article_id)
         self._raw_data = article
@@ -37,4 +38,5 @@ class ArticleExtactor(BaseExtractor):
             logger.error(msg)
             raise Exception(msg)
 
-        logger.info(u'Fim ArticleExtactor.extract(%s) %s' % (self.acronym, datetime.now()))
+        logger.info(u'Fim ArticleExtactor.extract(%s) %s' % (
+            self.acronym, datetime.now()))

@@ -1,4 +1,7 @@
-thriftpy
-mongoengine
+thriftpy==0.3.8
+rq==0.6.0
+rq-dashboard==0.3.7
+blinker==1.4
+mongoengine==0.10.6
 -e git+https://git@github.com/scieloorg/opac_schema@v2.12#egg=opac_schema
 -e git+https://github.com/scieloorg/xylose@1.15.5#egg=xylose

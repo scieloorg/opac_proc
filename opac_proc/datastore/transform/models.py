@@ -1,85 +1,33 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
-from mongoengine import (
-    DynamicDocument,
-    StringField,
-    IntField,
-    DateTimeField,
-    ListField,
-    EmbeddedDocumentField,
-    EmbeddedDocumentListField,
-    ReferenceField,
-    BooleanField,
-    URLField,
-)
+from mongoengine import DynamicDocument, signals
+from opac_proc.datastore.base_mixin import BaseMixin
 
 
-class BaseTransformMixin(object):
-
-    # # campos relacionados a transformação
-    transform_start_at = DateTimeField()
-    transform_finish_at = DateTimeField()
-    transform_complete = BooleanField(required=True, default=False)
-    transform_error_msg = StringField()
-
-    # soft delete
-    is_deleted = BooleanField(required=True, default=False)
-
-    @property
-    def is_transforming(self):
-        """
-        Retorna True se o documento esta em fase de transformação
-        """
-        return not self.extraction_complete
-
-    @property
-    def has_errors(self):
-        """
-        Retorna True se o documento poduziu algum error
-        na fase de transformação.
-        """
-        if hasattr(self, 'transform_error_msg'):
-            return self.transform_error_msg.strip() == ""
-        else:
-            return False
-
-    def reset_for_transform(self):
-        """
-        Restaura os campos de controle do documento
-        ao ponto anterior à transformação
-        """
-        # tranformação:
-        self.transform_start_at = None
-        self.transform_finish_at = None
-        self.transform_complete = False
-        self.transform_error_msg = ''
-        # carga:
-        self.loading_start_at = None
-        self.loading_finish_at = None
-        self.loading_complete = False
-        self.loading_error_msg = ''
-
-
-class TransformCollection(BaseTransformMixin, DynamicDocument):
+class TransformCollection(BaseMixin, DynamicDocument):
     meta = {
         'collection': 't_collection'
     }
+signals.pre_save.connect(TransformCollection.pre_save, sender=TransformCollection)
 
 
-class TransformJournal(BaseTransformMixin, DynamicDocument):
+class TransformJournal(BaseMixin, DynamicDocument):
     meta = {
-        'collection': 't_collection'
+        'collection': 't_journal'
     }
+signals.pre_save.connect(TransformJournal.pre_save, sender=TransformJournal)
 
 
-class TransformIssue(BaseTransformMixin, DynamicDocument):
+class TransformIssue(BaseMixin, DynamicDocument):
     meta = {
-        'collection': 't_collection'
+        'collection': 't_issue'
     }
+signals.pre_save.connect(TransformIssue.pre_save, sender=TransformIssue)
 
 
-class TransformArticle(BaseTransformMixin, DynamicDocument):
+class TransformArticle(BaseMixin, DynamicDocument):
     meta = {
-        'collection': 't_collection'
+        'collection': 't_article'
     }
+signals.pre_save.connect(TransformArticle.pre_save, sender=TransformArticle)

@@ -5,6 +5,7 @@ from datetime import datetime
 
 from opac_proc.datastore.extract.models import ExtractJournal
 from opac_proc.extractors.base import BaseExtractor
+from opac_proc.extractors.decorators import update_metadata
 
 
 logger = logging.getLogger(__name__)
@@ -22,11 +23,11 @@ class JournalExtactor(BaseExtractor):
         self.acronym = acronym
         self.issn = issn
 
+    @update_metadata
     def extract(self):
         """
         Conecta com a fonte (AM) e extrai todos os dados (coleção).
         """
-        super(JournalExtactor, self).extract()
         logger.info(u'Inicia JournalExtactor.extract(%s) %s' % (
             self.acronym, datetime.now()))
 
