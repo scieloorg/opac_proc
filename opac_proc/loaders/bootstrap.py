@@ -58,7 +58,7 @@ def run(collection_acronym):
     print "ISSUES:"
     load_issues()
     print "ARTICLES:"
-    load_articles()()
+    load_articles()
     print "fim!"
 
 

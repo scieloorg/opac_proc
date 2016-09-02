@@ -49,6 +49,7 @@ def run(collection_acronym):
         issn = child['issn']
         issues_ids = sorted(child['issues_ids'])
         articles_ids = sorted(child['articles_ids'])
+
         print "procurando issn: ", issn
         jtr = JournalTransformer(extract_model_key=issn)
         jtr.transform()

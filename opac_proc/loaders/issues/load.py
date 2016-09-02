@@ -36,7 +36,6 @@ class IssueLoader(BaseLoader):
         'year',
         'label',
         'order',
-        'bibliographic_legend',
         'pid'
     ]
 
@@ -47,6 +46,3 @@ class IssueLoader(BaseLoader):
             opac_journal = OpacJournal.objects.get(
                 _id=t_journal_uuid_str)
         return opac_journal
-
-    def prepare_bibliographic_legend(self):
-        return "USAR LEGENDARIUM"

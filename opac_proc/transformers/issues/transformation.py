@@ -89,18 +89,6 @@ class IssueTransformer(BaseTransformer):
         if hasattr(xylose_issue, 'order'):
             self.transform_model_instance['order'] = xylose_issue.order
 
-        # bibliographic_legend
-        if hasattr(xylose_issue, 'bibliographic_legend'):
-            legend = '%s. vol.%s no.%s %s %s./%s. %s' % (
-                issue.journal.abbreviated_title,
-                issue.volume,
-                issue.number,
-                issue.journal.publisher_state,
-                issue.start_month,
-                issue.end_month,
-                issue.publication_date[:4])
-            self.transform_model_instance['bibliographic_legend'] = xylose_issue.legend
-
         # pid
         if hasattr(xylose_issue, 'publisher_id'):
             self.transform_model_instance['pid'] = xylose_issue.publisher_id

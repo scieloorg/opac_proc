@@ -139,7 +139,7 @@ class JournalLoader(BaseLoader):
 
         last_issue_data = {
             'iid': str(t_issue.uuid).replace("-", ""),
-            'bibliographic_legend': 'USAR LEGENDARIUM',
+            # 'bibliographic_legend': 'USAR LEGENDARIUM',
             'sections': last_issue_sections,
         }
 
