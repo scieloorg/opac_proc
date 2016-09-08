@@ -6,6 +6,7 @@ from mongoengine.context_managers import switch_db
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
 from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.transform.models import TransformCollection, TransformJournal, TransformIssue
+from opac_proc.datastore.load.models import LoadIssue
 from opac_schema.v1.models import Issue as OpacIssue
 from opac_schema.v1.models import Journal as OpacJournal
 
@@ -22,6 +23,10 @@ class IssueLoader(BaseLoader):
     opac_model_class = OpacIssue
     opac_model_name = 'OpacIssue'
     opac_model_instance = None
+
+    load_model_class = LoadIssue
+    load_model_name = 'LoadIssue'
+    load_model_instance = None
 
     fields_to_load = [
         'iid',

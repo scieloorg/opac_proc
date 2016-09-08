@@ -20,10 +20,14 @@ class BaseLoader(object):
     opac_model_name = ''
     opac_model_instance = None
 
+    load_model_class = None
+    load_model_name = ''
+    load_model_instance = None
+
     metadata = {
         'process_start_at': None,
         'process_finish_at': None,
-        'process_completed': True,
+        'process_completed': False,
     }
 
     fields_to_load = [
@@ -53,6 +57,9 @@ class BaseLoader(object):
         uuid_str = str(transform_model_uuid).replace("-", "")
         self.get_opac_model_instance(query={'_id': uuid_str})
 
+        # Load model instance: to track process times by uuid
+        self.get_load_model_instance(query={'uuid': transform_model_uuid})
+
     def get_transform_model_instance(self, query={}):
         # retornamos uma instância do transform_model_class
         # correspondente com a **query dict.
@@ -67,12 +74,24 @@ class BaseLoader(object):
             self.opac_model_instance = self.opac_model_class.objects.filter(
                 **query).first()
 
+    def get_load_model_instance(self, query={}):
+        # retornamos uma instância do load_model_class
+        # correspondente com a **query dict.
+        with switch_db(self.load_model_class, OPAC_PROC_DB_NAME):
+            self.load_model_instance = self.load_model_class.objects.filter(
+                **query).first()
+            if not self.load_model_instance:
+                self.load_model_instance = self.load_model_class()
+                self.load_model_instance.uuid = query['uuid']
+                self.load_model_instance.save()
+
     def transform_model_instance_to_python(self):
         """
         Recupera a instância de transform_model_class,
         removemos metadata e retornamos um dicionario (python) pronto
         para criar uma instância do opac_model_class
         """
+        self.metadata['process_start_at'] = datetime.now()
 
         t_model = self.transform_model_instance
         if not t_model:
@@ -103,3 +122,8 @@ class BaseLoader(object):
     def load(self):
         with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
             self.opac_model_instance.save()
+
+        with switch_db(self.load_model_class, OPAC_PROC_DB_NAME):
+            self.metadata['process_finish_at'] = datetime.now()
+            self.metadata['process_completed'] = True
+            self.load_model_instance.update(**self.metadata)

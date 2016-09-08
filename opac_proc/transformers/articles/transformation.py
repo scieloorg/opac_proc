@@ -1,7 +1,7 @@
 # coding: utf-8
 import logging
 from datetime import datetime
-
+from werkzeug.urls import url_fix
 from xylose.scielodocument import Article
 from opac_proc.datastore.extract.models import ExtractArticle
 from opac_proc.datastore.transform.models import (
@@ -41,7 +41,6 @@ class ArticleTransformer(BaseTransformer):
         # issue
         pid = xylose_article.issue.publisher_id
         try:
-            print "xylose_article.issue.publisher_id", pid
             issue = TransformIssue.objects.get(pid=pid)
         except Exception, e:
             logger.error("TransformIssue (pid: %s) não encontrado!")
@@ -141,14 +140,14 @@ class ArticleTransformer(BaseTransformer):
                         htmls.append({
                             'type': 'html',
                             'language': lang,
-                            'url': url
+                            'url': url_fix(url)
                         })
                 elif text == 'pdf':
                     for lang, url in val.items():
                         pdfs.append({
                             'type': 'pdf',
                             'language': lang,
-                            'url': url
+                            'url': url_fix(url)
                         })
 
             self.transform_model_instance['htmls'] = htmls

@@ -1,15 +1,84 @@
-
-
 {% extends "base.html" %}
-
+{% block title %}Home{% endblock title %}
 {% block content %}
-    <p>
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-    </p>
+    <h1></h1>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Extraction info:
+                    <a class="pull-right" href="{{ url_for('extract') }}">
+                        <i class="glyphicon glyphicon-menu-right"></i>
+                    </a>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        Collections: <span class="badge">{{ extract_collection_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Journals: <span class="badge">{{ extract_journal_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Issues: <span class="badge">{{ extract_issue_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Articles: <span class="badge">{{ extract_article_count }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Transform info:
+                    <a class="pull-right" href="{{ url_for('transform') }}">
+                        <i class="glyphicon glyphicon-menu-right"></i>
+                    </a>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        Collections: <span class="badge">{{ transform_collection_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Journals: <span class="badge">{{ transform_journal_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Issues: <span class="badge">{{ transform_issue_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Articles: <span class="badge">{{ transform_article_count }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Load info:
+                    <a class="pull-right" href="{{ url_for('load') }}">
+                        <i class="glyphicon glyphicon-menu-right"></i>
+                    </a>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        Collections: <span class="badge">{{ load_collection_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Journals: <span class="badge">{{ load_journal_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Issues: <span class="badge">{{ load_issue_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Articles: <span class="badge">{{ load_article_count }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 

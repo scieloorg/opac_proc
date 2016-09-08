@@ -3,6 +3,7 @@ import logging
 
 from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.transform.models import TransformCollection
+from opac_proc.datastore.load.models import LoadCollection
 from opac_schema.v1.models import Collection as OpacCollection
 
 logger = logging.getLogger(__name__)
@@ -16,6 +17,10 @@ class CollectionLoader(BaseLoader):
     opac_model_class = OpacCollection
     opac_model_name = 'OpacCollection'
     opac_model_instance = None
+
+    load_model_class = LoadCollection
+    load_model_name = 'LoadCollection'
+    load_model_instance = None
 
     fields_to_load = [
         'acronym',
