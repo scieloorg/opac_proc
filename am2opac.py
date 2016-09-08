@@ -363,6 +363,7 @@ def process_last_issue(issn):
             m_last_issue.sections = sections
 
         journal.last_issue = m_last_issue
+        journal.last_issue.label = last_issue.label
         journal.issue_count = issue_count
         journal.save()
     else:
