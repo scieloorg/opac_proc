@@ -351,14 +351,20 @@ def process_last_issue(issn):
         m_last_issue.iid = issue.iid
 
         if last_issue.sections:
+
             sections = []
+
             for code, items in last_issue.sections.iteritems():
+
                 if items:
+
                     for k, v in items.iteritems():
+
                         section = models.TranslatedSection()
-                        section.name = v
-                        section.language = k
-                sections.append(section)
+                        section.name = v.encode('utf-8')
+                        section.language = k.encode('utf-8')
+
+                        sections.append(section)
 
             m_last_issue.sections = sections
 
