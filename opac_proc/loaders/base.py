@@ -13,7 +13,7 @@ OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
 
 class BaseLoader(object):
     transform_model_class = None        # definir no __init__ da sublcasse
-    transform_model_name = ''           # definir no __init__ da sublcasse
+    transform_model_name = ''
     transform_model_instance = None     # definir no __init__ da sublcasse
 
     opac_model_class = None
@@ -43,42 +43,47 @@ class BaseLoader(object):
         if not transform_model_uuid:
             raise ValueError('transform_model_uuid inválido!')
         elif not self.transform_model_class:
-            raise ValueError('subclase deve definir atributo: transform_model_class!')
-        elif not self.transform_model_name:
-            raise ValueError('subclase deve definir atributo: transform_model_name!')
+            raise ValueError('subclasse deve definir atributo: transform_model_class!')
         elif not self.opac_model_class:
-            raise ValueError('subclase deve definir atributo: opac_model_class!')
-        elif not self.opac_model_name:
-            raise ValueError('subclase deve definir atributo: opac_model_name!')
+            raise ValueError('subclasse deve definir atributo: opac_model_class!')
+        elif not self.load_model_class:
+            raise ValueError('subclasse deve definir atributo: load_model_class!')
 
-        self.get_transform_model_instance(query={'uuid': transform_model_uuid})
+        self.transform_model_name = str(self.transform_model_class)
+        self.opac_model_name = str(self.opac_model_class)
+        self.load_model_name = str(self.load_model_class)
+
+        self.get_transform_model_instance(
+            query={'uuid': transform_model_uuid})
 
         # buscamos uma instância na base opac com o mesmo UUID
         uuid_str = str(transform_model_uuid).replace("-", "")
-        self.get_opac_model_instance(query={'_id': uuid_str})
+        self.get_opac_model_instance(
+            query={'_id': uuid_str})
 
         # Load model instance: to track process times by uuid
-        self.get_load_model_instance(query={'uuid': transform_model_uuid})
+        self.get_load_model_instance(
+            query={'uuid': transform_model_uuid})
 
     def get_transform_model_instance(self, query={}):
         # retornamos uma instância do transform_model_class
         # correspondente com a **query dict.
         with switch_db(self.transform_model_class, OPAC_PROC_DB_NAME):
-            self.transform_model_instance = self.transform_model_class.objects.filter(
+            self.transform_model_instance = self.transform_model_class.objects(
                 **query).first()
 
     def get_opac_model_instance(self, query={}):
         # retornamos uma instância do opac_model_class
         # correspondente com a **query dict.
         with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
-            self.opac_model_instance = self.opac_model_class.objects.filter(
+            self.opac_model_instance = self.opac_model_class.objects(
                 **query).first()
 
     def get_load_model_instance(self, query={}):
         # retornamos uma instância do load_model_class
         # correspondente com a **query dict.
         with switch_db(self.load_model_class, OPAC_PROC_DB_NAME):
-            self.load_model_instance = self.load_model_class.objects.filter(
+            self.load_model_instance = self.load_model_class.objects(
                 **query).first()
             if not self.load_model_instance:
                 self.load_model_instance = self.load_model_class()
@@ -126,4 +131,5 @@ class BaseLoader(object):
         with switch_db(self.load_model_class, OPAC_PROC_DB_NAME):
             self.metadata['process_finish_at'] = datetime.now()
             self.metadata['process_completed'] = True
+            self.metadata['must_reprocess'] = False
             self.load_model_instance.update(**self.metadata)

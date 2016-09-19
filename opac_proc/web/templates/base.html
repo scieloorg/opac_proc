@@ -26,42 +26,7 @@
 
   <body>
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">Opac Proc</a>
-        </div>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-
-            <li {% if request.path == url_for('home')  %} class="active" {% endif %}>
-              <a href="{{ url_for('home') }}">Home</a>
-            </li>
-            <li {% if request.path == url_for('extract') %} class="active" {% endif %}>
-              <a href="{{ url_for('extract') }}">Extract</a>
-            </li>
-            <li {% if request.path == url_for('transform') %} class="active" {% endif %}>
-              <a href="{{ url_for('transform') }}">Transform</a>
-            </li>
-            <li {% if request.path == url_for('load') %} class="active" {% endif %}>
-              <a href="{{ url_for('load') }}">Load</a>
-            </li>
-            <li {% if request.path == url_for('rq_dashboard.overview') %} class="active" {% endif %}>
-              <a href="{{ url_for('rq_dashboard.overview') }}">RQ Dashboard</a>
-            </li>
-            <li {% if request.path == url_for('rq_scheduler_dashboard.overview') %} class="active" {% endif %}>
-              <a href="{{ url_for('rq_scheduler_dashboard.overview') }}">RQ Scheduler</a>
-            </li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
+    {% include "includes/nav.html" %}
 
     <div class="container">
 

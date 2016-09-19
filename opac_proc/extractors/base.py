@@ -13,10 +13,11 @@ logger = logging.getLogger(__name__)
 class BaseExtractor(object):
     _db = None
     articlemeta = None
-
-    _raw_data = {}      # definir no extract() da sublcasse
-    model_class = None  # definir no __init__ da sublcasse
-    model_name = ''     # definir no __init__ da sublcasse
+    get_instance_query = None  # definir na subclasse
+    _raw_data = {}
+    extract_model_class = None
+    extract_model_name = ''
+    extract_model_instance = None
 
     metadata = {
         'process_start_at': None,
@@ -30,14 +31,30 @@ class BaseExtractor(object):
             config.ARTICLE_META_THRIFT_DOMAIN,
             config.ARTICLE_META_THRIFT_PORT)
 
+    def get_extract_model_instance(self):
+        if not self.get_instance_query or not isinstance(self.get_instance_query, dict):
+            raise ValueError("Deve definir self.query como dicionario no __init__ da subclasse")
+
+        try:
+            instance = self.extract_model_class.objects(**self.get_instance_query)
+        except Exception, e:  # does not exist or multiple objects returned
+            # se existe deveria ser só uma instância do modelo
+            raise e
+        else:
+            if not instance:
+                return None
+            elif instance.count() > 1:
+                raise ValueError("self.get_instance_query retornou muitos resultados")
+            else:
+                return instance.first()
+
     def extract(self):
         """
         Conecta com a fonte (AM) e extrai todos os dados.
 
         Redefinir na subclasse:
         class FooExtractor(BaseExtractor):
-            model_class = Foo
-            model_name = 'foo'
+            extract_model_class = Foo
 
             def __init__(self, args, kwargs):
                 super(FooExtractor, self).__init__()
@@ -64,8 +81,8 @@ class BaseExtractor(object):
             msg = u"atributos metadata['is_locked'] indica que o processamento não finalizou corretamente."
             logger.error(msg)
             raise Exception(msg)
-        elif self.model_class is None or self.model_name is None:
-            msg = u"atributos model_class ou model_name não forma definidos na subclasse"
+        elif self.extract_model_class is None or self.extract_model_name is None:
+            msg = u"atributos extract_model_class ou extract_model_name não forma definidos na subclasse"
             logger.error(msg)
             raise Exception(msg)
         elif self.metadata['process_start_at'] is None:
@@ -82,14 +99,20 @@ class BaseExtractor(object):
             raise Exception(msg)
         else:
             # atualizamos as datas no self.metadata
+            self.metadata['must_reprocess'] = False
             self._raw_data.update(**self.metadata)
+            self.extract_model_instance = self.get_extract_model_instance()
             # salvamos no mongo
             try:
-                obj = self.model_class(**self._raw_data)
-                obj.save()
-                return obj
+                if self.extract_model_instance:
+                    self.extract_model_instance.modify(**self._raw_data)
+                else:
+                    self.extract_model_class(**self._raw_data).save()
             except Exception, e:
                 msg = u"Não foi possível salvar %s. Exeção: %s" % (
-                    self.model_name, e.message)
+                    self.extract_model_name, e)
                 logger.error(msg)
-                raise Exception(msg)
+                raise e
+            else:
+                self.extract_model_instance.reload()
+                return self.extract_model_instance

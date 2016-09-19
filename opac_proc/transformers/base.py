@@ -13,15 +13,15 @@ logger = logging.getLogger(__name__)
 
 
 class BaseTransformer(object):
-    _db = None                          # definir no __init__ da sublcasse
+    _db = None
 
     extract_model_class = None          # definir no __init__ da sublcasse
-    extract_model_name = ''             # definir no __init__ da sublcasse
-    extract_model_instance = None       # definir no __init__ da sublcasse
+    extract_model_name = ''
+    extract_model_instance = None
 
     transform_model_class = None        # definir no __init__ da sublcasse
-    transform_model_name = ''           # definir no __init__ da sublcasse
-    transform_model_instance = None     # definir no __init__ da sublcasse
+    transform_model_name = ''
+    transform_model_instance = None
 
     metadata = {
         'process_start_at': None,
@@ -38,6 +38,7 @@ class BaseTransformer(object):
         'process_start_at',
         'process_finish_at',
         'process_completed',
+        'must_reprocess',
     ]
 
     def __init__(self, extract_model_key, transform_model_uuid=None):
@@ -55,19 +56,18 @@ class BaseTransformer(object):
         if not extract_model_key:
             raise ValueError('extract_model_key inválido!')
         elif not self.extract_model_class:
-            raise ValueError('subclase deve definir atributo: extract_model_class!')
-        elif not self.extract_model_name:
-            raise ValueError('subclase deve definir atributo: extract_model_name!')
+            raise ValueError('subclasse deve definir atributo: extract_model_class!')
         elif not self.transform_model_class:
-            raise ValueError('subclase deve definir atributo: transform_model_class!')
-        elif not self.transform_model_name:
-            raise ValueError('subclase deve definir atributo: transform_model_name!')
+            raise ValueError('subclasse deve definir atributo: transform_model_class!')
+
+        self.extract_model_name = str(self.extract_model_class)
+        self.transform_model_name = str(self.transform_model_class)
 
         try:
             self.extract_model_instance = self.get_extract_model_instance(
                 extract_model_key)
         except NotImplemented:
-            raise ValueError('subclase deve definir o método: get_extract_model_instance!')
+            raise ValueError('subclasse deve definir o método: get_extract_model_instance!')
         except Exception, e:
             raise e
 
@@ -129,7 +129,6 @@ class BaseTransformer(object):
 
             def save(self):
                 # implmementar só se for algo deferente
-
         """
         raise NotImplemented
         # Deve implementar a extração na subclase,
@@ -142,12 +141,13 @@ class BaseTransformer(object):
 
         try:
             self.transform_model_instance.save()
+            self.metadata['must_reprocess'] = False
             self.transform_model_instance.update(**self.metadata)
             self.transform_model_instance.reload()
-            return self.transform_model_instance
         except Exception, e:
             msg = u"Não foi possível salvar %s. Exeção: %s" % (
                 self.transform_model_name, e)
-            print msg
             logger.error(msg)
             raise Exception(msg)
+        else:
+            return self.transform_model_instance

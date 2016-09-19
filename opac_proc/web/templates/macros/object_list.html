@@ -1,0 +1,21 @@
+
+{% macro render_row_cell(object, field_name, field_type='string') -%}
+
+    {% if field_type == 'string' %}
+        {{ object[field_name] }}
+    {% elif field_type == 'date' %}
+        {% if object[field_name] %}
+            {{ object[field_name].strftime('%Y-%m-%d') }}
+        {% endif %}
+    {% elif field_type == 'date_time' %}
+        {% if object[field_name] %}
+            {{ object[field_name].strftime('%Y-%m-%d %H:%M:%S') }}
+        {% endif %}
+    {% elif field_type == 'boolean' %}
+        {% if object[field_name] %}
+            <i class="glyphicon glyphicon-ok-circle"></i>
+        {% else %}
+            <i class="glyphicon glyphicon-remove-circle"></i>
+        {% endif %}
+    {% endif %}
+{%- endmacro %}

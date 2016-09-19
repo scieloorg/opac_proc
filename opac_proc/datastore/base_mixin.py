@@ -27,6 +27,8 @@ class BaseMixin(object):
     process_completed = BooleanField(required=True, default=False)
     process_error_msg = StringField()
 
+    must_reprocess = BooleanField(required=True, default=False)
+
     @property
     def has_errors(self):
         """
@@ -52,6 +54,20 @@ class BaseMixin(object):
     @classmethod  # signal pre_save (asociar em cada modelo)
     def pre_save(cls, sender, document, **kwargs):
         document.updated_at = datetime.now()
+
+    def update_reprocess_field(uuid):
+        """
+        deve ser redefinido em cada subclasse.
+        uuid é o campo para identificar qual documento deve ser atualizado.
+        """
+        raise NotImplemented
+
+    @classmethod  # signal pre_save (asociar em cada modelo)
+    def post_save(cls, sender, document, **kwargs):
+        uuid = document.uuid
+        if uuid and document.must_reprocess:
+            # notificamos o modelo que tem que ser reprocessando
+            return document.update_reprocess_field(uuid=uuid)
 
     def __unicode__(self):
         return unicode(self._id)

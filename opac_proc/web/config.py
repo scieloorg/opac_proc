@@ -28,7 +28,7 @@ ARTICLE_META_THRIFT_PORT = int(os.environ.get(
 # coleção a ser processada
 OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')
 
-
+# CONEXÃO MONGO OPAC PROC
 # host, porta e credenciais para conectar ao MongoDB
 MONGODB_NAME = os.environ.get('OPAC_PROC_MONGODB_NAME', 'opac_proc')
 MONGODB_HOST = os.environ.get('OPAC_PROC_MONGODB_HOST', 'localhost')
@@ -46,7 +46,7 @@ if MONGODB_USER and MONGODB_PASS:
     MONGODB_SETTINGS['username'] = MONGODB_USER
     MONGODB_SETTINGS['password'] = MONGODB_PASS
 
-
+# CONEXÃO MONGO OPAC WEB APP
 # host, porta e credenciais para conectar ao MongoDB do OPAC webapp
 OPAC_MONGODB_NAME = os.environ.get('OPAC_MONGODB_NAME', 'opac')
 OPAC_MONGODB_HOST = os.environ.get('OPAC_MONGODB_HOST', 'localhost')
@@ -64,7 +64,27 @@ if OPAC_MONGODB_USER and OPAC_MONGODB_PASS:
     OPAC_MONGODB_SETTINGS['username'] = OPAC_MONGODB_USER
     OPAC_MONGODB_SETTINGS['password'] = OPAC_MONGODB_PASS
 
+# CONEXÃO LOGS MONGO OPAC PROC LOGS
+# host, porta e credenciais para conectar ao MongoDB
+OPAC_PROC_LOG_MONGODB_NAME = os.environ.get('OPAC_PROC_LOG_MONGODB_NAME', 'opac_proc_log')
+OPAC_PROC_LOG_MONGODB_HOST = os.environ.get('OPAC_PROC_LOG_MONGODB_HOST', 'localhost')
+OPAC_PROC_LOG_MONGODB_PORT = os.environ.get('OPAC_PROC_LOG_MONGODB_PORT', 27017)
+OPAC_PROC_LOG_MONGODB_USER = os.environ.get('OPAC_PROC_LOG_MONGODB_USER', None)
+OPAC_PROC_LOG_MONGODB_PASS = os.environ.get('OPAC_PROC_LOG_MONGODB_PASS', None)
+
+OPAC_PROC_LOG_MONGODB_SETTINGS = {
+    'db': OPAC_PROC_LOG_MONGODB_NAME,
+    'host': OPAC_PROC_LOG_MONGODB_HOST,
+    'port': int(OPAC_PROC_LOG_MONGODB_PORT),
+}
+
+if OPAC_PROC_LOG_MONGODB_USER and OPAC_PROC_LOG_MONGODB_PASS:
+    OPAC_PROC_LOG_MONGODB_SETTINGS['username'] = OPAC_PROC_LOG_MONGODB_USER
+    OPAC_PROC_LOG_MONGODB_SETTINGS['password'] = OPAC_PROC_LOG_MONGODB_PASS
+
+
 # WEBAPP config:
 DEBUG = True
 TESTING = False
 SECRET_KEY = "s3cr3t-k3y"
+DEBUG_TB_INTERCEPT_REDIRECTS = False

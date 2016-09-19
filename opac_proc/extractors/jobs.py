@@ -3,12 +3,15 @@ from __future__ import unicode_literals
 
 import logging
 
-from opac_proc.extractors.journals.extraction import JournalExtactor
-from opac_proc.extractors.issues.extraction import IssueExtactor
-from opac_proc.extractors.articles.extraction import ArticleExtactor
+from opac_proc.extractors.ex_journals import JournalExtactor
+from opac_proc.extractors.ex_issues import IssueExtactor
+from opac_proc.extractors.ex_articles import ArticleExtactor
+
 
 logger = logging.getLogger(__name__)
 
+
+# Journals:
 
 def task_extract_journal(acronym, issn):
     extractor = JournalExtactor(acronym, issn)
@@ -17,12 +20,7 @@ def task_extract_journal(acronym, issn):
     return journal.id
 
 
-def task_extract_all_journals(acronym, issns):
-    for issn in issns:
-        job = q.enqueue(task_extract_journal, collection_acronym, issn)
-
-
-# ISSSUES:
+# Issues:
 
 
 def task_extract_issue(acronym, issue_id):
@@ -32,12 +30,7 @@ def task_extract_issue(acronym, issue_id):
     return issue.id
 
 
-def task_extract_all_issues(acronym, issns):
-    for issn in issns:
-        job = q.enqueue(task_extract_issue, collection_acronym, issn)
-
-
-# ARTICLES:
+# Articles:
 
 
 def task_extract_article(acronym, article_id):
@@ -45,8 +38,3 @@ def task_extract_article(acronym, article_id):
     extractor.extract()
     article = extractor.save()
     return article.id
-
-
-def task_extract_all_articles(acronym, issns):
-    for issn in issns:
-        job = q.enqueue(task_extract_article, collection_acronym, issn)

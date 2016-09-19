@@ -1,14 +1,18 @@
 # coding: utf-8
-from __future__ import unicode_literals
+import sys
+import os
 import logging
+from mongolog.handlers import MongoHandler
 
-import logging.config
-import config
-logger = logging.getLogger(__name__)
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
+sys.path.append(PROJECT_PATH)
+
+from opac_proc.web import config
 
 
-def config_logging(logging_level='INFO', logging_file=None):
+def getMongoLogger(name, level='INFO', process_stage='default'):
 
+    logger = logging.getLogger(name)
     allowed_levels = {
         'DEBUG': logging.DEBUG,
         'INFO': logging.INFO,
@@ -16,19 +20,10 @@ def config_logging(logging_level='INFO', logging_file=None):
         'ERROR': logging.ERROR,
         'CRITICAL': logging.CRITICAL
     }
+    logging_level = allowed_levels.get(level, config.OPAC_PROC_LOG_LEVEL)
+    logger.setLevel(logging_level)
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-    logger.setLevel(allowed_levels.get(logging_level, config.OPAC_PROC_LOG_LEVEL))
-
-    if logging_file:
-        hl = logging.FileHandler(logging_file, mode='a')
-    else:
-        hl = logging.StreamHandler()
-
-    hl.setFormatter(formatter)
-    hl.setLevel(allowed_levels.get(logging_level, 'INFO'))
-
-    logger.addHandler(hl)
-
+    collection_name = "%s_log" % process_stage
+    mongo_handler = MongoHandler.to(db='mongolog', collection=collection_name)
+    logger.addHandler(mongo_handler)
     return logger

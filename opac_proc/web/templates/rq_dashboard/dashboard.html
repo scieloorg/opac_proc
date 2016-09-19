@@ -128,6 +128,14 @@
                     </tbody>
                 </table>
 
+                <nav aria-label="Page navigation">
+                    <div id="page-selection">
+                        <nav>
+                            <ul class="pagination"></ul>
+                        </nav>
+                    </div>
+                </nav>
+
                 <script name="job-row" type="text/template">
                     <tr data-role="job" data-job-id="<%= d.id %>">
                         <td>
@@ -146,14 +154,16 @@
                             <span class="creation_date"><%= d.created_at %></span>
                         </td>
                         <td class="actions narrow">
-                            <% if (d.exc_info) { %>
-                                <a href="#" data-role="requeue-job-btn" class="btn btn-small">
-                                    <i class="glyphicon glyphicon-retweet"></i> Requeue
+                            <div class="btn-group-vertical" role="group">
+                                <% if (d.exc_info) { %>
+                                    <a href="#" data-role="requeue-job-btn" class="btn btn-default">
+                                        <i class="glyphicon glyphicon-retweet"></i> Requeue
+                                    </a>
+                                <% } %>
+                                <a href="#" data-role="cancel-job-btn" class="btn btn-danger">
+                                    <i class="glyphicon glyphicon-remove"></i> Cancel
                                 </a>
-                            <% } %>
-                            <a href="#" data-role="cancel-job-btn" class="btn btn-small">
-                                <i class="glyphicon glyphicon-remove"></i> Cancel
-                            </a>
+                            </div>
                         </td>
                     </tr>
                 </script>
@@ -163,12 +173,6 @@
                         <td colspan="3">No jobs.</td>
                     </tr>
                 </script>
-
-                <div id="page-selection">
-                    <nav>
-                        <ul class="pager"></ul>
-                    </nav>
-                </div>
 
                 <script name="no-previous-page-link" type="text/template">
                     <li class="previous disabled">

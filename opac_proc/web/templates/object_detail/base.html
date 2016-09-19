@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title|title }}{% endblock %}
+{% block content %}
+    {% include "includes/page_header.html" %}
+    <pre><code>{{ object_json|pprint }}</code></pre>
+{% endblock %}
