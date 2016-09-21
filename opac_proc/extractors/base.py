@@ -1,13 +1,20 @@
 # coding: utf-8
-import logging
-from datetime import datetime
+import os
+import sys
 
-import config
 from opac_proc.extractors.source_clients.thrift import am_clients
 from opac_proc.datastore.mongodb_connector import get_db_connection
 
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.append(PROJECT_PATH)
 
-logger = logging.getLogger(__name__)
+from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
+
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "extract")
+else:
+    logger = getMongoLogger(__name__, "INFO", "extract")
 
 
 class BaseExtractor(object):
@@ -77,6 +84,7 @@ class BaseExtractor(object):
         """
         Salva os dados coletados no datastore (mongo)
         """
+        logger.debug("Inciando metodo save()")
         if self.metadata['is_locked']:
             msg = u"atributos metadata['is_locked'] indica que o processamento não finalizou corretamente."
             logger.error(msg)
@@ -105,14 +113,19 @@ class BaseExtractor(object):
             # salvamos no mongo
             try:
                 if self.extract_model_instance:
+                    logger.debug("extract_model_instance encontrado. Atualizando!")
                     self.extract_model_instance.modify(**self._raw_data)
                 else:
+                    logger.debug("extract_model_instance NÃO encontrado. Criando novo!")
                     self.extract_model_class(**self._raw_data).save()
+                    self.extract_model_instance = self.get_extract_model_instance()
             except Exception, e:
                 msg = u"Não foi possível salvar %s. Exeção: %s" % (
                     self.extract_model_name, e)
                 logger.error(msg)
                 raise e
             else:
+                logger.debug("Reload de extract_model_instance")
                 self.extract_model_instance.reload()
+                logger.debug("Fim metodo save(), retornamos uuid: %s" % self.extract_model_instance.uuid)
                 return self.extract_model_instance

@@ -1,13 +1,17 @@
 # coding: utf-8
-from __future__ import unicode_literals
-
-import logging
-
+from opac_proc.transformers.tr_collections import CollectionTransformer
 from opac_proc.transformers.tr_journals import JournalTransformer
 from opac_proc.transformers.tr_issues import IssueTransformer
 from opac_proc.transformers.tr_articles import ArticleTransformer
 
-logger = logging.getLogger(__name__)
+# Collections:
+
+
+def task_transform_collection(acronym):
+    ctr = CollectionTransformer(collection.acronym)
+    ctr.transform()
+    collection = ctr.save()
+    return collection.id
 
 
 # Journals:

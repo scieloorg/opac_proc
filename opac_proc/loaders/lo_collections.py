@@ -1,13 +1,9 @@
 # coding: utf-8
-import logging
-
-from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.models import (
     TransformCollection,
     LoadCollection)
+from opac_proc.loaders.base import BaseLoader
 from opac_schema.v1.models import Collection as OpacCollection
-
-logger = logging.getLogger(__name__)
 
 
 class CollectionLoader(BaseLoader):

@@ -6,21 +6,41 @@
         <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Extraction info:
+                    Extract:
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
-                        Collections: <span class="badge">{{ extract_collection_count }}</span>
+                        Collections:
+                        {% if extract_collection_count == 0 %}
+                            <span class="badge badge-danger">{{ extract_collection_count }}</span>
+                        {% else %}
+                            <span class="badge badge-primary">{{ extract_collection_count }}</span>
+                        {% endif %}
                     </li>
                     <li class="list-group-item">
-                        Journals: <span class="badge">{{ extract_journal_count }}</span>
+                        Journals:
+                        {% if extract_journal_count == 0 %}
+                            <span class="badge badge-danger">{{ extract_journal_count }}</span>
+                        {% else %}
+                            <span class="badge badge-primary">{{ extract_journal_count }}</span>
+                        {% endif %}
                     </li>
                     <li class="list-group-item">
-                        Issues: <span class="badge">{{ extract_issue_count }}</span>
+                        Issues:
+                        {% if extract_issue_count == 0 %}
+                            <span class="badge badge-danger">{{ extract_issue_count }}</span>
+                        {% else %}
+                            <span class="badge badge-primary">{{ extract_issue_count }}</span>
+                        {% endif %}
                     </li>
                     <li class="list-group-item">
-                        Articles: <span class="badge">{{ extract_article_count }}</span>
+                        Articles:
+                        {% if extract_article_count == 0 %}
+                            <span class="badge badge-danger">{{ extract_article_count }}</span>
+                        {% else %}
+                            <span class="badge badge-primary">{{ extract_article_count }}</span>
+                        {% endif %}
                     </li>
                 </ul>
             </div>
@@ -28,21 +48,61 @@
         <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Transform info:
+                    Transform:
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
-                        Collections: <span class="badge">{{ transform_collection_count }}</span>
+                        Collections:
+                        {% if transform_collection_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif transform_collection_count < extract_collection_count %}
+                            <span class="badge badge-warning">
+                        {% elif transform_collection_count > extract_collection_count %}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ transform_collection_count }}</span>
                     </li>
                     <li class="list-group-item">
-                        Journals: <span class="badge">{{ transform_journal_count }}</span>
+                        Journals:
+                        {% if transform_journal_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif transform_journal_count < extract_journal_count %}
+                            <span class="badge badge-warning">
+                        {% elif transform_journal_count > extract_journal_count %}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ transform_journal_count }}</span>
                     </li>
                     <li class="list-group-item">
-                        Issues: <span class="badge">{{ transform_issue_count }}</span>
+                        Issues:
+                        {% if transform_issue_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif transform_issue_count < extract_issue_count %}
+                            <span class="badge badge-warning">
+                        {% elif transform_issue_count > extract_issue_count %}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ transform_issue_count }}</span>
                     </li>
                     <li class="list-group-item">
-                        Articles: <span class="badge">{{ transform_article_count }}</span>
+                        Articles:
+                        {% if transform_article_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif transform_article_count < extract_article_count %}
+                            <span class="badge badge-warning">
+                        {% elif transform_article_count > extract_article_count %}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ transform_article_count }}</span>
                     </li>
                 </ul>
             </div>
@@ -50,21 +110,61 @@
         <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Load info:
+                    Load:
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
-                        Collections: <span class="badge">{{ load_collection_count }}</span>
+                        Collections:
+                        {% if load_collection_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif load_collection_count < transform_collection_count %}
+                            <span class="badge badge-warning">
+                        {% elif load_collection_count > transform_collection_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ load_collection_count }}</span>
                     </li>
                     <li class="list-group-item">
-                        Journals: <span class="badge">{{ load_journal_count }}</span>
+                        Journals:
+                        {% if load_journal_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif load_journal_count < transform_journal_count %}
+                            <span class="badge badge-warning">
+                        {% elif load_journal_count > transform_journal_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ load_journal_count }}</span>
                     </li>
                     <li class="list-group-item">
-                        Issues: <span class="badge">{{ load_issue_count }}</span>
+                        Issues:
+                        {% if load_issue_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif load_issue_count < transform_issue_count %}
+                            <span class="badge badge-warning">
+                        {% elif load_issue_count > transform_issue_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ load_issue_count }}</span>
                     </li>
                     <li class="list-group-item">
-                        Articles: <span class="badge">{{ load_article_count }}</span>
+                        Articles:
+                        {% if load_article_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif load_article_count < transform_article_count %}
+                            <span class="badge badge-warning">
+                        {% elif load_article_count > transform_article_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ load_article_count }}</span>
                     </li>
                 </ul>
             </div>

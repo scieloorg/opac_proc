@@ -1,6 +1,4 @@
 # coding: utf-8
-import logging
-
 from mongoengine.context_managers import switch_db
 
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
@@ -13,8 +11,6 @@ from opac_proc.datastore.models import (
 from opac_schema.v1.models import Issue as OpacIssue
 from opac_schema.v1.models import Journal as OpacJournal
 
-
-logger = logging.getLogger(__name__)
 OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
 
 

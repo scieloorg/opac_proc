@@ -31,7 +31,9 @@
               <a href="{{ url_for('extract_articles_list') }}">Articles</a>
             </li>
             <li role="separator" class="divider"></li>
-            <li><a href="#">Logs</a></li>
+            <li {% if request.path == url_for('extract_logs_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('extract_logs_list') }}">Logs</a>
+            </li>
           </ul>
         </li>
 
@@ -41,20 +43,22 @@
             Transform <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li {% if request.path == url_for('transform_collections') %} class="active" {% endif %}>
-              <a href="{{ url_for('transform_collections') }}">Collections</a>
+            <li {% if request.path == url_for('transform_collections_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_collections_list') }}">Collections</a>
             </li>
-            <li {% if request.path == url_for('transform_journals') %} class="active" {% endif %}>
-              <a href="{{ url_for('transform_journals') }}">Journals</a>
+            <li {% if request.path == url_for('transform_journals_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_journals_list') }}">Journals</a>
             </li>
-            <li {% if request.path == url_for('transform_issues') %} class="active" {% endif %}>
-              <a href="{{ url_for('transform_issues') }}">Issues</a>
+            <li {% if request.path == url_for('transform_issues_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_issues_list') }}">Issues</a>
             </li>
-            <li {% if request.path == url_for('transform_articles') %} class="active" {% endif %}>
-              <a href="{{ url_for('transform_articles') }}">Articles</a>
+            <li {% if request.path == url_for('transform_articles_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_articles_list') }}">Articles</a>
             </li>
             <li role="separator" class="divider"></li>
-            <li><a href="#">Logs</a></li>
+            <li {% if request.path == url_for('transform_logs_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_logs_list') }}">Logs</a>
+            </li>
           </ul>
         </li>
 
@@ -77,7 +81,9 @@
               <a href="{{ url_for('load_articles') }}">Articles</a>
             </li>
             <li role="separator" class="divider"></li>
-            <li><a href="#">Logs</a></li>
+            <li {% if request.path == url_for('load_logs_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('load_logs_list') }}">Logs</a>
+            </li>
           </ul>
         </li>
 

@@ -1,14 +1,17 @@
 # coding: utf-8
-from __future__ import unicode_literals
-
-import logging
-
+from opac_proc.extractors.ex_collections import CollectionExtactor
 from opac_proc.extractors.ex_journals import JournalExtactor
 from opac_proc.extractors.ex_issues import IssueExtactor
 from opac_proc.extractors.ex_articles import ArticleExtactor
 
 
-logger = logging.getLogger(__name__)
+# Collection:
+
+def task_extract_collection(acronym):
+    extractor = CollectionExtactor(acronym)
+    extractor.extract()
+    collection = extractor.save()
+    return collection.id
 
 
 # Journals:

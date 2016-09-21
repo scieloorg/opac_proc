@@ -1,15 +1,21 @@
 # coding: utf-8
+import os
+import sys
 import json
-import logging
-from datetime import datetime
 
-import config
-from opac_proc.extractors.source_clients.thrift import am_clients
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.extractors.decorators import update_metadata
 
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.append(PROJECT_PATH)
 
-logger = logging.getLogger(__name__)
+from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
+
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "transform")
+else:
+    logger = getMongoLogger(__name__, "INFO", "transform")
 
 
 class BaseTransformer(object):
@@ -94,12 +100,14 @@ class BaseTransformer(object):
         definida em cada subclase, e retorna um dicionario pronto para criar
         um instância de documento xylose
         """
+        logger.debug('iniciando clean_for_xylose')
         obj_json = self.extract_model_instance.to_json()
         obj_dict = json.loads(obj_json)
         result_dict = {}
         for k, v in obj_dict.iteritems():
             if k not in self.exclude_fields:
                 result_dict[k] = v
+        logger.debug('finalizado clean_for_xylose')
         return result_dict
 
     def get_extract_model_instance(self, key):
@@ -138,7 +146,7 @@ class BaseTransformer(object):
         """
         Salva os dados transformados no datastore (mongo)
         """
-
+        logger.debug("iniciando save()")
         try:
             self.transform_model_instance.save()
             self.metadata['must_reprocess'] = False
@@ -150,4 +158,5 @@ class BaseTransformer(object):
             logger.error(msg)
             raise Exception(msg)
         else:
+            logger.debug("finalizando save()")
             return self.transform_model_instance

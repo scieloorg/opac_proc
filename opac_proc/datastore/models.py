@@ -1,6 +1,4 @@
 # coding: utf-8
-from __future__ import unicode_literals
-
 from mongoengine import DynamicDocument, signals, DoesNotExist
 from base_mixin import BaseMixin
 
@@ -213,3 +211,34 @@ class LoadArticle(BaseMixin, DynamicDocument):
     }
 signals.pre_save.connect(LoadArticle.pre_save, sender=LoadArticle)
 signals.post_save.connect(LoadArticle.post_save, sender=LoadArticle)
+
+
+# #### LOGS
+
+
+class ExtractLog(DynamicDocument):
+    meta = {
+        'collection': 'extract_log',
+        'db_alias': 'opac_proc_logs',
+    }
+
+
+class TransformLog(DynamicDocument):
+    meta = {
+        'collection': 'transform_log',
+        'db_alias': 'opac_proc_logs',
+    }
+
+
+class LoadLog(DynamicDocument):
+    meta = {
+        'collection': 'load_log',
+        'db_alias': 'opac_proc_logs',
+    }
+
+
+class DefaultLog(DynamicDocument):
+    meta = {
+        'collection': 'default_log',
+        'db_alias': 'opac_proc_logs',
+    }

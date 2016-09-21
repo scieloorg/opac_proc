@@ -1,14 +1,16 @@
 # coding: utf-8
-
-import logging
 from datetime import datetime
-
 from opac_proc.datastore.models import ExtractIssue
 from opac_proc.extractors.base import BaseExtractor
 from opac_proc.extractors.decorators import update_metadata
 
+from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
 
-logger = logging.getLogger(__name__)
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "extract")
+else:
+    logger = getMongoLogger(__name__, "INFO", "extract")
 
 
 class IssueExtactor(BaseExtractor):

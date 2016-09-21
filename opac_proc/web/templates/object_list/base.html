@@ -46,7 +46,7 @@
                         {% for column in list_colums %}
                             {% if loop.first %}
                                 <td {% if column.field_name|lower == 'uuid' %} style="width: 300px" {% endif %}>
-                                    <a class="row-detail" href="{{ object._id }}"> {# hack! para evitar a property no model que me diz a url #}
+                                    <a class="row-detail" href="{{ object.pk }}"> {# hack! URL de detail é relativo a URL de listagem #}
                                         {{ mhelper.render_row_cell(object, column.field_name, column.field_type) }}
                                     </a>
                                 </td>

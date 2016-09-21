@@ -16,6 +16,10 @@ def get_opac_webapp_db_name():
     return config.OPAC_MONGODB_NAME
 
 
+def get_opac_logs_db_name():
+    return config.OPAC_PROC_LOG_MONGODB_NAME
+
+
 def get_db_connection():
     if config.MONGODB_USER and config.MONGODB_PASS:
         logger.debug('Iniciando conexão - com credenciais do banco: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
@@ -32,13 +36,19 @@ def get_db_connection():
 
 
 def register_connections():
+    # OPAC PROC
+    opac_proc_db_name = get_opac_proc_db_name()
     logger.debug('Registrando conexão - {db}: mongo://{host}:{port}/{db}'.format(
         **config.MONGODB_SETTINGS))
-
-    opac_proc_db_name = get_opac_proc_db_name()
     register_connection(opac_proc_db_name, opac_proc_db_name)
 
+    # OPAC WEBAPP
+    opac_db_name = get_opac_webapp_db_name()
     logger.debug('Registrando conexão - {db}: mongo://{host}:{port}/{db}'.format(
         **config.OPAC_MONGODB_SETTINGS))
-    opac_db_name = get_opac_webapp_db_name()
     register_connection(opac_db_name, opac_db_name)
+
+    # OPAC PROC LOGS
+    opac_logs_db_name = get_opac_logs_db_name()
+    logger.debug('Registrando conexão de logs - {db}'.format(db=opac_logs_db_name))
+    register_connection(opac_logs_db_name, opac_logs_db_name)

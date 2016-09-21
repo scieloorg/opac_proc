@@ -1,7 +1,4 @@
 # coding: utf-8
-import logging
-from datetime import datetime
-
 from xylose.scielodocument import Journal
 
 from opac_proc.datastore.models import (
@@ -12,7 +9,13 @@ from opac_proc.transformers.base import BaseTransformer
 from opac_proc.transformers.utils import trydate
 from opac_proc.extractors.decorators import update_metadata
 
-logger = logging.getLogger(__name__)
+from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
+
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "transform")
+else:
+    logger = getMongoLogger(__name__, "INFO", "transform")
 
 
 class JournalTransformer(BaseTransformer):

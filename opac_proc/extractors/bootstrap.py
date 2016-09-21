@@ -1,10 +1,9 @@
 # coding: utf-8
-from __future__ import unicode_literals
+import os
+import sys
 from redis import Redis
 from rq import Queue
 
-import os
-import sys
 import optparse
 import textwrap
 import logging
@@ -12,9 +11,6 @@ import logging
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
-from opac_proc.web import config
-
-from opac_proc.logger_setup import config_logging
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.datastore.models import (
     ExtractCollection,
@@ -24,15 +20,24 @@ from opac_proc.datastore.models import (
 
 from opac_proc.extractors.ex_collections import CollectionExtactor
 from opac_proc.extractors.jobs import (
+    task_extract_collection,
     task_extract_journal,
     task_extract_issue,
     task_extract_article
 )
 
-logger = logging.getLogger(__name__)
+from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
+
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "extract")
+else:
+    logger = getMongoLogger(__name__, "INFO", "extract")
+
 redis_conn = Redis()
 
 q_names = [
+    'qex_collections',
     'qex_journals',
     'qex_issues',
     'qex_articles',
@@ -45,9 +50,9 @@ for name in q_names:
 
 def reprocess_collection(collection_acronym):
     for collection in ExtractCollection.objects(must_reprocess=True):
-        coll_ex = CollectionExtactor(collection.acronym)
-        coll_ex.extract()
-        coll_ex.save()
+        queues['qex_collections'].enqueue(
+            task_extract_collection,
+            collection_acronym)
 
 
 def reprocess_journal(collection_acronym):
@@ -152,13 +157,6 @@ def main(argv=sys.argv[1:]):
         default=False,
         help=u'Reprocessar todos os registros de Extração')
 
-    # Arquivo de log
-    parser.add_option(
-        '--logging_file',
-        '-o',
-        default=config.OPAC_PROC_LOG_FILE_PATH,
-        help=u'Caminho absoluto do log file')
-
     # Nível do log
     parser.add_option(
         '--logging_level',
@@ -168,7 +166,7 @@ def main(argv=sys.argv[1:]):
         help=u'Nível do log')
 
     options, args = parser.parse_args(argv)
-    config_logging(options.logging_level, options.logging_file)
+    logger = getMongoLogger(__name__, options.logging_level, "extract")
 
     try:
         if options.extract_all and options.reprocess_all:

@@ -11,6 +11,12 @@ class DetailView(MethodView):
     page_title = u'Object Detail'
     page_subtitle = u''
 
+    def get_document_by_id(self, object_id):
+        """
+        metodo que retorna o documento procurando pelo object_id.
+        """
+        return self.model_class.objects.get(_id=object_id)
+
     def render_template(self, context):
         return render_template(self.template_name, **context)
 
@@ -20,7 +26,7 @@ class DetailView(MethodView):
             abort(400, u'Deve indicar um id (parametro: object_id) válido')
         else:
             try:
-                doc = self.model_class.objects.get(_id=object_id)
+                doc = self.get_document_by_id(object_id)
                 doc_json = doc.to_json()
                 doc_json = json.loads(doc_json)
             except DoesNotExist:

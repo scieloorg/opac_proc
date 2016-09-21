@@ -1,0 +1,13 @@
+body { padding-top: 50px;}
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+/* complemento de color para span.badge */
+.badge-default  { background-color: #777;}
+.badge-primary  { background-color: #337ab7;}
+.badge-success  { background-color: #5cb85c;}
+.badge-info     { background-color: #5bc0de;}
+.badge-warning  { background-color: #f0ad4e;}
+.badge-danger   { background-color: #d9534f;}

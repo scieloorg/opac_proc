@@ -1,5 +1,4 @@
 # coding: utf-8
-import logging
 from uuid import uuid4
 from mongoengine.context_managers import switch_db
 
@@ -19,7 +18,14 @@ from opac_schema.v1.models import TranslatedTitle as OpacTranslatedTitle
 from opac_schema.v1.models import TranslatedSection as OpacTranslatedSection
 
 
-logger = logging.getLogger(__name__)
+from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
+
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "transform")
+else:
+    logger = getMongoLogger(__name__, "INFO", "transform")
+
 OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
 
 

@@ -1,10 +1,9 @@
 # coding: utf-8
-from __future__ import unicode_literals
+import os
+import sys
 from redis import Redis
 from rq import Queue
 
-import os
-import sys
 import optparse
 import textwrap
 import logging
@@ -12,9 +11,6 @@ import logging
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
-from opac_proc.web import config
-
-from opac_proc.logger_setup import config_logging
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.datastore.models import (
     ExtractCollection,
@@ -25,15 +21,23 @@ from opac_proc.datastore.models import (
 
 from opac_proc.transformers.tr_collections import CollectionTransformer
 from opac_proc.transformers.jobs import (
+    task_transform_collection,
     task_transform_journal,
     task_transform_issue,
     task_transform_article)
 
+from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
 
-logger = logging.getLogger(__name__)
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "transform")
+else:
+    logger = getMongoLogger(__name__, "INFO", "transform")
+
 redis_conn = Redis()
 
 q_names = [
+    'qtr_collections',
     'qtr_journals',
     'qtr_issues',
     'qtr_articles',
@@ -46,9 +50,9 @@ for name in q_names:
 
 def reprocess_collection(collection_acronym):
     for collection in TransformCollection.objects(must_reprocess=True):
-        coll_ex = CollectionTransformer(collection.acronym)
-        coll_ex.extract()
-        coll_ex.save()
+        queues['qtr_collections'].enqueue(
+            task_transform_collection,
+            collection.acronym)
 
 
 def reprocess_journal(collection_acronym):
@@ -94,7 +98,7 @@ def transform_all(collection_acronym):
         logger.error('Não foram definidas as Queues')
         raise Exception(u'Não foram definidas as Queues')
 
-    for child in coll_transform.children_ids:
+    for child in col.children_ids:
         issn = child['issn']
         issues_ids = child['issues_ids']
         articles_ids = child['articles_ids']
@@ -141,7 +145,7 @@ def main(argv=sys.argv[1:]):
         '-t',
         dest='transform_all',
         default=False,
-        help=u'Extair tudo: coleções,periódicos,fascículos e artigos')
+        help=u'Transformar tudo: coleções,periódicos,fascículos e artigos')
 
     parser.add_option(
         '--reprocess-all',
@@ -149,13 +153,6 @@ def main(argv=sys.argv[1:]):
         dest='reprocess_all',
         default=False,
         help=u'Reprocessar todos os registros de Transformação')
-
-    # Arquivo de log
-    parser.add_option(
-        '--logging_file',
-        '-o',
-        default=config.OPAC_PROC_LOG_FILE_PATH,
-        help=u'Caminho absoluto do log file')
 
     # Nível do log
     parser.add_option(
@@ -166,7 +163,7 @@ def main(argv=sys.argv[1:]):
         help=u'Nível do log')
 
     options, args = parser.parse_args(argv)
-    config_logging(options.logging_level, options.logging_file)
+    logger = getMongoLogger(__name__, options.logging_level, "transform")
 
     try:
         if options.transform_all and options.reprocess_all:

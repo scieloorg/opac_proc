@@ -19,38 +19,44 @@ from opac_proc.web.views.extract.list_views import (
     ExtractCollectionListView,
     ExtractJournalListView,
     ExtractIssueListView,
-    ExtractArticleListView)
+    ExtractArticleListView,
+    ExtractLogListView)
 
 from opac_proc.web.views.extract.detail_views import (
     ExtractCollectionDetailView,
     ExtractJournalDetailView,
     ExtractIssueDetailView,
-    ExtractArticleDetailView)
+    ExtractArticleDetailView,
+    ExtractLogDetailView)
 
 from opac_proc.web.views.transform.list_views import (
     TransformCollectionListView,
     TransformJournalListView,
     TransformIssueListView,
-    TransformArticleListView)
+    TransformArticleListView,
+    TransformLogListView)
 
 from opac_proc.web.views.transform.detail_views import (
     TransformCollectionDetailView,
     TransformJournalDetailView,
     TransformIssueDetailView,
-    TransformArticleDetailView)
+    TransformArticleDetailView,
+    TransformLogDetailView)
 
 
 from opac_proc.web.views.load.list_views import (
     LoadCollectionListView,
     LoadJournalListView,
     LoadIssueListView,
-    LoadArticleListView)
+    LoadArticleListView,
+    LoadLogListView)
 
 from opac_proc.web.views.load.detail_views import (
     LoadCollectionDetailView,
     LoadJournalDetailView,
     LoadIssueDetailView,
-    LoadArticleDetailView)
+    LoadArticleDetailView,
+    LoadLogDetailView)
 
 from opac_proc.datastore import models
 
@@ -120,15 +126,17 @@ app.add_url_rule(
     '/extract/journals/',
     view_func=ExtractJournalListView.as_view('extract_journals_list'))
 
-
 app.add_url_rule(
     '/extract/issues/',
     view_func=ExtractIssueListView.as_view('extract_issues_list'))
 
-
 app.add_url_rule(
     '/extract/articles/',
     view_func=ExtractArticleListView.as_view('extract_articles_list'))
+
+app.add_url_rule(
+    '/extract/logs/',
+    view_func=ExtractLogListView.as_view('extract_logs_list'))
 
 # EXTRACT: Detail View
 
@@ -152,23 +160,32 @@ app.add_url_rule(
     view_func=ExtractArticleDetailView.as_view('extract_article_detail'),
     methods=['GET'])
 
+app.add_url_rule(
+    '/extract/logs/<string:object_id>/',
+    view_func=ExtractLogDetailView.as_view('extract_log_detail'),
+    methods=['GET'])
+
 # TRANSFORM: List Views
 
 app.add_url_rule(
     '/transform/collections/',
-    view_func=TransformCollectionListView.as_view('transform_collections'))
+    view_func=TransformCollectionListView.as_view('transform_collections_list'))
 
 app.add_url_rule(
     '/transform/journals/',
-    view_func=TransformJournalListView.as_view('transform_journals'))
+    view_func=TransformJournalListView.as_view('transform_journals_list'))
 
 app.add_url_rule(
     '/transform/issues/',
-    view_func=TransformIssueListView.as_view('transform_issues'))
+    view_func=TransformIssueListView.as_view('transform_issues_list'))
 
 app.add_url_rule(
     '/transform/articles/',
-    view_func=TransformArticleListView.as_view('transform_articles'))
+    view_func=TransformArticleListView.as_view('transform_articles_list'))
+
+app.add_url_rule(
+    '/transform/logs/',
+    view_func=TransformLogListView.as_view('transform_logs_list'))
 
 
 # TRANSFORM: Detail View
@@ -193,6 +210,11 @@ app.add_url_rule(
     view_func=TransformArticleDetailView.as_view('transform_article_detail'),
     methods=['GET'])
 
+app.add_url_rule(
+    '/transform/logs/<string:object_id>/',
+    view_func=TransformLogDetailView.as_view('transform_log_detail'),
+    methods=['GET'])
+
 # LOAD: List View
 
 app.add_url_rule(
@@ -207,12 +229,13 @@ app.add_url_rule(
     '/load/issues/',
     view_func=LoadIssueListView.as_view('load_issues'))
 
-
 app.add_url_rule(
     '/load/articles/',
     view_func=LoadArticleListView.as_view('load_articles'))
 
-
+app.add_url_rule(
+    '/load/logs/',
+    view_func=LoadLogListView.as_view('load_logs_list'))
 # Load: Detail View
 
 app.add_url_rule(
@@ -233,6 +256,11 @@ app.add_url_rule(
 app.add_url_rule(
     '/load/articles/<string:object_id>/',
     view_func=LoadArticleDetailView.as_view('load_article_detail'),
+    methods=['GET'])
+
+app.add_url_rule(
+    '/load/logs/<string:object_id>/',
+    view_func=LoadLogDetailView.as_view('load_log_detail'),
     methods=['GET'])
 
 
