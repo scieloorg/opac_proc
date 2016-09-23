@@ -1,16 +1,14 @@
 # coding: utf-8
 import os
 import sys
-from redis import Redis
-from rq import Queue
 
 import optparse
 import textwrap
-import logging
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
+from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.datastore.models import (
     ExtractCollection,
@@ -34,93 +32,102 @@ if config.DEBUG:
 else:
     logger = getMongoLogger(__name__, "INFO", "transform")
 
-redis_conn = Redis()
-
-q_names = [
-    'qtr_collections',
-    'qtr_journals',
-    'qtr_issues',
-    'qtr_articles',
-]
-
-queues = {}
-for name in q_names:
-    queues[name] = Queue(name, connection=redis_conn)
+r_queues = RQueues()
+r_queues.create_queues_for_stage('transform')
 
 
 def reprocess_collection(collection_acronym):
     for collection in TransformCollection.objects(must_reprocess=True):
-        queues['qtr_collections'].enqueue(
+        r_queues.enqueue(
+            'transform', 'collection',
             task_transform_collection,
-            collection.acronym)
+            collection.code)
 
 
-def reprocess_journal(collection_acronym):
+def reprocess_journal():
     for tr_journal in TransformJournal.objects(must_reprocess=True):
-        queues['qtr_journals'].enqueue(
-            task_extract_journal,
-            collection_acronym, tr_journal.code)
+        r_queues.enqueue(
+            'transform', 'journal',
+            task_transform_journal,
+            tr_journal.code)
 
 
-def reprocess_issue(collection_acronym):
+def reprocess_issue():
     for tr_issue in TransformIssue.objects(must_reprocess=True):
-        queues['qtr_issues'].enqueue(
-            task_extract_issue,
-            collection_acronym, tr_issue.code)
+        r_queues.enqueue(
+            'transform', 'issue',
+            task_transform_issue,
+            tr_issue.code)
 
 
-def reprocess_article(collection_acronym):
+def reprocess_article():
     for tr_article in TransformArticle.objects(must_reprocess=True):
-        queues['qtr_articles'].enqueue(
-            task_extract_article,
-            collection_acronym, tr_article.code)
+        r_queues.enqueue(
+            'transform', 'article',
+            task_transform_article,
+            tr_article.code)
 
 
 def reprocess_all_pendings(collection_acronym):
     db = get_db_connection()
     reprocess_collection(collection_acronym)
-    reprocess_journal(collection_acronym)
-    reprocess_issue(collection_acronym)
-    reprocess_article(collection_acronym)
+    reprocess_journal()
+    reprocess_issue()
+    reprocess_article()
 
 
 def transform_all(collection_acronym):
+    logger.info(u'inciando transform_all(%s)' % collection_acronym)
     db = get_db_connection()
-    logger.info('Tranformando Collection:  %s' % collection_acronym)
-    coll_transform = CollectionTransformer(
-        extract_model_key=collection_acronym)
-    coll_transform.transform()
-    col = coll_transform.save()
-    logger.info('Collection %s tranformada' % col.acronym)
-    logger.info("Disparando tasks")
+    col = ExtractCollection.objects.get(acronym=collection_acronym)
 
-    if not queues:
-        logger.error('Não foram definidas as Queues')
-        raise Exception(u'Não foram definidas as Queues')
+    if not r_queues:
+        msg = u'Não foram definidas as Queues'
+        logger.error(msg)
+        raise RuntimeError(msg)
 
+    logger.debug(u'enfilerando task: task_transform_collection')
+    r_queues.enqueue(
+        'transform', 'collection',
+        task_transform_collection,
+        col.acronym)
+
+    try:
+        logger.debug(u'Tentamos recuperar a coleção transformada')
+        col = TransformCollection.objects.get(acronym=collection_acronym)
+    except Exception as e:
+        logger.debug(u'Erro tentando recuperar a coleção transformada. (a task terminou?) Continuamos com a coleção extradia')
+        pass
+
+    logger.info(u'Collection %s tranformada' % col.acronym)
+
+    logger.info(u'Disparando tasks')
     for child in col.children_ids:
         issn = child['issn']
         issues_ids = child['issues_ids']
         articles_ids = child['articles_ids']
 
-        logger.debug("enfilerando task: task_transform_journal [issn: %s]" % issn)
-        queues['qtr_journals'].enqueue(
+        logger.debug(u"enfilerando task: task_transform_journal [issn: %s]" % issn)
+        r_queues.enqueue(
+            'transform', 'journal',
             task_transform_journal,
             issn)
 
         for issue_id in issues_ids:
-            logger.debug("enfilerando task: task_transform_issue [issue_id: %s]" % issue_id)
-            queues['qtr_issues'].enqueue(
+            logger.debug(u"enfilerando task: task_transform_issue [issue_id: %s]" % issue_id)
+            r_queues.enqueue(
+                'transform', 'issue',
                 task_transform_issue,
                 issue_id)
 
         for article_id in articles_ids:
-            logger.debug("enfilerando task: task_transform_article [article_id: %s]" % article_id)
-            queues['qtr_articles'].enqueue(
+            logger.debug(u"enfilerando task: task_transform_article [article_id: %s]" % article_id)
+            r_queues.enqueue(
+                'transform', 'article',
                 task_transform_article,
                 article_id)
 
-    logger.info("Fim enfileramento de tasks")
+    logger.info(u"Fim enfileramento de tasks")
 
 
 def main(argv=sys.argv[1:]):
@@ -167,14 +174,14 @@ def main(argv=sys.argv[1:]):
 
     try:
         if options.transform_all and options.reprocess_all:
-            logger.error("Operação inválida: --transform-all e --reprocess-all são mutuamente exclusivos")
+            logger.error(u"Operação inválida: --transform-all e --reprocess-all são mutuamente exclusivos")
             exit(1)
         elif options.transform_all:
             transform_all(options.collection)
         elif options.reprocess_all:
             reprocess_all_pendings(options.collection)
         else:
-            logger.error("Operação inválida: deve indicar: --transform-all ou --reprocess-all")
+            logger.error(u"Operação inválida: deve indicar: --transform-all ou --reprocess-all")
             exit(1)
     except KeyboardInterrupt:
         logger.info(u"Processamento interrompido pelo usuário.")

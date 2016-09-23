@@ -56,7 +56,7 @@ class IssueTransformer(BaseTransformer):
             journal = TransformJournal.objects.get(acronym=acronym)
         except Exception, e:
             # se não for encontrado, salvamos o code do Issue para processar depois
-            logger.error("TransformJournal (acronym: %s) não encontrado!")
+            logger.error(u"TransformJournal (acronym: %s) não encontrado!")
             raise e
         else:
             self.transform_model_instance['journal'] = journal.uuid

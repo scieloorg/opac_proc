@@ -84,7 +84,7 @@ class BaseExtractor(object):
         """
         Salva os dados coletados no datastore (mongo)
         """
-        logger.debug("Inciando metodo save()")
+        logger.debug(u"Inciando metodo save()")
         if self.metadata['is_locked']:
             msg = u"atributos metadata['is_locked'] indica que o processamento não finalizou corretamente."
             logger.error(msg)
@@ -113,10 +113,10 @@ class BaseExtractor(object):
             # salvamos no mongo
             try:
                 if self.extract_model_instance:
-                    logger.debug("extract_model_instance encontrado. Atualizando!")
+                    logger.debug(u"extract_model_instance encontrado. Atualizando!")
                     self.extract_model_instance.modify(**self._raw_data)
                 else:
-                    logger.debug("extract_model_instance NÃO encontrado. Criando novo!")
+                    logger.debug(u"extract_model_instance NÃO encontrado. Criando novo!")
                     self.extract_model_class(**self._raw_data).save()
                     self.extract_model_instance = self.get_extract_model_instance()
             except Exception, e:
@@ -125,7 +125,7 @@ class BaseExtractor(object):
                 logger.error(msg)
                 raise e
             else:
-                logger.debug("Reload de extract_model_instance")
+                logger.debug(u"Reload de extract_model_instance")
                 self.extract_model_instance.reload()
-                logger.debug("Fim metodo save(), retornamos uuid: %s" % self.extract_model_instance.uuid)
+                logger.debug(u"Fim metodo save(), retornamos uuid: %s" % self.extract_model_instance.uuid)
                 return self.extract_model_instance

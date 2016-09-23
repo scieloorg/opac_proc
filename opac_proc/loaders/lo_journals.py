@@ -1,5 +1,6 @@
 # coding: utf-8
 from mongoengine.context_managers import switch_db
+from mongoengine import DoesNotExist
 
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
 from opac_proc.loaders.base import BaseLoader
@@ -18,20 +19,25 @@ from opac_schema.v1.models import (
     TranslatedSection,
     LastIssue)
 
+from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
+
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "load")
+else:
+    logger = getMongoLogger(__name__, "INFO", "load")
+
 OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
 
 
 class JournalLoader(BaseLoader):
     transform_model_class = TransformJournal
-    transform_model_name = 'TransformJournal'
     transform_model_instance = None
 
     opac_model_class = OpacJournal
-    opac_model_name = 'OpacJournal'
     opac_model_instance = None
 
     load_model_class = LoadJournal
-    load_model_name = 'LoadJournal'
     load_model_instance = None
 
     fields_to_load = [
@@ -76,23 +82,34 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection do
         """
-        transformed_coll_uuid_str = str(
-            self.transform_model_instance.collection).replace("-", "")
-        with switch_db(Collection, OPAC_WEBAPP_DB_NAME):
-            opac_collection = Collection.objects.get(
-                _id=transformed_coll_uuid_str)
-        return opac_collection
+        logger.debug(u"iniciando: prepare_collection")
+        transformed_coll_uuid_str = str(self.transform_model_instance.collection).replace("-", "")
+
+        try:
+            with switch_db(Collection, OPAC_WEBAPP_DB_NAME):
+                opac_collection = Collection.objects.get(_id=transformed_coll_uuid_str)
+                logger.debug(u"collection: %s (_id: %s) encontrada" % (opac_collection.name, transformed_coll_uuid_str))
+        except DoesNotExist, e:
+            logger.error(u"collection (_id: %s) não encontrada. Já fez o Load Collection?" % transformed_coll_uuid_str)
+            raise e
+        else:
+            return opac_collection
 
     def prepare_timeline(self):
         """
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection do
         """
+        logger.debug(u"iniciando: prepare_timeline")
         timeline_docs = []
         if hasattr(self.transform_model_instance, 'timeline'):
             for tl_dict in self.transform_model_instance.timeline:
                 timeline_doc = Timeline(**tl_dict)
                 timeline_docs.append(timeline_doc)
+        else:
+            logger.info(u"Não existem Timelines transformados. uuid: %s" % self.transform_model_instance.uuid)
+
+        logger.debug(u"timeline criadas: %s" % len(timeline_docs))
         return timeline_docs
 
     def prepare_social_networks(self):
@@ -101,6 +118,7 @@ class JournalLoader(BaseLoader):
         deve retornar um valor válido para Journal.collection do
         """
         # ainda não processmos esta infomação desde o AM/Xylose/Extract
+        logger.debug(u"iniciando: prepare_social_networks")
         return []
 
     def prepare_other_titles(self):
@@ -108,11 +126,16 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection do
         """
+        logger.debug(u"iniciando: prepare_other_titles")
         other_titles_docs = []
         if hasattr(self.transform_model_instance, 'other_titles'):
             for otitle_dict in self.transform_model_instance.other_titles:
                 other_titles_doc = OtherTitle(**otitle_dict)
                 other_titles_docs.append(other_titles_doc)
+        else:
+            logger.info(u"Não existem Other Titles transformados. uuid: %s" % self.transform_model_instance.uuid)
+
+        logger.debug(u"other_titles criados: %s" % len(other_titles_docs))
         return other_titles_docs
 
     def prepare_mission(self):
@@ -120,11 +143,16 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection do
         """
+        logger.debug(u"iniciando: prepare_mission")
         mission_docs = []
         if hasattr(self.transform_model_instance, 'mission'):
             for mission_dict in self.transform_model_instance.mission:
                 mission_doc = Mission(**mission_dict)
                 mission_docs.append(mission_doc)
+        else:
+            logger.info(u"Não existem Missions transformados. uuid: %s" % self.transform_model_instance.uuid)
+
+        logger.debug(u"Missions criados: %s" % len(mission_docs))
         return mission_docs
 
     def prepare_last_issue(self):
@@ -132,18 +160,20 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection do
         """
+        logger.debug(u"iniciando: prepare_last_issue")
         t_journal_uuid = self.transform_model_instance.uuid
         t_issue = TransformIssue.objects.filter(
-            journal=t_journal_uuid).order_by(
-            '-year', '-order').first().select_related()
+            journal=t_journal_uuid).order_by('-year', '-order').first().select_related()
 
+        logger.debug(u"last issue: t_issue encontrado (iid: %s)" % t_issue.iid)
         last_issue_sections = []
         if hasattr(t_issue, 'sections'):
             last_issue_sections = t_issue.sections
+        else:
+            logger.info(u"Não existem Issue.sections transformados. uuid: %s" % t_issue.uuid)
 
         last_issue_data = {
             'iid': str(t_issue.uuid).replace("-", ""),
-            # 'bibliographic_legend': 'USAR LEGENDARIUM',
             'sections': last_issue_sections,
         }
 
@@ -159,9 +189,12 @@ class JournalLoader(BaseLoader):
         if hasattr(t_issue, 'end_month'):
             last_issue_data['end_month'] = t_issue.end_month
 
+        logger.debug(u"criando documento LastIssue: %s" % last_issue_data)
         return LastIssue(**last_issue_data)
 
     def prepare_issue_count(self):
+        logger.debug(u"iniciando: prepare_issue_count")
         issue_count = TransformIssue.objects.filter(
             journal=self.transform_model_instance).count()
+        logger.debug(u"Quantidade de issues encontradas: %s" % issue_count)
         return issue_count

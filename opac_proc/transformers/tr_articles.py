@@ -49,7 +49,7 @@ class ArticleTransformer(BaseTransformer):
         try:
             issue = TransformIssue.objects.get(pid=pid)
         except Exception, e:
-            logger.error("TransformIssue (pid: %s) não encontrado!")
+            logger.error(u"TransformIssue (pid: %s) não encontrado!")
             raise e
         else:
             self.transform_model_instance['issue'] = issue.uuid
@@ -59,7 +59,7 @@ class ArticleTransformer(BaseTransformer):
         try:
             journal = TransformJournal.objects.get(acronym=acronym)
         except Exception, e:
-            logger.error("TransformJournal (acronym: %s) não encontrado!")
+            logger.error(u"TransformJournal (acronym: %s) não encontrado!")
             raise e
         else:
             self.transform_model_instance['journal'] = journal.uuid

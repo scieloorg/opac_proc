@@ -60,7 +60,7 @@ class ArticleMeta(object):
 
                 xjournal = Journal(jjournal)
 
-                logger.info('Journal loaded: %s_%s' % (identifier.collection, identifier.code))
+                logger.info(u'Journal loaded: %s_%s' % (identifier.collection, identifier.code))
 
                 yield xjournal
 
@@ -74,12 +74,12 @@ class ArticleMeta(object):
 
             xjournal = Journal(jjournal)
 
-            logger.info('Journal loaded: %s_%s' % (collection, code))
+            logger.info(u'Journal loaded: %s_%s' % (collection, code))
 
             return xjournal
 
         except:
-            msg = 'Error retrieving journal: %s_%s' % (collection, code)
+            msg = u'Error retrieving journal: %s_%s' % (collection, code)
             # raise ServerError(msg)
             logger.error(msg)
             pass
@@ -91,7 +91,7 @@ class ArticleMeta(object):
                 collection
             )
         except:
-            msg = 'Error checking if document exists: %s_%s' % (collection, code)
+            msg = u'Error checking if document exists: %s_%s' % (collection, code)
             # raise ServerError(msg)
             logger.error(msg)
             pass
@@ -104,7 +104,7 @@ class ArticleMeta(object):
                 doaj_id
             )
         except:
-            msg = 'Error senting doaj id for document: %s_%s' % (collection, code)
+            msg = u'Error senting doaj id for document: %s_%s' % (collection, code)
             # raise ServerError(msg)
             logger.error(msg)
             pass
@@ -118,7 +118,7 @@ class ArticleMeta(object):
                 fmt=fmt
             )
         except:
-            msg = 'Error retrieving document: %s_%s' % (collection, code)
+            msg = u'Error retrieving document: %s_%s' % (collection, code)
             # raise ServerError(msg)
             logger.error(msg)
             pass
@@ -127,19 +127,19 @@ class ArticleMeta(object):
         try:
             jarticle = json.loads(article)
         except:
-            msg = 'Fail to load JSON when retrienving document: %s_%s' % (collection, code)
+            msg = u'Fail to load JSON when retrienving document: %s_%s' % (collection, code)
             raise ServerError(msg)
 
         if not jarticle:
-            logger.warning('Document not found for : %s_%s' % (collection, code))
+            logger.warning(u'Document not found for : %s_%s' % (collection, code))
             return None
 
         if fmt == 'xylose':
             xarticle = Article(jarticle)
-            logger.info('Document loaded: %s_%s' % (collection, code))
+            logger.info(u'Document loaded: %s_%s' % (collection, code))
             return xarticle
         else:
-            logger.info('Document loaded: %s_%s' % (collection, code))
+            logger.info(u'Document loaded: %s_%s' % (collection, code))
             return article
 
     def documents(self, collection=None, issn=None, from_date=None,
@@ -193,7 +193,7 @@ class ArticleMeta(object):
                     yield Issue(json.loads(issue))
 
                 except:
-                    msg = 'Error retrieving issue: %s_%s' % (collection, identifier)
+                    msg = u'Error retrieving issue: %s_%s' % (collection, identifier)
                     # raise ServerError(msg)
                     logger.error(msg)
                     pass
@@ -211,7 +211,7 @@ class ArticleMeta(object):
             return Issue(json.loads(issue))
 
         except:
-            msg = 'Error retrieving issue: %s_%s' % (collection, identifier)
+            msg = u'Error retrieving issue: %s_%s' % (collection, identifier)
             # raise ServerError(msg)
             logger.error(msg)
             pass
@@ -239,7 +239,7 @@ class ArticleMeta(object):
                     yield Article(json.loads(article))
 
                 except:
-                    msg = 'Error retrieving issue: %s_%s' % (collection, identifier)
+                    msg = u'Error retrieving issue: %s_%s' % (collection, identifier)
                     # raise ServerError(msg)
                     logger.error(msg)
                     pass

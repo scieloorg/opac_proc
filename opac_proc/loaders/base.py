@@ -5,7 +5,10 @@ import json
 from datetime import datetime
 from mongoengine.context_managers import switch_db
 from opac_proc.datastore.mongodb_connector import (
-    register_connections, get_opac_proc_db_name, get_opac_webapp_db_name)
+    get_db_connection,
+    register_connections,
+    get_opac_proc_db_name,
+    get_opac_webapp_db_name)
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
@@ -24,17 +27,18 @@ OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
 
 
 class BaseLoader(object):
+    _db = None
     transform_model_class = None        # definir no __init__ da sublcasse
     transform_model_name = ''
     transform_model_instance = None     # definir no __init__ da sublcasse
 
-    opac_model_class = None
+    opac_model_class = None             # definir no __init__ da sublcasse
     opac_model_name = ''
-    opac_model_instance = None
+    opac_model_instance = None          # definir no __init__ da sublcasse
 
-    load_model_class = None
+    load_model_class = None             # definir no __init__ da sublcasse
     load_model_name = ''
-    load_model_instance = None
+    load_model_instance = None          # definir no __init__ da sublcasse
 
     metadata = {
         'uuid': None,
@@ -52,15 +56,16 @@ class BaseLoader(object):
         - transform_model_uuid:
             uuid do modelo do TransformModel que queremos carregar
         """
+        self._db = get_db_connection()
         register_connections()
         if not transform_model_uuid:
-            raise ValueError('transform_model_uuid inválido!')
+            raise ValueError(u'transform_model_uuid inválido!')
         elif not self.transform_model_class:
-            raise ValueError('subclasse deve definir atributo: transform_model_class!')
+            raise ValueError(u'subclasse deve definir atributo: transform_model_class!')
         elif not self.opac_model_class:
-            raise ValueError('subclasse deve definir atributo: opac_model_class!')
+            raise ValueError(u'subclasse deve definir atributo: opac_model_class!')
         elif not self.load_model_class:
-            raise ValueError('subclasse deve definir atributo: load_model_class!')
+            raise ValueError(u'subclasse deve definir atributo: load_model_class!')
 
         self.transform_model_name = str(self.transform_model_class)
         self.opac_model_name = str(self.opac_model_class)
@@ -109,7 +114,7 @@ class BaseLoader(object):
 
         t_model = self.transform_model_instance
         if not t_model:
-            raise ValueError("Precisa instanciar o self.transform_model_instance")
+            raise ValueError(u"Precisa instanciar o self.transform_model_instance")
 
         result_dict = {}
         for field in self.fields_to_load:
@@ -122,32 +127,41 @@ class BaseLoader(object):
         return result_dict
 
     def prepare(self):
-        logger.debug("iniciando metodo prepare(uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"iniciando metodo prepare(uuid: %s)" % self.metadata['uuid'])
         obj_dict = self.transform_model_instance_to_python()
         obj_dict['_id'] = str(self.transform_model_instance.uuid).replace("-", "")
 
-        logger.debug("recuperando modelo no opac (_id: %s)" % obj_dict['_id'])
+        logger.debug(u"recuperando modelo no opac (_id: %s)" % obj_dict['_id'])
         with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
             if self.opac_model_instance is None:
-                logger.debug("modelo opac (_id) não encontrado. novo registro" % obj_dict['_id'])
+                logger.debug(u"modelo opac (_id) não encontrado. novo registro" % obj_dict['_id'])
                 self.opac_model_instance = self.opac_model_class(**obj_dict)
             else:
-                logger.debug("modelo opac (_id) encontrado. atualizando registro" % obj_dict['_id'])
+                logger.debug(u"modelo opac (_id) encontrado. atualizando registro" % obj_dict['_id'])
                 for k, v in obj_dict.iteritems():
                     self.opac_model_instance[k] = v
         return self.opac_model_instance
 
     def load(self):
-        logger.debug("iniciando metodo load() (uuid: %s)" % self.metadata['uuid'])
-        logger.debug("salvando modelo no opac (uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"iniciando metodo load() (uuid: %s)" % self.metadata['uuid'])
+
+        logger.debug(u"salvando modelo %s no opac_proc (uuid: %s)" % (
+            self.opac_model_name, self.metadata['uuid']))
+
         with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
             self.opac_model_instance.save()
+            logger.debug(u"modelo %s no opac (uuid: %s) foi salvo" % (
+                self.opac_model_name, self.metadata['uuid']))
 
-        logger.debug("salvando modelo no opac_proc (uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"salvando modelo %s no opac_proc (uuid: %s)" % (
+            self.load_model_name, self.metadata['uuid']))
+
         with switch_db(self.load_model_class, OPAC_PROC_DB_NAME):
             self.metadata['process_finish_at'] = datetime.now()
             self.metadata['process_completed'] = True
             self.metadata['must_reprocess'] = False
             self.load_model_instance.update(**self.metadata)
+            logger.debug(u"modelo %s no opac_proc (uuid: %s) foi atualizado" % (
+                self.load_model_name, self.metadata['uuid']))
 
-        logger.debug("finalizando metodo load() (uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"finalizando metodo load() (uuid: %s)" % self.metadata['uuid'])

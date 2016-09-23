@@ -24,7 +24,7 @@ class CollectionTransformer(BaseTransformer):
     def get_extract_model_instance(self, key):
         # retornamos uma instancia de ExtractCollection
         # buscando pela key (=acronym)
-        logger.debug("CollectionTransformer: extraindo a e_collection com acronym: %s" % key)
+        logger.debug(u"CollectionTransformer: extraindo a e_collection com acronym: %s" % key)
         return self.extract_model_class.objects.get(acronym=key)
 
     @update_metadata

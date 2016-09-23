@@ -1,16 +1,14 @@
 # coding: utf-8
 import os
 import sys
-from redis import Redis
-from rq import Queue
 
 import optparse
 import textwrap
-import logging
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
+from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.datastore.models import (
     ExtractCollection,
@@ -23,8 +21,7 @@ from opac_proc.extractors.jobs import (
     task_extract_collection,
     task_extract_journal,
     task_extract_issue,
-    task_extract_article
-)
+    task_extract_article)
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
@@ -34,46 +31,43 @@ if config.DEBUG:
 else:
     logger = getMongoLogger(__name__, "INFO", "extract")
 
-redis_conn = Redis()
-
-q_names = [
-    'qex_collections',
-    'qex_journals',
-    'qex_issues',
-    'qex_articles',
-]
-
-queues = {}
-for name in q_names:
-    queues[name] = Queue(name, connection=redis_conn)
+r_queues = RQueues()
+r_queues.create_queues_for_stage('extract')
 
 
 def reprocess_collection(collection_acronym):
     for collection in ExtractCollection.objects(must_reprocess=True):
-        queues['qex_collections'].enqueue(
+        r_queues.enqueue(
+            'extract', 'collection',
             task_extract_collection,
-            collection_acronym)
+            collection.acronym)
 
 
 def reprocess_journal(collection_acronym):
     for ex_journal in ExtractJournal.objects(must_reprocess=True):
-        queues['qex_journals'].enqueue(
+        r_queues.enqueue(
+            'extract', 'journal',
             task_extract_journal,
-            collection_acronym, ex_journal.code)
+            collection_acronym,
+            ex_journal.code)
 
 
 def reprocess_issue(collection_acronym):
     for ex_issue in ExtractIssue.objects(must_reprocess=True):
-        queues['qex_issues'].enqueue(
+        r_queues.enqueue(
+            'extract', 'issue',
             task_extract_issue,
-            collection_acronym, ex_issue.code)
+            collection_acronym,
+            ex_issue.code)
 
 
 def reprocess_article(collection_acronym):
     for ex_article in ExtractArticle.objects(must_reprocess=True):
-        queues['qex_articles'].enqueue(
+        r_queues.enqueue(
+            'extract', 'article',
             task_extract_article,
-            collection_acronym, ex_article.code)
+            collection_acronym,
+            ex_article.code)
 
 
 def reprocess_all_pendings(collection_acronym):
@@ -87,15 +81,15 @@ def reprocess_all_pendings(collection_acronym):
 def extract_all(collection_acronym):
     db = get_db_connection()
     db_name = config.MONGODB_SETTINGS['db']
-    logger.info('Extraindo Collection:  %s' % collection_acronym)
+    logger.info(u'Extraindo Collection:  %s' % collection_acronym)
     coll_extractor = CollectionExtactor(collection_acronym)
     coll_extractor.extract()
     col = coll_extractor.save()
-    logger.info('Collection %s extraida' % col.acronym)
-    logger.info("Disparando tasks")
+    logger.info(u'Collection %s extraida' % col.acronym)
+    logger.info(u'Disparando tasks')
 
-    if not queues:
-        logger.error('Não foram definidas as Queues')
+    if not r_queues:
+        logger.error(u'Não foram definidas as Queues')
         raise Exception(u'Não foram definidas as Queues')
 
     for child in col.children_ids:
@@ -103,27 +97,30 @@ def extract_all(collection_acronym):
         issues_ids = child['issues_ids']
         articles_ids = child['articles_ids']
 
-        logger.debug("enfilerando task: task_extract_journal [issn: %s]" % issn)
-        queues['qex_journals'].enqueue(
+        logger.debug(u"enfilerando task: task_extract_journal [issn: %s]" % issn)
+        r_queues.enqueue(
+            'extract', 'journal',
             task_extract_journal,
             collection_acronym,
             issn)
 
         for issue_id in issues_ids:
-            logger.debug("enfilerando task: task_extract_issue [issue_id: %s]" % issue_id)
-            queues['qex_issues'].enqueue(
+            logger.debug(u"enfilerando task: task_extract_issue [issue_id: %s]" % issue_id)
+            r_queues.enqueue(
+                'extract', 'issue',
                 task_extract_issue,
                 collection_acronym,
                 issue_id)
 
         for article_id in articles_ids:
-            logger.debug("enfilerando task: task_extract_article [article_id: %s]" % article_id)
-            queues['qex_articles'].enqueue(
+            logger.debug(u"enfilerando task: task_extract_article [article_id: %s]" % article_id)
+            r_queues.enqueue(
+                'extract', 'article',
                 task_extract_article,
                 collection_acronym,
                 article_id)
 
-    logger.info("Fim enfileramento de tasks")
+    logger.info(u"Fim enfileramento de tasks")
 
 
 def main(argv=sys.argv[1:]):
@@ -170,14 +167,14 @@ def main(argv=sys.argv[1:]):
 
     try:
         if options.extract_all and options.reprocess_all:
-            logger.error("Operação inválida: --extract-all e --reprocess-all são mutuamente exclusivos")
+            logger.error(u"Operação inválida: --extract-all e --reprocess-all são mutuamente exclusivos")
             exit(1)
         elif options.extract_all:
             extract_all(options.collection)
         elif options.reprocess_all:
             reprocess_all_pendings(options.collection)
         else:
-            logger.error("Operação inválida: deve indicar: --extract-all ou --reprocess-all")
+            logger.error(u"Operação inválida: deve indicar: --extract-all ou --reprocess-all")
             exit(1)
     except KeyboardInterrupt:
         logger.info(u"Processamento interrompido pelo usuário.")

@@ -100,14 +100,14 @@ class BaseTransformer(object):
         definida em cada subclase, e retorna um dicionario pronto para criar
         um instância de documento xylose
         """
-        logger.debug('iniciando clean_for_xylose')
+        logger.debug(u'iniciando clean_for_xylose')
         obj_json = self.extract_model_instance.to_json()
         obj_dict = json.loads(obj_json)
         result_dict = {}
         for k, v in obj_dict.iteritems():
             if k not in self.exclude_fields:
                 result_dict[k] = v
-        logger.debug('finalizado clean_for_xylose')
+        logger.debug(u'finalizado clean_for_xylose')
         return result_dict
 
     def get_extract_model_instance(self, key):
@@ -146,7 +146,7 @@ class BaseTransformer(object):
         """
         Salva os dados transformados no datastore (mongo)
         """
-        logger.debug("iniciando save()")
+        logger.debug(u"iniciando save()")
         try:
             self.transform_model_instance.save()
             self.metadata['must_reprocess'] = False
@@ -158,5 +158,5 @@ class BaseTransformer(object):
             logger.error(msg)
             raise Exception(msg)
         else:
-            logger.debug("finalizando save()")
+            logger.debug(u"finalizando save()")
             return self.transform_model_instance

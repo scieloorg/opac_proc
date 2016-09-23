@@ -8,7 +8,7 @@ from opac_proc.transformers.tr_articles import ArticleTransformer
 
 
 def task_transform_collection(acronym):
-    ctr = CollectionTransformer(collection.acronym)
+    ctr = CollectionTransformer(extract_model_key=acronym)
     ctr.transform()
     collection = ctr.save()
     return collection.id
