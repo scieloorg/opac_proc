@@ -138,38 +138,35 @@ def load_all(collection_acronym):
     logger.info(u'Collection %s carregada' % coll_transform.acronym)
     logger.info(u"Disparando tasks")
 
-    for child in coll_transform.children_ids:
-        issn = child['issn']
-        issues_ids = child['issues_ids']
-        articles_ids = child['articles_ids']
+    # for child in coll_transform.children_ids:
+    #     issn = child['issn']
+    #     issues_ids = child['issues_ids']
+    #     articles_ids = child['articles_ids']
 
-        logger.debug(u"recuperando periódico [issn: %s]" % issn)
-        t_journal = TransformJournal.objects.get(Q(scielo_issn=issn) | Q(print_issn=issn) | Q(eletronic_issn=issn))
+    #     logger.debug(u"recuperando periódico [issn: %s]" % issn)
+    #     t_journal = TransformJournal.objects.get(Q(scielo_issn=issn) | Q(print_issn=issn) | Q(eletronic_issn=issn))
 
-        logger.debug(u"enfilerando task: task_transform_journal [issn: %s]" % issn)
-        job_journal = r_queues.enqueue(
-            'load', 'journal',
-            task_load_journal,
-            t_journal.uuid,
-            depends_on=job_collection)
+    #     logger.debug(u"enfilerando task: task_transform_journal [issn: %s]" % issn)
+    #     job_journal = r_queues.enqueue(
+    #         'load', 'journal',
+    #         task_load_journal,
+    #         t_journal.uuid)
 
-        for issue_id in issues_ids:
-            logger.debug(u"recuperando issue [pid: %s]" % issue_id)
-            t_issue = TransformIssue.objects.get(pid=issue_id)
-            logger.debug(u"enfilerando task: task_transform_issue [issue_id: %s]" % issue_id)
-            job_issue = r_queues.enqueue(
-                'load', 'issue',
-                task_load_issue,
-                t_issue.uuid,
-                depends_on=job_journal)
+    #     for issue_id in issues_ids:
+    #         logger.debug(u"recuperando issue [pid: %s]" % issue_id)
+    #         t_issue = TransformIssue.objects.get(pid=issue_id)
+    #         logger.debug(u"enfilerando task: task_transform_issue [issue_id: %s]" % issue_id)
+    #         job_issue = r_queues.enqueue(
+    #             'load', 'issue',
+    #             task_load_issue,
+    #             t_issue.uuid)
 
-            for t_article in TransformArticle.objects(issue=t_issue.uuid):
-                logger.debug(u"enfilerando task: task_load_article [article_id: %s]" % t_article.pid)
-                r_queues.enqueue(
-                    'load', 'article',
-                    task_load_article,
-                    t_article.uuid,
-                    depends_on=job_issue)
+    #         for t_article in TransformArticle.objects(issue=t_issue.uuid):
+    #             logger.debug(u"enfilerando task: task_load_article [article_id: %s]" % t_article.pid)
+    #             r_queues.enqueue(
+    #                 'load', 'article',
+    #                 task_load_article,
+    #                 t_article.uuid)
 
     logger.info(u"Fim enfileramento de tasks")
 
