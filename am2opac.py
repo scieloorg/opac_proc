@@ -200,9 +200,14 @@ def process_issue(issn_collection):
 
         m_issue.pid = issue.publisher_id
 
+        suppl_text = (issue.supplement_number or issue.supplement_volume) or ''
+
+        m_issue.suppl_text = suppl_text if suppl_text != '0' else ''
+
         m_issue.save()
 
     process_last_issue(issn)
+    process_volume_issue(issn)
 
 
 def process_article(issn_collection):
@@ -226,6 +231,7 @@ def process_article(issn_collection):
             m_article.issue = issue
         except DoesNotExist as e:
             logger.warning(u"Artigo SEM issue. publisher_id: %s" % str(article.publisher_id))
+            continue
         except Exception as e:
             logger.error(u"Erro ao tentar acessar o atributo issue do artigo: %s, Erro %s" % (str(article.publisher_id), e))
 
@@ -324,6 +330,62 @@ def process_article(issn_collection):
 
         m_article.save()
 
+    process_ahead(issn)
+
+
+def process_volume_issue(issn):
+
+    logger.info("Alterando o tipo para os itens que são fascículo de volume...")
+
+    connect(**config.MONGODB_SETTINGS)
+
+    # Get last issue for each Journal
+    journal = models.Journal.objects.get(scielo_issn=issn)
+
+    logger.info(u"Coletando fascículo de volume do periódico: %s" % journal.title)
+
+    volume_issue = models.Issue.objects.filter(number=None).filter(type__ne='supplement').filter(type__ne='pressrelease')
+
+    for issue in volume_issue:
+        issue.type = "volume_issue"
+        issue.save()
+
+
+def process_ahead(issn):
+
+    logger.info("Coletando ahead of print...")
+
+    connect(**config.MONGODB_SETTINGS)
+
+    # Get last issue for each Journal
+    journal = models.Journal.objects.get(scielo_issn=issn)
+
+    logger.info(u"Coletando ahead of print do periódico: %s" % journal.title)
+
+    issue = models.Issue.objects.filter(type='ahead').filter(journal=journal).order_by('-year', '-order').first()
+
+    if issue:
+        logger.info(u"Fascículos do tipo ahead mais recente, ano: %s" % issue.year)
+
+        outdated_aheads = models.Issue.objects.filter(type='ahead').filter(journal=journal).filter(_id__ne=issue.iid)
+
+        logger.info(u"Alterando o tipo dos aheads antigos e mantendo o mais com o tipo 'ahead'")
+        for outdated_ahead in outdated_aheads:
+            logger.info(u"Alterando o tipo do ahead ano: %s para 'outdated_ahead'" % outdated_ahead.year)
+            outdated_ahead.type = 'outdated_ahead'
+            outdated_ahead.save()
+
+        logger.info(u"Varendo se existe artigos em ahead")
+        article_in_ahead = []
+        for article in models.Article.objects.filter(issue=issue.iid):
+            article_in_ahead.append(article.id)
+
+        if not article_in_ahead:
+            logger.info(u"O periódico %s, não possui artigo em ahead" % journal.title)
+            issue.type = 'outdated_ahead'
+            issue.save()
+    else:
+        logger.info(u"O periódico %s, não possui artigo em ahead" % journal.title)
 
 def process_last_issue(issn):
 
@@ -401,6 +463,32 @@ def bulk(options, pool):
         pool.map(process_article, pissns)
 
 
+def serial(options):
+
+    db = connect(**config.MONGODB_SETTINGS)
+    db_name = config.MONGODB_SETTINGS['db']
+    db.drop_database(db_name)
+    logger.info(u"Banco de dado (%s) removido completamente!" % db_name)
+
+    # Collection
+    for col in articlemeta.collections():
+        if col.acronym == options.collection:
+            logger.info(u"Adicionado a coleção: %s" % options.collection)
+            process_collection(col)
+
+    # Se não tem issns indicados no argparse, processa todos os itens
+    if not options.issns:
+        issns = [(journal.scielo_issn, options.collection) for journal in articlemeta.journals(collection=options.collection)]
+    else:
+        issns = [(issn, options.collection) for issn in options.issns]
+
+    for pissns in issns:
+        logger.info(u"Enviando para processamento os issns: %s, %s" % pissns)
+        process_journal(pissns)
+        process_issue(pissns)
+        process_article(pissns)
+
+
 def run(options, pool):
 
     logger.info(u'Coleção alvo: %s' % options.collection)
@@ -441,6 +529,9 @@ def main(argv=sys.argv[1:]):
     que serão exposto pelo OPAC.
     """
 
+    def get_comma_separated_args(option, opt, value, parser):
+        setattr(parser.values, option.dest, value.split(','))
+
     parser = optparse.OptionParser(
         textwrap.dedent(usage), version=u"version: 1.0")
 
@@ -473,18 +564,40 @@ def main(argv=sys.argv[1:]):
         default=multiprocessing.cpu_count(),
         help=u'Número de processadores, o recomendado é utilizar a quantidade de processadores disponíveis na máquina.')
 
+    # Serial
+    parser.add_option(
+        '-s', '--serial',
+        dest='serial',
+        action="store_true",
+        help=u'Inícia o processamento em modo serial.')
+
+    # Issns
+    parser.add_option(
+        '-i', '--issns',
+        type='string',
+        action='callback',
+        dest='issns',
+        callback=get_comma_separated_args)
+
     options, args = parser.parse_args(argv)
 
     config_logging(options.logging_level, options.logging_file)
 
-    pool = Pool(options.process, init_worker)
-
     try:
-        return run(options, pool)
+
+        if options.serial:
+            return serial(options)
+        else:
+            pool = Pool(options.process, init_worker)
+            return run(options, pool)
+
     except KeyboardInterrupt:
+
         logger.info(u"Processamento interrompido pelo usuário.")
-        pool.terminate()
-        pool.join()
+
+        if not options.serial:
+            pool.terminate()
+            pool.join()
 
 if __name__ == '__main__':
     main(sys.argv)
