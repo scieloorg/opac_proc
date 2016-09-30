@@ -90,31 +90,46 @@ class BaseLoader(object):
     def get_transform_model_instance(self, query={}):
         # recuperamos uma instância do transform_model_class
         # correspondente com a **query dict.
-        # caso não exista, retornamos uma nova instância
+        # caso não exista, levantamos uma exeção por não ter o dado fonte
         with switch_db(self.transform_model_class, OPAC_PROC_DB_NAME):
-            self.transform_model_instance = self.transform_model_class.objects(**query).first()
+            logger.debug(u'recuperando modelo: %s' % self.transform_model_name)
+            self.transform_model_instance = self.transform_model_class.objects.get(**query)
+            logger.debug(u'modelo %s encontrado. query: %s' % (self.transform_model_name, query))
 
     def get_opac_model_instance(self, query={}):
         # recuperamos uma instância do opac_model_class
         # correspondente com a **query dict.
         # caso não exista, retornamos uma nova instância
         with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
-            self.opac_model_instance = self.opac_model_class.objects(**query).first()
-            if not self.opac_model_instance:
-                self.opac_model_instance = self.load_model_class()
-                self.opac_model_instance.uuid = self._uuid_str
-                self.opac_model_instance.save()
+            try:
+                logger.debug(u'recuperando modelo: %s' % self.opac_model_name)
+                self.opac_model_instance = self.opac_model_class.objects.get(**query)
+                logger.debug(u'modelo %s encontrado. query: %s' % (self.opac_model_name, query))
+            except self.opac_model_class.DoesNotExist:
+                self.opac_model_instance = None
+            except Exception as e:
+                logger.error(e)
+                raise e
 
     def get_load_model_instance(self, query={}):
         # recuperamos uma instância do load_model_class
         # correspondente com a **query dict.
         # caso não exista, retornamos uma nova instância
         with switch_db(self.load_model_class, OPAC_PROC_DB_NAME):
-            self.load_model_instance = self.load_model_class.objects(**query).first()
-            if not self.load_model_instance:
-                self.load_model_instance = self.load_model_class()
-                self.load_model_instance.uuid = self._uuid
+            try:
+                logger.debug(u'recuperando modelo: %s' % self.load_model_name)
+                self.load_model_instance = self.load_model_class.objects.get(**query)
+                logger.debug(u'modelo %s encontrado. query: %s' % (self.load_model_name, query))
+            except self.load_model_class.DoesNotExist:
+                logger.debug(u'load_model_instance não foi encontrado. criamos nova instância')
+                self.load_model_instance = self.load_model_class(**query)
+                self.load_model_instance['uuid'] = self._uuid
                 self.load_model_instance.save()
+                self.load_model_instance.reload()
+                logger.debug('nova instancia de load_model_instance. uuid: %s' % self.load_model_instance['uuid'])
+            except Exception, e:
+                logger.error(e)
+                raise e
 
     def transform_model_instance_to_python(self):
         """
@@ -132,7 +147,7 @@ class BaseLoader(object):
         result_dict = {}
         for field in self.fields_to_load:
             if field in ["jid", "iid", "aid"]:
-                result_dict[field] = str(t_model.uuid).replace("-", "")
+                result_dict[field] = self._uuid_str
             elif hasattr(self, 'prepare_%s' % field):
                 result_dict[field] = getattr(self, 'prepare_%s' % field)()
             elif hasattr(t_model, field):
@@ -143,31 +158,39 @@ class BaseLoader(object):
     def prepare(self):
         logger.debug(u"iniciando metodo prepare (uuid: %s)" % self.metadata['uuid'])
         obj_dict = self.transform_model_instance_to_python()
-        obj_dict['_id'] = str(self.transform_model_instance.uuid).replace("-", "")
+        obj_dict['_id'] = self._uuid_str
 
         logger.debug(u"recuperando modelo no opac (_id: %s)" % obj_dict['_id'])
         with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
+            logger.debug(u'tentamos atualizar modelo opac')
             if self.opac_model_instance is None:
-                logger.debug(u"modelo opac (_id %s) não encontrado. novo registro" % obj_dict['_id'])
+                logger.debug(u'opac_model_instance is None. criamos nova instância')
                 self.opac_model_instance = self.opac_model_class(**obj_dict)
+                self.opac_model_instance.save()
+                self.opac_model_instance.reload()
+                logger.debug(u'novo modelo opac criado: _id = %s' % self.opac_model_instance._id)
             else:
-                logger.debug(u"modelo opac (_id: %s) encontrado. atualizando registro" % obj_dict['_id'])
                 for k, v in obj_dict.iteritems():
                     self.opac_model_instance[k] = v
-            self.opac_model_instance.save()
-        logger.debug(u"finalizando metodo prepare (uuid: %s)" % self.metadata['uuid'])
+                self.opac_model_instance.save()
+
+            logger.debug(u"modelo opac (_id: %s) encontrado. atualizando registro" % obj_dict['_id'])
+
+        logger.debug(u"finalizando metodo prepare(uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u'opac_model_instance SALVO: %s' % self.opac_model_instance.to_json())
         return self.opac_model_instance
 
     def load(self):
         logger.debug(u"iniciando metodo load() (uuid: %s)" % self.metadata['uuid'])
 
-        logger.debug(u"salvando modelo %s no opac_proc (uuid: %s)" % (
-            self.opac_model_name, self.metadata['uuid']))
+        logger.debug(u"salvando modelo %s no opac (_id: %s)" % (
+            self.opac_model_name, self.opac_model_instance._id))
 
         with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
             self.opac_model_instance.save()
-            logger.debug(u"modelo %s no opac (uuid: %s) foi salvo" % (
-                self.opac_model_name, self.metadata['uuid']))
+            self.opac_model_instance.reload()
+            logger.debug(u"modelo %s no opac (_id: %s) foi salvo" % (
+                self.opac_model_name, self.opac_model_instance._id))
 
         logger.debug(u"salvando modelo %s no opac_proc (uuid: %s)" % (
             self.load_model_name, self.metadata['uuid']))

@@ -37,7 +37,7 @@ r_queues.create_queues_for_stage('transform')
 
 
 def reprocess_collection(collection_acronym):
-    for collection in TransformCollection.objects(must_reprocess=True):
+    for collection in TransformCollection(must_reprocess=True):
         r_queues.enqueue(
             'transform', 'collection',
             task_transform_collection,
@@ -45,7 +45,7 @@ def reprocess_collection(collection_acronym):
 
 
 def reprocess_journal():
-    for tr_journal in TransformJournal.objects(must_reprocess=True):
+    for tr_journal in TransformJournal(must_reprocess=True):
         r_queues.enqueue(
             'transform', 'journal',
             task_transform_journal,
@@ -53,7 +53,7 @@ def reprocess_journal():
 
 
 def reprocess_issue():
-    for tr_issue in TransformIssue.objects(must_reprocess=True):
+    for tr_issue in TransformIssue(must_reprocess=True):
         r_queues.enqueue(
             'transform', 'issue',
             task_transform_issue,
@@ -61,7 +61,7 @@ def reprocess_issue():
 
 
 def reprocess_article():
-    for tr_article in TransformArticle.objects(must_reprocess=True):
+    for tr_article in TransformArticle(must_reprocess=True):
         r_queues.enqueue(
             'transform', 'article',
             task_transform_article,

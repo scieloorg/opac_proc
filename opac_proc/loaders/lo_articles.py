@@ -124,7 +124,7 @@ class ArticleLoader(BaseLoader):
         else:
             logger.info(u"Não existem Resources (PDFs) transformados. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"Resources (PDFs) criados: %s" % len(htmls_resources))
+        logger.debug(u"Resources (PDFs) criados: %s" % len(pdfs_resources))
         return pdfs_resources
 
     def prepare_translated_titles(self):
@@ -152,5 +152,5 @@ class ArticleLoader(BaseLoader):
         else:
             logger.info(u"Não existem Sections transformadas. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"Translated Titles criados: %s" % len(translated_titles))
+        logger.debug(u"sections criados: %s" % len(sections))
         return sections

@@ -1,10 +1,11 @@
 # coding: utf-8
-from flask import render_template, flash, request
+from flask import render_template, flash, request, redirect, jsonify
 from flask.views import View
 from flask_mongoengine import Pagination
 
 
 class ListView(View):
+    methods = ['GET', 'POST']
     page_title = 'List view'
     page_subtitle = ''
     panel_title = ''
@@ -38,6 +39,18 @@ class ListView(View):
         },
     ]
 
+    can_create = False
+    can_update = False
+    can_delete = False
+
+    _allowed_POST_action_names = [
+        'create',
+        'update_all',
+        'update_selected',
+        'delete_all',
+        'delete_selected'
+    ]
+
     def render_template(self, context):
         return render_template(self.template_name, **context)
 
@@ -53,10 +66,90 @@ class ListView(View):
             'range': result_range
         }
 
+    def do_create(self):
+        raise NotImplemented
+
+    def do_update_all(self):
+        raise NotImplemented
+
+    def do_update_selected(self, ids):
+        raise NotImplemented
+
+    def do_delete_all(self):
+        raise NotImplemented
+
+    def do_delete_selected(self, ids):
+        raise NotImplemented
+
+    def get_selected_ids():
+        """
+        Retorna a lista de ids que vem no request.form
+        a lista deve conter os ids prontos para usar no orm:
+        - Logs: deve ser uma lista de ObjectsId
+        - Extract, Transorm, Load models deve ser uma lista de UUID
+        - OPAC models de ver uma lista de strings (uuid como string)
+        """
+        raise NotImplemented
+
     def dispatch_request(self):
+        if request.method == 'POST':  # create action
+            action_name = request.form['action_name']
+            if action_name not in self._allowed_POST_action_names:
+                flask(u'Invalid operation: %s' % action_name)
+            else:
+                if action_name == 'create':
+                    if self.can_create:
+                        try:
+                            self.do_create()
+                        except Exception as e:
+                            flash(u'ERROR: %s' % str(e), 'error')
+                    else:
+                        flash(u'This action is disabled', 'error')
+                elif action_name == 'update_all':
+                    if self.can_update:
+                        try:
+                            self.do_update_all()
+                        except Exception as e:
+                            flash(u'ERROR: %s' % str(e), 'error')
+                    else:
+                        flash(u'This action is disabled', 'error')
+                elif action_name == 'update_selected':
+                    if self.can_update:
+                        try:
+                            self.do_update_selected()
+                        except Exception as e:
+                            flash(u'ERROR: %s' % str(e), 'error')
+                    else:
+                        flash(u'This action is disabled', 'error')
+                elif action_name == 'delete_all':
+                    if self.can_delete:
+                        try:
+                            self.do_delete_all()
+                        except Exception as e:
+                            flash(u'ERROR: %s' % str(e), 'error')
+                    else:
+                        flash(u'This action is disabled', 'error')
+                elif action_name == 'delete_selected':
+                    if self.can_delete:
+                        try:
+                            ids = self.get_selected_ids()
+                            if ids:
+                                self.do_delete_selected(ids)
+                            else:
+                                flask(u'Invalid selection', 'error')
+                        except Exception as e:
+                            flash(u'ERROR: %s' % str(e), 'error')
+                    else:
+                        flash(u'This action is disabled', 'error')
+
+        # listamos os registros
         page = request.args.get('page', 1, type=int)
         objects = Pagination(self.get_objects(), page, self.per_page)
         context = {
+            # actions:
+            'can_create': self.can_create,
+            'can_update': self.can_update,
+            'can_delete': self.can_delete,
             # meta:
             'page_title': self.page_title,
             'page_subtitle': self.page_subtitle,

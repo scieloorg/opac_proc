@@ -10,6 +10,9 @@ OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 class TransformCollectionListView(ListView):
     # panel_title = u"Lista de todas as coleções coletadas na operação: extração"
     page_title = "Transform: Collection"
+    can_create = True
+    can_update = True
+    can_delete = True
     list_colums = [
         {
             'field_label': u'UUID',

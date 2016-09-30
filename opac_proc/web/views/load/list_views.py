@@ -1,5 +1,7 @@
 # coding: utf-8
 from mongoengine.context_managers import switch_db
+from bson.objectid import ObjectId
+from flask import request, flash
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
@@ -173,6 +175,9 @@ class LoadLogListView(ListView):
     page_title = "Load: Logs"
     page_subtitle = "most recent first"
     per_page = 50
+    can_create = False
+    can_update = False
+    can_delete = True
     list_colums = [
         {
             'field_label': u'Timestamp',
@@ -210,3 +215,37 @@ class LoadLogListView(ListView):
         register_connections()
         with switch_db(models.LoadLog, OPAC_PROC_LOGS_DB_NAME):
             return models.LoadLog.objects.order_by('-time')
+
+    def do_delete_all(self):
+        register_connections()
+        with switch_db(models.LoadLog, OPAC_PROC_LOGS_DB_NAME):
+            models.LoadLog.objects.all().delete()
+        flash('All records deleted successfully!', 'success')
+
+    def do_delete_selected(self, ids):
+        register_connections()
+        delete_errors_count = 0
+        with switch_db(models.LoadLog, OPAC_PROC_LOGS_DB_NAME):
+            for oid in ids:
+                try:
+                    model = models.LoadLog.objects(pk=oid).first()
+                    model.delete()
+                except Exception as e:
+                    delete_errors_count += 1
+        if delete_errors_count:
+            flash('%s records cannot be deleted' % delete_errors_count, 'error')
+        successfully_deleted = len(ids) - delete_errors_count
+        if successfully_deleted > 0:
+            flash('%s records deleted successfully!' % successfully_deleted, 'success')
+        else:
+            flash('%s records deleted successfully!' % successfully_deleted, 'warning')
+
+    def get_selected_ids(self):
+        ids = request.form.getlist('rowid')
+        if not ids:
+            raise ValueError("No records selected")
+        elif isinstance(ids, list):
+            ids = [ObjectId(id.strip()) for id in ids]
+        else:
+            raise ValueError("Invalid selection %s" % ids)
+        return ids

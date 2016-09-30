@@ -1,18 +1,15 @@
 # coding: utf-8
 import os
 import sys
+import logging
 from mongoengine import connect, register_connection
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
 from opac_proc.web import config
-from opac_proc.logger_setup import getMongoLogger
 
-if config.DEBUG:
-    logger = getMongoLogger(__name__, "DEBUG", "load")
-else:
-    logger = getMongoLogger(__name__, "INFO", "load")
+logger = logging.getLogger(__name__)
 
 
 def get_opac_proc_db_name():

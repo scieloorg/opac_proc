@@ -11,3 +11,9 @@ body { padding-top: 50px;}
 .badge-info     { background-color: #5bc0de;}
 .badge-warning  { background-color: #f0ad4e;}
 .badge-danger   { background-color: #d9534f;}
+
+/* notifications alert list */
+.flash-msg-list {
+    padding-top: 10px;
+    position: sticky;
+}

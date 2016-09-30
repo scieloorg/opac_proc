@@ -65,8 +65,9 @@ if OPAC_MONGODB_USER and OPAC_MONGODB_PASS:
     OPAC_MONGODB_SETTINGS['password'] = OPAC_MONGODB_PASS
 
 # WEBAPP config:
-DEBUG = True
-TESTING = False
-SECRET_KEY = "s3cr3t-k3y"
+DEBUG = bool(os.environ.get('OPAC_PROC_DEBUG', True))
+TESTING = bool(os.environ.get('OPAC_PROC_TESTING', False))
+SECRET_KEY = os.environ.get('OPAC_PROC_SECRET_KEY', "s3cr3t-k3y")
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 OPAC_PROC_LOG_MONGODB_NAME = 'opac_proc_logs'
+PROCESS_HOLD_INTERVAL = int(os.environ.get('OPAC_PROC_PROCESS_HOLD_INTERVAL', 0))  # segundos de pausa no processo

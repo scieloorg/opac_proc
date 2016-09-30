@@ -53,6 +53,7 @@ class IssueLoader(BaseLoader):
         logger.debug(u"iniciando prepare_journal")
         t_journal_uuid = self.transform_model_instance.journal
         t_journal_uuid_str = str(t_journal_uuid).replace("-", "")
+
         with switch_db(OpacJournal, OPAC_WEBAPP_DB_NAME):
             try:
                 opac_journal = OpacJournal.objects.get(_id=t_journal_uuid_str)

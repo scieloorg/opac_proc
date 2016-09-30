@@ -11,7 +11,6 @@ def task_extract_collection(acronym):
     extractor = CollectionExtactor(acronym)
     extractor.extract()
     collection = extractor.save()
-    return collection.id
 
 
 # Journals:
@@ -20,7 +19,6 @@ def task_extract_journal(acronym, issn):
     extractor = JournalExtactor(acronym, issn)
     extractor.extract()
     journal = extractor.save()
-    return journal.id
 
 
 # Issues:
@@ -30,7 +28,6 @@ def task_extract_issue(acronym, issue_id):
     extractor = IssueExtactor(acronym, issue_id)
     extractor.extract()
     issue = extractor.save()
-    return issue.id
 
 
 # Articles:
@@ -40,4 +37,3 @@ def task_extract_article(acronym, article_id):
     extractor = ArticleExtactor(acronym, article_id)
     extractor.extract()
     article = extractor.save()
-    return article.id

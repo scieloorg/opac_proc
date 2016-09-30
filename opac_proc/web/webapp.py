@@ -12,6 +12,17 @@ from flask_mongoengine import MongoEngine
 from flask_wtf import Form
 from flask_debugtoolbar import DebugToolbarExtension
 
+from mongoengine.context_managers import switch_db
+from opac_schema.v1.models import Collection as OpacCollection
+from opac_schema.v1.models import Journal as OpacJournal
+from opac_schema.v1.models import Issue as OpacIssue
+from opac_schema.v1.models import Article as OpacArticle
+from opac_schema.v1.models import PressRelease as OpacPressRelease
+from opac_schema.v1.models import Sponsor as OpacSponsor
+from opac_schema.v1.models import Pages as OpacPages
+from opac_schema.v1.models import Resource as OpacResource
+from opac_schema.v1.models import News as OpacNews
+
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
@@ -59,6 +70,7 @@ from opac_proc.web.views.load.detail_views import (
     LoadLogDetailView)
 
 from opac_proc.datastore import models
+from opac_proc.datastore.mongodb_connector import register_connections, get_opac_webapp_db_name
 
 db = MongoEngine()
 toolbar = DebugToolbarExtension()
@@ -79,6 +91,9 @@ app.register_blueprint(rq_dashboard.blueprint, url_prefix='/dashboard')
 db.init_app(app)
 toolbar.init_app(app)
 
+register_connections()
+OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
+
 
 @app.route('/', methods=('GET', 'POST'))
 def home():
@@ -97,6 +112,30 @@ def home():
     load_issue_count = models.LoadIssue.objects.all().count()
     load_article_count = models.LoadArticle.objects.all().count()
 
+    with switch_db(OpacCollection, OPAC_WEBAPP_DB_NAME):
+        opac_collection_count = OpacCollection.objects.all().count()
+
+    with switch_db(OpacJournal, OPAC_WEBAPP_DB_NAME):
+        opac_journal_count = OpacJournal.objects.all().count()
+
+    with switch_db(OpacIssue, OPAC_WEBAPP_DB_NAME):
+        opac_issue_count = OpacIssue.objects.all().count()
+
+    with switch_db(OpacArticle, OPAC_WEBAPP_DB_NAME):
+        opac_article_count = OpacArticle.objects.all().count()
+
+    with switch_db(OpacSponsor, OPAC_WEBAPP_DB_NAME):
+        opac_sponsor_count = OpacSponsor.objects.all().count()
+
+    with switch_db(OpacPages, OPAC_WEBAPP_DB_NAME):
+        opac_page_count = OpacPages.objects.all().count()
+
+    with switch_db(OpacResource, OPAC_WEBAPP_DB_NAME):
+        opac_resource_count = OpacResource.objects.all().count()
+
+    with switch_db(OpacNews, OPAC_WEBAPP_DB_NAME):
+        opac_news_count = OpacNews.objects.all().count()
+
     context = {
         # extract
         'extract_collection_count': extract_collection_count,
@@ -113,6 +152,16 @@ def home():
         'load_journal_count': load_journal_count,
         'load_issue_count': load_issue_count,
         'load_article_count': load_article_count,
+        # opac
+        'opac_collection_count': opac_collection_count,
+        'opac_journal_count': opac_journal_count,
+        'opac_issue_count': opac_issue_count,
+        'opac_article_count': opac_article_count,
+        # opac outros modelos
+        'opac_sponsor_count': opac_sponsor_count,
+        'opac_page_count': opac_page_count,
+        'opac_resource_count': opac_resource_count,
+        'opac_news_count': opac_news_count,
     }
     return render_template("home.html", **context)
 

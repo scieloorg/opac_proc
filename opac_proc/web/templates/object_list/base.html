@@ -1,135 +1,360 @@
 {% extends "base.html" %}
 {% import 'macros/object_list.html' as mhelper %}
-
 {% block title %}{{ page_title|title }}{% endblock %}
 {% block content %}
 
-    {% include "includes/page_header.html" %}
-    <div class="panel panel-default">
-        <!-- Default panel contents -->
-        {% if panel_title %}
-            <div class="panel-heading">
-                {{ panel_title }}
+  {% include "includes/page_header.html" %}
+  <div class="panel panel-default">
+    <!-- Default panel contents -->
+    {% if panel_title %}
+      <div class="panel-heading">
+        {{ panel_title }}
+      </div>
+    {% endif %}
+    <div class="panel-body">
+      <span class="pull-right">
+        <strong>Página:</strong> {{ current_page }} / {{ total_pages }} &bull;
+        <strong>Registros:</strong> <span class="badge">{{ total_records }}</span>
+      </span>
+    </div>
+    <table class="table_object_list table table-striped table-hover">
+      <caption>
+        {# action buttons #}
+        <div class="btn-toolbar action-toolbar pull-right" role="toolbar">
+          <div class="btn-group" role="group">
+            {# create action #}
+            {% if can_create %}
+              <button type="button" class="btn btn-primary" data-action="create">Create</button>
+            {% else %}
+              <button type="button" class="btn btn-primary disabled" data-action="create">Create</button>
+            {% endif %}
+
+            {# update action #}
+            <div class="btn-group" role="group">
+              {% if can_update and objects|length > 0 %}
+                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Update <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a data-action="update" data-target="selected" href="#">Selected</a></li>
+                  <li><a data-action="update" data-target="all" href="#">All</a></li>
+                </ul>
+              {% else %}
+                <button type="button" class="btn btn-info disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Update <span class="caret"></span>
+                </button>
+              {% endif %}
             </div>
-        {% endif %}
-        <div class="panel-body">
-            <span class="pull-right">
-                <strong>Página:</strong> {{ current_page }} / {{ total_pages }} &bull;
-                <strong>Registros:</strong> <span class="badge">{{ total_records }}</span>
-            </span>
+
+            {# delete action #}
+            <div class="btn-group" role="group">
+              {% if can_delete %}
+                <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Delete <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a data-action="delete" data-target="selected" href="#">Selected</a></li>
+                  <li><a data-action="delete" data-target="all" href="#">All</a></li>
+                </ul>
+              {% else %}
+                <button type="button" class="btn btn-danger disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Delete <span class="caret"></span>
+                </button>
+              {% endif %}
+            </div>
+          </div>
         </div>
-        <table class="table_object_list table table-striped table-hover">
-            <caption>
-                {# action buttons #}
-                <div class="btn-toolbar pull-right" role="toolbar" aria-label="...">
-                    <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-default">Left</button>
-                      <button type="button" class="btn btn-default">Middle</button>
-                      <button type="button" class="btn btn-default">Right</button>
-                    </div>
-                </div>
-            </caption>
-            <thead>
-                <th>
-                    <input id="table_check_all" type="checkbox" name="row_checkbox_all">
-                </th>
-                {% for field_label in list_colums|map(attribute='field_label') %}
-                    <th>{{ field_label }}</th>
+      </caption>
+      <thead>
+        <th>
+          <input id="table_check_all" type="checkbox" name="row_checkbox_all">
+        </th>
+        {% for field_label in list_colums|map(attribute='field_label') %}
+          <th>{{ field_label }}</th>
+        {% endfor %}
+      </thead>
+      <tbody class="tbody_object_list">
+        {% for object in objects  %}
+          <tr>
+            <th>
+              <input type="checkbox" name="row_checkbox" data-rowid="{{ object.pk }}">
+            </th>
+            {% for column in list_colums %}
+              {% if loop.first %}
+                <td {% if column.field_name|lower == 'uuid' %} style="width: 300px" {% endif %}>
+                  <a class="row-detail" href="{{ object.pk }}"> {# hack! URL de detail é relativo a URL de listagem #}
+                    {{ mhelper.render_row_cell(object, column.field_name, column.field_type) }}
+                  </a>
+                </td>
+              {% else %}
+                <td>
+                  {{ mhelper.render_row_cell(object, column.field_name, column.field_type) }}
+                </td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="{{ list_colums|length + 1 }}" style="text-align:center;">
+            <nav aria-label="pagination">
+              <ul class="pagination" >
+                {% if has_prev %}
+                  <li>
+                    <a href="?page={{ prev_num }}" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="disabled" >
+                    <a href="#" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                {% endif %}
+
+                {% for page_num in pager_range.range %}
+                  {% if loop.first and pager_range.has_more_prevs %}
+                    <li>
+                      <a href="?page={{ page_num }}">...</a>
+                    </li>
+                  {% endif %}
+
+                  <li {% if page_num == current_page %} class="active" {% endif %}>
+                    <a href="?page={{ page_num }}">{{ page_num }}</a>
+                  </li>
+
+                  {% if loop.last and pager_range.has_more_nexts %}
+                    <li>
+                      <a href="?page={{ page_num }}">...</a>
+                    </li>
+                  {% endif %}
                 {% endfor %}
-            </thead>
-            <tbody class="tbody_object_list">
-                {% for object in objects  %}
-                    <tr>
-                        <th>
-                            <input type="checkbox" name="row_checkbox">
-                        </th>
-                        {% for column in list_colums %}
-                            {% if loop.first %}
-                                <td {% if column.field_name|lower == 'uuid' %} style="width: 300px" {% endif %}>
-                                    <a class="row-detail" href="{{ object.pk }}"> {# hack! URL de detail é relativo a URL de listagem #}
-                                        {{ mhelper.render_row_cell(object, column.field_name, column.field_type) }}
-                                    </a>
-                                </td>
-                            {% else %}
-                                <td>
-                                    {{ mhelper.render_row_cell(object, column.field_name, column.field_type) }}
-                                </td>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="{{ list_colums|length + 1 }}" style="text-align:center;">
-                        <nav aria-label="pagination">
-                            <ul class="pagination" >
-                                {% if has_prev %}
-                                    <li>
-                                        <a href="?page={{ prev_num }}" aria-label="Previous">
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li class="disabled" >
-                                        <a href="#" aria-label="Previous">
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>
-                                {% endif %}
 
-                                {% for page_num in pager_range.range %}
-                                    {% if loop.first and pager_range.has_more_prevs %}
-                                        <li>
-                                            <a href="?page={{ page_num }}">...</a>
-                                        </li>
-                                    {% endif %}
-
-                                    <li {% if page_num == current_page %} class="active" {% endif %}>
-                                        <a href="?page={{ page_num }}">{{ page_num }}</a>
-                                    </li>
-
-                                    {% if loop.last and pager_range.has_more_nexts %}
-                                        <li>
-                                            <a href="?page={{ page_num }}">...</a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-
-                                {% if has_next %}
-                                    <li>
-                                        <a href="?page={{ next_num }}" aria-label="Next">
-                                            <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li class="disabled" >
-                                        <a href="#" aria-label="Previous">
-                                            <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-    </div> {# /panel-default #}
+                {% if has_next %}
+                  <li>
+                    <a href="?page={{ next_num }}" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="disabled" >
+                    <a href="#" aria-label="Previous">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div> {# /panel-default #}
+  <div style="display:none;">
+    <form id="action_form" action="." method="">
+      <input id="action_name" name="action_name" type="text" value="">
+    </form>
+  </div>
 {% endblock %}
 {% block extra_js %}
-    <script type="text/javascript">
-        $(function() {
-            $('.row-detail').popover()
-            $('#table_check_all:checkbox').click(function(event) {
-                var $this = $(this);
-                if ($this.is(":checked")) {
-                    $('input:checkbox', '.tbody_object_list').prop('checked', true);
-                } else {
-                    $('input:checkbox', '.tbody_object_list').prop('checked', false);
+  <script type="text/javascript">
 
-                }
-            });
+    var Toolbar = {
+      /* action buttons selectors */
+      btn_create_selector: '[data-action="create"]:not(".disabled")',
+      btn_update_all_selector: '[data-action="update"][data-target="all"]',
+      btn_update_selected_selector: '[data-action="update"][data-target="selected"]',
+      btn_delete_all_selector: '[data-action="delete"][data-target="all"]',
+      btn_delete_selected_selector: '[data-action="delete"][data-target="selected"]',
+      /* action buttons */
+      btn_create: null,
+      btn_update_all: null,
+      btn_update_selected: null,
+      btn_delete_all: null,
+      btn_delete_selected: null,
+      /* list of rows selected */
+      rows_selected: [],
+      /* helpers */
+      get_rows_selected: function(){
+        Toolbar.rows_selected = []
+        $('input:checkbox:checked', '.tbody_object_list').each(function(index, element){
+          Toolbar.rows_selected.push($(element).data('rowid'));
         });
-    </script>
+      },
+      show_loading_box: function(){
+        var dialog = bootbox.dialog({
+            message: '<p class="text-center">Please wait while we do something...<br><i class="fa fa-spin fa-spinner"></i></p>',
+            closeButton: false
+        });
+        dialog.modal();
+      },
+      notify_no_rows_selected:function(){
+        bootbox.alert({
+          message: "You must select at least one row!",
+          size: 'small',
+        });
+      },
+      notify_invalid_action:function(){
+        bootbox.alert({
+          message: "This action is invalid!",
+          size: 'small',
+        });
+      },
+      ask_confirmation: function(msg, callback){
+        bootbox.confirm({
+          message: msg,
+          size: 'small',
+          buttons: {
+            confirm: {
+              label: '<i class="fa fa-check"></i> Confirm',
+              className: 'btn-success'
+            },
+            cancel: {
+              label: '<i class="fa fa-times"></i> Cancel',
+              className: 'btn-danger'
+            }
+          },
+          callback: function (result) {
+            if (result) {
+              callback();
+              Toolbar.show_loading_box();
+            }
+          }
+        });
+      },
+      submit_action_form: function(action){
+        var form = $('#action_form');
+        var action_field = $('input#action_name', form);
+
+        switch (action) {
+          case "create":{
+            action_field.val('create');
+            form.attr('method', 'POST');
+            form.attr('action', '.');
+            form.submit();
+            break;
+          };
+          case "update_all":{
+            action_field.val('update_all');
+            form.attr('method', 'POST');
+            form.attr('action', '.');
+            form.submit();
+            break;
+          };
+          case "update_selected":{
+            action_field.val('update_selected');
+            form.attr('method', 'POST');
+            form.attr('action', '.');
+            var rows = Toolbar.rows_selected;
+            for (var i = 0; i < rows.length; i++) {
+              form.append( "<input type='text' name='rowid' value='" + rows[i] + " '>" );
+            }
+            form.submit();
+            break;
+          };
+          case "delete_all":{
+            action_field.val('delete_all');
+            form.attr('method', 'POST');
+            form.attr('action', '.');
+            form.submit();
+            break;
+          };
+          case "delete_selected":{
+            action_field.val('delete_selected');
+            form.attr('method', 'POST');
+            form.attr('action', '.');
+            var rows = Toolbar.rows_selected;
+            for (var i = 0; i < rows.length; i++) {
+              form.append( "<input type='text' name='rowid' value='" + rows[i] + " '>" );
+            }
+            form.submit();
+            break;
+          };
+          default:{
+            Toolbar.notify_invalid_action();
+            break;
+          }
+        }
+      },
+      submit_create: function(){
+        Toolbar.submit_action_form('create');
+      },
+      submit_update_all: function(){
+        Toolbar.submit_action_form('update_all');
+      },
+      submit_update_selected: function(){
+        Toolbar.submit_action_form('update_selected');
+      },
+      submit_delete_all: function(){
+        Toolbar.submit_action_form('delete_all');
+      },
+      submit_delete_selected: function(){
+        Toolbar.submit_action_form('delete_selected');
+      },
+      init: function(){
+        var self = this;
+        /* create */
+        this.btn_create = $(this.btn_create_selector);
+        this.btn_create.click(function(){
+          var msg = 'You will <b>CREATE</b> new records.<br/>Are you sure? ';
+          self.ask_confirmation(msg, Toolbar.submit_create);
+        });
+        /* update all */
+        this.btn_update_all = $(this.btn_update_all_selector);
+        this.btn_update_all.click(function(){
+          var msg = 'You will <b>UPDATE</b> all records.<br/>Are you sure? ';
+          self.ask_confirmation(msg, Toolbar.submit_update_all);
+        });
+        /* update selected */
+        this.btn_update_selected = $(this.btn_update_selected_selector);
+        this.btn_update_selected.click(function(){
+          self.get_rows_selected();
+          if (self.rows_selected == 0){
+            self.notify_no_rows_selected();
+            return;
+          } else {
+            var selected_count =  self.rows_selected.length;
+            var msg = 'You will <b>UPDATE</b> selected ' + selected_count + ' record(s).<br/>Are you sure? ';
+            self.ask_confirmation(msg, Toolbar.submit_update_selected);
+          }
+        });
+        /* delete all*/
+        this.btn_delete_all = $(this.btn_delete_all_selector);
+        this.btn_delete_all.click(function(){
+          var msg = 'You will <b>DELETE</b> all records.<br/>Are you sure? ';
+          self.ask_confirmation(msg, Toolbar.submit_delete_all);
+        });
+        /* delete selected */
+        this.btn_delete_selected = $(this.btn_delete_selected_selector);
+        this.btn_delete_selected.click(function(){
+          self.get_rows_selected();
+          if (self.rows_selected == 0){
+            self.notify_no_rows_selected();
+            return;
+          } else {
+            var selected_count =  self.rows_selected.length;
+            var msg = 'You will <b>DELETE</b> selected ' + selected_count + ' record(s).<br/>re you sure? ';
+            self.ask_confirmation(msg, Toolbar.submit_delete_selected);
+          }
+        });
+
+      }
+    } /* Toolbar*/
+
+    $(function() {
+      $('#table_check_all:checkbox').click(function(event) {
+        var $this = $(this);
+        if ($this.is(":checked")) {
+          $('input:checkbox', '.tbody_object_list').prop('checked', true);
+        } else {
+          $('input:checkbox', '.tbody_object_list').prop('checked', false);
+        }
+      });
+
+      /* action toolbar */
+      Toolbar.init();
+    });
+  </script>
 {% endblock %}

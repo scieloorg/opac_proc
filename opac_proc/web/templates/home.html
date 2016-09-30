@@ -3,56 +3,62 @@
 {% block content %}
     <h1></h1>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Extract:
+                    <strong>Extract:</strong>
+                    <a class="pull-right" href="{{ url_for('extract_logs_list') }}" data-toggle="tooltip" data-placement="left" title="View Logs">
+                        <span class="glyphicon glyphicon-list-alt"></span>
+                    </a>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
-                    <li class="list-group-item">
+                    <a href="{{ url_for('extract_collections_list') }}" class="list-group-item">
                         Collections:
                         {% if extract_collection_count == 0 %}
                             <span class="badge badge-danger">{{ extract_collection_count }}</span>
                         {% else %}
                             <span class="badge badge-primary">{{ extract_collection_count }}</span>
                         {% endif %}
-                    </li>
-                    <li class="list-group-item">
+                    </a>
+                    <a href="{{ url_for('extract_journals_list') }}" class="list-group-item">
                         Journals:
                         {% if extract_journal_count == 0 %}
                             <span class="badge badge-danger">{{ extract_journal_count }}</span>
                         {% else %}
                             <span class="badge badge-primary">{{ extract_journal_count }}</span>
                         {% endif %}
-                    </li>
-                    <li class="list-group-item">
+                    </a>
+                    <a href="{{ url_for('extract_issues_list') }}" class="list-group-item">
                         Issues:
                         {% if extract_issue_count == 0 %}
                             <span class="badge badge-danger">{{ extract_issue_count }}</span>
                         {% else %}
                             <span class="badge badge-primary">{{ extract_issue_count }}</span>
                         {% endif %}
-                    </li>
-                    <li class="list-group-item">
+                    </a>
+                    <a href="{{ url_for('extract_articles_list') }}" class="list-group-item">
                         Articles:
                         {% if extract_article_count == 0 %}
                             <span class="badge badge-danger">{{ extract_article_count }}</span>
                         {% else %}
                             <span class="badge badge-primary">{{ extract_article_count }}</span>
                         {% endif %}
-                    </li>
+                    </a>
                 </ul>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Transform:
+                    <strong>Transform:</strong>
+                    <a class="pull-right" href="{{ url_for('transform_logs_list') }}" data-toggle="tooltip" data-placement="left" title="View Logs">
+                        <span class="glyphicon glyphicon-list-alt"></span>
+                    </a>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
-                    <li class="list-group-item">
+                    <a href="{{ url_for('transform_collections_list') }}" class="list-group-item">
                         Collections:
                         {% if transform_collection_count == 0 %}
                             <span class="badge badge-danger">
@@ -64,8 +70,8 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ transform_collection_count }}</span>
-                    </li>
-                    <li class="list-group-item">
+                    </a>
+                    <a href="{{ url_for('transform_journals_list') }}" class="list-group-item">
                         Journals:
                         {% if transform_journal_count == 0 %}
                             <span class="badge badge-danger">
@@ -77,8 +83,8 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ transform_journal_count }}</span>
-                    </li>
-                    <li class="list-group-item">
+                    </a>
+                    <a href="{{ url_for('transform_issues_list') }}" class="list-group-item">
                         Issues:
                         {% if transform_issue_count == 0 %}
                             <span class="badge badge-danger">
@@ -90,8 +96,8 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ transform_issue_count }}</span>
-                    </li>
-                    <li class="list-group-item">
+                    </a>
+                    <a href="{{ url_for('transform_articles_list') }}" class="list-group-item">
                         Articles:
                         {% if transform_article_count == 0 %}
                             <span class="badge badge-danger">
@@ -103,18 +109,21 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ transform_article_count }}</span>
-                    </li>
+                    </a>
                 </ul>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Load:
+                    <strong>Load:</strong>
+                    <a class="pull-right" href="{{ url_for('load_logs_list') }}" data-toggle="tooltip" data-placement="left" title="View Logs">
+                        <span class="glyphicon glyphicon-list-alt"></span>
+                    </a>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
-                    <li class="list-group-item">
+                    <a href="{{ url_for('load_collections') }}" class="list-group-item">
                         Collections:
                         {% if load_collection_count == 0 %}
                             <span class="badge badge-danger">
@@ -126,8 +135,8 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ load_collection_count }}</span>
-                    </li>
-                    <li class="list-group-item">
+                    </a>
+                    <a href="{{ url_for('load_journals') }}" class="list-group-item">
                         Journals:
                         {% if load_journal_count == 0 %}
                             <span class="badge badge-danger">
@@ -139,8 +148,8 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ load_journal_count }}</span>
-                    </li>
-                    <li class="list-group-item">
+                    </a>
+                    <a href="{{ url_for('load_issues') }}" class="list-group-item">
                         Issues:
                         {% if load_issue_count == 0 %}
                             <span class="badge badge-danger">
@@ -152,8 +161,8 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ load_issue_count }}</span>
-                    </li>
-                    <li class="list-group-item">
+                    </a>
+                    <a href="{{ url_for('load_articles') }}" class="list-group-item">
                         Articles:
                         {% if load_article_count == 0 %}
                             <span class="badge badge-danger">
@@ -165,11 +174,91 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ load_article_count }}</span>
+                    </a>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <strong>OPAC schema:</strong>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        Collections:
+                        {% if opac_collection_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif opac_collection_count < load_collection_count %}
+                            <span class="badge badge-warning">
+                        {% elif opac_collection_count > load_collection_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ opac_collection_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Journals:
+                        {% if opac_journal_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif opac_journal_count < load_journal_count %}
+                            <span class="badge badge-warning">
+                        {% elif opac_journal_count > load_journal_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ opac_journal_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Issues:
+                        {% if opac_issue_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif opac_issue_count < load_issue_count %}
+                            <span class="badge badge-warning">
+                        {% elif opac_issue_count > load_issue_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ opac_issue_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Articles:
+                        {% if opac_article_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif opac_article_count < load_article_count %}
+                            <span class="badge badge-warning">
+                        {% elif opac_article_count > load_article_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ opac_article_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Sponsors <span class="badge">{{ opac_sponsor_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Pages <span class="badge">{{ opac_page_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        Resources <span class="badge">{{ opac_resource_count }}</span>
+                    </li>
+                    <li class="list-group-item">
+                        News <span class="badge">{{ opac_news_count }}</span>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
-
+{% endblock %}
+{% block extra_js %}
+<script>
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
 {% endblock %}
 

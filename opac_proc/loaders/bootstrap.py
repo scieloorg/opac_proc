@@ -43,7 +43,7 @@ r_queues.create_queues_for_stage('load')
 
 def reprocess_collection(propagate=False):
     db = get_db_connection()
-    for collection in LoadCollection.objects(must_reprocess=True):
+    for collection in LoadCollection(must_reprocess=True):
         job = r_queues.enqueue(
             'load', 'collection',
             task_load_collection,
@@ -55,7 +55,7 @@ def reprocess_collection(propagate=False):
 
 def reprocess_journal(depends_on=None, propagate=False):
     db = get_db_connection()
-    for journal in LoadJournal.objects(must_reprocess=True):
+    for journal in LoadJournal(must_reprocess=True):
 
         if depends_on:
             job = r_queues.enqueue(
@@ -75,7 +75,7 @@ def reprocess_journal(depends_on=None, propagate=False):
 
 def reprocess_issue(depends_on=None, propagate=False):
     db = get_db_connection()
-    for issue in LoadIssue.objects(must_reprocess=True):
+    for issue in LoadIssue(must_reprocess=True):
 
         if depends_on:
             job = r_queues.enqueue(
@@ -95,7 +95,7 @@ def reprocess_issue(depends_on=None, propagate=False):
 
 def reprocess_article(depends_on=None, propagate=False):
     db = get_db_connection()
-    for article in LoadArticle.objects(must_reprocess=True):
+    for article in LoadArticle(must_reprocess=True):
         if depends_on:
             r_queues.enqueue(
                 'load', 'article',
@@ -128,45 +128,53 @@ def load_all(collection_acronym):
     logger.info(u'Recuperando TransformCollection:  %s' % collection_acronym)
     coll_transform = TransformCollection.objects.get(
         acronym=collection_acronym)
+    logger.info(u'TransformCollection coletada:  %s (uuid: %s)' % (
+        coll_transform.acronym, coll_transform.uuid))
 
-    logger.info(u'Tranformando Collection:  %s' % collection_acronym)
+    logger.info(u"Disparando task: task_load_collection")
     job_collection = r_queues.enqueue(
         'load', 'collection',
         task_load_collection,
         coll_transform.uuid)
 
     logger.info(u'Collection %s carregada' % coll_transform.acronym)
-    logger.info(u"Disparando tasks")
 
-    # for child in coll_transform.children_ids:
-    #     issn = child['issn']
-    #     issues_ids = child['issues_ids']
-    #     articles_ids = child['articles_ids']
+    import time
+    time.sleep(2)
 
-    #     logger.debug(u"recuperando periódico [issn: %s]" % issn)
-    #     t_journal = TransformJournal.objects.get(Q(scielo_issn=issn) | Q(print_issn=issn) | Q(eletronic_issn=issn))
+    for child in coll_transform.children_ids:
+        issn = child['issn']
+        issues_ids = child['issues_ids']
+        articles_ids = child['articles_ids']
 
-    #     logger.debug(u"enfilerando task: task_transform_journal [issn: %s]" % issn)
-    #     job_journal = r_queues.enqueue(
-    #         'load', 'journal',
-    #         task_load_journal,
-    #         t_journal.uuid)
+        logger.debug(u"recuperando periódico [issn: %s]" % issn)
+        t_journal = TransformJournal.objects.get(Q(scielo_issn=issn) | Q(print_issn=issn) | Q(eletronic_issn=issn))
 
-    #     for issue_id in issues_ids:
-    #         logger.debug(u"recuperando issue [pid: %s]" % issue_id)
-    #         t_issue = TransformIssue.objects.get(pid=issue_id)
-    #         logger.debug(u"enfilerando task: task_transform_issue [issue_id: %s]" % issue_id)
-    #         job_issue = r_queues.enqueue(
-    #             'load', 'issue',
-    #             task_load_issue,
-    #             t_issue.uuid)
+        logger.debug(u"enfilerando task: task_transform_journal [issn: %s]" % issn)
+        job_journal = r_queues.enqueue(
+            'load', 'journal',
+            task_load_journal,
+            t_journal.uuid)
 
-    #         for t_article in TransformArticle.objects(issue=t_issue.uuid):
-    #             logger.debug(u"enfilerando task: task_load_article [article_id: %s]" % t_article.pid)
-    #             r_queues.enqueue(
-    #                 'load', 'article',
-    #                 task_load_article,
-    #                 t_article.uuid)
+        time.sleep(2)
+
+        for issue_id in issues_ids:
+            logger.debug(u"recuperando issue [pid: %s]" % issue_id)
+            t_issue = TransformIssue.objects.get(pid=issue_id)
+            logger.debug(u"enfilerando task: task_transform_issue [issue_id: %s]" % issue_id)
+            job_issue = r_queues.enqueue(
+                'load', 'issue',
+                task_load_issue,
+                t_issue.uuid)
+
+            time.sleep(1)
+
+            for t_article in TransformArticle.objects(issue=t_issue.uuid):
+                logger.debug(u"enfilerando task: task_load_article [article_id: %s]" % t_article.pid)
+                r_queues.enqueue(
+                    'load', 'article',
+                    task_load_article,
+                    t_article.uuid)
 
     logger.info(u"Fim enfileramento de tasks")
 
@@ -210,7 +218,7 @@ def main(argv=sys.argv[1:]):
         help=u'Nível do log')
 
     options, args = parser.parse_args(argv)
-    logger = getMongoLogger(__name__, options.logging_level, "load")
+    # logger = getMongoLogger(__name__, options.logging_level, "load")
 
     try:
         if options.load_all and options.reprocess_all:
