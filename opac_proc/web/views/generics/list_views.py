@@ -6,6 +6,10 @@ from flask_mongoengine import Pagination
 
 class ListView(View):
     methods = ['GET', 'POST']
+    stage = ''  # 'extract' | 'transform' | 'load'
+    model_class = None  # classe do modelo. Ex: LoadCollection, TransformJournal
+    model_name = ''  # nome do modelo (lowercase). ex: "article" ou "issue" ou "journal" ou "collection"
+    process_class = None  # subclasse de Process que vai atender a ação
     page_title = 'List view'
     page_subtitle = ''
     panel_title = ''
@@ -51,6 +55,12 @@ class ListView(View):
         'delete_selected'
     ]
 
+    def get_objects(self):
+        if self.model_class is None:
+            raise ValueError("model class not defined")
+        else:
+            return self.model_class.objects()
+
     def render_template(self, context):
         return render_template(self.template_name, **context)
 
@@ -67,29 +77,84 @@ class ListView(View):
         }
 
     def do_create(self):
-        raise NotImplemented
+        processor = self.process_class()
+        if self.model_name == 'collection':
+            processor.process_all_collections()
+        elif self.model_name == 'journal':
+            processor.process_all_journals()
+        elif self.model_name == 'issue':
+            processor.process_all_issues()
+        elif self.model_name == 'article':
+            processor.process_all_articles()
+        else:
+            raise ValueError('Invalid "model_name" attribute')
+        flash("Started process to %s all %s(s)" % (self.stage, self.model_name))
 
     def do_update_all(self):
-        raise NotImplemented
+        processor = self.process_class()
+        if self.model_name == 'collection':
+            processor.reprocess_collections()
+        elif self.model_name == 'journal':
+            processor.reprocess_journals()
+        elif self.model_name == 'issue':
+            processor.reprocess_issues()
+        elif self.model_name == 'article':
+            processor.reprocess_articles()
+        else:
+            raise ValueError('Invalid "model_name" attribute')
+
+        flash("Started reprocess to %s all %s" % (self.stage.upper(), self.model_name.upper()))
 
     def do_update_selected(self, ids):
-        raise NotImplemented
+        processor = self.process_class()
+        if self.model_name == 'collection':
+            processor.reprocess_collections(ids)
+        elif self.model_name == 'journal':
+            processor.reprocess_journals(ids)
+        elif self.model_name == 'issue':
+            processor.reprocess_issues(ids)
+        elif self.model_name == 'article':
+            processor.reprocess_articles(ids)
+        else:
+            raise ValueError('Invalid "model_name" attribute')
+
+        flash("Started reprocess to %s %s %s" % (self.stage.upper(), len(ids), self.model_name.upper()))
 
     def do_delete_all(self):
-        raise NotImplemented
+        if self.model_class is None:
+            raise ValueError("model class not defined")
+        else:
+            self.model_class.objects.all().delete()
+            flash("All records deleted successfully!", "success")
 
     def do_delete_selected(self, ids):
-        raise NotImplemented
+        if self.model_class is None:
+            raise ValueError("model class not defined")
 
-    def get_selected_ids():
-        """
-        Retorna a lista de ids que vem no request.form
-        a lista deve conter os ids prontos para usar no orm:
-        - Logs: deve ser uma lista de ObjectsId
-        - Extract, Transorm, Load models deve ser uma lista de UUID
-        - OPAC models de ver uma lista de strings (uuid como string)
-        """
-        raise NotImplemented
+        delete_errors_count = 0
+        for oid in ids:
+            try:
+                model = self.model_class.objects.get(pk=oid)
+                model.delete()
+            except Exception as e:
+                delete_errors_count += 1
+        if delete_errors_count:
+            flash("%s records cannot be deleted" % delete_errors_count, "error")
+        successfully_deleted = len(ids) - delete_errors_count
+        if successfully_deleted > 0:
+            flash("%s records deleted successfully!" % successfully_deleted, "success")
+        else:
+            flash("%s records deleted successfully!" % successfully_deleted, "warning")
+
+    def get_selected_ids(self):
+        ids = request.form.getlist('rowid')
+        if not ids:
+            raise ValueError("No records selected")
+        elif isinstance(ids, list):
+            ids = [id.strip() for id in ids]
+        else:
+            raise ValueError("Invalid selection %s" % ids)
+        return ids
 
     def dispatch_request(self):
         if request.method == 'POST':  # create action
@@ -116,7 +181,11 @@ class ListView(View):
                 elif action_name == 'update_selected':
                     if self.can_update:
                         try:
-                            self.do_update_selected()
+                            ids = self.get_selected_ids()
+                            if ids:
+                                self.do_update_selected(ids)
+                            else:
+                                flask(u'Invalid selection', 'error')
                         except Exception as e:
                             flash(u'ERROR: %s' % str(e), 'error')
                     else:

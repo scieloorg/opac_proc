@@ -23,7 +23,7 @@ ARTICLE_META_THRIFT_DOMAIN = os.environ.get(
     'articlemeta.scielo.org')
 ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_THRIFT_PORT',
-    11720))
+    11620))  # antes 11720
 
 # coleção a ser processada
 OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')

@@ -85,4 +85,4 @@ class RQueues(Singleton):
 
     def enqueue(self, stage, model, task, *args, **kwargs):
         queue = self.get_queue(stage, model)
-        return queue.enqueue(task, *args, **kwargs)
+        return queue.enqueue(task, args=args, kwargs=kwargs, timeout=2000)

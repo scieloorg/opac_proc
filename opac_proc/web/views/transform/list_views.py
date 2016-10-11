@@ -1,18 +1,23 @@
 # coding: utf-8
 from mongoengine.context_managers import switch_db
+from bson.objectid import ObjectId
+from flask import flash
+
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
+
+from opac_proc.transformers.process import TransformProcess
 
 OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 
 class TransformCollectionListView(ListView):
-    # panel_title = u"Lista de todas as coleções coletadas na operação: extração"
-    page_title = "Transform: Collection"
+    model_class = models.TransformCollection
     can_create = True
     can_update = True
     can_delete = True
+    page_title = "Transform: Collection"
     list_colums = [
         {
             'field_label': u'UUID',
@@ -51,11 +56,12 @@ class TransformCollectionListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.TransformCollection.objects()
-
 
 class TransformJournalListView(ListView):
+    model_class = models.TransformJournal
+    can_create = True
+    can_update = True
+    can_delete = True
     page_title = "Transform: Journals"
     list_colums = [
         {
@@ -90,11 +96,12 @@ class TransformJournalListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.TransformJournal.objects()
-
 
 class TransformIssueListView(ListView):
+    model_class = models.TransformIssue
+    can_create = True
+    can_update = True
+    can_delete = True
     page_title = "Transform: Issues"
     list_colums = [
         {
@@ -129,11 +136,12 @@ class TransformIssueListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.TransformIssue.objects()
-
 
 class TransformArticleListView(ListView):
+    model_class = models.TransformArticle
+    can_create = True
+    can_update = True
+    can_delete = True
     page_title = "Transform: Articles"
     list_colums = [
         {
@@ -168,11 +176,12 @@ class TransformArticleListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.TransformArticle.objects()
-
 
 class TransformLogListView(ListView):
+    model_class = models.TransformLog
+    can_create = False
+    can_update = False
+    can_delete = True
     page_title = "Transform: Logs"
     page_subtitle = "most recent first"
     per_page = 50
@@ -211,5 +220,19 @@ class TransformLogListView(ListView):
 
     def get_objects(self):
         register_connections()
-        with switch_db(models.TransformLog, OPAC_PROC_LOGS_DB_NAME):
-            return models.TransformLog.objects.order_by('-time')
+        with switch_db(self.model_class, OPAC_PROC_LOGS_DB_NAME):
+            return self.model_class.objects.order_by('-time')
+
+    def do_delete_all(self):
+        register_connections()
+        with switch_db(self.model_class, OPAC_PROC_LOGS_DB_NAME):
+            super(TransformLogListView, self).do_delete_all()
+
+    def do_delete_selected(self, ids):
+        register_connections()
+        with switch_db(self.model_class, OPAC_PROC_LOGS_DB_NAME):
+            super(TransformLogListView, self).do_delete_selected(ids)
+
+    def get_selected_ids(self):
+        ids = super(TransformLogListView, self).get_selected_ids()
+        return [ObjectId(id.strip()) for id in ids]

@@ -1,5 +1,7 @@
 # coding: utf-8
 from mongoengine.context_managers import switch_db
+from bson.objectid import ObjectId
+
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
@@ -10,11 +12,15 @@ OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 
 class ExtractCollectionListView(ListView):
-    # panel_title = u"Lista de todas as coleções coletadas na operação: extração"
-    page_title = "Extract: Collection"
+    stage = 'extract'
+    model_class = models.ExtractCollection
+    model_name = 'collection'
+    process_class = ExtractProcess
+
     can_create = True
     can_update = True
     can_delete = True
+    page_title = "Extract: Collection"
     list_colums = [
         {
             'field_label': u'UUID',
@@ -53,31 +59,17 @@ class ExtractCollectionListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.ExtractCollection.objects()
-
-    def do_create(self):
-        ex_processor = ExtractProcess()
-        raise NotImplemented
-
-    def do_update_all(self):
-        raise NotImplemented
-
-    def do_update_selected(self, ids):
-        raise NotImplemented
-
-    def do_delete_all(self):
-        raise NotImplemented
-
-    def do_delete_selected(self, ids):
-        raise NotImplemented
-
 
 class ExtractJournalListView(ListView):
-    page_title = "Extract: Journals"
+    stage = 'extract'
+    model_class = models.ExtractJournal
+    model_name = 'journal'
+    process_class = ExtractProcess
+
     can_create = True
     can_update = True
     can_delete = True
+    page_title = "Extract: Journals"
     list_colums = [
         {
             'field_label': u'UUID',
@@ -111,31 +103,17 @@ class ExtractJournalListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.ExtractJournal.objects()
-
-    def do_create(self):
-        ex_processor = ExtractProcess()
-        raise NotImplemented
-
-    def do_update_all(self):
-        raise NotImplemented
-
-    def do_update_selected(self, ids):
-        raise NotImplemented
-
-    def do_delete_all(self):
-        raise NotImplemented
-
-    def do_delete_selected(self, ids):
-        raise NotImplemented
-
 
 class ExtractIssueListView(ListView):
-    page_title = "Extract: Issues"
+    stage = 'extract'
+    model_class = models.ExtractIssue
+    model_name = 'issue'
+    process_class = ExtractProcess
+
     can_create = True
     can_update = True
     can_delete = True
+    page_title = "Extract: Issues"
     list_colums = [
         {
             'field_label': u'UUID',
@@ -168,32 +146,18 @@ class ExtractIssueListView(ListView):
             'field_type': 'boolean'
         },
     ]
-
-    def get_objects(self):
-        return models.ExtractIssue.objects()
-
-    def do_create(self):
-        ex_processor = ExtractProcess()
-        raise NotImplemented
-
-    def do_update_all(self):
-        raise NotImplemented
-
-    def do_update_selected(self, ids):
-        raise NotImplemented
-
-    def do_delete_all(self):
-        raise NotImplemented
-
-    def do_delete_selected(self, ids):
-        raise NotImplemented
 
 
 class ExtractArticleListView(ListView):
-    page_title = "Extract: Articles"
+    stage = 'extract'
+    model_class = models.ExtractArticle
+    model_name = 'article'
+    process_class = ExtractProcess
+
     can_create = True
     can_update = True
     can_delete = True
+    page_title = "Extract: Articles"
     list_colums = [
         {
             'field_label': u'UUID',
@@ -227,33 +191,19 @@ class ExtractArticleListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.ExtractArticle.objects()
-
-    def do_create(self):
-        ex_processor = ExtractProcess()
-        raise NotImplemented
-
-    def do_update_all(self):
-        raise NotImplemented
-
-    def do_update_selected(self, ids):
-        raise NotImplemented
-
-    def do_delete_all(self):
-        raise NotImplemented
-
-    def do_delete_selected(self, ids):
-        raise NotImplemented
-
 
 class ExtractLogListView(ListView):
+    stage = 'extract'
+    model_class = models.ExtractLog
+    model_name = 'loadlog'
+    process_class = None  # logs somente tem o Delete
+
+    can_create = False
+    can_update = False
+    can_delete = True
     page_title = "Extract: Logs"
     page_subtitle = "most recent first"
     per_page = 50
-    can_create = True
-    can_update = True
-    can_delete = True
     list_colums = [
         {
             'field_label': u'Timestamp',
@@ -289,17 +239,19 @@ class ExtractLogListView(ListView):
 
     def get_objects(self):
         register_connections()
-        with switch_db(models.ExtractLog, OPAC_PROC_LOGS_DB_NAME):
-            return models.ExtractLog.objects.order_by('-time')
+        with switch_db(self.model_class, OPAC_PROC_LOGS_DB_NAME):
+            return self.model_class.objects.order_by('-time')
 
     def do_delete_all(self):
         register_connections()
-        with switch_db(models.ExtractLog, OPAC_PROC_LOGS_DB_NAME):
-            models.ExtractLog.all().delete()
-        flash('All records deleted successfully!', 'success')
+        with switch_db(self.model_class, OPAC_PROC_LOGS_DB_NAME):
+            super(ExtractLogListView, self).do_delete_all()
 
     def do_delete_selected(self, ids):
         register_connections()
-        with switch_db(models.ExtractLog, OPAC_PROC_LOGS_DB_NAME):
-            models.ExtractLog.in_bulk(ids).delete()
-        flash('%s records deleted successfully!' % len(ids), 'success')
+        with switch_db(self.model_class, OPAC_PROC_LOGS_DB_NAME):
+            super(ExtractLogListView, self).do_delete_selected(ids)
+
+    def get_selected_ids(self):
+        ids = super(ExtractLogListView, self).get_selected_ids()
+        return [ObjectId(id.strip()) for id in ids]

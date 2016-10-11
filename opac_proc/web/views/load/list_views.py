@@ -1,16 +1,25 @@
 # coding: utf-8
 from mongoengine.context_managers import switch_db
 from bson.objectid import ObjectId
-from flask import request, flash
+
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
+
+from opac_proc.loaders.process import LoadProcess
 
 OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 
 class LoadCollectionListView(ListView):
-    # panel_title = u"Lista de todas as coleções coletadas na operação: extração"
+    stage = 'load'
+    model_class = models.LoadCollection
+    model_name = 'collection'
+    process_class = LoadProcess
+
+    can_create = True
+    can_update = True
+    can_delete = True
     page_title = "Load: Collection"
     list_colums = [
         {
@@ -50,11 +59,16 @@ class LoadCollectionListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.LoadCollection.objects()
-
 
 class LoadJournalListView(ListView):
+    stage = 'load'
+    model_class = models.LoadJournal
+    model_name = 'journal'
+    process_class = LoadProcess
+
+    can_create = True
+    can_update = True
+    can_delete = True
     page_title = "Load: Journals"
     list_colums = [
         {
@@ -89,11 +103,17 @@ class LoadJournalListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.LoadJournal.objects()
-
 
 class LoadIssueListView(ListView):
+    stage = 'load'
+    model_class = models.LoadIssue
+    model_name = 'issue'
+    process_class = LoadProcess
+
+    can_create = True
+    can_update = True
+    can_delete = True
+
     page_title = "Load: Issues"
     list_colums = [
         {
@@ -128,11 +148,17 @@ class LoadIssueListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.LoadIssue.objects()
-
 
 class LoadArticleListView(ListView):
+    stage = 'load'
+    model_class = models.LoadArticle
+    model_name = 'article'
+    process_class = LoadProcess
+
+    can_create = True
+    can_update = True
+    can_delete = True
+
     page_title = "Load: Articles"
     list_colums = [
         {
@@ -167,17 +193,19 @@ class LoadArticleListView(ListView):
         },
     ]
 
-    def get_objects(self):
-        return models.LoadArticle.objects()
-
 
 class LoadLogListView(ListView):
-    page_title = "Load: Logs"
-    page_subtitle = "most recent first"
-    per_page = 50
+    stage = 'load'
+    model_class = models.LoadLog
+    model_name = 'loadlog'
+    process_class = None  # logs somente tem o Delete
+
     can_create = False
     can_update = False
     can_delete = True
+    page_title = "Load: Logs"
+    page_subtitle = "most recent first"
+    per_page = 50
     list_colums = [
         {
             'field_label': u'Timestamp',
@@ -213,39 +241,19 @@ class LoadLogListView(ListView):
 
     def get_objects(self):
         register_connections()
-        with switch_db(models.LoadLog, OPAC_PROC_LOGS_DB_NAME):
-            return models.LoadLog.objects.order_by('-time')
+        with switch_db(self.model_class, OPAC_PROC_LOGS_DB_NAME):
+            return self.model_class.objects.order_by('-time')
 
     def do_delete_all(self):
         register_connections()
-        with switch_db(models.LoadLog, OPAC_PROC_LOGS_DB_NAME):
-            models.LoadLog.objects.all().delete()
-        flash('All records deleted successfully!', 'success')
+        with switch_db(self.model_class, OPAC_PROC_LOGS_DB_NAME):
+            super(LoadLogListView, self).do_delete_all()
 
     def do_delete_selected(self, ids):
         register_connections()
-        delete_errors_count = 0
-        with switch_db(models.LoadLog, OPAC_PROC_LOGS_DB_NAME):
-            for oid in ids:
-                try:
-                    model = models.LoadLog.objects(pk=oid).first()
-                    model.delete()
-                except Exception as e:
-                    delete_errors_count += 1
-        if delete_errors_count:
-            flash('%s records cannot be deleted' % delete_errors_count, 'error')
-        successfully_deleted = len(ids) - delete_errors_count
-        if successfully_deleted > 0:
-            flash('%s records deleted successfully!' % successfully_deleted, 'success')
-        else:
-            flash('%s records deleted successfully!' % successfully_deleted, 'warning')
+        with switch_db(self.model_class, OPAC_PROC_LOGS_DB_NAME):
+            super(LoadLogListView, self).do_delete_selected(ids)
 
     def get_selected_ids(self):
-        ids = request.form.getlist('rowid')
-        if not ids:
-            raise ValueError("No records selected")
-        elif isinstance(ids, list):
-            ids = [ObjectId(id.strip()) for id in ids]
-        else:
-            raise ValueError("Invalid selection %s" % ids)
-        return ids
+        ids = super(LoadLogListView, self).get_selected_ids()
+        return [ObjectId(id.strip()) for id in ids]
