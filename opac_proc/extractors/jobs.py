@@ -147,7 +147,7 @@ def task_extract_article(acronym, article_id):
 
 def task_reprocess_articles(ids=None):
     db = get_db_connection()
-    stage = "load"
+    stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -168,7 +168,7 @@ def task_reprocess_articles(ids=None):
 
 def task_process_all_articles():
     db = get_db_connection()
-    stage = "load"
+    stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 

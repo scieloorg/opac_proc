@@ -2,7 +2,6 @@
 {% import 'macros/object_list.html' as mhelper %}
 {% block title %}{{ page_title|title }}{% endblock %}
 {% block content %}
-
   {% include "includes/page_header.html" %}
   <div class="panel panel-default">
     <!-- Default panel contents -->
@@ -19,51 +18,126 @@
     </div>
     <table class="table_object_list table table-striped table-hover">
       <caption>
-        {# action buttons #}
-        <div class="btn-toolbar action-toolbar pull-right" role="toolbar">
-          <div class="btn-group" role="group">
-            {# create action #}
-            {% if can_create %}
-              <button type="button" class="btn btn-primary" data-action="create">Create</button>
-            {% else %}
-              <button type="button" class="btn btn-primary disabled" data-action="create">Create</button>
-            {% endif %}
+        <div class="row">
+          {# actions toolbar #}
+          <div class="col-md-12 action-toolbar-wrapper toolbar-wrapper">
+            <h4><i class="fa fa-cogs" aria-hidden="true"></i> Actions:</h4>
+            <div class="btn-toolbar action-toolbar" role="toolbar">
+              <div class="btn-group" role="group">
+                {# create action #}
+                {% if can_create %}
+                  <button type="button" class="btn btn-primary" data-action="create">Create</button>
+                {% else %}
+                  <button type="button" class="btn btn-primary disabled" data-action="create">Create</button>
+                {% endif %}
 
-            {# update action #}
-            <div class="btn-group" role="group">
-              {% if can_update and objects|length > 0 %}
-                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Update <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a data-action="update" data-target="selected" href="#">Selected</a></li>
-                  <li><a data-action="update" data-target="all" href="#">All</a></li>
-                </ul>
-              {% else %}
-                <button type="button" class="btn btn-info disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Update <span class="caret"></span>
-                </button>
-              {% endif %}
+                {# update action #}
+                <div class="btn-group" role="group">
+                  {% if can_update and objects|length > 0 %}
+                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Update <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a data-action="update" data-target="selected" href="#">Selected</a></li>
+                      <li><a data-action="update" data-target="all" href="#">All</a></li>
+                    </ul>
+                  {% else %}
+                    <button type="button" class="btn btn-info disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Update <span class="caret"></span>
+                    </button>
+                  {% endif %}
+                </div>
+
+                {# delete action #}
+                <div class="btn-group" role="group">
+                  {% if can_delete %}
+                    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Delete <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a data-action="delete" data-target="selected" href="#">Selected</a></li>
+                      <li><a data-action="delete" data-target="all" href="#">All</a></li>
+                    </ul>
+                  {% else %}
+                    <button type="button" class="btn btn-danger disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Delete <span class="caret"></span>
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
             </div>
+          </div> {# /action-toolbar-wrapper #}
+        </div>
+        {# filters toolbar #}
+        {% if list_filters %}
+          <div class="row">
+            <div class="col-md-12 filters-toolbar-wrapper toolbar-wrapper">
+              <h4><i class="fa fa-filter" aria-hidden="true"></i> Filters:</h4>
+              <form class="form-inline">
+                {% for field_filter in list_filters %}
+                  <div class="form-group">
 
-            {# delete action #}
-            <div class="btn-group" role="group">
-              {% if can_delete %}
-                <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Delete <span class="caret"></span>
+                    {% if field_filter['field_type'] == 'string' %}
+
+                      <label for="filter__value__{{field_filter['field_name']}}">{{ field_filter['field_label'] }}: </label><br>
+                      <select name="filter__option__{{field_filter['field_name']}}" class="form-control input-sm">
+                        <option value="">-----</option>
+                        {% for opt in filter_string_options %}
+                          <option value="{{ opt[0]}}">{{ opt[1] }}</option>
+                        {% endfor %}
+                      </select>
+                      <input name="filter__value__{{field_filter['field_name']}}" type="text"  class="form-control input-sm">
+
+                    {% elif field_filter['field_type'] == 'uuid' %}
+
+                      <label for="filter__value__{{field_filter['field_name']}}">{{ field_filter['field_label'] }}: </label><br>
+                      <div class="input-group date" id="datetimepicker__from__{{field_filter['field_name']}}">
+                        <div class="input-group-addon">Equal to:</div>
+                        <input name="filter__value__{{field_filter['field_name']}}" type="text" class="form-control input-sm">
+                      </div>
+
+                    {% elif field_filter['field_type'] == 'boolean' %}
+
+                      <label for="filter__value__{{field_filter['field_name']}}">{{ field_filter['field_label'] }}: </label><br>
+                      <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default">
+                          <input name="filter__value__{{field_filter['field_name']}}" type="radio" autocomplete="off" value="1">True
+                        </label>
+                        <label class="btn btn-default">
+                          <input name="filter__value__{{field_filter['field_name']}}" type="radio" autocomplete="off" value="0">False
+                        </label>
+                      </div>
+
+                    {% elif field_filter['field_type'] == 'date_time' %}
+
+                      <label for="filter__value__{{field_filter['field_name']}}">{{ field_filter['field_label'] }}: </label><br>
+                      {# from #}
+                      <div class="input-group date" id="datetimepicker__from__{{field_filter['field_name']}}">
+                        <div class="input-group-addon">From:</div>
+                        <input name="filter__value__from__{{field_filter['field_name']}}" type="text" class="form-control input-sm">
+                        <div class="input-group-addon">
+                          <i class="fa fa-calendar"></i>
+                        </div>
+                      </div>
+                      {# until #}
+                      <div class="input-group date" id="datetimepicker__until__{{field_filter['field_name']}}">
+                        <div class="input-group-addon">Until:</div>
+                        <input name="filter__value__until__{{field_filter['field_name']}}" type="text" class="form-control input-sm">
+                        <div class="input-group-addon">
+                          <i class="fa fa-calendar"></i>
+                        </div>
+                      </div>
+
+                    {% endif %}
+                  </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary pull-right">
+                  <i class="fa fa-filter" aria-hidden="true"></i> Apply Filters
                 </button>
-                <ul class="dropdown-menu">
-                  <li><a data-action="delete" data-target="selected" href="#">Selected</a></li>
-                  <li><a data-action="delete" data-target="all" href="#">All</a></li>
-                </ul>
-              {% else %}
-                <button type="button" class="btn btn-danger disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Delete <span class="caret"></span>
-                </button>
-              {% endif %}
+              </form>
             </div>
           </div>
-        </div>
+        {% endif %}
       </caption>
       <thead>
         <th>
@@ -343,6 +417,8 @@
       }
     } /* Toolbar*/
 
+
+
     $(function() {
       $('#table_check_all:checkbox').click(function(event) {
         var $this = $(this);
@@ -355,6 +431,43 @@
 
       /* action toolbar */
       Toolbar.init();
+      /* Datetime pickers */
+
+      {% for field_filter in list_filters %}
+        {% if field_filter['field_type'] == 'date_time' %}
+          {# /* https://eonasdan.github.io/bootstrap-datetimepicker/#linked-pickers */ #}
+          var datetimepicker_from_id = "datetimepicker__from__{{field_filter['field_name']}}";
+          var datetimepicker_until_id = "datetimepicker__until__{{field_filter['field_name']}}";
+          $('#' + datetimepicker_from_id).datetimepicker({
+            locale: 'pt-br',
+            icons: {
+              time: "fa fa-clock-o",
+              date: "fa fa-calendar",
+              up: "fa fa-arrow-up",
+              down: "fa fa-arrow-down"
+            }
+          });
+          $('#' + datetimepicker_until_id).datetimepicker({
+            useCurrent: false, /* Important! See issue #1075 */
+            locale: 'pt-br',
+            icons: {
+              time: "fa fa-clock-o",
+              date: "fa fa-calendar",
+              up: "fa fa-arrow-up",
+              down: "fa fa-arrow-down"
+            }
+          });
+          $('#' + datetimepicker_from_id).on("dp.change", function (e) {
+              $('#' + datetimepicker_until_id).data("DateTimePicker").minDate(e.date);
+          });
+          $('#' + datetimepicker_until_id).on("dp.change", function (e) {
+              $('#' + datetimepicker_from_id).data("DateTimePicker").maxDate(e.date);
+          });
+        {% endif %}
+      {% endfor %}
+
+
+
     });
   </script>
 {% endblock %}

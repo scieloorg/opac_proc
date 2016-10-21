@@ -13,7 +13,11 @@ OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 
 class TransformCollectionListView(ListView):
+    stage = 'transform'
     model_class = models.TransformCollection
+    model_name = 'collection'
+    process_class = TransformProcess
+
     can_create = True
     can_update = True
     can_delete = True
@@ -58,7 +62,11 @@ class TransformCollectionListView(ListView):
 
 
 class TransformJournalListView(ListView):
+    stage = 'transform'
     model_class = models.TransformJournal
+    model_name = 'journal'
+    process_class = TransformProcess
+
     can_create = True
     can_update = True
     can_delete = True
@@ -98,7 +106,11 @@ class TransformJournalListView(ListView):
 
 
 class TransformIssueListView(ListView):
+    stage = 'transform'
     model_class = models.TransformIssue
+    model_name = 'issue'
+    process_class = TransformProcess
+
     can_create = True
     can_update = True
     can_delete = True
@@ -138,7 +150,11 @@ class TransformIssueListView(ListView):
 
 
 class TransformArticleListView(ListView):
+    stage = 'transform'
     model_class = models.TransformArticle
+    model_name = 'article'
+    process_class = TransformProcess
+
     can_create = True
     can_update = True
     can_delete = True
@@ -178,7 +194,11 @@ class TransformArticleListView(ListView):
 
 
 class TransformLogListView(ListView):
+    stage = 'transform'
     model_class = models.TransformLog
+    model_name = 'transformlog'
+    process_class = None  # logs somente tem o Delete
+
     can_create = False
     can_update = False
     can_delete = True

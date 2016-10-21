@@ -1,4 +1,5 @@
 # coding: utf-8
+import re
 from flask import render_template, flash, request, redirect, jsonify
 from flask.views import View
 from flask_mongoengine import Pagination
@@ -22,14 +23,9 @@ class ListView(View):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -47,6 +43,29 @@ class ListView(View):
     can_update = False
     can_delete = False
 
+    list_filters = [
+        {
+            'field_label': u'UUID',
+            'field_name': 'uuid',
+            'field_type': 'uuid'
+        },
+        {
+            'field_label': u'Last update',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Must reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
     _allowed_POST_action_names = [
         'create',
         'update_all',
@@ -55,11 +74,82 @@ class ListView(View):
         'delete_selected'
     ]
 
+    filter_string_options = (
+        ('iexact', 'Exact'),
+        ('contains', 'Contains'),
+        ('istartswith', 'Starts with'),
+        ('endswith', 'Ends with')
+    )
+
+    def _valid_uuid(self, uuid):
+        regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+        match = regex.match(uuid)
+        return bool(match)
+
+    def get_filters(self):
+        qs_filters = {}
+        filter_string_lookups = dict(self.filter_string_options).keys()
+
+        if request.method == 'GET':
+            for list_filter in self.list_filters:
+
+                f_field_name = list_filter['field_name']
+                f_field_type = list_filter['field_type']
+                f_field_label = list_filter['field_label']
+                qs_filter_value = request.args.get('filter__value__%s' % f_field_name, None)
+                qs_filter_from = request.args.get('filter__value__from__%s' % f_field_name, None)
+                qs_filter_until = request.args.get('filter__value__until__%s' % f_field_name, None)
+                qs_filter_option = request.args.get('filter__option__%s' % f_field_name, None)
+                print "**" * 20
+                print "f_field_name", f_field_name
+                print "f_field_type", f_field_type
+                print "qs_filter_value", qs_filter_value
+                print "qs_filter_from", qs_filter_from
+                print "qs_filter_until", qs_filter_until
+                print "qs_filter_option", qs_filter_option
+                print "**" * 20
+
+                if qs_filter_value is None or qs_filter_value == "":
+                    continue  # ignore this filter
+                elif qs_filter_option:  # http://docs.mongoengine.org/guide/querying.html#string-queries
+                    if f_field_type == 'string' and qs_filter_option in self.filter_string_lookups:
+                        field_lookup = f_field_name + '__' + qs_filter_option
+                        qs_filters[field_lookup] = qs_filter_value
+                    else:
+                        flash('filter for: "%s" is invalid' % f_field_label, 'warning')
+                        continue  # ignore this filter
+                else:
+                    if f_field_type == 'uuid':
+                        qs_filter_value = qs_filter_value.strip()
+                        if self._valid_uuid(qs_filter_value):
+                            qs_filter_value = str(qs_filter_value)
+                        else:
+                            flash('Filter for: "%s". It is not a valid UUID value' % f_field_label, 'error')
+                            continue  # ignore this filter
+
+                    elif f_field_type == 'boolean':
+                        qs_filter_value = bool(qs_filter_value)
+                    elif f_field_type == 'date_time':
+                        if qs_filter_from and qs_filter_until:
+                            pass
+                        else:
+                            flash('Filter for: "%s". It is not a valid range of dates' % f_field_label, 'error')
+                    qs_filters[f_field_name] = qs_filter_value
+
+            print "result qs_filters: ", qs_filters
+            return qs_filters
+        else:
+            return qs_filters
+
     def get_objects(self):
         if self.model_class is None:
             raise ValueError("model class not defined")
         else:
-            return self.model_class.objects()
+            filters = self.get_filters()
+            if self.list_filters and filters:
+                return self.model_class.objects.filter(**filters)
+            else:
+                return self.model_class.objects()
 
     def render_template(self, context):
         return render_template(self.template_name, **context)
@@ -215,6 +305,9 @@ class ListView(View):
         page = request.args.get('page', 1, type=int)
         objects = Pagination(self.get_objects(), page, self.per_page)
         context = {
+            # filters:
+            'list_filters': self.list_filters,
+            'filter_string_options': self.filter_string_options,
             # actions:
             'can_create': self.can_create,
             'can_update': self.can_update,

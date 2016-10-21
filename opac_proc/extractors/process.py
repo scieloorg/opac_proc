@@ -1,8 +1,7 @@
 # coding: utf-8
 import time
-
-
 from opac_proc.core.process import Process
+
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
 

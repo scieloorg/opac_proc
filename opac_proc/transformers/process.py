@@ -33,36 +33,43 @@ class TransformProcess(Process):
         self.async = async
         self.r_queues.create_queues_for_stage(self.stage)
 
-    def reprocess_collection():
-        collections = models.TransformCollection(must_reprocess=True)
-        for collection in collections:
-            self.process_collection(collection.code)
+    def reprocess_collections(self, ids=None):
+        self.r_queues.enqueue(
+            self.stage, 'collection', jobs.task_reprocess_collections, ids)
 
-    def reprocess_journal():
-        journals = models.TransformJournal(must_reprocess=True)
-        for journal in journals:
-            self.process_journal(self.collection_acronym, journal.code)
+    def reprocess_journals(self, ids=None):
+        self.r_queues.enqueue(
+            self.stage, 'journal', jobs.task_reprocess_journals, ids)
 
-    def reprocess_issue():
-        issues = models.TransformIssue(must_reprocess=True)
-        for issue in issues:
-            self.process_issue(self.collection_acronym, issue.code)
+    def reprocess_issues(self, ids=None):
+        self.r_queues.enqueue(
+            self.stage, 'issue', jobs.task_reprocess_issues, ids)
 
-    def reprocess_article():
-        articles = models.TransformArticle(must_reprocess=True)
-        for article in articles:
-            self.process_article(self.collection_acronym, article.code)
+    def reprocess_articles(self, ids=None):
+        self.r_queues.enqueue(
+            self.stage, 'article', jobs.task_reprocess_articles, ids)
 
-    def reprocess_all():
-        # invocamos todos os metodos de reprocessar
-        self.reprocess_collection()
-        self.reprocess_journal()
-        self.reprocess_issue()
-        self.reprocess_article()
+    def reprocess_all(self):
+        self.reprocess_collections()
+        self.reprocess_journals()
+        self.reprocess_issues()
+        self.reprocess_articles()
 
-    def process_collection(collection_acronym=None):
+    def process_collection(self, collection_acronym=None, collection_uuid=None):
         if not collection_acronym:
             collection_acronym = self.collection_acronym
+
+        if collection_uuid is not None:
+            uuid = str(collection_uuid)
+        elif collection_acronym is not None:
+            try:
+                collection = models.TransformCollection.objects.get(acronym=collection_acronym)
+            except models.TransformCollection.DoesNotExist:
+                raise ValueError(u'TransformCollection com acronym: %s não encontrado!' % collection_acronym)
+
+            uuid = str(collection.uuid)
+        else:
+            raise ValueError("must provide at least one parameter: issn or uuid")
 
         if self.async:
             self.r_queues.enqueue(
@@ -75,7 +82,23 @@ class TransformProcess(Process):
             collection.reload()
             return collection
 
-    def process_journal(collection_acronym, issn):
+    def process_journal(self, collection_acronym=None, issn=None, uuid=None):
+        if not collection_acronym:
+            collection_acronym = self.collection_acronym
+
+        if issn is not None:
+            try:
+                journal = models.TransformJournal.objects.get(code=issn)
+            except models.TransformJournal.DoesNotExist:
+                raise ValueError(u'TransformJournal com code: %s não encontrado!' % issn)
+
+            uuid = str(journal.uuid)
+
+        elif uuid is not None:
+            uuid = str(uuid)
+        else:
+            raise ValueError("must provide at least one parameter: issn or uuid")
+
         if self.async:
             self.r_queues.enqueue(
                 self.stage, 'journal',
@@ -84,12 +107,27 @@ class TransformProcess(Process):
                 issn)
         else:
             # invocamos a task como funcão normal (sem fila)
-            journal = jobs.task_transform_journal(
-                collection_acronym, issn)
+            journal = jobs.task_transform_journal(collection_acronym, issn)
             journal.reload()
             return journal
 
-    def process_issue(collection_acronym, issue_pid):
+    def process_issue(self, collection_acronym=None, issue_pid=None, uuid=None):
+        if not collection_acronym:
+            collection_acronym = self.collection_acronym
+
+        if issue_pid is not None:
+            try:
+                issue = models.TransformIssue.objects.get(pid=issue_pid)
+            except models.TransformIssue.DoesNotExist:
+                raise ValueError(u'TransformIssue com pid: %s não encontrado!' % issue_pid)
+
+            uuid = str(issue.uuid)
+
+        elif uuid is not None:
+            uuid = str(uuid)
+        else:
+            raise ValueError("must provide at least one parameter: issn or uuid")
+
         if self.async:
             self.r_queues.enqueue(
                 self.stage, 'issue',
@@ -103,7 +141,23 @@ class TransformProcess(Process):
             issue.reload()
             return issue
 
-    def process_article(collection_acronym, article_pid):
+    def process_article(self, collection_acronym=None, article_pid=None, uuid=None):
+        if not collection_acronym:
+            collection_acronym = self.collection_acronym
+
+        if article_pid is not None:
+            try:
+                article = models.TransformArticle.objects.get(pid=article_pid)
+            except models.TransformArticle.DoesNotExist:
+                raise ValueError(u'TransformArticle com pid: %s não encontrado!' % issue_pid)
+
+            uuid = str(article.uuid)
+
+        elif uuid is not None:
+            uuid = str(uuid)
+        else:
+            raise ValueError("must provide at least one parameter: issn or uuid")
+
         if self.async:
             self.r_queues.enqueue(
                 self.stage, 'article',
@@ -116,6 +170,22 @@ class TransformProcess(Process):
                 collection_acronym, article_pid)
             articles.reload()
             return article
+
+    def process_all_collections(self):
+        self.r_queues.enqueue(
+            self.stage, 'collection', jobs.task_process_all_collections, self.collection_acronym)
+
+    def process_all_journals(self):
+        self.r_queues.enqueue(
+            self.stage, 'journal', jobs.task_process_all_journals)
+
+    def process_all_issues(self):
+        self.r_queues.enqueue(
+            self.stage, 'issue', jobs.task_process_all_issues)
+
+    def process_all_articles(self):
+        self.r_queues.enqueue(
+            self.stage, 'issue', jobs.task_process_all_articles)
 
     def process_all(collection_acronym=None):
         logger.debug(u"Inicio process_all. collection_acronym = %s" % collection_acronym)
