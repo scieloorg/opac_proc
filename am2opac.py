@@ -16,6 +16,7 @@ from mongoengine import connect
 from opac_schema.v1 import models
 from mongoengine import Q, DoesNotExist
 from thrift_clients import clients
+from scieloh5m5 import h5m5
 
 import config
 import utils
@@ -25,6 +26,7 @@ articlemeta = clients.ArticleMeta(
     config.ARTICLE_META_THRIFT_PORT)
 
 logger = logging.getLogger(__name__)
+
 
 def init_worker():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -63,6 +65,34 @@ def process_collection(collection):
     m_collection._id = str(uuid4().hex)
     m_collection.acronym = collection.acronym
     m_collection.name = collection.name
+
+    endpoint = 'ajx/publication/size'
+
+    params = {
+        'code': collection.acronym,
+        'collection': collection.acronym,
+        'field': 'citations'
+    }
+
+    references = utils.do_request_json('{0}/{1}'.format(config.OPAC_METRICS_URL, endpoint), params)
+
+    params['field'] = 'documents'
+    articles = utils.do_request_json('{0}/{1}'.format(config.OPAC_METRICS_URL, endpoint), params)
+
+    params['field'] = 'issue'
+    issues = utils.do_request_json('{0}/{1}'.format(config.OPAC_METRICS_URL, endpoint), params)
+
+    params['field'] = 'issn'
+    journals = utils.do_request_json('{0}/{1}'.format(config.OPAC_METRICS_URL, endpoint), params)
+
+    metrics = models.CollectionMetrics()
+
+    metrics.total_citation = int(references.get('total', 0))
+    metrics.total_article = int(articles.get('total', 0))
+    metrics.total_issue = int(issues.get('total', 0))
+    metrics.total_journal = int(journals.get('total', 0))
+
+    m_collection.metrics = metrics
 
     return m_collection.save()
 
@@ -150,6 +180,19 @@ def process_journal(issn_collection):
                 other_titles.append(t)
 
             m_journal.other_titles = other_titles
+
+        # Obtendo o ano atual
+        year = datetime.datetime.now().year
+
+        metrics = models.JounalMetrics()
+
+        _h5m5 = h5m5.get(m_journal.scielo_issn, str(year))
+
+        if _h5m5:
+            metrics.total_h5_index = _h5m5['h5']
+            metrics.total_h5_median = _h5m5['m5']
+
+        m_journal.metrics = metrics
 
         m_journal.save()
     except Exception as e:
@@ -386,6 +429,7 @@ def process_ahead(issn):
             issue.save()
     else:
         logger.info(u"O periódico %s, não possui artigo em ahead" % journal.title)
+
 
 def process_last_issue(issn):
 
