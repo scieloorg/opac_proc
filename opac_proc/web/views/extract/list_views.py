@@ -191,6 +191,34 @@ class ExtractArticleListView(ListView):
         },
     ]
 
+    list_filters = [
+        {
+            'field_label': u'UUID',
+            'field_name': 'uuid',
+            'field_type': 'uuid'
+        },
+        {
+            'field_label': u'PID',
+            'field_name': 'pid',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Must reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
 
 class ExtractLogListView(ListView):
     stage = 'extract'

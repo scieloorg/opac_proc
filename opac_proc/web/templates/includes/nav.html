@@ -18,17 +18,17 @@
             Extract <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li {% if request.path == url_for('extract_collections_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('extract_collections_list') }}">Collections</a>
+            <li {% if request.path == url_for('extract_collection_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('extract_collection_list') }}">Collections</a>
             </li>
-            <li {% if request.path == url_for('extract_journals_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('extract_journals_list') }}">Journals</a>
+            <li {% if request.path == url_for('extract_journal_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('extract_journal_list') }}">Journals</a>
             </li>
-            <li {% if request.path == url_for('extract_issues_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('extract_issues_list') }}">Issues</a>
+            <li {% if request.path == url_for('extract_issue_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('extract_issue_list') }}">Issues</a>
             </li>
-            <li {% if request.path == url_for('extract_articles_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('extract_articles_list') }}">Articles</a>
+            <li {% if request.path == url_for('extract_article_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('extract_article_list') }}">Articles</a>
             </li>
             <li role="separator" class="divider"></li>
             <li {% if request.path == url_for('extract_logs_list') %} class="active" {% endif %}>
@@ -43,17 +43,17 @@
             Transform <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li {% if request.path == url_for('transform_collections_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('transform_collections_list') }}">Collections</a>
+            <li {% if request.path == url_for('transform_collection_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_collection_list') }}">Collections</a>
             </li>
-            <li {% if request.path == url_for('transform_journals_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('transform_journals_list') }}">Journals</a>
+            <li {% if request.path == url_for('transform_journal_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_journal_list') }}">Journals</a>
             </li>
-            <li {% if request.path == url_for('transform_issues_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('transform_issues_list') }}">Issues</a>
+            <li {% if request.path == url_for('transform_issue_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_issue_list') }}">Issues</a>
             </li>
-            <li {% if request.path == url_for('transform_articles_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('transform_articles_list') }}">Articles</a>
+            <li {% if request.path == url_for('transform_article_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_article_list') }}">Articles</a>
             </li>
             <li role="separator" class="divider"></li>
             <li {% if request.path == url_for('transform_logs_list') %} class="active" {% endif %}>
@@ -68,21 +68,58 @@
             Load <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li {% if request.path == url_for('load_collections') %} class="active" {% endif %}>
-              <a href="{{ url_for('load_collections') }}">Collections</a>
+            <li {% if request.path == url_for('load_collection_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('load_collection_list') }}">Collections</a>
             </li>
-            <li {% if request.path == url_for('load_journals') %} class="active" {% endif %}>
-              <a href="{{ url_for('load_journals') }}">Journals</a>
+            <li {% if request.path == url_for('load_journal_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('load_journal_list') }}">Journals</a>
             </li>
-            <li {% if request.path == url_for('load_issues') %} class="active" {% endif %}>
-              <a href="{{ url_for('load_issues') }}">Issues</a>
+            <li {% if request.path == url_for('load_issue_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('load_issue_list') }}">Issues</a>
             </li>
-            <li {% if request.path == url_for('load_articles') %} class="active" {% endif %}>
-              <a href="{{ url_for('load_articles') }}">Articles</a>
+            <li {% if request.path == url_for('load_article_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('load_article_list') }}">Articles</a>
             </li>
             <li role="separator" class="divider"></li>
             <li {% if request.path == url_for('load_logs_list') %} class="active" {% endif %}>
               <a href="{{ url_for('load_logs_list') }}">Logs</a>
+            </li>
+          </ul>
+        </li>
+
+        {# OPAC #}
+        <li class="dropdown {% if request.path.startswith('/opac/') %} active {% endif %}">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            OPAC <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li {% if request.path == url_for('opac_collection_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_collection_list') }}">Collections</a>
+            </li>
+            <li {% if request.path == url_for('opac_journal_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_journal_list') }}">Journals</a>
+            </li>
+            <li {% if request.path == url_for('opac_issue_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_issue_list') }}">Issues</a>
+            </li>
+            <li {% if request.path == url_for('opac_article_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_article_list') }}">Articles</a>
+            </li>
+            <li role="separator" class="divider"></li>
+            <li {% if request.path == url_for('opac_sponsor_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_sponsor_list') }}">Sponsors</a>
+            </li>
+            <li {% if request.path == url_for('opac_page_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_page_list') }}">Pages</a>
+            </li>
+            <li {% if request.path == url_for('opac_resource_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_resource_list') }}">Resources</a>
+            </li>
+            <li {% if request.path == url_for('opac_pressrelease_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_pressrelease_list') }}">Press Releases</a>
+            </li>
+            <li {% if request.path == url_for('opac_news_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_news_list') }}">News</a>
             </li>
           </ul>
         </li>

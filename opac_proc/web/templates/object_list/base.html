@@ -22,119 +22,15 @@
           {# actions toolbar #}
           <div class="col-md-12 action-toolbar-wrapper toolbar-wrapper">
             <h4><i class="fa fa-cogs" aria-hidden="true"></i> Actions:</h4>
-            <div class="btn-toolbar action-toolbar" role="toolbar">
-              <div class="btn-group" role="group">
-                {# create action #}
-                {% if can_create %}
-                  <button type="button" class="btn btn-primary" data-action="create">Create</button>
-                {% else %}
-                  <button type="button" class="btn btn-primary disabled" data-action="create">Create</button>
-                {% endif %}
-
-                {# update action #}
-                <div class="btn-group" role="group">
-                  {% if can_update and objects|length > 0 %}
-                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Update <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                      <li><a data-action="update" data-target="selected" href="#">Selected</a></li>
-                      <li><a data-action="update" data-target="all" href="#">All</a></li>
-                    </ul>
-                  {% else %}
-                    <button type="button" class="btn btn-info disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Update <span class="caret"></span>
-                    </button>
-                  {% endif %}
-                </div>
-
-                {# delete action #}
-                <div class="btn-group" role="group">
-                  {% if can_delete %}
-                    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Delete <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                      <li><a data-action="delete" data-target="selected" href="#">Selected</a></li>
-                      <li><a data-action="delete" data-target="all" href="#">All</a></li>
-                    </ul>
-                  {% else %}
-                    <button type="button" class="btn btn-danger disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Delete <span class="caret"></span>
-                    </button>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div> {# /action-toolbar-wrapper #}
+            {% include "object_list/includes/actions_toolbar.html" %}
+          </div>
         </div>
         {# filters toolbar #}
         {% if list_filters %}
           <div class="row">
             <div class="col-md-12 filters-toolbar-wrapper toolbar-wrapper">
               <h4><i class="fa fa-filter" aria-hidden="true"></i> Filters:</h4>
-              <form class="form-inline">
-                {% for field_filter in list_filters %}
-                  <div class="form-group">
-
-                    {% if field_filter['field_type'] == 'string' %}
-
-                      <label for="filter__value__{{field_filter['field_name']}}">{{ field_filter['field_label'] }}: </label><br>
-                      <select name="filter__option__{{field_filter['field_name']}}" class="form-control input-sm">
-                        <option value="">-----</option>
-                        {% for opt in filter_string_options %}
-                          <option value="{{ opt[0]}}">{{ opt[1] }}</option>
-                        {% endfor %}
-                      </select>
-                      <input name="filter__value__{{field_filter['field_name']}}" type="text"  class="form-control input-sm">
-
-                    {% elif field_filter['field_type'] == 'uuid' %}
-
-                      <label for="filter__value__{{field_filter['field_name']}}">{{ field_filter['field_label'] }}: </label><br>
-                      <div class="input-group date" id="datetimepicker__from__{{field_filter['field_name']}}">
-                        <div class="input-group-addon">Equal to:</div>
-                        <input name="filter__value__{{field_filter['field_name']}}" type="text" class="form-control input-sm">
-                      </div>
-
-                    {% elif field_filter['field_type'] == 'boolean' %}
-
-                      <label for="filter__value__{{field_filter['field_name']}}">{{ field_filter['field_label'] }}: </label><br>
-                      <div class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-default">
-                          <input name="filter__value__{{field_filter['field_name']}}" type="radio" autocomplete="off" value="1">True
-                        </label>
-                        <label class="btn btn-default">
-                          <input name="filter__value__{{field_filter['field_name']}}" type="radio" autocomplete="off" value="0">False
-                        </label>
-                      </div>
-
-                    {% elif field_filter['field_type'] == 'date_time' %}
-
-                      <label for="filter__value__{{field_filter['field_name']}}">{{ field_filter['field_label'] }}: </label><br>
-                      {# from #}
-                      <div class="input-group date" id="datetimepicker__from__{{field_filter['field_name']}}">
-                        <div class="input-group-addon">From:</div>
-                        <input name="filter__value__from__{{field_filter['field_name']}}" type="text" class="form-control input-sm">
-                        <div class="input-group-addon">
-                          <i class="fa fa-calendar"></i>
-                        </div>
-                      </div>
-                      {# until #}
-                      <div class="input-group date" id="datetimepicker__until__{{field_filter['field_name']}}">
-                        <div class="input-group-addon">Until:</div>
-                        <input name="filter__value__until__{{field_filter['field_name']}}" type="text" class="form-control input-sm">
-                        <div class="input-group-addon">
-                          <i class="fa fa-calendar"></i>
-                        </div>
-                      </div>
-
-                    {% endif %}
-                  </div>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary pull-right">
-                  <i class="fa fa-filter" aria-hidden="true"></i> Apply Filters
-                </button>
-              </form>
+              {% include "object_list/includes/filters_toolbar.html" %}
             </div>
           </div>
         {% endif %}
@@ -233,192 +129,9 @@
   </div>
 {% endblock %}
 {% block extra_js %}
+  <script src="{{ url_for('static', filename='js/actions_toolbar.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/filters_toolbar.js') }}"></script>
   <script type="text/javascript">
-
-    var Toolbar = {
-      /* action buttons selectors */
-      btn_create_selector: '[data-action="create"]:not(".disabled")',
-      btn_update_all_selector: '[data-action="update"][data-target="all"]',
-      btn_update_selected_selector: '[data-action="update"][data-target="selected"]',
-      btn_delete_all_selector: '[data-action="delete"][data-target="all"]',
-      btn_delete_selected_selector: '[data-action="delete"][data-target="selected"]',
-      /* action buttons */
-      btn_create: null,
-      btn_update_all: null,
-      btn_update_selected: null,
-      btn_delete_all: null,
-      btn_delete_selected: null,
-      /* list of rows selected */
-      rows_selected: [],
-      /* helpers */
-      get_rows_selected: function(){
-        Toolbar.rows_selected = []
-        $('input:checkbox:checked', '.tbody_object_list').each(function(index, element){
-          Toolbar.rows_selected.push($(element).data('rowid'));
-        });
-      },
-      show_loading_box: function(){
-        var dialog = bootbox.dialog({
-            message: '<p class="text-center">Please wait while we do something...<br><i class="fa fa-spin fa-spinner"></i></p>',
-            closeButton: false
-        });
-        dialog.modal();
-      },
-      notify_no_rows_selected:function(){
-        bootbox.alert({
-          message: "You must select at least one row!",
-          size: 'small',
-        });
-      },
-      notify_invalid_action:function(){
-        bootbox.alert({
-          message: "This action is invalid!",
-          size: 'small',
-        });
-      },
-      ask_confirmation: function(msg, callback){
-        bootbox.confirm({
-          message: msg,
-          size: 'small',
-          buttons: {
-            confirm: {
-              label: '<i class="fa fa-check"></i> Confirm',
-              className: 'btn-success'
-            },
-            cancel: {
-              label: '<i class="fa fa-times"></i> Cancel',
-              className: 'btn-danger'
-            }
-          },
-          callback: function (result) {
-            if (result) {
-              callback();
-              Toolbar.show_loading_box();
-            }
-          }
-        });
-      },
-      submit_action_form: function(action){
-        var form = $('#action_form');
-        var action_field = $('input#action_name', form);
-
-        switch (action) {
-          case "create":{
-            action_field.val('create');
-            form.attr('method', 'POST');
-            form.attr('action', '.');
-            form.submit();
-            break;
-          };
-          case "update_all":{
-            action_field.val('update_all');
-            form.attr('method', 'POST');
-            form.attr('action', '.');
-            form.submit();
-            break;
-          };
-          case "update_selected":{
-            action_field.val('update_selected');
-            form.attr('method', 'POST');
-            form.attr('action', '.');
-            var rows = Toolbar.rows_selected;
-            for (var i = 0; i < rows.length; i++) {
-              form.append( "<input type='text' name='rowid' value='" + rows[i] + " '>" );
-            }
-            form.submit();
-            break;
-          };
-          case "delete_all":{
-            action_field.val('delete_all');
-            form.attr('method', 'POST');
-            form.attr('action', '.');
-            form.submit();
-            break;
-          };
-          case "delete_selected":{
-            action_field.val('delete_selected');
-            form.attr('method', 'POST');
-            form.attr('action', '.');
-            var rows = Toolbar.rows_selected;
-            for (var i = 0; i < rows.length; i++) {
-              form.append( "<input type='text' name='rowid' value='" + rows[i] + " '>" );
-            }
-            form.submit();
-            break;
-          };
-          default:{
-            Toolbar.notify_invalid_action();
-            break;
-          }
-        }
-      },
-      submit_create: function(){
-        Toolbar.submit_action_form('create');
-      },
-      submit_update_all: function(){
-        Toolbar.submit_action_form('update_all');
-      },
-      submit_update_selected: function(){
-        Toolbar.submit_action_form('update_selected');
-      },
-      submit_delete_all: function(){
-        Toolbar.submit_action_form('delete_all');
-      },
-      submit_delete_selected: function(){
-        Toolbar.submit_action_form('delete_selected');
-      },
-      init: function(){
-        var self = this;
-        /* create */
-        this.btn_create = $(this.btn_create_selector);
-        this.btn_create.click(function(){
-          var msg = 'You will <b>CREATE</b> new records.<br/>Are you sure? ';
-          self.ask_confirmation(msg, Toolbar.submit_create);
-        });
-        /* update all */
-        this.btn_update_all = $(this.btn_update_all_selector);
-        this.btn_update_all.click(function(){
-          var msg = 'You will <b>UPDATE</b> all records.<br/>Are you sure? ';
-          self.ask_confirmation(msg, Toolbar.submit_update_all);
-        });
-        /* update selected */
-        this.btn_update_selected = $(this.btn_update_selected_selector);
-        this.btn_update_selected.click(function(){
-          self.get_rows_selected();
-          if (self.rows_selected == 0){
-            self.notify_no_rows_selected();
-            return;
-          } else {
-            var selected_count =  self.rows_selected.length;
-            var msg = 'You will <b>UPDATE</b> selected ' + selected_count + ' record(s).<br/>Are you sure? ';
-            self.ask_confirmation(msg, Toolbar.submit_update_selected);
-          }
-        });
-        /* delete all*/
-        this.btn_delete_all = $(this.btn_delete_all_selector);
-        this.btn_delete_all.click(function(){
-          var msg = 'You will <b>DELETE</b> all records.<br/>Are you sure? ';
-          self.ask_confirmation(msg, Toolbar.submit_delete_all);
-        });
-        /* delete selected */
-        this.btn_delete_selected = $(this.btn_delete_selected_selector);
-        this.btn_delete_selected.click(function(){
-          self.get_rows_selected();
-          if (self.rows_selected == 0){
-            self.notify_no_rows_selected();
-            return;
-          } else {
-            var selected_count =  self.rows_selected.length;
-            var msg = 'You will <b>DELETE</b> selected ' + selected_count + ' record(s).<br/>re you sure? ';
-            self.ask_confirmation(msg, Toolbar.submit_delete_selected);
-          }
-        });
-
-      }
-    } /* Toolbar*/
-
-
-
     $(function() {
       $('#table_check_all:checkbox').click(function(event) {
         var $this = $(this);
@@ -428,46 +141,13 @@
           $('input:checkbox', '.tbody_object_list').prop('checked', false);
         }
       });
-
-      /* action toolbar */
-      Toolbar.init();
-      /* Datetime pickers */
-
+      ActionToolbar.init();
+      /* filters toolbar */
       {% for field_filter in list_filters %}
-        {% if field_filter['field_type'] == 'date_time' %}
-          {# /* https://eonasdan.github.io/bootstrap-datetimepicker/#linked-pickers */ #}
-          var datetimepicker_from_id = "datetimepicker__from__{{field_filter['field_name']}}";
-          var datetimepicker_until_id = "datetimepicker__until__{{field_filter['field_name']}}";
-          $('#' + datetimepicker_from_id).datetimepicker({
-            locale: 'pt-br',
-            icons: {
-              time: "fa fa-clock-o",
-              date: "fa fa-calendar",
-              up: "fa fa-arrow-up",
-              down: "fa fa-arrow-down"
-            }
-          });
-          $('#' + datetimepicker_until_id).datetimepicker({
-            useCurrent: false, /* Important! See issue #1075 */
-            locale: 'pt-br',
-            icons: {
-              time: "fa fa-clock-o",
-              date: "fa fa-calendar",
-              up: "fa fa-arrow-up",
-              down: "fa fa-arrow-down"
-            }
-          });
-          $('#' + datetimepicker_from_id).on("dp.change", function (e) {
-              $('#' + datetimepicker_until_id).data("DateTimePicker").minDate(e.date);
-          });
-          $('#' + datetimepicker_until_id).on("dp.change", function (e) {
-              $('#' + datetimepicker_from_id).data("DateTimePicker").maxDate(e.date);
-          });
-        {% endif %}
+        window.FilterToolbar.push_filter("{{field_filter['field_name']}}", "{{field_filter['field_type']}}");
       {% endfor %}
-
-
-
+      window.FilterToolbar.init();
+      window.FilterToolbar.setup_datepickers();
     });
   </script>
 {% endblock %}

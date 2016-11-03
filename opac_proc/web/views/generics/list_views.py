@@ -1,5 +1,6 @@
 # coding: utf-8
 import re
+from datetime import datetime, timedelta
 from flask import render_template, flash, request, redirect, jsonify
 from flask.views import View
 from flask_mongoengine import Pagination
@@ -76,9 +77,9 @@ class ListView(View):
 
     filter_string_options = (
         ('iexact', 'Exact'),
-        ('contains', 'Contains'),
+        ('icontains', 'Contains'),
         ('istartswith', 'Starts with'),
-        ('endswith', 'Ends with')
+        ('iendswith', 'Ends with')
     )
 
     def _valid_uuid(self, uuid):
@@ -100,19 +101,11 @@ class ListView(View):
                 qs_filter_from = request.args.get('filter__value__from__%s' % f_field_name, None)
                 qs_filter_until = request.args.get('filter__value__until__%s' % f_field_name, None)
                 qs_filter_option = request.args.get('filter__option__%s' % f_field_name, None)
-                print "**" * 20
-                print "f_field_name", f_field_name
-                print "f_field_type", f_field_type
-                print "qs_filter_value", qs_filter_value
-                print "qs_filter_from", qs_filter_from
-                print "qs_filter_until", qs_filter_until
-                print "qs_filter_option", qs_filter_option
-                print "**" * 20
 
-                if qs_filter_value is None or qs_filter_value == "":
+                if (qs_filter_value is None or qs_filter_value == "") and qs_filter_from is None and qs_filter_until is None:
                     continue  # ignore this filter
                 elif qs_filter_option:  # http://docs.mongoengine.org/guide/querying.html#string-queries
-                    if f_field_type == 'string' and qs_filter_option in self.filter_string_lookups:
+                    if f_field_type == 'string' and qs_filter_option in filter_string_lookups:
                         field_lookup = f_field_name + '__' + qs_filter_option
                         qs_filters[field_lookup] = qs_filter_value
                     else:
@@ -122,19 +115,39 @@ class ListView(View):
                     if f_field_type == 'uuid':
                         qs_filter_value = qs_filter_value.strip()
                         if self._valid_uuid(qs_filter_value):
-                            qs_filter_value = str(qs_filter_value)
+                            qs_filters[f_field_name] = str(qs_filter_value)
                         else:
                             flash('Filter for: "%s". It is not a valid UUID value' % f_field_label, 'error')
                             continue  # ignore this filter
 
                     elif f_field_type == 'boolean':
-                        qs_filter_value = bool(qs_filter_value)
+                        qs_filter_value = qs_filter_value.strip()
+                        if qs_filter_value == "true":
+                            qs_filters[f_field_name] = True
+                        elif qs_filter_value == "false":
+                            qs_filters[f_field_name] = False
+                        # else:  ignore
                     elif f_field_type == 'date_time':
                         if qs_filter_from and qs_filter_until:
-                            pass
+                            # convert datetime string to datetime objects
+                            qs_filter_from = datetime.strptime(qs_filter_from, "%Y-%m-%d %H:%M:%S")
+                            qs_filter_until = datetime.strptime(qs_filter_until, "%Y-%m-%d %H:%M:%S")
+                            qs_filter_until_plus_1 = qs_filter_until + timedelta(seconds=1)
+                            qs_filters['__raw__'] = {
+                                f_field_name: {
+                                    '$gte': qs_filter_from,
+                                    '$lte': qs_filter_until_plus_1,
+                                }
+                            }
+                        elif qs_filter_from:  # falta: qs_filter_until
+                            flash('Filter for: "%s" was ignored. You must fill the "Until:" date time field!' % f_field_label, 'warning')
+                            continue
+                        elif qs_filter_until:  # falta: qs_filter_from
+                            flash('Filter for: "%s" was ignored. You must fill the "From:" date time field!' % f_field_label, 'warning')
+                            continue
                         else:
-                            flash('Filter for: "%s". It is not a valid range of dates' % f_field_label, 'error')
-                    qs_filters[f_field_name] = qs_filter_value
+                            # date time filter not filled. Ignoring
+                            continue
 
             print "result qs_filters: ", qs_filters
             return qs_filters

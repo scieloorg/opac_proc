@@ -1,0 +1,90 @@
+<form class="form-inline">
+  {% for field_filter in list_filters %}
+    <div class="form-group">
+
+      {% if field_filter['field_type'] == 'string' %}
+        {% with
+          filter_id = 'filter__value__' + field_filter['field_name'],
+          filter_select_id = 'filter__option__' + field_filter['field_name'] %}
+
+          <label for="{{ filter_id }}">{{ field_filter['field_label'] }}: </label><br>
+          <select id="{{ filter_select_id }}" name="{{ filter_select_id }}" class="form-control input-sm">
+            <option value="">-----</option>
+            {% for opt in filter_string_options %}
+              <option value="{{ opt[0]}}">{{ opt[1] }}</option>
+            {% endfor %}
+          </select>
+          <input id="{{ filter_id }}" name="{{ filter_id }}" type="text"  class="form-control input-sm">
+        {% endwith %}
+
+      {% elif field_filter['field_type'] == 'uuid' %}
+
+        {% with filter_id = 'filter__value__' + field_filter['field_name'] %}
+          <label for="{{ filter_id }}">{{ field_filter['field_label'] }}: </label><br>
+          <div class="input-group">
+            <div class="input-group-addon">Equal to:</div>
+            <input id="{{ filter_id }}" name="{{ filter_id }}" type="text" class="form-control input-sm">
+          </div>
+        {% endwith %}
+
+      {% elif field_filter['field_type'] == 'boolean' %}
+
+        {% with filter_id = 'filter__value__' + field_filter['field_name'] %}
+          <label for="{{ filter_id }}">{{ field_filter['field_label'] }}: </label><br>
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-default">
+              <input id="{{ filter_id }}_1" name="{{ filter_id }}" type="radio" autocomplete="off" value="true">True
+            </label>
+            <label class="btn btn-default">
+              <input  id="{{ filter_id }}_0" name="{{ filter_id }}" type="radio" autocomplete="off" value="false">False
+            </label>
+          </div>
+
+        {% endwith %}
+
+      {% elif field_filter['field_type'] == 'date_time' %}
+        {% with
+          filter_id = 'filter__value__' + field_filter['field_name'],
+          filter_from_id = 'filter__value__from__' + field_filter['field_name'],
+          filter_until_id = 'filter__value__until__' + field_filter['field_name'],
+          datepicker_from_id = 'datetimepicker__from__' + field_filter['field_name'],
+          datepicker_until_id = 'datetimepicker__until__' + field_filter['field_name'] %}
+
+          <label for="{{ filter_id }}">
+            {{ field_filter['field_label'] }}:
+          </label><br>
+
+          {# from #}
+          <div class="input-group date" id="{{ datepicker_from_id }}">
+            <div class="input-group-addon">From:</div>
+            <input id="{{ filter_from_id }}"  name="{{ filter_from_id }}" type="text" class="form-control input-sm">
+            <div class="input-group-addon">
+              <i class="fa fa-calendar"></i>
+            </div>
+          </div>
+
+          {# until #}
+          <div class="input-group date" id="{{ datepicker_until_id }}">
+            <div class="input-group-addon">Until:</div>
+            <input id="{{ filter_until_id }}"  name="{{ filter_until_id }}" type="text" class="form-control input-sm">
+            <div class="input-group-addon">
+              <i class="fa fa-calendar"></i>
+            </div>
+          </div>
+
+        {% endwith %}
+
+      {% endif %}
+    </div>
+  {% endfor %}
+  <div class="row">
+    <div class="col-md-12">
+      <button type="reset" class="btn btn-warning">
+        <i class="fa fa-trash" aria-hidden="true"></i> Clear Filters
+      </button>
+      <button type="submit" class="btn btn-primary pull-right">
+        <i class="fa fa-filter" aria-hidden="true"></i> Apply Filters
+      </button>
+    </div>
+  </div>
+</form>
