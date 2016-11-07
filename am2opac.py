@@ -132,7 +132,7 @@ def process_journal(issn_collection):
         # aguarda um string.
         m_journal.publisher_name = journal.publisher_name[0]
         m_journal.eletronic_issn = journal.electronic_issn
-        m_journal.scielo_issn = journal.scielo_issn
+        m_journal.scielo_issn = journal.scielo_issn # v400 isis
         m_journal.print_issn = journal.print_issn
         m_journal.acronym = journal.acronym
         m_journal.previous_title = journal.previous_title
@@ -319,9 +319,6 @@ def process_article(issn_collection):
         except ValueError as e:
             logger.error(u'Ordenação inválida: %s-%s' % (e, article.publisher_id))
 
-        htmls = []
-        pdfs = []
-
         try:
             m_article.doi = article.doi
             m_article.is_aop = article.is_ahead_of_print
@@ -338,33 +335,9 @@ def process_article(issn_collection):
             if article.authors:
                 m_article.authors = ['%s, %s' % (author['surname'], author['given_names']) for author in article.authors]
 
-            if article.fulltexts():
-                for text, val in article.fulltexts().items():
-                    if text == 'html':
-                        for lang, url in val.items():
-                            resource = models.Resource()
-                            resource._id = str(uuid4().hex)
-                            resource.type = 'html'
-                            resource.language = lang
-                            resource.url = url
-                            resource.save()
-                            htmls.append(resource)
-                    if text == 'pdf':
-                        for lang, url in val.items():
-                            resource = models.Resource()
-                            resource._id = str(uuid4().hex)
-                            resource.type = 'pdf'
-                            resource.language = lang
-                            resource.url = url
-                            resource.save()
-                            pdfs.append(resource)
-
         except Exception as e:
             logger.error(u"Erro inesperado: %s, %s" % (article.publisher_id, e))
             continue
-
-        m_article.htmls = htmls
-        m_article.pdfs = pdfs
 
         m_article.pid = article.publisher_id
         m_article.fpage = article.start_page
