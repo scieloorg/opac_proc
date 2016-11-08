@@ -112,9 +112,6 @@
             <li {% if request.path == url_for('opac_page_list') %} class="active" {% endif %}>
               <a href="{{ url_for('opac_page_list') }}">Pages</a>
             </li>
-            <li {% if request.path == url_for('opac_resource_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('opac_resource_list') }}">Resources</a>
-            </li>
             <li {% if request.path == url_for('opac_pressrelease_list') %} class="active" {% endif %}>
               <a href="{{ url_for('opac_pressrelease_list') }}">Press Releases</a>
             </li>

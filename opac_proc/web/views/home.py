@@ -9,7 +9,6 @@ from opac_schema.v1.models import Article as OpacArticle
 from opac_schema.v1.models import PressRelease as OpacPressRelease
 from opac_schema.v1.models import Sponsor as OpacSponsor
 from opac_schema.v1.models import Pages as OpacPages
-from opac_schema.v1.models import Resource as OpacResource
 from opac_schema.v1.models import News as OpacNews
 
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_webapp_db_name
@@ -56,9 +55,6 @@ def home():
     with switch_db(OpacPages, OPAC_WEBAPP_DB_NAME):
         opac_page_count = OpacPages.objects.all().count()
 
-    with switch_db(OpacResource, OPAC_WEBAPP_DB_NAME):
-        opac_resource_count = OpacResource.objects.all().count()
-
     with switch_db(OpacNews, OPAC_WEBAPP_DB_NAME):
         opac_news_count = OpacNews.objects.all().count()
 
@@ -87,7 +83,6 @@ def home():
         'opac_sponsor_count': opac_sponsor_count,
         'opac_pressrelease_count': opac_pressrelease_count,
         'opac_page_count': opac_page_count,
-        'opac_resource_count': opac_resource_count,
         'opac_news_count': opac_news_count,
     }
     return render_template("home.html", **context)

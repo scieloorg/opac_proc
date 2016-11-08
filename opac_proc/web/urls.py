@@ -49,7 +49,6 @@ from opac_proc.web.views.opac.list_views import (
     OpacArticleListView,
     OpacSponsorListView,
     OpacPageListView,
-    OpacResourceListView,
     OpacPressReleaseListView,
     OpacNewsListView)
 
@@ -60,7 +59,6 @@ from opac_proc.web.views.opac.detail_views import (
     OpacArticleDetailView,
     OpacSponsorDetailView,
     OpacPageDetailView,
-    OpacResourceDetailView,
     OpacPressReleaseDetailView,
     OpacNewsDetailView)
 
@@ -168,10 +166,6 @@ url_patterns = (
             'page': {
                 'list_view_class': OpacPageListView,
                 'detail_view_class': OpacPageDetailView,
-            },
-            'resource': {
-                'list_view_class': OpacResourceListView,
-                'detail_view_class': OpacResourceDetailView,
             },
             'pressrelease': {
                 'list_view_class': OpacPressReleaseListView,

@@ -48,11 +48,6 @@ class OpacPageDetailView(OpacBaseDetailView):
     page_title = u'OPAC Pages Detail'
 
 
-class OpacResourceDetailView(OpacBaseDetailView):
-    model_class = models.Resource
-    page_title = u'OPAC Resource Detail'
-
-
 class OpacPressReleaseDetailView(OpacBaseDetailView):
     model_class = models.PressRelease
     page_title = u'OPAC Press Release Detail'

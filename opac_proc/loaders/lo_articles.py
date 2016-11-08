@@ -14,7 +14,6 @@ from opac_proc.datastore.models import (
 from opac_schema.v1.models import Article as OpacArticle
 from opac_schema.v1.models import Issue as OpacIssue
 from opac_schema.v1.models import Journal as OpacJournal
-from opac_schema.v1.models import Resource as OpacResource
 from opac_schema.v1.models import TranslatedTitle as OpacTranslatedTitle
 from opac_schema.v1.models import TranslatedSection as OpacTranslatedSection
 
@@ -97,34 +96,36 @@ class ArticleLoader(BaseLoader):
         logger.debug(u"iniciando prepare_htmls")
         htmls_resources = []
 
-        if hasattr(self.transform_model_instance, 'htmls'):
-            with switch_db(OpacResource, OPAC_WEBAPP_DB_NAME):
-                for html in self.transform_model_instance.htmls:
-                    resource = OpacResource(**html)
-                    resource._id = str(uuid4().hex)
-                    resource.save()
-                    htmls_resources.append(resource)
-        else:
-            logger.info(u"Não existem Resources (HTMLs) transformados. uuid: %s" % self.transform_model_instance.uuid)
+        # if hasattr(self.transform_model_instance, 'htmls'):
+        #     # Remover Resource
+        #     with switch_db(OpacResource, OPAC_WEBAPP_DB_NAME):
+        #         for html in self.transform_model_instance.htmls:
+        #             resource = OpacResource(**html)
+        #             resource._id = str(uuid4().hex)
+        #             resource.save()
+        #             htmls_resources.append(resource)
+        # else:
+        #     logger.info(u"Não existem Resources (HTMLs) transformados. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"Resources (HTMLs) criados: %s" % len(htmls_resources))
+        logger.debug(u"htmls_resources criados: %s" % len(htmls_resources))
         return htmls_resources
 
     def prepare_pdfs(self):
         logger.debug(u"iniciando prepare_pdfs")
         pdfs_resources = []
 
-        if hasattr(self.transform_model_instance, 'pdfs'):
-            with switch_db(OpacResource, OPAC_WEBAPP_DB_NAME):
-                for pdf in self.transform_model_instance.pdfs:
-                    resource = OpacResource(**pdf)
-                    resource._id = str(uuid4().hex)
-                    resource.save()
-                    pdfs_resources.append(resource)
-        else:
-            logger.info(u"Não existem Resources (PDFs) transformados. uuid: %s" % self.transform_model_instance.uuid)
+        # if hasattr(self.transform_model_instance, 'pdfs'):
+        #     # Remover Resource
+        #     with switch_db(OpacResource, OPAC_WEBAPP_DB_NAME):
+        #         for pdf in self.transform_model_instance.pdfs:
+        #             resource = OpacResource(**pdf)
+        #             resource._id = str(uuid4().hex)
+        #             resource.save()
+        #             pdfs_resources.append(resource)
+        # else:
+        #     logger.info(u"Não existem Resources (PDFs) transformados. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"Resources (PDFs) criados: %s" % len(pdfs_resources))
+        logger.debug(u"pdfs_resources criados: %s" % len(pdfs_resources))
         return pdfs_resources
 
     def prepare_translated_titles(self):

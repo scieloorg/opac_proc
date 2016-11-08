@@ -324,56 +324,6 @@ class OpacPageListView(OpacBaseListView):
     ]
 
 
-class OpacResourceListView(OpacBaseListView):
-    model_class = models.Resource
-    model_name = 'resource'
-    page_title = "OPAC: Resources"
-    list_colums = [
-        {
-            'field_label': u'ID',
-            'field_name': '_id',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'URL',
-            'field_name': 'url',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Type',
-            'field_name': 'type',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Language',
-            'field_name': 'language',
-            'field_type': 'string'
-        }
-    ]
-    list_filters = [
-        {
-            'field_label': u'ID',
-            'field_name': '_id',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'URL',
-            'field_name': 'url',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Type',
-            'field_name': 'type',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Language',
-            'field_name': 'language',
-            'field_type': 'string'
-        }
-    ]
-
-
 class OpacPressReleaseListView(OpacBaseListView):
     model_class = models.PressRelease
     model_name = 'PressRelease'
