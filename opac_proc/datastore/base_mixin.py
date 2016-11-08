@@ -16,7 +16,6 @@ class BaseMixin(object):
     _id = UUIDField(primary_key=True, required=True, default=uuid.uuid4)
     uuid = UUIDField(required=True, default=uuid.uuid4)
     updated_at = DateTimeField()
-    is_locked = BooleanField(default=False)
 
     # campos genericos do processamento:
     process_start_at = DateTimeField()
@@ -28,7 +27,7 @@ class BaseMixin(object):
     def pre_save(cls, sender, document, **kwargs):
         document.updated_at = datetime.now()
 
-    def update_reprocess_field(uuid):
+    def update_reprocess_field(self, uuid):
         """
         deve ser redefinido em cada subclasse.
         uuid é o campo para identificar qual documento deve ser atualizado.
@@ -40,7 +39,7 @@ class BaseMixin(object):
         uuid = document.uuid
         if uuid and document.must_reprocess:
             # notificamos o modelo que tem que ser reprocessando
-            return document.update_reprocess_field(uuid=uuid)
+            return document.update_reprocess_field(uuid)
 
     def __unicode__(self):
         return unicode(self._id)

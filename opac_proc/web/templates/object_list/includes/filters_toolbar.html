@@ -11,7 +11,7 @@
           <select id="{{ filter_select_id }}" name="{{ filter_select_id }}" class="form-control input-sm">
             <option value="">-----</option>
             {% for opt in filter_string_options %}
-              <option value="{{ opt[0]}}">{{ opt[1] }}</option>
+              <option value="{{ opt[0] }}">{{ opt[1] }}</option>
             {% endfor %}
           </select>
           <input id="{{ filter_id }}" name="{{ filter_id }}" type="text"  class="form-control input-sm">
@@ -33,16 +33,18 @@
           <label for="{{ filter_id }}">{{ field_filter['field_label'] }}: </label><br>
           <div class="btn-group" data-toggle="buttons">
             <label class="btn btn-default">
-              <input id="{{ filter_id }}_1" name="{{ filter_id }}" type="radio" autocomplete="off" value="true">True
+              <input id="{{ filter_id }}_1" name="{{ filter_id }}" type="radio" autocomplete="off" value="true">
+              <i class="fa fa-check text-success" aria-hidden="true"></i>
             </label>
             <label class="btn btn-default">
-              <input  id="{{ filter_id }}_0" name="{{ filter_id }}" type="radio" autocomplete="off" value="false">False
+              <input  id="{{ filter_id }}_0" name="{{ filter_id }}" type="radio" autocomplete="off" value="false">
+              <i class="fa fa-times text-danger" aria-hidden="true"></i>
             </label>
           </div>
-
         {% endwith %}
 
       {% elif field_filter['field_type'] == 'date_time' %}
+
         {% with
           filter_id = 'filter__value__' + field_filter['field_name'],
           filter_from_id = 'filter__value__from__' + field_filter['field_name'],
@@ -71,7 +73,21 @@
               <i class="fa fa-calendar"></i>
             </div>
           </div>
+        {% endwith %}
 
+      {% elif field_filter['field_type'] == 'choices' %}
+
+        {% with
+          filter_id = 'filter__value__' + field_filter['field_name'],
+          filter_select_id = 'filter__option__' + field_filter['field_name'] %}
+
+          <label for="{{ filter_id }}">{{ field_filter['field_label'] }}: </label><br>
+          <select id="{{ filter_select_id }}" name="{{ filter_select_id }}" class="form-control input-sm">
+            <option value="">-----</option>
+            {% for opt in field_filter['field_options'] %}
+              <option value="{{ opt[0] }}">{{ opt[1] }}</option>
+            {% endfor %}
+          </select>
         {% endwith %}
 
       {% endif %}
@@ -79,10 +95,10 @@
   {% endfor %}
   <div class="row">
     <div class="col-md-12">
-      <button type="reset" class="btn btn-warning">
+      <button type="reset" class="btn btn-warning btn-sm">
         <i class="fa fa-trash" aria-hidden="true"></i> Clear Filters
       </button>
-      <button type="submit" class="btn btn-primary pull-right">
+      <button type="submit" class="btn btn-primary btn-sm pull-right">
         <i class="fa fa-filter" aria-hidden="true"></i> Apply Filters
       </button>
     </div>

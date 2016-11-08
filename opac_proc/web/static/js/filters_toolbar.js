@@ -31,6 +31,7 @@ window.FilterToolbar = {
   _set_filter_values_to_fields: function(){
     for (var i = 0; i < this._filters.length; i++) {
       var fdata = this._filters[i];
+
       if(fdata['type'] == 'string' || fdata['type'] == 'uuid') {
         var field = document.getElementById(fdata['param_name']);
         var qs_value = fdata['param_value'];
@@ -60,6 +61,14 @@ window.FilterToolbar = {
           /* boolean filter is set to false in querystring */
           field_false.click();
         } /* else, boolean filter is unset in querystring */
+      } else if (fdata['type'] == 'choices') {
+        var select_input_id = fdata['filter_select_id'];
+        var option_value_from_qs = fdata['param_option_value'];
+        // set the option_value_from_qs to be selected
+        if (option_value_from_qs) {
+          var option_selected_selector = '#'+ select_input_id +' [value="' + option_value_from_qs + '"]';
+          document.querySelector(option_selected_selector).selected = true;
+        }
       }
     }
   },
@@ -129,6 +138,11 @@ window.FilterToolbar = {
       /* datepickers ids */
       fdata['datetimepicker_from_id'] = "datetimepicker__from__" + name;
       fdata['datetimepicker_until_id'] = "datetimepicker__until__" + name;
+    } else if (type == 'choices') {
+      fdata['field_id'] = "filter__value__" + name;
+      fdata['filter_select_id'] = "filter__option__" + name;
+      fdata['param_option_name'] = "filter__option__" + name;
+      fdata['param_option_value'] = this._getParameterByName(fdata['param_option_name']);
     }
     this._filters.push(fdata);
   },

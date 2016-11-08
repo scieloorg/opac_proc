@@ -200,6 +200,10 @@ class BaseLoader(object):
             self.metadata['process_completed'] = True
             self.metadata['must_reprocess'] = False
             self.load_model_instance.update(**self.metadata)
+            for field_to_load in self.fields_to_load:
+                opac_field_value = self.opac_model_instance[field_to_load]
+                self.load_model_instance[field_to_load] = opac_field_value
+            self.load_model_instance.save()
             logger.debug(u"modelo %s no opac_proc (uuid: %s) foi atualizado" % (
                 self.load_model_name, self.metadata['uuid']))
 

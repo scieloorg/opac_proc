@@ -26,13 +26,11 @@
     <![endif]-->
     {% block extra_head %}{% endblock %}
   </head>
-
   <body>
 
     {% include "includes/nav.html" %}
 
     <div class="container">
-
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flash-msg-list list-unstyled">
@@ -49,7 +47,6 @@
         {% endif %}
       {% endwith %}
       {% block content %}{% endblock %}
-
     </div><!-- /.container -->
 
     <!-- Bootstrap core JavaScript
