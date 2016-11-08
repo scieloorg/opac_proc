@@ -415,7 +415,7 @@ def process_last_issue(issn):
 
     logger.info(u"Recuperando último fascículo journal: %s" % journal.title)
 
-    issue = models.Issue.objects.filter(journal=journal).order_by('-year', '-order').first()
+    issue = models.Issue.objects.filter(journal=journal).filter(type__ne='ahead').order_by('-year', '-order').first()
     issue_count = models.Issue.objects.filter(journal=journal).count()
 
     if issue:
@@ -457,16 +457,21 @@ def process_last_issue(issn):
 
 def bulk(options, pool):
 
-    db = connect(**config.MONGODB_SETTINGS)
-    db_name = config.MONGODB_SETTINGS['db']
-    db.drop_database(db_name)
-    logger.info(u"Banco de dado (%s) removido completamente!" % db_name)
+    connect(**config.MONGODB_SETTINGS)
+    logger.info(u"Removendo todos os registro de Periódicos")
+    models.Journal.drop_collection()
+    logger.info(u"Removendo todos os registro de Fascículo")
+    models.Issue.drop_collection()
+    logger.info(u"Removendo todos os registro de Artigo")
+    models.Article.drop_collection()
 
     # Collection
     for col in articlemeta.collections():
         if col.acronym == options.collection:
-            logger.info(u"Adicionado a coleção: %s" % options.collection)
-            process_collection(col)
+            # Cadastra a coleção somente quando não existe na base de dados.
+            if not models.Collection.objects.filter(acronym=options.collection):
+                logger.info(u"Adicionado a coleção: %s" % options.collection)
+                process_collection(col)
 
     # Get the number of ISSNs
     issns = [(journal.scielo_issn, options.collection) for journal in articlemeta.journals(collection=options.collection)]
@@ -482,16 +487,21 @@ def bulk(options, pool):
 
 def serial(options):
 
-    db = connect(**config.MONGODB_SETTINGS)
-    db_name = config.MONGODB_SETTINGS['db']
-    db.drop_database(db_name)
-    logger.info(u"Banco de dado (%s) removido completamente!" % db_name)
+    connect(**config.MONGODB_SETTINGS)
+    logger.info(u"Removendo todos os registro de Periódicos")
+    models.Journal.drop_collection()
+    logger.info(u"Removendo todos os registro de Fascículo")
+    models.Issue.drop_collection()
+    logger.info(u"Removendo todos os registro de Artigo")
+    models.Article.drop_collection()
 
     # Collection
     for col in articlemeta.collections():
         if col.acronym == options.collection:
-            logger.info(u"Adicionado a coleção: %s" % options.collection)
-            process_collection(col)
+            # Cadastra a coleção somente quando não existe na base de dados.
+            if not models.Collection.objects.filter(acronym=options.collection):
+                logger.info(u"Adicionado a coleção: %s" % options.collection)
+                process_collection(col)
 
     # Se não tem issns indicados no argparse, processa todos os itens
     if not options.issns:
