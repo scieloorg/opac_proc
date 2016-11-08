@@ -54,7 +54,7 @@ class ArticleMeta(object):
             for identifier in identifiers:
 
                 journal = self.client.get_journal(
-                    code=identifier.code[0], collection=identifier.collection)
+                    code=identifier.code, collection=identifier.collection)
 
                 jjournal = json.loads(journal)
 
