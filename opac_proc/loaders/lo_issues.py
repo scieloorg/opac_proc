@@ -46,7 +46,8 @@ class IssueLoader(BaseLoader):
         'year',
         'label',
         'order',
-        'pid'
+        'pid',
+        'suppl_text',
     ]
 
     def prepare_journal(self):
@@ -62,3 +63,12 @@ class IssueLoader(BaseLoader):
                 logger.error(u"Journal (_id: %s) não encontrado. Já fez o Load Journal?" % transformed_coll_uuid_str)
                 raise e
         return opac_journal
+
+    def prepare_suppl_text(self):
+        logger.debug(u"iniciando prepare_suppl_text")
+        t_issue = self.transform_model_instance
+        if hasattr(t_issue, 'supplement_number') or \
+           hasattr(t_issue, 'supplement_volume'):
+            return t_issue.supplement_number or t_issue.supplement_volume
+        else:
+            return u''
