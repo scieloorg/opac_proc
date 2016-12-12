@@ -53,7 +53,7 @@ class ArticleMeta(object):
                 raise StopIteration
 
             for identifier in identifiers:
-                yield identifier.code[0]
+                yield identifier.code
 
             offset += 1000
 
