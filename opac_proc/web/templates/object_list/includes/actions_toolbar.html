@@ -1,0 +1,48 @@
+<div class="btn-toolbar action-toolbar" role="toolbar">
+  <div class="btn-group" role="group">
+    {# create action #}
+    {% if can_create %}
+      <button type="button" class="btn btn-primary btn-sm" data-action="create">
+        <i class="fa fa-download" aria-hidden="true"></i> Create/Import
+      </button>
+    {% else %}
+      <button type="button" class="btn btn-primary btn-sm disabled" data-action="create">
+        <i class="fa fa-download" aria-hidden="true"></i> Create/Import
+      </button>
+    {% endif %}
+
+    {# update action #}
+    <div class="btn-group" role="group">
+      {% if can_update and objects|length > 0 %}
+        <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-refresh"></i> Update <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a data-action="update" data-target="selected" href="#">Selected</a></li>
+          <li><a data-action="update" data-target="all" href="#">All</a></li>
+        </ul>
+      {% else %}
+        <button type="button" class="btn btn-info btn-sm disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-refresh"></i> Update <span class="caret"></span>
+        </button>
+      {% endif %}
+    </div>
+
+    {# delete action #}
+    <div class="btn-group" role="group">
+      {% if can_delete %}
+        <button type="button" class="btn btn-danger btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-trash" aria-hidden="true"></i> Delete <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a data-action="delete" data-target="selected" href="#">Selected</a></li>
+          <li><a data-action="delete" data-target="all" href="#">All</a></li>
+        </ul>
+      {% else %}
+        <button type="button" class="btn btn-danger btn-sm disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-trash" aria-hidden="true"></i> Delete <span class="caret"></span>
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</div>

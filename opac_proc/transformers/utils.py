@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import datetime
-import requests
 
 import config
 
@@ -24,13 +23,3 @@ def trydate(str_date):
 
 def split_list(li, col):
     return [li[i:i+col] for i in range(0, len(li), col)]
-
-
-def do_request_json(url, params):
-    try:
-        response = requests.get(url, params=params)
-    except:
-        return {}
-    if response.status_code == 200:
-        return response.json()
-    return {}

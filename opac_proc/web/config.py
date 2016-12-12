@@ -23,12 +23,12 @@ ARTICLE_META_THRIFT_DOMAIN = os.environ.get(
     'articlemeta.scielo.org')
 ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_THRIFT_PORT',
-    11620))
+    11620))  # antes 11720
 
 # coleção a ser processada
 OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')
 
-
+# CONEXÃO MONGO OPAC PROC
 # host, porta e credenciais para conectar ao MongoDB
 MONGODB_NAME = os.environ.get('OPAC_PROC_MONGODB_NAME', 'opac_proc')
 MONGODB_HOST = os.environ.get('OPAC_PROC_MONGODB_HOST', 'localhost')
@@ -46,6 +46,7 @@ if MONGODB_USER and MONGODB_PASS:
     MONGODB_SETTINGS['username'] = MONGODB_USER
     MONGODB_SETTINGS['password'] = MONGODB_PASS
 
+# CONEXÃO MONGO OPAC WEB APP
 # host, porta e credenciais para conectar ao MongoDB do OPAC webapp
 OPAC_MONGODB_NAME = os.environ.get('OPAC_MONGODB_NAME', 'opac')
 OPAC_MONGODB_HOST = os.environ.get('OPAC_MONGODB_HOST', 'localhost')
@@ -63,4 +64,10 @@ if OPAC_MONGODB_USER and OPAC_MONGODB_PASS:
     OPAC_MONGODB_SETTINGS['username'] = OPAC_MONGODB_USER
     OPAC_MONGODB_SETTINGS['password'] = OPAC_MONGODB_PASS
 
-OPAC_METRICS_URL = os.environ.get('OPAC_METRICS_URL', 'http://analytics.scielo.org')
+# WEBAPP config:
+DEBUG = bool(os.environ.get('OPAC_PROC_DEBUG', True))
+TESTING = bool(os.environ.get('OPAC_PROC_TESTING', False))
+SECRET_KEY = os.environ.get('OPAC_PROC_SECRET_KEY', "s3cr3t-k3y")
+DEBUG_TB_INTERCEPT_REDIRECTS = False
+OPAC_PROC_LOG_MONGODB_NAME = 'opac_proc_logs'
+PROCESS_HOLD_INTERVAL = int(os.environ.get('OPAC_PROC_PROCESS_HOLD_INTERVAL', 0))  # segundos de pausa no processo

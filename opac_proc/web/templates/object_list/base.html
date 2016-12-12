@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% import 'macros/object_list.html' as mhelper %}
+{% block title %}{{ page_title|title }}{% endblock %}
+{% block content %}
+  {% include "includes/page_header.html" %}
+  <div class="panel panel-default">
+    <!-- Default panel contents -->
+    {% if panel_title %}
+      <div class="panel-heading">
+        {{ panel_title }}
+      </div>
+    {% endif %}
+    <div class="panel-body">
+      <span class="pull-right">
+        <strong>Página:</strong> {{ current_page }} / {{ total_pages }} &bull;
+        <strong>Registros:</strong> <span class="badge">{{ total_records }}</span>
+      </span>
+    </div>
+    <table class="table_object_list table table-striped table-hover">
+      <caption>
+        <div class="row">
+          {# actions toolbar #}
+          <div class="col-md-12 action-toolbar-wrapper toolbar-wrapper">
+            <h4><i class="fa fa-cogs" aria-hidden="true"></i> Actions:</h4>
+            {% include "object_list/includes/actions_toolbar.html" %}
+          </div>
+        </div>
+        {# filters toolbar #}
+        {% if list_filters %}
+          <div class="row">
+            <div class="col-md-12 filters-toolbar-wrapper toolbar-wrapper">
+              <h4><i class="fa fa-filter" aria-hidden="true"></i> Filters:</h4>
+              {% include "object_list/includes/filters_toolbar.html" %}
+            </div>
+          </div>
+        {% endif %}
+      </caption>
+      <thead>
+        <th>
+          <input id="table_check_all" type="checkbox" name="row_checkbox_all">
+        </th>
+        {% for field_label in list_colums|map(attribute='field_label') %}
+          <th>{{ field_label }}</th>
+        {% endfor %}
+      </thead>
+      <tbody class="tbody_object_list">
+        {% for object in objects  %}
+          <tr>
+            <th>
+              <input type="checkbox" name="row_checkbox" data-rowid="{{ object.pk }}">
+            </th>
+            {% for column in list_colums %}
+              {% if loop.first %}
+                <td {% if column.field_name|lower == 'uuid' %} style="width: 300px" {% endif %}>
+                  <a class="row-detail" href="{{ object.pk }}"> {# hack! URL de detail é relativo a URL de listagem #}
+                    {{ mhelper.render_row_cell(object, column.field_name, column.field_type) }}
+                  </a>
+                </td>
+              {% else %}
+                <td>
+                  {{ mhelper.render_row_cell(object, column.field_name, column.field_type) }}
+                </td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="{{ list_colums|length + 1 }}" style="text-align:center;">
+            <nav aria-label="pagination">
+              <ul class="pagination" >
+                {% if has_prev %}
+                  <li>
+                    <a href="?page={{ prev_num }}" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="disabled" >
+                    <a href="#" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                {% endif %}
+
+                {% for page_num in pager_range.range %}
+                  {% if loop.first and pager_range.has_more_prevs %}
+                    <li>
+                      <a href="?page={{ page_num }}">...</a>
+                    </li>
+                  {% endif %}
+
+                  <li {% if page_num == current_page %} class="active" {% endif %}>
+                    <a href="?page={{ page_num }}">{{ page_num }}</a>
+                  </li>
+
+                  {% if loop.last and pager_range.has_more_nexts %}
+                    <li>
+                      <a href="?page={{ page_num }}">...</a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if has_next %}
+                  <li>
+                    <a href="?page={{ next_num }}" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="disabled" >
+                    <a href="#" aria-label="Previous">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div> {# /panel-default #}
+  <div style="display:none;">
+    <form id="action_form" action="." method="">
+      <input id="action_name" name="action_name" type="text" value="">
+    </form>
+  </div>
+{% endblock %}
+{% block extra_js %}
+  <script src="{{ url_for('static', filename='js/actions_toolbar.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/filters_toolbar.js') }}"></script>
+  <script type="text/javascript">
+    $(function() {
+      $('#table_check_all:checkbox').click(function(event) {
+        var $this = $(this);
+        if ($this.is(":checked")) {
+          $('input:checkbox', '.tbody_object_list').prop('checked', true);
+        } else {
+          $('input:checkbox', '.tbody_object_list').prop('checked', false);
+        }
+      });
+      ActionToolbar.init();
+      /* filters toolbar */
+      {% for field_filter in list_filters %}
+        window.FilterToolbar.push_filter("{{field_filter['field_name']}}", "{{field_filter['field_type']}}");
+      {% endfor %}
+      window.FilterToolbar.init();
+      window.FilterToolbar.setup_datepickers();
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,36 @@
+body { padding-top: 50px;}
+
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+/* complemento de color para span.badge */
+.badge-default  { background-color: #777;}
+.badge-primary  { background-color: #337ab7;}
+.badge-success  { background-color: #5cb85c;}
+.badge-info     { background-color: #5bc0de;}
+.badge-warning  { background-color: #f0ad4e;}
+.badge-danger   { background-color: #d9534f;}
+
+/* notifications alert list */
+.flash-msg-list {
+    padding-top: 10px;
+    position: sticky;
+}
+
+/* object list filtrs and actions */
+.toolbar-wrapper {
+  margin-bottom: 5px;
+  padding: 5px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 98%;
+  margin-left: 1%;
+}
+.toolbar-wrapper .form-group {
+  margin-bottom: 10px;
+  margin-right: 5px;
+  padding-right: 10px;
+}
