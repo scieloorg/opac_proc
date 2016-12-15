@@ -6,13 +6,17 @@ import signal
 import textwrap
 import optparse
 import datetime
+import os.path
 import logging.config
+from lxml import etree
 from uuid import uuid4
 import multiprocessing
+from StringIO import StringIO
 from multiprocessing import Pool
 
 from mongoengine import connect
 
+import packtools
 from opac_schema.v1 import models
 from mongoengine import Q, DoesNotExist
 from thrift_clients import clients
@@ -343,6 +347,25 @@ def process_article(issn_collection):
         m_article.fpage = article.start_page
         m_article.lpage = article.end_page
         m_article.elocation = article.elocation
+
+        try:
+            m_article.xml = article.data['article']['v702'][0]['_']
+        except IndexError, KeyError:
+            pass
+
+        pdfs = []
+
+        if article.fulltexts():
+            for text, val in article.fulltexts().items():
+                if text == 'pdf':
+                    dict_pdf = {}
+                    for lang, url in val.items():
+                        dict_pdf['lang'] = lang
+                        dict_pdf['url'] = url
+
+                    pdfs.append(dict_pdf)
+
+        m_article.pdfs = pdfs
 
         m_article.save()
 
