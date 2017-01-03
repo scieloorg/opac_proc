@@ -61,16 +61,10 @@ class LoadProcess(Process):
 
             uuid = str(collection.uuid)
 
-        if self.async:
-            self.r_queues.enqueue(
-                self.stage, 'collection',
-                jobs.task_load_collection,
-                uuid)
-        else:
-            # invocamos a task como funcão normal (sem fila)
-            collection = jobs.task_load_collection(uuid)
-            collection.reload()
-            return collection
+        self.r_queues.enqueue(
+            self.stage, 'collection',
+            jobs.task_load_collection,
+            uuid)
 
     def process_journal(self, collection_acronym=None, issn=None, uuid=None):
         if not collection_acronym:

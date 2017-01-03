@@ -17,7 +17,7 @@ from opac_proc.datastore import models
 
 def home():
     register_connections()
-    OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
+    opac_webapp_db_name = get_opac_webapp_db_name()
     # extract counts
     extract_collection_count = models.ExtractCollection.objects.all().count()
     extract_journal_count = models.ExtractJournal.objects.all().count()
@@ -34,28 +34,28 @@ def home():
     load_issue_count = models.LoadIssue.objects.all().count()
     load_article_count = models.LoadArticle.objects.all().count()
     # OPAC counts
-    with switch_db(OpacCollection, OPAC_WEBAPP_DB_NAME):
+    with switch_db(OpacCollection, opac_webapp_db_name):
         opac_collection_count = OpacCollection.objects.all().count()
 
-    with switch_db(OpacJournal, OPAC_WEBAPP_DB_NAME):
+    with switch_db(OpacJournal, opac_webapp_db_name):
         opac_journal_count = OpacJournal.objects.all().count()
 
-    with switch_db(OpacIssue, OPAC_WEBAPP_DB_NAME):
+    with switch_db(OpacIssue, opac_webapp_db_name):
         opac_issue_count = OpacIssue.objects.all().count()
 
-    with switch_db(OpacArticle, OPAC_WEBAPP_DB_NAME):
+    with switch_db(OpacArticle, opac_webapp_db_name):
         opac_article_count = OpacArticle.objects.all().count()
 
-    with switch_db(OpacPressRelease, OPAC_WEBAPP_DB_NAME):
+    with switch_db(OpacPressRelease, opac_webapp_db_name):
         opac_pressrelease_count = OpacPressRelease.objects.all().count()
 
-    with switch_db(OpacSponsor, OPAC_WEBAPP_DB_NAME):
+    with switch_db(OpacSponsor, opac_webapp_db_name):
         opac_sponsor_count = OpacSponsor.objects.all().count()
 
-    with switch_db(OpacPages, OPAC_WEBAPP_DB_NAME):
+    with switch_db(OpacPages, opac_webapp_db_name):
         opac_page_count = OpacPages.objects.all().count()
 
-    with switch_db(OpacNews, OPAC_WEBAPP_DB_NAME):
+    with switch_db(OpacNews, opac_webapp_db_name):
         opac_news_count = OpacNews.objects.all().count()
 
     context = {

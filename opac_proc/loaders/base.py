@@ -76,13 +76,13 @@ class BaseLoader(object):
         self._uuid = transform_model_uuid
         self._uuid_str = str(transform_model_uuid).replace("-", "")
 
-        self.get_transform_model_instance(query={'uuid': self._uuid})
+        self.get_transform_model_instance(query_dict={'uuid': self._uuid})
 
         # buscamos uma instância na base opac com o mesmo UUID
-        self.get_opac_model_instance(query={'_id': self._uuid_str})
+        self.get_opac_model_instance(query_dict={'_id': self._uuid_str})
 
         # Load model instance: to track process times by uuid
-        self.get_load_model_instance(query={'uuid': self._uuid})
+        self.get_load_model_instance(query_dict={'uuid': self._uuid})
 
         self.metadata['uuid'] = self._uuid
 
