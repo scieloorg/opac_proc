@@ -78,7 +78,7 @@ class BaseExtractor(object):
         """
         # Deve implementar a extração na subclase,
         # invocando este metodo como mostra a docstring
-        raise NotImplemented
+        raise NotImplementedError
 
     def save(self):
         """

@@ -1,13 +1,12 @@
 # coding: utf-8
+import datetime
 from mongoengine.context_managers import switch_db
 from mongoengine import DoesNotExist
-
 from scieloh5m5 import h5m5
 
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
 from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.models import (
-    TransformCollection,
     TransformJournal,
     TransformIssue,
     LoadJournal)
@@ -17,8 +16,6 @@ from opac_schema.v1.models import (
     Timeline,
     Mission,
     OtherTitle,
-    SocialNetwork,
-    TranslatedSection,
     LastIssue)
 
 from opac_proc.web import config
@@ -201,8 +198,7 @@ class JournalLoader(BaseLoader):
 
     def prepare_issue_count(self):
         logger.debug(u"iniciando: prepare_issue_count")
-        issue_count = TransformIssue.objects.filter(
-            journal=self.transform_model_instance).count()
+        issue_count = TransformIssue.objects.filter(journal=self.transform_model_instance).count()
         logger.debug(u"Quantidade de issues encontradas: %s" % issue_count)
         return issue_count
 
@@ -215,7 +211,9 @@ class JournalLoader(BaseLoader):
         }
 
         year = datetime.datetime.now().year
-        _h5m5 = h5m5.get(m_journal.scielo_issn, str(year))
+        t_journal = self.transform_model_instance
+        _h5m5 = h5m5.get(t_journal.scielo_issn, str(year))
+
         if _h5m5:
             metrics_data['total_h5_index'] = _h5m5['h5']
             metrics_data['total_h5_median'] = _h5m5['m5']

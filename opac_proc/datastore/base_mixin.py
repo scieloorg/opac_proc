@@ -6,8 +6,7 @@ from datetime import datetime
 from mongoengine import (
     UUIDField,
     DateTimeField,
-    BooleanField,
-    StringField,
+    BooleanField
 )
 
 
@@ -32,7 +31,7 @@ class BaseMixin(object):
         deve ser redefinido em cada subclasse.
         uuid é o campo para identificar qual documento deve ser atualizado.
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     @classmethod  # signal pre_save (asociar em cada modelo)
     def post_save(cls, sender, document, **kwargs):

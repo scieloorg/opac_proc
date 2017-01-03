@@ -20,11 +20,11 @@ else:
 def task_extract_collection(acronym):
     extractor = CollectionExtactor(acronym)
     extractor.extract()
-    collection = extractor.save()
+    extractor.save()
 
 
 def task_reprocess_collections(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -45,7 +45,7 @@ def task_reprocess_collections(ids=None):
 
 
 def task_process_all_collections(acronym):
-    db = get_db_connection()
+    get_db_connection()
     stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -57,11 +57,11 @@ def task_process_all_collections(acronym):
 def task_extract_journal(acronym, issn):
     extractor = JournalExtactor(acronym, issn)
     extractor.extract()
-    journal = extractor.save()
+    extractor.save()
 
 
 def task_reprocess_journals(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -82,7 +82,7 @@ def task_reprocess_journals(ids=None):
 
 
 def task_process_all_journals():
-    db = get_db_connection()
+    get_db_connection()
     stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -98,11 +98,11 @@ def task_process_all_journals():
 def task_extract_issue(acronym, issue_id):
     extractor = IssueExtactor(acronym, issue_id)
     extractor.extract()
-    issue = extractor.save()
+    extractor.save()
 
 
 def task_reprocess_issues(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -123,7 +123,7 @@ def task_reprocess_issues(ids=None):
 
 
 def task_process_all_issues():
-    db = get_db_connection()
+    get_db_connection()
     stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -142,11 +142,11 @@ def task_process_all_issues():
 def task_extract_article(acronym, article_id):
     extractor = ArticleExtactor(acronym, article_id)
     extractor.extract()
-    article = extractor.save()
+    extractor.save()
 
 
 def task_reprocess_articles(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -167,7 +167,7 @@ def task_reprocess_articles(ids=None):
 
 
 def task_process_all_articles():
-    db = get_db_connection()
+    get_db_connection()
     stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)

@@ -19,11 +19,11 @@ else:
 def task_transform_collection(acronym):
     transformer = CollectionTransformer(extract_model_key=acronym)
     transformer.transform()
-    collection = transformer.save()
+    transformer.save()
 
 
 def task_reprocess_collections(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "transform"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -44,7 +44,7 @@ def task_reprocess_collections(ids=None):
 
 
 def task_process_all_collections(acronym):
-    db = get_db_connection()
+    get_db_connection()
     stage = "transform"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -56,11 +56,11 @@ def task_process_all_collections(acronym):
 def task_transform_journal(acronym, issn):
     transformer = JournalTransformer(extract_model_key=issn)
     transformer.transform()
-    journal = transformer.save()
+    transformer.save()
 
 
 def task_reprocess_journals(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "transform"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -87,7 +87,7 @@ def task_reprocess_journals(ids=None):
 
 
 def task_process_all_journals():
-    db = get_db_connection()
+    get_db_connection()
     stage = "transform"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -103,11 +103,11 @@ def task_process_all_journals():
 def task_transform_issue(acronym, issue_id):
     transformer = IssueTransformer(extract_model_key=issue_id)
     transformer.transform()
-    issue = transformer.save()
+    transformer.save()
 
 
 def task_reprocess_issues(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "transform"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -128,7 +128,7 @@ def task_reprocess_issues(ids=None):
 
 
 def task_process_all_issues():
-    db = get_db_connection()
+    get_db_connection()
     stage = "transform"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -147,11 +147,11 @@ def task_process_all_issues():
 def task_transform_article(acronym, article_id):
     transformer = ArticleTransformer(extract_model_key=article_id)
     transformer.transform()
-    article = transformer.save()
+    transformer.save()
 
 
 def task_reprocess_articles(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "transform"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -174,7 +174,7 @@ def task_reprocess_articles(ids=None):
 
 
 def task_process_all_articles():
-    db = get_db_connection()
+    get_db_connection()
     stage = "transform"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)

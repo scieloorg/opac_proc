@@ -32,7 +32,7 @@ def get_db_connection():
     try:
         db = connect(**config.MONGODB_SETTINGS)
     except Exception, e:   # melhorar captura da Exceção
-        logger.error(u"Não é possível conectar com banco de dados mongo", str(e))
+        logger.error(u"Não é possível conectar com banco de dados mongo. %s", str(e))
     else:
         db_name = get_opac_proc_db_name()
         logger.info(u"Conexão establecida com banco: %s!" % db_name)

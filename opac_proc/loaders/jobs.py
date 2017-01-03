@@ -26,7 +26,7 @@ def task_load_collection(uuid):
 
 
 def task_reprocess_collections(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "load"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -47,7 +47,7 @@ def task_reprocess_collections(ids=None):
 
 
 def task_process_all_collections():
-    db = get_db_connection()
+    get_db_connection()
     stage = "load"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -65,7 +65,7 @@ def task_load_journal(uuid):
 
 
 def task_reprocess_journals(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "load"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -86,7 +86,7 @@ def task_reprocess_journals(ids=None):
 
 
 def task_process_all_journals():
-    db = get_db_connection()
+    get_db_connection()
     stage = "load"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -105,7 +105,7 @@ def task_load_issue(uuid):
 
 
 def task_reprocess_issues(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "load"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -126,7 +126,7 @@ def task_reprocess_issues(ids=None):
 
 
 def task_process_all_issues():
-    db = get_db_connection()
+    get_db_connection()
     stage = "load"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -145,7 +145,7 @@ def task_load_article(uuid):
 
 
 def task_reprocess_articles(ids=None):
-    db = get_db_connection()
+    get_db_connection()
     stage = "load"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
@@ -166,7 +166,7 @@ def task_reprocess_articles(ids=None):
 
 
 def task_process_all_articles():
-    db = get_db_connection()
+    get_db_connection()
     stage = "load"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)

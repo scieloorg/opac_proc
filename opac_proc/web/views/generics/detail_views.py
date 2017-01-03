@@ -1,6 +1,6 @@
 # coding: utf-8
 import json
-from flask import render_template, abort, request
+from flask import render_template, abort
 from flask.views import MethodView
 from mongoengine import DoesNotExist, MultipleObjectsReturned
 

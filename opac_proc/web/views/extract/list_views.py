@@ -408,4 +408,4 @@ class ExtractLogListView(ExtractBaseListView):
 
     def get_selected_ids(self):
         ids = super(ExtractLogListView, self).get_selected_ids()
-        return [ObjectId(id.strip()) for id in ids]
+        return [ObjectId(_id.strip()) for _id in ids]

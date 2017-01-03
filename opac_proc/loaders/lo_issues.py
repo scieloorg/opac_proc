@@ -5,8 +5,6 @@ from mongoengine import DoesNotExist
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
 from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.models import (
-    TransformCollection,
-    TransformJournal,
     TransformIssue,
     LoadIssue)
 from opac_schema.v1.models import Issue as OpacIssue
@@ -60,7 +58,7 @@ class IssueLoader(BaseLoader):
                 opac_journal = OpacJournal.objects.get(_id=t_journal_uuid_str)
                 logger.debug(u"Journal: %s (_id: %s) encontrado" % (opac_journal.acronym, t_journal_uuid_str))
             except DoesNotExist, e:
-                logger.error(u"Journal (_id: %s) não encontrado. Já fez o Load Journal?" % transformed_coll_uuid_str)
+                logger.error(u"Journal (_id: %s) não encontrado. Já fez o Load Journal?" % t_journal_uuid_str)
                 raise e
         return opac_journal
 
