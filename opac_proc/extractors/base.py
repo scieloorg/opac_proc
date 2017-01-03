@@ -117,8 +117,8 @@ class BaseExtractor(object):
                     self.extract_model_instance.modify(**self._raw_data)
                 else:
                     logger.debug(u"extract_model_instance NÃO encontrado. Criando novo!")
-                    self.extract_model_class(**self._raw_data).save()
-                    self.extract_model_instance = self.get_extract_model_instance()
+                    self.extract_model_instance = self.extract_model_class(**self._raw_data)
+                    self.extract_model_instance.save()
             except Exception, e:
                 msg = u"Não foi possível salvar %s. Exeção: %s" % (
                     self.extract_model_name, e)

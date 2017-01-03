@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 articlemeta_thrift = thriftpy.load(
-    os.path.join(os.path.dirname(__file__))+'/articlemeta.thrift')
+    os.path.join(os.path.dirname(__file__)) + '/articlemeta.thrift')
 
 
 class ServerError(Exception):
