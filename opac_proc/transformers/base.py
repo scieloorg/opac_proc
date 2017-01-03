@@ -4,7 +4,6 @@ import sys
 import json
 
 from opac_proc.datastore.mongodb_connector import get_db_connection
-from opac_proc.extractors.decorators import update_metadata
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
@@ -72,7 +71,7 @@ class BaseTransformer(object):
         try:
             self.extract_model_instance = self.get_extract_model_instance(
                 extract_model_key)
-        except NotImplemented:
+        except NotImplementedError:
             raise ValueError('subclasse deve definir o método: get_extract_model_instance!')
         except Exception, e:
             raise e
@@ -111,7 +110,7 @@ class BaseTransformer(object):
         return result_dict
 
     def get_extract_model_instance(self, key):
-        raise NotImplemented
+        raise NotImplementedError
 
     # @update_metadata
     def transform(self):
@@ -138,7 +137,7 @@ class BaseTransformer(object):
             def save(self):
                 # implmementar só se for algo deferente
         """
-        raise NotImplemented
+        raise NotImplementedError
         # Deve implementar a extração na subclase,
         # invocando este metodo como mostra a docstring
 

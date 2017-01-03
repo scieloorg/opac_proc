@@ -8,7 +8,6 @@ from opac_proc.datastore.models import (
     TransformIssue,
     TransformJournal)
 from opac_proc.transformers.base import BaseTransformer
-from opac_proc.transformers.utils import trydate
 from opac_proc.extractors.decorators import update_metadata
 
 from opac_proc.web import config
@@ -101,7 +100,7 @@ class IssueTransformer(BaseTransformer):
         if hasattr(xylose_issue, 'sections') and xylose_issue.sections:
             xylose_sections = xylose_issue.sections
             t_issue_sections = []
-            for code, items in xylose_sections.iteritems():
+            for _, items in xylose_sections.iteritems():
                 if items:
                     for name, lang in items.iteritems():
                         t_issue_sections.append({

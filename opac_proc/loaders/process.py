@@ -1,5 +1,4 @@
 # coding: utf-8
-import time
 from mongoengine import Q
 
 from opac_proc.core.process import Process
@@ -21,17 +20,15 @@ else:
 class LoadProcess(Process):
     stage = 'load'
     collection_acronym = None
-    async = True
     db = get_db_connection()
     r_queues = RQueues()
 
-    def __init__(self, collection_acronym=None, async=True):
+    def __init__(self, collection_acronym=None):
         if collection_acronym:
             self.collection_acronym = collection_acronym
         else:
             self.collection_acronym = config.OPAC_PROC_COLLECTION
 
-        self.async = async
         self.r_queues.create_queues_for_stage(self.stage)
 
     def reprocess_collections(self, ids=None):
@@ -49,12 +46,6 @@ class LoadProcess(Process):
     def reprocess_articles(self, ids=None):
         self.r_queues.enqueue(
             self.stage, 'article', jobs.task_reprocess_articles, ids)
-
-    def reprocess_all(self):
-        self.reprocess_collections()
-        self.reprocess_journals()
-        self.reprocess_issues()
-        self.reprocess_articles()
 
     def process_collection(self, collection_acronym=None, collection_uuid=None):
         if not collection_acronym:
@@ -99,16 +90,10 @@ class LoadProcess(Process):
         else:
             raise ValueError("must provide at least one parameter: issn or uuid")
 
-        if self.async:
-            self.r_queues.enqueue(
-                self.stage, 'journal',
-                jobs.task_load_journal,
-                uuid)
-        else:
-            # invocamos a task como funcão normal (sem fila)
-            journal = jobs.task_load_journal(uuid)
-            journal.reload()
-            return journal
+        self.r_queues.enqueue(
+            self.stage, 'journal',
+            jobs.task_load_journal,
+            uuid)
 
     def process_issue(self, collection_acronym=None, issue_pid=None, uuid=None):
         if not collection_acronym:
@@ -127,17 +112,10 @@ class LoadProcess(Process):
         else:
             raise ValueError("must provide at least one parameter: issn or uuid")
 
-        if self.async:
-            self.r_queues.enqueue(
-                self.stage, 'issue',
-                jobs.task_load_issue,
-                uuid)
-        else:
-            # invocamos a task como funcão normal (sem fila)
-            issue = jobs.task_load_issue(
-                collection_acronym, uuid)
-            issue.reload()
-            return issue
+        self.r_queues.enqueue(
+            self.stage, 'issue',
+            jobs.task_load_issue,
+            uuid)
 
     def process_article(self, collection_acronym=None, article_pid=None, uuid=None):
         if not collection_acronym:
@@ -156,17 +134,10 @@ class LoadProcess(Process):
         else:
             raise ValueError("must provide at least one parameter: issn or uuid")
 
-        if self.async:
-            self.r_queues.enqueue(
-                self.stage, 'article',
-                jobs.task_load_article,
-                uuid)
-        else:
-            # invocamos a task como funcão normal (sem fila)
-            article = jobs.task_transform_article(
-                jobs.task_load_article, uuid)
-            articles.reload()
-            return article
+        self.r_queues.enqueue(
+            self.stage, 'article',
+            jobs.task_load_article,
+            uuid)
 
     def process_all_collections(self):
         self.r_queues.enqueue(
@@ -183,35 +154,3 @@ class LoadProcess(Process):
     def process_all_articles(self):
         self.r_queues.enqueue(
             self.stage, 'issue', jobs.task_process_all_articles)
-
-    def process_all(self, collection_acronym=None):
-        logger.debug(u"Inicio process_all. collection_acronym = %s" % collection_acronym)
-        if collection_acronym is None:
-            collection_acronym = self.collection_acronym
-
-        # processamos a coleção de forma asincrona pq devemos garantir que coleção extraida
-        self.async = False
-        logger.info(u'Transoformando Collection:  %s' % collection_acronym)
-        collection = process_collection(collection_acronym)
-        self.async = True  # o resto do processo deve ficar em tasks
-
-        for child in collection.children_ids:
-            issn = child['issn']
-            issues_ids = child['issues_ids']
-            articles_ids = child['articles_ids']
-
-            logger.debug(u"enfilerando task: task_extract_journal [issn: %s]" % issn)
-            process_journal(collection.acronym, issn=issn)
-
-            # processamos os issues com tasks
-            for issue_id in issues_ids:
-                logger.debug(u"enfilerando task: task_extract_issue [issue_id: %s]" % issue_id)
-                process_issue(collection.acronym, issue_id)
-
-            # processamos os articles com tasks
-            for article_id in articles_ids:
-                logger.debug(u"enfilerando task: task_extract_article [article_id: %s]" % article_id)
-                process_article(collection.acronym, article_id)
-
-        logger.debug(u"Fim enfileramento de tasks")
-        logger.debug(u"Fim process_all")

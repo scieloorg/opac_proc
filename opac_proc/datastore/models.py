@@ -1,5 +1,5 @@
 # coding: utf-8
-from mongoengine import DynamicDocument, signals, DoesNotExist
+from mongoengine import DynamicDocument, signals
 from base_mixin import BaseMixin
 
 
@@ -14,7 +14,7 @@ class ExtractCollection(BaseMixin, DynamicDocument):
         """
         try:
             doc = TransformCollection.objects.get(uuid=uuid).first()
-        except Exception, e:
+        except Exception:
             pass
         else:
             doc['must_reprocess'] = True
@@ -36,7 +36,7 @@ class ExtractJournal(BaseMixin, DynamicDocument):
         """
         try:
             doc = TransformJournal.objects.get(uuid=uuid).first()
-        except Exception, e:
+        except Exception:
             pass
         else:
             doc['must_reprocess'] = True
@@ -58,7 +58,7 @@ class ExtractIssue(BaseMixin, DynamicDocument):
         """
         try:
             doc = TransformIssue.objects.get(uuid=uuid).first()
-        except Exception, e:
+        except Exception:
             pass
         else:
             doc['must_reprocess'] = True
@@ -79,7 +79,7 @@ class ExtractArticle(BaseMixin, DynamicDocument):
         """
         try:
             doc = TransformArticle.objects.get(uuid=uuid).first()
-        except Exception, e:
+        except Exception:
             pass
         else:
             doc['must_reprocess'] = True
@@ -102,7 +102,7 @@ class TransformCollection(BaseMixin, DynamicDocument):
         """
         try:
             doc = LoadCollection.objects.get(uuid=uuid).first()
-        except Exception, e:
+        except Exception:
             pass
         else:
             doc['must_reprocess'] = True
@@ -123,7 +123,7 @@ class TransformJournal(BaseMixin, DynamicDocument):
         """
         try:
             doc = LoadJournal.objects.get(uuid=uuid).first()
-        except Exception, e:
+        except Exception:
             pass
         else:
             doc['must_reprocess'] = True
@@ -144,7 +144,7 @@ class TransformIssue(BaseMixin, DynamicDocument):
         """
         try:
             doc = LoadIssue.objects.get(uuid=uuid).first()
-        except Exception, e:
+        except Exception:
             pass
         else:
             doc['must_reprocess'] = True
@@ -165,7 +165,7 @@ class TransformArticle(BaseMixin, DynamicDocument):
         """
         try:
             doc = LoadArticle.objects.get(uuid=uuid).first()
-        except Exception, e:
+        except Exception:
             pass
         else:
             doc['must_reprocess'] = True

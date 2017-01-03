@@ -2,8 +2,6 @@
 
 import datetime
 
-import config
-
 
 def trydate(str_date):
     """
