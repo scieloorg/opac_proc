@@ -15,7 +15,7 @@ mongolog==0.1.1
 -e git+https://github.com/scieloorg/scieloh5m5@1.3.4#egg=scieloh5m5
 requests==2.12.4
 Flask-DebugToolbar==0.10.0
-Flask-WTF==0.14
+Flask-WTF==0.14.2
 gunicorn==19.6.0
 itsdangerous==0.24
 python-slugify==1.2.1
