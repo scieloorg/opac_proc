@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import sys
+import time
 import signal
 import textwrap
 import optparse
@@ -21,6 +22,7 @@ from opac_schema.v1 import models
 from mongoengine import Q, DoesNotExist
 from thrift_clients import clients
 from scieloh5m5 import h5m5
+from opac_ssm_api import client
 
 import config
 import utils
@@ -349,7 +351,10 @@ def process_article(issn_collection):
         m_article.elocation = article.elocation
 
         try:
-            m_article.xml = article.data['article']['v702'][0]['_']
+            # O property ``data_model_version`` indica se é um modelo de XML/HTMl
+            if article.data_model_version == 'xml':
+                m_article.xml = article.file_code(fullpath=True)
+                logger.info(u"Caminho do XML do artigo: {0}".format(m_article.xml))
         except IndexError, KeyError:
             pass
 
@@ -370,6 +375,7 @@ def process_article(issn_collection):
         m_article.save()
 
     process_ahead(issn)
+    process_articles_ssm(issn)
 
 
 def process_volume_issue(issn):
@@ -476,6 +482,85 @@ def process_last_issue(issn):
         journal.save()
     else:
         logger.info(u"Impossível recuperar o último fascículo para o períodico: %s" % journal.title)
+
+
+def process_articles_ssm(issn):
+
+    connect(**config.MONGODB_SETTINGS)
+
+    journal = models.Journal.objects.get(scielo_issn=issn)
+
+    logger.info(u"Enviando os artigos do periódico: {0} para SSM".format(journal.title))
+
+    for article in models.Article.objects.filter(journal=journal):
+
+        article.htmls = []
+        article.save()
+
+        try:
+            if article.xml:
+                # O caminho deve ser até o acrônimo do periódico.
+                filename = os.path.join(config.ARTICLE_FILE_PATH, article.xml)
+                try:
+                    fp = open(filename)
+                except IOError:
+                    logger.error(u"Erro ao tentar coletar o arquivo {0}".format(filename))
+                    continue
+
+                list_dict_html = []
+                xml_etree = etree.parse(StringIO(fp.read()))
+
+                client_ssm = client.Client()
+
+                for lang, output in packtools.HTMLGenerator.parse(xml_etree, valid_only=False):
+                    dict_htmls = {}
+                    source = etree.tostring(output, encoding="utf-8",
+                                                    method="html",
+                                                    doctype=u"<!DOCTYPE html>")
+
+                    dict_htmls['lang'] = lang
+
+                    filename = os.path.basename(getattr(fp, 'name', None)).split('.')
+
+                    ssm_push_id = client_ssm.add_asset(pfile=StringIO(source),
+                                                       filename=utils.generate_filename(filename[0], lang, 'html'),
+                                                       filetype='html',
+                                                       metadata={'lang': lang,
+                                                       'issue': article.issue.legend,
+                                                       'title': article.title,
+                                                       'journal': article.journal.title,
+                                                       'pid': article.pid})
+
+                    time.sleep(3)
+
+                    asset_info = client_ssm.get_asset_info(ssm_push_id)
+
+                    dict_htmls['source'] = asset_info['url']
+
+                    list_dict_html.append(dict_htmls)
+
+                article.htmls = list_dict_html
+
+                ssm_push_id = client_ssm.add_asset(pfile=StringIO(source),
+                                                   filename=utils.generate_filename(filename[0], lang, 'xml'),
+                                                   filetype='xml',
+                                                   metadata={'lang': lang,
+                                                   'issue': article.issue.legend,
+                                                   'title': article.title,
+                                                   'journal': article.journal.title,
+                                                   'pid': article.pid})
+
+                time.sleep(3)
+
+                asset_info = client_ssm.get_asset_info(ssm_push_id)
+
+                article.xml = asset_info['url']
+
+                article.save()
+
+        except Exception as e:
+            logger.error(u"Erro ao tentar transformar artigo: %s, erro: %s" % (article.pid, e))
+            pass
 
 
 def bulk(options, pool):

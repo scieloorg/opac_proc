@@ -20,3 +20,4 @@ gunicorn==19.6.0
 itsdangerous==0.24
 python-slugify==1.2.1
 packtools==1.3.2
+-e git+git@github.com:scieloorg/opac_ssm_api.git@648a31d2271c95e843d1d8388eaae59e19d2e1ab#egg=opac_ssm_api
