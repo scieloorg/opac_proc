@@ -2,7 +2,6 @@
 
 import os
 import datetime
-from datetime import timedelta
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 

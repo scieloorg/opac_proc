@@ -1,5 +1,4 @@
 # coding: utf-8
-from uuid import uuid4
 from mongoengine.context_managers import switch_db
 from mongoengine import DoesNotExist
 
@@ -7,9 +6,6 @@ from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
 from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.models import (
     LoadArticle,
-    TransformCollection,
-    TransformJournal,
-    TransformIssue,
     TransformArticle)
 from opac_schema.v1.models import Article as OpacArticle
 from opac_schema.v1.models import Issue as OpacIssue

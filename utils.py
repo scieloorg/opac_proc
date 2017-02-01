@@ -3,8 +3,6 @@
 import datetime
 import requests
 
-import config
-
 
 def trydate(str_date):
     """

@@ -1,7 +1,6 @@
 # coding: utf-8
 import os
 import sys
-import json
 from datetime import datetime
 from mongoengine.context_managers import switch_db
 from opac_proc.datastore.mongodb_connector import (
@@ -77,52 +76,52 @@ class BaseLoader(object):
         self._uuid = transform_model_uuid
         self._uuid_str = str(transform_model_uuid).replace("-", "")
 
-        self.get_transform_model_instance(query={'uuid': self._uuid})
+        self.get_transform_model_instance(query_dict={'uuid': self._uuid})
 
         # buscamos uma instância na base opac com o mesmo UUID
-        self.get_opac_model_instance(query={'_id': self._uuid_str})
+        self.get_opac_model_instance(query_dict={'_id': self._uuid_str})
 
         # Load model instance: to track process times by uuid
-        self.get_load_model_instance(query={'uuid': self._uuid})
+        self.get_load_model_instance(query_dict={'uuid': self._uuid})
 
         self.metadata['uuid'] = self._uuid
 
-    def get_transform_model_instance(self, query={}):
+    def get_transform_model_instance(self, query_dict):
         # recuperamos uma instância do transform_model_class
-        # correspondente com a **query dict.
+        # correspondente com a **query_dict dict.
         # caso não exista, levantamos uma exeção por não ter o dado fonte
         with switch_db(self.transform_model_class, OPAC_PROC_DB_NAME):
             logger.debug(u'recuperando modelo: %s' % self.transform_model_name)
-            self.transform_model_instance = self.transform_model_class.objects(**query).first()
-            logger.debug(u'modelo %s encontrado. query: %s' % (self.transform_model_name, query))
+            self.transform_model_instance = self.transform_model_class.objects(**query_dict).first()
+            logger.debug(u'modelo %s encontrado. query_dict: %s' % (self.transform_model_name, query_dict))
 
-    def get_opac_model_instance(self, query={}):
+    def get_opac_model_instance(self, query_dict):
         # recuperamos uma instância do opac_model_class
-        # correspondente com a **query dict.
+        # correspondente com a **query_dict dict.
         # caso não exista, retornamos uma nova instância
         with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
             try:
                 logger.debug(u'recuperando modelo: %s' % self.opac_model_name)
-                self.opac_model_instance = self.opac_model_class.objects.get(**query)
-                logger.debug(u'modelo %s encontrado. query: %s' % (self.opac_model_name, query))
+                self.opac_model_instance = self.opac_model_class.objects.get(**query_dict)
+                logger.debug(u'modelo %s encontrado. query_dict: %s' % (self.opac_model_name, query_dict))
             except self.opac_model_class.DoesNotExist:
                 self.opac_model_instance = None
             except Exception as e:
                 logger.error(e)
                 raise e
 
-    def get_load_model_instance(self, query={}):
+    def get_load_model_instance(self, query_dict):
         # recuperamos uma instância do load_model_class
-        # correspondente com a **query dict.
+        # correspondente com a **query_dict dict.
         # caso não exista, retornamos uma nova instância
         with switch_db(self.load_model_class, OPAC_PROC_DB_NAME):
             try:
                 logger.debug(u'recuperando modelo: %s' % self.load_model_name)
-                self.load_model_instance = self.load_model_class.objects.get(**query)
-                logger.debug(u'modelo %s encontrado. query: %s' % (self.load_model_name, query))
+                self.load_model_instance = self.load_model_class.objects.get(**query_dict)
+                logger.debug(u'modelo %s encontrado. query_dict: %s' % (self.load_model_name, query_dict))
             except self.load_model_class.DoesNotExist:
                 logger.debug(u'load_model_instance não foi encontrado. criamos nova instância')
-                self.load_model_instance = self.load_model_class(**query)
+                self.load_model_instance = self.load_model_class(**query_dict)
                 self.load_model_instance['uuid'] = self._uuid
                 self.load_model_instance.save()
                 self.load_model_instance.reload()

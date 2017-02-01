@@ -1,40 +1,42 @@
 # coding: utf-8
 
-from opac_proc.datastore.redis_queues import RQueues
-from opac_proc.datastore.mongodb_connector import get_db_connection
-
 
 class Process(object):
     stage = 'default'
     collection_acronym = None
-    async = True
 
-    def reprocess_collection():
-        raise NotImplemented
+    def reprocess_collections(self, ids=None):
+        raise NotImplementedError
 
-    def reprocess_journal():
-        raise NotImplemented
+    def reprocess_journals(self, ids=None):
+        raise NotImplementedError
 
-    def reprocess_issue():
-        raise NotImplemented
+    def reprocess_issues(self, ids=None):
+        raise NotImplementedError
 
-    def reprocess_article():
-        raise NotImplemented
+    def reprocess_articles(self, ids=None):
+        raise NotImplementedError
 
-    def reprocess_all():
-        raise NotImplemented
+    def process_collection(self, collection_acronym=None, collection_uuid=None):
+        raise NotImplementedError
 
-    def process_collection():
-        raise NotImplemented
+    def process_journal(self, collection_acronym=None, issn=None, uuid=None):
+        raise NotImplementedError
 
-    def process_journal():
-        raise NotImplemented
+    def process_issue(self, collection_acronym=None, issue_pid=None, uuid=None):
+        raise NotImplementedError
 
-    def process_issue():
-        raise NotImplemented
+    def process_article(self, collection_acronym=None, article_pid=None, uuid=None):
+        raise NotImplementedError
 
-    def process_article():
-        raise NotImplemented
+    def process_all_collections(self):
+        raise NotImplementedError
 
-    def process_all():
-        raise NotImplemented
+    def process_all_journals(self):
+        raise NotImplementedError
+
+    def process_all_issues(self):
+        raise NotImplementedError
+
+    def process_all_articles(self):
+        raise NotImplementedError

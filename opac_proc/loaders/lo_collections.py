@@ -6,7 +6,6 @@ from opac_proc.datastore.models import (
     LoadCollection)
 from opac_proc.loaders.base import BaseLoader
 from opac_schema.v1.models import Collection as OpacCollection
-from opac_schema.v1.models import CollectionMetrics
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
@@ -35,7 +34,7 @@ class CollectionLoader(BaseLoader):
         'metrics',
     ]
 
-    def _get_json_metrics(metric_name, url, params):
+    def _get_json_metrics(self, metric_name, url, params):
         json_data = {}
 
         try:
@@ -69,7 +68,7 @@ class CollectionLoader(BaseLoader):
 
         # jornals:
         params['field'] = 'issn'
-        journals_url = '{0}/{1}'.format(config.OPAC_METRICS_URL, PUBLICATION_SIZE_ENDPOINT)
+        url = '{0}/{1}'.format(config.OPAC_METRICS_URL, PUBLICATION_SIZE_ENDPOINT)
         journals = self._get_json_metrics('jornals', url, params)
 
         metrics = {}

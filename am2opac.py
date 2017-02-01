@@ -7,19 +7,15 @@ import signal
 import textwrap
 import optparse
 import datetime
-import os.path
 import logging.config
-from lxml import etree
 from uuid import uuid4
 import multiprocessing
-from StringIO import StringIO
 from multiprocessing import Pool
 
 from mongoengine import connect
 
-import packtools
 from opac_schema.v1 import models
-from mongoengine import Q, DoesNotExist
+from mongoengine import DoesNotExist
 from thrift_clients import clients
 from scieloh5m5 import h5m5
 from opac_ssm_api import client
@@ -351,11 +347,8 @@ def process_article(issn_collection):
         m_article.elocation = article.elocation
 
         try:
-            # O property ``data_model_version`` indica se é um modelo de XML/HTMl
-            if article.data_model_version == 'xml':
-                m_article.xml = article.file_code(fullpath=True)
-                logger.info(u"Caminho do XML do artigo: {0}".format(m_article.xml))
-        except IndexError, KeyError:
+            m_article.xml = article.data['article']['v702'][0]['_']
+        except (IndexError, KeyError):
             pass
 
         pdfs = []
@@ -462,7 +455,7 @@ def process_last_issue(issn):
 
             sections = []
 
-            for code, items in last_issue.sections.iteritems():
+            for _, items in last_issue.sections.iteritems():
 
                 if items:
 
@@ -586,7 +579,7 @@ def bulk(options, pool):
 
     issns_list = utils.split_list(issns, options.process)
 
-    for i, pissns in enumerate(issns_list):
+    for _, pissns in enumerate(issns_list):
         logger.info(u"Enviando para processamento os issns: %s" % pissns)
         pool.map(process_journal, pissns)
         pool.map(process_issue, pissns)

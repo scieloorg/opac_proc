@@ -3,7 +3,6 @@ import os
 import thriftpy
 import json
 import logging
-from datetime import date
 
 from thriftpy.rpc import make_client
 from xylose.scielodocument import Article, Journal, Issue
@@ -14,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 articlemeta_thrift = thriftpy.load(
-    os.path.join(os.path.dirname(__file__))+'/articlemeta.thrift')
+    os.path.join(os.path.dirname(__file__)) + '/articlemeta.thrift')
 
 
 class ServerError(Exception):
@@ -98,7 +97,7 @@ class ArticleMeta(object):
 
     def set_doaj_id(self, code, collection, doaj_id):
         try:
-            article = self.client.set_doaj_id(
+            self.client.set_doaj_id(
                 code,
                 collection,
                 doaj_id
@@ -211,7 +210,7 @@ class ArticleMeta(object):
             return Issue(json.loads(issue))
 
         except:
-            msg = u'Error retrieving issue: %s_%s' % (collection, identifier)
+            msg = u'Error retrieving issue: %s_%s' % (collection, code)
             # raise ServerError(msg)
             logger.error(msg)
             pass

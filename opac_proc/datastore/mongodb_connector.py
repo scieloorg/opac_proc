@@ -26,16 +26,20 @@ def get_opac_logs_db_name():
 
 def get_db_connection():
     if config.MONGODB_USER and config.MONGODB_PASS:
-        logger.debug(u'Iniciando conexão - com credenciais do banco: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
+        msg = u'Iniciando conexão - com credenciais do banco: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS)
+        logger.debug(msg)
     else:
-        logger.debug(u'Iniciando conexão - sem credenciais do banco: mongo://{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
+        msg = u'Iniciando conexão - sem credenciais do banco: mongo://{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS)
+        logger.debug(msg)
     try:
         db = connect(**config.MONGODB_SETTINGS)
     except Exception, e:   # melhorar captura da Exceção
-        logger.error(u"Não é possível conectar com banco de dados mongo", str(e))
+        msg = u"Não é possível conectar com banco de dados mongo. %s", str(e)
+        logger.error(msg)
     else:
         db_name = get_opac_proc_db_name()
-        logger.info(u"Conexão establecida com banco: %s!" % db_name)
+        msg = u"Conexão establecida com banco: %s!" % db_name
+        logger.info(msg)
         return db
 
 

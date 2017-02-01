@@ -1,7 +1,7 @@
 # coding: utf-8
 import re
 from datetime import datetime, timedelta
-from flask import render_template, flash, request, redirect, jsonify
+from flask import render_template, flash, request
 from flask.views import View
 from flask_mongoengine import Pagination
 
@@ -252,7 +252,7 @@ class ListView(View):
             try:
                 model = self.model_class.objects.get(pk=oid)
                 model.delete()
-            except Exception as e:
+            except Exception:
                 delete_errors_count += 1
         if delete_errors_count:
             flash("%s records cannot be deleted" % delete_errors_count, "error")
@@ -267,7 +267,7 @@ class ListView(View):
         if not ids:
             raise ValueError("No records selected")
         elif isinstance(ids, list):
-            ids = [id.strip() for id in ids]
+            ids = [_id.strip() for _id in ids]
         else:
             raise ValueError("Invalid selection %s" % ids)
         return ids
@@ -276,7 +276,7 @@ class ListView(View):
         if request.method == 'POST':  # create action
             action_name = request.form['action_name']
             if action_name not in self._allowed_POST_action_names:
-                flask(u'Invalid operation: %s' % action_name)
+                flash(u'Invalid operation: %s' % action_name)
             else:
                 if action_name == 'create':
                     if self.can_create:
@@ -301,7 +301,7 @@ class ListView(View):
                             if ids:
                                 self.do_update_selected(ids)
                             else:
-                                flask(u'Invalid selection', 'error')
+                                flash(u'Invalid selection', 'error')
                         except Exception as e:
                             flash(u'ERROR: %s' % str(e), 'error')
                     else:
@@ -321,7 +321,7 @@ class ListView(View):
                             if ids:
                                 self.do_delete_selected(ids)
                             else:
-                                flask(u'Invalid selection', 'error')
+                                flash(u'Invalid selection', 'error')
                         except Exception as e:
                             flash(u'ERROR: %s' % str(e), 'error')
                     else:

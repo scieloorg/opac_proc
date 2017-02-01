@@ -10,7 +10,6 @@ from opac_proc.datastore.models import (
     TransformIssue,
     TransformJournal)
 from opac_proc.transformers.base import BaseTransformer
-from opac_proc.transformers.utils import trydate
 from opac_proc.extractors.decorators import update_metadata
 
 from opac_proc.web import config

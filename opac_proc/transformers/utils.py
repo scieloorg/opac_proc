@@ -2,8 +2,6 @@
 
 import datetime
 
-import config
-
 
 def trydate(str_date):
     """
@@ -22,4 +20,4 @@ def trydate(str_date):
 
 
 def split_list(li, col):
-    return [li[i:i+col] for i in range(0, len(li), col)]
+    return [li[i:i + col] for i in range(0, len(li), col)]

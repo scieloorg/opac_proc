@@ -2,6 +2,9 @@
 
 Processamento que coleta os dados desde o Article Meta e armazena eles no MongoDB para serem expostos pelo OPAC.
 
+### Badges:
+
+[![Code Health](https://landscape.io/github/scieloorg/opac_proc/master/landscape.svg?style=flat)](https://landscape.io/github/scieloorg/opac_proc/master)
 
 ### Pre-requisitos
 

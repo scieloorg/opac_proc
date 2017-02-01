@@ -4,7 +4,6 @@ import os
 import thriftpy
 import json
 import logging
-from datetime import date
 
 from thriftpy.rpc import make_client
 # from xylose.scielodocument import Article, Journal, Issue
