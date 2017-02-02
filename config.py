@@ -24,12 +24,15 @@ ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_THRIFT_PORT',
     11620))
 
+# caminho absoluto para os XMLs do artigo, caminho até o acrônimo do periódico.
+ARTICLE_FILE_PATH = os.environ.get('OPAC_PROC_ARTICLE_FILE_PATH', 'articles_scielosp_org')
+
 # coleção a ser processada
 OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')
 
 
 # host, porta e credenciais para conectar ao MongoDB
-MONGODB_NAME = os.environ.get('OPAC_PROC_MONGODB_NAME', 'opac_proc')
+MONGODB_NAME = os.environ.get('OPAC_PROC_MONGODB_NAME', 'opac')
 MONGODB_HOST = os.environ.get('OPAC_PROC_MONGODB_HOST', 'localhost')
 MONGODB_PORT = os.environ.get('OPAC_PROC_MONGODB_PORT', 27017)
 MONGODB_USER = os.environ.get('OPAC_PROC_MONGODB_USER', None)

@@ -32,3 +32,13 @@ def do_request_json(url, params):
     if response.status_code == 200:
         return response.json()
     return {}
+
+def generate_filename(filename, extension, lang=''):
+    """
+    Return something like this: ``1678-4464-csp-32-07-e00107014_pt.html``
+    """
+    if not lang:
+        return '{0}.{2}'.format(filename, lang, extension)
+    else:
+        return '{0}_{1}.{2}'.format(filename, lang, extension)
+
