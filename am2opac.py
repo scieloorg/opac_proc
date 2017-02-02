@@ -1,19 +1,25 @@
 #!/usr/bin/python
 # coding: utf-8
 
+import os
 import sys
 import time
+import json
 import signal
 import textwrap
 import optparse
 import datetime
 import logging.config
 from uuid import uuid4
+from lxml import etree
+from StringIO import StringIO
+
 import multiprocessing
 from multiprocessing import Pool
 
 from mongoengine import connect
 
+import packtools
 from opac_schema.v1 import models
 from mongoengine import DoesNotExist
 from thrift_clients import clients
@@ -108,7 +114,7 @@ def process_journal(issn_collection):
     try:
         journal = articlemeta.get_journal(collection=collection, code=issn)
 
-        logger.info(u"Adicionando journal %s" % journal.title)
+        logger.info(u"Adicionando journal %s", journal.title)
 
         m_journal = models.Journal()
 
@@ -198,8 +204,8 @@ def process_journal(issn_collection):
 
         m_journal.save()
     except Exception as e:
-        logger.error(u"Exception %s. Processando Journal (ISSN: %s, Collection: %s)" % (
-            str(e), issn, collection))
+        logger.error(u"Exception %s. Processando Journal (ISSN: %s, Collection: %s)",
+            str(e), issn, collection)
 
 
 def process_issue(issn_collection):
@@ -212,7 +218,7 @@ def process_issue(issn_collection):
 
         m_issue = models.Issue()
 
-        logger.info(u"Adicionando issue: %s - %s" % (issn, issue.label))
+        logger.info(u"Adicionando issue: %s - %s", issn, issue.label)
 
         # We have to define which id will be use to legacy journals.
         _id = str(uuid4().hex)
@@ -229,7 +235,7 @@ def process_issue(issn_collection):
             journal = models.Journal.objects.get(scielo_issn=issue.journal.scielo_issn)
             m_issue.journal = journal
         except Exception as e:
-            logger.warning(u"Erro obtendo journal com ISSN: %s, Exception: %s" % (issue.journal.scielo_issn, str(e)))
+            logger.warning(u"Erro obtendo journal com ISSN: %s, Exception: %s", issue.journal.scielo_issn, str(e))
 
         m_issue.volume = issue.volume
         m_issue.number = issue.number
@@ -263,7 +269,7 @@ def process_article(issn_collection):
 
     for article in articlemeta.articles(collection=collection, issn=issn):
 
-        logger.info(u"Adicionando artigo: %s" % article.publisher_id)
+        logger.info(u"Adicionando artigo: %s", article.publisher_id)
 
         m_article = models.Article()
 
@@ -275,17 +281,17 @@ def process_article(issn_collection):
             issue = models.Issue.objects.get(pid=article.issue.publisher_id)
             m_article.issue = issue
         except DoesNotExist as e:
-            logger.warning(u"Artigo SEM issue. publisher_id: %s" % str(article.publisher_id))
+            logger.warning(u"Artigo SEM issue. publisher_id: %s", str(article.publisher_id))
             continue
         except Exception as e:
-            logger.error(u"Erro ao tentar acessar o atributo issue do artigo: %s, Erro %s" % (str(article.publisher_id), e))
+            logger.error(u"Erro ao tentar acessar o atributo issue do artigo: %s, Erro %s", str(article.publisher_id), e)
 
         try:
             journal = models.Journal.objects.get(
                 scielo_issn=article.journal.scielo_issn)
             m_article.journal = journal
         except Exception as e:
-            logger.error(u"Erro: %s" % e)
+            logger.error(u"Erro: %s", e)
 
         m_article.title = article.original_title()
 
@@ -319,7 +325,7 @@ def process_article(issn_collection):
         try:
             m_article.order = int(article.order)
         except ValueError as e:
-            logger.error(u'Ordenação inválida: %s-%s' % (e, article.publisher_id))
+            logger.error(u'Ordenação inválida: %s-%s', e, article.publisher_id)
 
         try:
             m_article.doi = article.doi
@@ -338,7 +344,7 @@ def process_article(issn_collection):
                 m_article.authors = ['%s, %s' % (author['surname'], author['given_names']) for author in article.authors]
 
         except Exception as e:
-            logger.error(u"Erro inesperado: %s, %s" % (article.publisher_id, e))
+            logger.error(u"Erro inesperado: %s, %s", article.publisher_id, e)
             continue
 
         m_article.pid = article.publisher_id
@@ -346,10 +352,8 @@ def process_article(issn_collection):
         m_article.lpage = article.end_page
         m_article.elocation = article.elocation
 
-        try:
-            m_article.xml = article.data['article']['v702'][0]['_']
-        except (IndexError, KeyError):
-            pass
+        if article.data_model_version == 'xml':
+            m_article.xml = article.file_code(fullpath=True)
 
         pdfs = []
 
@@ -380,7 +384,7 @@ def process_volume_issue(issn):
     # Get last issue for each Journal
     journal = models.Journal.objects.get(scielo_issn=issn)
 
-    logger.info(u"Coletando fascículo de volume do periódico: %s" % journal.title)
+    logger.info(u"Coletando fascículo de volume do periódico: %s", journal.title)
 
     volume_issue = models.Issue.objects.filter(number=None).filter(type__ne='supplement').filter(type__ne='pressrelease')
 
@@ -398,18 +402,18 @@ def process_ahead(issn):
     # Get last issue for each Journal
     journal = models.Journal.objects.get(scielo_issn=issn)
 
-    logger.info(u"Coletando ahead of print do periódico: %s" % journal.title)
+    logger.info(u"Coletando ahead of print do periódico: %s", journal.title)
 
     issue = models.Issue.objects.filter(type='ahead').filter(journal=journal).order_by('-year', '-order').first()
 
     if issue:
-        logger.info(u"Fascículos do tipo ahead mais recente, ano: %s" % issue.year)
+        logger.info(u"Fascículos do tipo ahead mais recente, ano: %s", issue.year)
 
         outdated_aheads = models.Issue.objects.filter(type='ahead').filter(journal=journal).filter(_id__ne=issue.iid)
 
         logger.info(u"Alterando o tipo dos aheads antigos e mantendo o mais com o tipo 'ahead'")
         for outdated_ahead in outdated_aheads:
-            logger.info(u"Alterando o tipo do ahead ano: %s para 'outdated_ahead'" % outdated_ahead.year)
+            logger.info(u"Alterando o tipo do ahead ano: %s para 'outdated_ahead'", outdated_ahead.year)
             outdated_ahead.type = 'outdated_ahead'
             outdated_ahead.save()
 
@@ -419,11 +423,11 @@ def process_ahead(issn):
             article_in_ahead.append(article.id)
 
         if not article_in_ahead:
-            logger.info(u"O periódico %s, não possui artigo em ahead" % journal.title)
+            logger.info(u"O periódico %s, não possui artigo em ahead", journal.title)
             issue.type = 'outdated_ahead'
             issue.save()
     else:
-        logger.info(u"O periódico %s, não possui artigo em ahead" % journal.title)
+        logger.info(u"O periódico %s, não possui artigo em ahead", journal.title)
 
 
 def process_last_issue(issn):
@@ -435,7 +439,7 @@ def process_last_issue(issn):
     # Get last issue for each Journal
     journal = models.Journal.objects.get(scielo_issn=issn)
 
-    logger.info(u"Recuperando último fascículo journal: %s" % journal.title)
+    logger.info(u"Recuperando último fascículo journal: %s", journal.title)
 
     issue = models.Issue.objects.filter(journal=journal).filter(type__ne='ahead').order_by('-year', '-order').first()
     issue_count = models.Issue.objects.filter(journal=journal).count()
@@ -474,7 +478,7 @@ def process_last_issue(issn):
         journal.issue_count = issue_count
         journal.save()
     else:
-        logger.info(u"Impossível recuperar o último fascículo para o períodico: %s" % journal.title)
+        logger.info(u"Impossível recuperar o último fascículo para o períodico: %s", journal.title)
 
 
 def process_articles_ssm(issn):
@@ -483,27 +487,30 @@ def process_articles_ssm(issn):
 
     journal = models.Journal.objects.get(scielo_issn=issn)
 
-    logger.info(u"Enviando os artigos do periódico: {0} para SSM".format(journal.title))
+    logger.info(u"Enviando os artigos do periódico: %s para SSM", journal.title)
 
     for article in models.Article.objects.filter(journal=journal):
 
         article.htmls = []
         article.save()
 
-        try:
-            if article.xml:
-                # O caminho deve ser até o acrônimo do periódico.
-                filename = os.path.join(config.ARTICLE_FILE_PATH, article.xml)
-                try:
-                    fp = open(filename)
-                except IOError:
-                    logger.error(u"Erro ao tentar coletar o arquivo {0}".format(filename))
-                    continue
+        if article.xml:
+            # O caminho deve ser até o acrônimo do periódico.
+            filename = os.path.join(config.ARTICLE_FILE_PATH, article.xml)
+
+            try:
+                fp = open(filename)
+            except IOError:
+                logger.error(u"Erro ao tentar coletar o arquivo %s", filename)
+                continue
+
+            try:
 
                 list_dict_html = []
                 xml_etree = etree.parse(StringIO(fp.read()))
 
                 client_ssm = client.Client()
+
 
                 for lang, output in packtools.HTMLGenerator.parse(xml_etree, valid_only=False):
                     dict_htmls = {}
@@ -513,16 +520,20 @@ def process_articles_ssm(issn):
 
                     dict_htmls['lang'] = lang
 
-                    filename = os.path.basename(getattr(fp, 'name', None)).split('.')
+                    metadata = json.dumps({'lang': lang,
+                                           'issue': article.issue.legend,
+                                           'title': article.title,
+                                           'journal': article.journal.title,
+                                           'pid': article.pid})
+
+                    file_path, _ = os.path.splitext(getattr(fp, 'name', None))
+
+                    filename = os.path.basename(file_path)
 
                     ssm_push_id = client_ssm.add_asset(pfile=StringIO(source),
-                                                       filename=utils.generate_filename(filename[0], lang, 'html'),
+                                                       filename=utils.generate_filename(filename, 'html', lang),
                                                        filetype='html',
-                                                       metadata={'lang': lang,
-                                                       'issue': article.issue.legend,
-                                                       'title': article.title,
-                                                       'journal': article.journal.title,
-                                                       'pid': article.pid})
+                                                       metadata=metadata)
 
                     time.sleep(3)
 
@@ -534,14 +545,15 @@ def process_articles_ssm(issn):
 
                 article.htmls = list_dict_html
 
+                metadata = json.dumps({'issue': article.issue.legend,
+                                       'title': article.title,
+                                       'journal': article.journal.title,
+                                       'pid': article.pid})
+
                 ssm_push_id = client_ssm.add_asset(pfile=StringIO(source),
-                                                   filename=utils.generate_filename(filename[0], lang, 'xml'),
+                                                   filename=utils.generate_filename(filename, 'xml'),
                                                    filetype='xml',
-                                                   metadata={'lang': lang,
-                                                   'issue': article.issue.legend,
-                                                   'title': article.title,
-                                                   'journal': article.journal.title,
-                                                   'pid': article.pid})
+                                                   metadata=metadata)
 
                 time.sleep(3)
 
@@ -551,9 +563,9 @@ def process_articles_ssm(issn):
 
                 article.save()
 
-        except Exception as e:
-            logger.error(u"Erro ao tentar transformar artigo: %s, erro: %s" % (article.pid, e))
-            pass
+            except Exception as e:
+                logger.error(u"Erro ao tentar transformar artigo: %s, erro: %s", article.pid, e)
+                pass
 
 
 def bulk(options, pool):
@@ -580,10 +592,11 @@ def bulk(options, pool):
     issns_list = utils.split_list(issns, options.process)
 
     for _, pissns in enumerate(issns_list):
-        logger.info(u"Enviando para processamento os issns: %s" % pissns)
+        logger.info(u"Enviando para processamento os issns: %s", pissns)
         pool.map(process_journal, pissns)
         pool.map(process_issue, pissns)
         pool.map(process_article, pissns)
+        poll.map(process_article(pissns))
 
 
 def serial(options):
@@ -619,7 +632,7 @@ def serial(options):
 
 def run(options, pool):
 
-    logger.info(u'Coleção alvo: %s' % options.collection)
+    logger.info(u'Coleção alvo: %s', options.collection)
     logger.debug(u'Articles Meta API: %s, at port: %s', config.ARTICLE_META_THRIFT_DOMAIN, config.ARTICLE_META_THRIFT_PORT)
     if config.MONGODB_USER and config.MONGODB_PASS:
         logger.debug(u'Conexão e credenciais do banco: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS))
@@ -639,7 +652,7 @@ def run(options, pool):
     logger.info(u'Finalização do processo: %s', finished)
 
     elapsed_time = str(finished - started)
-    logger.info(u"Tempo total de processamento: %s sec." % elapsed_time)
+    logger.info(u"Tempo total de processamento: %s sec.", elapsed_time)
 
     logger.info(U"Processamento finalizado com sucesso.")
     pool.close()
