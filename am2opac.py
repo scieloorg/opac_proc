@@ -4,7 +4,6 @@
 import os
 import sys
 import time
-import json
 import signal
 import textwrap
 import optparse
@@ -520,11 +519,11 @@ def process_articles_ssm(issn):
 
                     dict_htmls['lang'] = lang
 
-                    metadata = json.dumps({'lang': lang,
-                                           'issue': article.issue.legend,
-                                           'title': article.title,
-                                           'journal': article.journal.title,
-                                           'pid': article.pid})
+                    metadata = {'lang': lang,
+                                'issue': article.issue.legend,
+                                'title': article.title,
+                                'journal': article.journal.title,
+                                'pid': article.pid}
 
                     file_path, _ = os.path.splitext(getattr(fp, 'name', None))
 
@@ -545,10 +544,10 @@ def process_articles_ssm(issn):
 
                 article.htmls = list_dict_html
 
-                metadata = json.dumps({'issue': article.issue.legend,
-                                       'title': article.title,
-                                       'journal': article.journal.title,
-                                       'pid': article.pid})
+                metadata = {'issue': article.issue.legend,
+                            'title': article.title,
+                            'journal': article.journal.title,
+                            'pid': article.pid}
 
                 ssm_push_id = client_ssm.add_asset(pfile=StringIO(source),
                                                    filename=utils.generate_filename(filename, 'xml'),
