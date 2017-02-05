@@ -41,7 +41,7 @@ services:
         - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
         - OPAC_PROC_WEBAPP_VERSION=${OPAC_PROC_WEBAPP_VERSION}    # export OPAC_PROC_WEBAPP_VERSION="v0.1.0-dev"
     command: /start_worker.sh
-    # user: nobody
+    user: nobody
     restart: always
     hostname: opac-proc-webapp
     depends_on:
@@ -63,7 +63,7 @@ services:
       - OPAC_PROC_DEBUG=True
       - OPAC_PROC_TESTING=False
       - OPAC_PROC_SECRET_KEY="s3cr3t-k3y"
-      - OPAC_PROC_SENTRY_DSN=https://71f6ea0d8a3b4058b836382ee3b6f8c7:b4a7ae8289bf448790c28d099b2e0814@homolog.sentry.scielo.org/7
+      # - OPAC_PROC_SENTRY_DSN=
       # mongo processamento
       - OPAC_PROC_MONGODB_NAME=opac_proc
       - OPAC_PROC_MONGODB_HOST=mongo-proc
@@ -94,7 +94,7 @@ services:
         - OPAC_PROC_BUILD_DATE=${OPAC_PROC_BUILD_DATE}            # export OPAC_PROC_BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
         - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
         - OPAC_PROC_WEBAPP_VERSION=${OPAC_PROC_WEBAPP_VERSION}    # export OPAC_PROC_WEBAPP_VERSION="v0.1.0-dev"
-    # user: nobody
+    user: nobody
     restart: always
     hostname: opac-proc-webapp
     depends_on:
@@ -118,7 +118,7 @@ services:
       - OPAC_PROC_DEBUG=True
       - OPAC_PROC_TESTING=False
       - OPAC_PROC_SECRET_KEY="s3cr3t-k3y"
-      - OPAC_PROC_SENTRY_DSN=https://71f6ea0d8a3b4058b836382ee3b6f8c7:b4a7ae8289bf448790c28d099b2e0814@homolog.sentry.scielo.org/7
+      # - OPAC_PROC_SENTRY_DSN=
       # mongo processamento
       - OPAC_PROC_MONGODB_NAME=opac_proc
       - OPAC_PROC_MONGODB_HOST=mongo-proc

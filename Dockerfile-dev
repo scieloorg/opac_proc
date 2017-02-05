@@ -34,7 +34,7 @@ RUN sed -i 's/\r//' /start_worker.sh \
     && chown nobody /start_worker.sh
 
 RUN chown -R nobody:nogroup /app
-# USER nobody
+USER nobody
 
 EXPOSE 8000
 WORKDIR /app
