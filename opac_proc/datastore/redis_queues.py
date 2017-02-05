@@ -1,7 +1,13 @@
 # coding: utf-8
-
+import os
+import sys
 from redis import Redis
 from rq import Queue
+
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.append(PROJECT_PATH)
+
+from opac_proc.web import config
 
 
 class Singleton(object):
@@ -61,7 +67,7 @@ class RQueues(Singleton):
         if redis_conn:
             self.redis_conn = redis_conn
         else:
-            self.redis_conn = Redis()  # usar configuarção
+            self.redis_conn = Redis(**config.REDIS_SETTINGS)
 
     def create_queue(self, stage, model):
         queue = self.queues[stage][model]

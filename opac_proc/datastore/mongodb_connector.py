@@ -26,10 +26,12 @@ def get_opac_logs_db_name():
 
 def get_db_connection():
     if config.MONGODB_USER and config.MONGODB_PASS:
-        msg = u'Iniciando conexão - com credenciais do banco: mongo://{username}:{password}@{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS)
+        msg = u'Iniciando conexão - com credenciais do banco: mongo://{username}:{password}@{host}:{port}/{db}'.format(
+            **config.MONGODB_SETTINGS)
         logger.debug(msg)
     else:
-        msg = u'Iniciando conexão - sem credenciais do banco: mongo://{host}:{port}/{db}'.format(**config.MONGODB_SETTINGS)
+        msg = u'Iniciando conexão - sem credenciais do banco: mongo://{host}:{port}/{db}'.format(
+            **config.MONGODB_SETTINGS)
         logger.debug(msg)
     try:
         db = connect(**config.MONGODB_SETTINGS)
@@ -48,15 +50,46 @@ def register_connections():
     opac_proc_db_name = get_opac_proc_db_name()
     logger.debug(u'Registrando conexão - {db}: mongo://{host}:{port}/{db}'.format(
         **config.MONGODB_SETTINGS))
-    register_connection(opac_proc_db_name, opac_proc_db_name)
+
+    opac_proc_connection = {
+        'name': opac_proc_db_name,
+        'host': config.MONGODB_SETTINGS['host'],
+        'port': config.MONGODB_SETTINGS['port'],
+    }
+    if 'username' in config.MONGODB_SETTINGS and 'password' in config.MONGODB_SETTINGS:
+        opac_proc_connection['username'] = config.MONGODB_SETTINGS['username']
+        opac_proc_connection['password'] = config.MONGODB_SETTINGS['password']
+
+    register_connection(opac_proc_db_name, **opac_proc_connection)
 
     # OPAC WEBAPP
-    opac_db_name = get_opac_webapp_db_name()
+    opac_webapp_db_name = get_opac_webapp_db_name()
     logger.debug(u'Registrando conexão - {db}: mongo://{host}:{port}/{db}'.format(
         **config.OPAC_MONGODB_SETTINGS))
-    register_connection(opac_db_name, opac_db_name)
+
+    opac_webapp_connection = {
+        'name': opac_webapp_db_name,
+        'host': config.OPAC_MONGODB_SETTINGS['host'],
+        'port': config.OPAC_MONGODB_SETTINGS['port'],
+    }
+
+    if 'username' in config.OPAC_MONGODB_SETTINGS and 'password' in config.OPAC_MONGODB_SETTINGS:
+        opac_webapp_connection['username'] = config.OPAC_MONGODB_SETTINGS['username']
+        opac_webapp_connection['password'] = config.OPAC_MONGODB_SETTINGS['password']
+    register_connection(opac_webapp_db_name, **opac_webapp_connection)
 
     # OPAC PROC LOGS
     opac_logs_db_name = get_opac_logs_db_name()
-    logger.debug(u'Registrando conexão de logs - {db}'.format(db=opac_logs_db_name))
-    register_connection(opac_logs_db_name, opac_logs_db_name)
+    logger.debug(u'Registrando conexão - {db}: mongo://{host}:{port}/{db}'.format(
+        **config.OPAC_PROC_LOG_MONGODB_SETTINGS))
+
+    opac_logs_connection = {
+        'name': opac_logs_db_name,
+        'host': config.OPAC_PROC_LOG_MONGODB_SETTINGS['host'],
+        'port': config.OPAC_PROC_LOG_MONGODB_SETTINGS['port'],
+    }
+
+    if 'username' in config.OPAC_PROC_LOG_MONGODB_SETTINGS and 'password' in config.OPAC_PROC_LOG_MONGODB_SETTINGS:
+        opac_logs_connection['username'] = config.OPAC_PROC_LOG_MONGODB_SETTINGS['username']
+        opac_logs_connection['password'] = config.OPAC_PROC_LOG_MONGODB_SETTINGS['password']
+    register_connection(opac_logs_db_name, **opac_logs_connection)
