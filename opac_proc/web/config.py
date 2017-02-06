@@ -88,3 +88,8 @@ if OPAC_PROC_LOG_MONGODB_USER and OPAC_PROC_LOG_MONGODB_PASS:
 
 
 from redis_config import *  # noqa
+
+
+OPAC_PROC_BUILD_DATE = os.environ.get('OPAC_PROC_BUILD_DATE', None)
+OPAC_PROC_VCS_REF = os.environ.get('OPAC_PROC_VCS_REF', None)
+OPAC_PROC_WEBAPP_VERSION = os.environ.get('OPAC_PROC_WEBAPP_VERSION', None)
