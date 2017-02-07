@@ -595,7 +595,6 @@ def bulk(options, pool):
         pool.map(process_journal, pissns)
         pool.map(process_issue, pissns)
         pool.map(process_article, pissns)
-        poll.map(process_article(pissns))
 
 
 def serial(options):
