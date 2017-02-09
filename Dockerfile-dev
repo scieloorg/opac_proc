@@ -1,4 +1,5 @@
 FROM python:2.7
+# FROM python:2.7-alpine  # temos que trocar a imagem base para alpine
 ENV PYTHONUNBUFFERED 1
 ENV DEBIAN_FRONTEND noninteractive
 # Build-time metadata as defined at http://label-schema.org
@@ -11,17 +12,19 @@ ENV OPAC_PROC_VCS_REF ${OPAC_PROC_VCS_REF}
 ENV OPAC_PROC_WEBAPP_VERSION ${OPAC_PROC_WEBAPP_VERSION}
 
 LABEL org.label-schema.build-date=$OPAC_PROC_BUILD_DATE \
-      org.label-schema.name="OPAC WebApp - development build" \
-      org.label-schema.description="OPAC WebApp main app" \
-      org.label-schema.url="https://github.com/scieloorg/opac/" \
+      org.label-schema.name="OPAC Proc - development build" \
+      org.label-schema.description="OPAC Proc main app" \
+      org.label-schema.url="https://github.com/scieloorg/opac_proc/" \
       org.label-schema.vcs-ref=$OPAC_PROC_VCS_REF \
-      org.label-schema.vcs-url="https://github.com/scieloorg/opac/" \
+      org.label-schema.vcs-url="https://github.com/scieloorg/opac_proc/" \
       org.label-schema.vendor="SciELO" \
       org.label-schema.version=$OPAC_PROC_WEBAPP_VERSION \
       org.label-schema.schema-version="1.0"
 
+# pacotes necessários para instalar as deps no alpine. ainda faltam deps para grpc
 # RUN apk --update add --no-cache \
-#     git gcc build-base libxml2 libxml2-dev libxml2-utils
+#     git gcc build-base linux-headers musl-dev python-dev \
+#     libxml2 libxml2-dev libxml2-utils libxslt-dev py-lxml
 RUN apt-get update && apt-get install -qqy apt-utils libxml2-utils
 
 COPY ./requirements.txt /app/requirements.txt
@@ -39,4 +42,4 @@ USER nobody
 EXPOSE 8000
 WORKDIR /app
 
-CMD gunicorn --workers 3 --bind 0.0.0.0:8000 webapp:app --chdir=opac_proc/web/ --log-level INFO
+CMD gunicorn --workers 3 --bind 0.0.0.0:8000 webapp:app --chdir=opac_proc/web/ --log-level DEBUG

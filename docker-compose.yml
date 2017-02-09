@@ -1,32 +1,143 @@
 version: '2'
 
-networks:
-   opac-network:
-    external: true
-
 services:
 
-    opac_mongo:
-        image: mongo
-        restart: always
-        ports:
-          - "27017:27017"
-        hostname: opac-mongo
-        networks:
-            - opac-network
+  mongo-proc:
+    image: mongo:latest
+    restart: always
+    user: mongodb
+    hostname: mongo-proc
+    ports:
+        - 27017
+    volumes:
+        - /etc/localtime:/etc/localtime:ro
 
-    opac_proc:
-        image: scieloorg/opac_proc
-        restart: on-failure:3
-        volumes:
-            - /tmp/opac_proc_logs:/app/logs
-        links:
-            - opac_mongo:opac-mongo
-        environment:
-            - OPAC_PROC_COLLECTION=spa
-            - OPAC_PROC_MONGODB_HOST=opac-mongo
-            - OPAC_PROC_MONGODB_PORT=27017
-            - OPAC_PROC_MONGODB_NAME=opac_db
-            - OPAC_PROC_LOG_LEVEL=DEBUG
-        networks:
-            - opac-network
+  mongo-logs:
+    image: mongo:latest
+    restart: always
+    user: mongodb
+    hostname: mongo-logs
+    ports:
+        - 27017
+    volumes:
+        - /etc/localtime:/etc/localtime:ro
+
+  redis:
+    image: redis:alpine
+    user: redis
+    restart: always
+    hostname: opac-proc-redis
+    ports:
+        - "6379:6379"  # deve ser o mesmo que a env var: OPAC_PROC_REDIS_PORT
+    volumes:
+      - ./redis-data-dev:/data
+      - /etc/localtime:/etc/localtime:ro
+
+  rq-worker:
+    build:
+      context: .
+      args:
+        - OPAC_PROC_BUILD_DATE=${OPAC_PROC_BUILD_DATE}            # export OPAC_PROC_BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+        - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
+        - OPAC_PROC_WEBAPP_VERSION=${OPAC_PROC_WEBAPP_VERSION}    # export OPAC_PROC_WEBAPP_VERSION="v0.1.0-dev"
+    command: /start_worker.sh
+    user: nobody
+    restart: always
+    hostname: opac-proc-webapp
+    depends_on:
+      - mongo-proc
+      - mongo-logs
+      - redis
+    links:
+      - mongo-proc:mongo-proc
+      - mongo-logs:mongo-logs
+      - redis:redis
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - .:/app
+    environment:
+      - OPAC_PROC_LOG_LEVEL=DEBUG
+      - OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN=articlemeta.scielo.org
+      - OPAC_PROC_ARTICLE_META_THRIFT_PORT=11620
+      - OPAC_PROC_COLLECTION=spa
+      - OPAC_PROC_DEBUG=True
+      - OPAC_PROC_TESTING=False
+      - OPAC_PROC_SECRET_KEY="s3cr3t-k3y"
+      # - OPAC_PROC_SENTRY_DSN=
+      # mongo processamento
+      - OPAC_PROC_MONGODB_NAME=opac_proc
+      - OPAC_PROC_MONGODB_HOST=mongo-proc
+      - OPAC_PROC_MONGODB_PORT=27017
+      # - OPAC_PROC_MONGODB_USER=
+      # - OPAC_PROC_MONGODB_PASS=
+      # mongo db do opac
+      - OPAC_MONGODB_NAME=${OPAC_MONGODB_NAME}  # nome do banco mongo do OPAC
+      - OPAC_MONGODB_HOST=${OPAC_MONGODB_HOST}  # host do banco mongo do OPAC
+      - OPAC_MONGODB_PORT=${OPAC_MONGODB_PORT}  # porta do banco mongo do OPAC
+      # - OPAC_MONGODB_USER=
+      # - OPAC_MONGODB_PASS=
+      # mongo logs do opac
+      - OPAC_PROC_LOG_MONGODB_NAME=opac_proc_logs
+      - OPAC_PROC_LOG_MONGODB_HOST=mongo-logs
+      - OPAC_PROC_LOG_MONGODB_PORT=27017
+      # - OPAC_PROC_LOG_MONGODB_USER=
+      # - OPAC_PROC_LOG_MONGODB_PASS=
+      # Redis:
+      - OPAC_PROC_REDIS_HOST=redis
+      - OPAC_PROC_REDIS_PORT=6379
+
+  webapp:
+    build:
+      context: .
+      args:
+        - OPAC_PROC_BUILD_DATE=${OPAC_PROC_BUILD_DATE}            # export OPAC_PROC_BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+        - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
+        - OPAC_PROC_WEBAPP_VERSION=${OPAC_PROC_WEBAPP_VERSION}    # export OPAC_PROC_WEBAPP_VERSION="v0.1.0-dev"
+    user: nobody
+    restart: always
+    hostname: opac-proc-webapp
+    depends_on:
+      - mongo-proc
+      - mongo-logs
+      - redis
+    links:
+      - mongo-proc:mongo-proc
+      - mongo-logs:mongo-logs
+      - redis:redis
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "9000:8000"
+    environment:
+      - OPAC_PROC_LOG_LEVEL=DEBUG
+      - OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN=articlemeta.scielo.org
+      - OPAC_PROC_ARTICLE_META_THRIFT_PORT=11620
+      - OPAC_PROC_COLLECTION=spa
+      - OPAC_PROC_DEBUG=True
+      - OPAC_PROC_TESTING=False
+      - OPAC_PROC_SECRET_KEY="s3cr3t-k3y"
+      # - OPAC_PROC_SENTRY_DSN=
+      # mongo processamento
+      - OPAC_PROC_MONGODB_NAME=opac_proc
+      - OPAC_PROC_MONGODB_HOST=mongo-proc
+      - OPAC_PROC_MONGODB_PORT=27017
+      # - OPAC_PROC_MONGODB_USER=
+      # - OPAC_PROC_MONGODB_PASS=
+      # mongo db do opac
+      - OPAC_MONGODB_NAME=${OPAC_MONGODB_NAME}  # nome do banco mongo do OPAC
+      - OPAC_MONGODB_HOST=${OPAC_MONGODB_HOST}  # host do banco mongo do OPAC
+      - OPAC_MONGODB_PORT=${OPAC_MONGODB_PORT}  # porta do banco mongo do OPAC
+      # - OPAC_MONGODB_USER=
+      # - OPAC_MONGODB_PASS=
+      # mongo logs do opac
+      - OPAC_PROC_LOG_MONGODB_NAME=opac_proc_logs
+      - OPAC_PROC_LOG_MONGODB_HOST=mongo-logs
+      - OPAC_PROC_LOG_MONGODB_PORT=27017
+      # - OPAC_PROC_LOG_MONGODB_USER=
+      # - OPAC_PROC_LOG_MONGODB_PASS=
+      # Redis:
+      - OPAC_PROC_REDIS_HOST=redis
+      - OPAC_PROC_REDIS_PORT=6379
+    stdin_open: True
+    tty: true
+

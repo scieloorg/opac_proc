@@ -19,7 +19,7 @@ db = MongoEngine()
 toolbar = DebugToolbarExtension()
 
 
-def create_app():
+def create_app(test_mode=False):
     app = Flask(
         __name__,
         static_url_path='/static',
@@ -29,6 +29,12 @@ def create_app():
     app.config.from_object(rq_dashboard.default_settings)
     app.config.from_object(rq_scheduler_dashboard.default_settings)
     app.config.from_pyfile('config.py')
+
+    if test_mode:
+        # sobreescrita de conf para testing
+        app.config.from_pyfile('config_testing.py')
+        app.config['TESTING'] = True
+        app.config['DEBUG'] = False
 
     app.register_blueprint(rq_scheduler_dashboard.blueprint, url_prefix='/scheduler')
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/dashboard')
