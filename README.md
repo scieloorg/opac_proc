@@ -5,13 +5,10 @@ Processamento que coleta os dados desde o Article Meta e armazena eles no MongoD
 ### Badges:
 
 [![Code Health](https://landscape.io/github/scieloorg/opac_proc/master/landscape.svg?style=flat)](https://landscape.io/github/scieloorg/opac_proc/master)
-
+[![Build Status](https://travis-ci.org/scieloorg/opac_proc.svg?branch=master)](https://travis-ci.org/scieloorg/opac_proc)
 [![Updates](https://pyup.io/repos/github/scieloorg/opac_proc/shield.svg)](https://pyup.io/repos/github/scieloorg/opac_proc/)
-
 [![Python 3](https://pyup.io/repos/github/scieloorg/opac_proc/python-3-shield.svg)](https://pyup.io/repos/github/scieloorg/opac_proc/)
-
 [![](https://images.microbadger.com/badges/image/scieloorg/opac_proc.svg)](https://microbadger.com/images/scieloorg/opac_proc "Get your own image badge on microbadger.com")
-
 [![](https://images.microbadger.com/badges/version/scieloorg/opac_proc.svg)](https://microbadger.com/images/scieloorg/opac_proc "Get your own version badge on microbadger.com")
 
 ### Pre-requisitos
