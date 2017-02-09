@@ -104,6 +104,7 @@ travis_create_opac_mongodb_container:
 	--hostname opac-mongo \
 	-p 27017:27017 \
 	-v /etc/localtime:/etc/localtime:ro \
+	-d \
 	mongo:latest
 
 
