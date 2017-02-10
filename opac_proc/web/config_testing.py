@@ -1,38 +1,31 @@
 # coding: utf-8
 
+"""
+    Copia do `config.py` com as settings para usar no testing`
+"""
+
 import os
 import datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 # log level
-OPAC_PROC_LOG_LEVEL = os.environ.get('OPAC_PROC_LOG_LEVEL', 'INFO')
+OPAC_PROC_LOG_LEVEL = 'INFO'
 # caminho absoluto (default) para o arquivo de log
-OPAC_PROC_LOG_FILE_PATH_DEFAULT = '%s/logs/%s.log' % (
+OPAC_PROC_LOG_FILE_PATH_DEFAULT = '%s/logs/testing_%s.log' % (
     HERE, datetime.datetime.now().strftime('%Y-%m-%d'))
 
 # caminho absoluto para o arquivo de log
-OPAC_PROC_LOG_FILE_PATH = os.environ.get(
-    'OPAC_PROC_LOG_FILE_PATH',
-    OPAC_PROC_LOG_FILE_PATH_DEFAULT)
-
-# host e porta para conectar na API Thrift do Article meta ----------
-ARTICLE_META_THRIFT_DOMAIN = os.environ.get(
-    'OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN',
-    'articlemeta.scielo.org')
-ARTICLE_META_THRIFT_PORT = int(os.environ.get(
-    'OPAC_PROC_ARTICLE_META_THRIFT_PORT',
-    11620))  # antes 11720
+OPAC_PROC_LOG_FILE_PATH = OPAC_PROC_LOG_FILE_PATH_DEFAULT
 
 # WEBAPP config: ----------------------------------------------------
-DEBUG = bool(os.environ.get('OPAC_PROC_DEBUG', True))
-TESTING = bool(os.environ.get('OPAC_PROC_TESTING', False))
-SECRET_KEY = os.environ.get('OPAC_PROC_SECRET_KEY', "s3cr3t-k3y")
+DEBUG = False
+TESTING = True
+SECRET_KEY = 'testing-s3cr3t-k3y'
 DEBUG_TB_INTERCEPT_REDIRECTS = False
-OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')
 
 # CONEXÃO MONGO OPAC PROC --------------------------------------------
-MONGODB_NAME = os.environ.get('OPAC_PROC_MONGODB_NAME', 'opac_proc')
+MONGODB_NAME = 'opac_proc_testing'
 MONGODB_HOST = os.environ.get('OPAC_PROC_MONGODB_HOST', 'localhost')
 MONGODB_PORT = os.environ.get('OPAC_PROC_MONGODB_PORT', 27017)
 MONGODB_USER = os.environ.get('OPAC_PROC_MONGODB_USER', None)
@@ -49,7 +42,7 @@ if MONGODB_USER and MONGODB_PASS:
     MONGODB_SETTINGS['password'] = MONGODB_PASS
 
 # CONEXÃO MONGO OPAC WEB APP -----------------------------------------
-OPAC_MONGODB_NAME = os.environ.get('OPAC_MONGODB_NAME', 'opac')
+OPAC_MONGODB_NAME = 'opac_testing'
 OPAC_MONGODB_HOST = os.environ.get('OPAC_MONGODB_HOST', 'localhost')
 OPAC_MONGODB_PORT = os.environ.get('OPAC_MONGODB_PORT', 27017)
 OPAC_MONGODB_USER = os.environ.get('OPAC_MONGODB_USER', None)
@@ -65,8 +58,9 @@ if OPAC_MONGODB_USER and OPAC_MONGODB_PASS:
     OPAC_MONGODB_SETTINGS['username'] = OPAC_MONGODB_USER
     OPAC_MONGODB_SETTINGS['password'] = OPAC_MONGODB_PASS
 
+
 # CONEXÃO MONGO OPAC PROC LOGS ---------------------------------------
-OPAC_PROC_LOG_MONGODB_NAME = os.environ.get('OPAC_PROC_LOG_MONGODB_NAME', 'opac_proc_logs')
+OPAC_PROC_LOG_MONGODB_NAME = 'opac_proc_logs_testing'
 OPAC_PROC_LOG_MONGODB_HOST = os.environ.get('OPAC_PROC_LOG_MONGODB_HOST', 'localhost')
 OPAC_PROC_LOG_MONGODB_PORT = os.environ.get('OPAC_PROC_LOG_MONGODB_PORT', 27017)
 OPAC_PROC_LOG_MONGODB_USER = os.environ.get('OPAC_PROC_LOG_MONGODB_USER', None)
@@ -81,37 +75,3 @@ OPAC_PROC_LOG_MONGODB_SETTINGS = {
 if OPAC_PROC_LOG_MONGODB_USER and OPAC_PROC_LOG_MONGODB_PASS:
     OPAC_PROC_LOG_MONGODB_SETTINGS['username'] = OPAC_PROC_LOG_MONGODB_USER
     OPAC_PROC_LOG_MONGODB_SETTINGS['password'] = OPAC_PROC_LOG_MONGODB_PASS
-
-# REDIS CONNECTION ---------------------------------------------
-REDIS_HOST = os.environ.get('OPAC_PROC_REDIS_HOST', 'localhost')
-REDIS_PORT = int(os.environ.get('OPAC_PROC_REDIS_PORT', 6379))
-REDIS_PASSWORD = os.environ.get('OPAC_PROC_REDIS_PASSWORD', None)
-
-REDIS_SETTINGS = {
-    'host': REDIS_HOST,
-    'port': REDIS_PORT,
-    'password': REDIS_PASSWORD,
-}
-
-QUEUES = [
-    'qex_collections',
-    'qex_journals',
-    'qex_issues',
-    'qex_articles',
-    'qtr_collections',
-    'qtr_journals',
-    'qtr_issues',
-    'qtr_articles',
-    'qlo_collections',
-    'qlo_journals',
-    'qlo_issues',
-    'qlo_article'
-]
-
-# Sentry -------------------------------------------------------
-SENTRY_DSN = os.environ.get('OPAC_PROC_SENTRY_DSN', None)
-
-# Build Args ---------------------------------------------------
-OPAC_PROC_BUILD_DATE = os.environ.get('OPAC_PROC_BUILD_DATE', None)
-OPAC_PROC_VCS_REF = os.environ.get('OPAC_PROC_VCS_REF', None)
-OPAC_PROC_WEBAPP_VERSION = os.environ.get('OPAC_PROC_WEBAPP_VERSION', None)

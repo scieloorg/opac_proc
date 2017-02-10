@@ -8,7 +8,7 @@ services:
     user: mongodb
     hostname: mongo-proc
     ports:
-        - 27017
+        - "27027:27017"
     volumes:
         - /etc/localtime:/etc/localtime:ro
 
@@ -18,7 +18,7 @@ services:
     user: mongodb
     hostname: mongo-logs
     ports:
-        - 27017
+        - "27037:27017"
     volumes:
         - /etc/localtime:/etc/localtime:ro
 
@@ -28,7 +28,7 @@ services:
     restart: always
     hostname: opac-proc-redis
     ports:
-        - "6379:6379"  # deve ser o mesmo que a env var: OPAC_PROC_REDIS_PORT
+        - "6379:6379"
     volumes:
       - ./redis-data-dev:/data
       - /etc/localtime:/etc/localtime:ro
@@ -36,6 +36,7 @@ services:
   rq-worker:
     build:
       context: .
+      dockerfile: ./Dockerfile-dev
       args:
         - OPAC_PROC_BUILD_DATE=${OPAC_PROC_BUILD_DATE}            # export OPAC_PROC_BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
         - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
@@ -89,6 +90,7 @@ services:
   webapp:
     build:
       context: .
+      dockerfile: ./Dockerfile-dev
       args:
         - OPAC_PROC_BUILD_DATE=${OPAC_PROC_BUILD_DATE}            # export OPAC_PROC_BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
         - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
@@ -106,6 +108,7 @@ services:
       - redis:redis
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - .:/app
     ports:
       - "9000:8000"
     environment:

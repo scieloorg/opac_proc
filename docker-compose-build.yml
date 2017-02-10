@@ -8,7 +8,7 @@ services:
     user: mongodb
     hostname: mongo-proc
     ports:
-        - 27017
+        - "27027:27017"
     volumes:
         - /etc/localtime:/etc/localtime:ro
 
@@ -18,7 +18,7 @@ services:
     user: mongodb
     hostname: mongo-logs
     ports:
-        - 27017
+        - "27037:27017"
     volumes:
         - /etc/localtime:/etc/localtime:ro
 
@@ -28,7 +28,7 @@ services:
     restart: always
     hostname: opac-proc-redis
     ports:
-        - "6379:6379"  # deve ser o mesmo que a env var: OPAC_PROC_REDIS_PORT
+        - "6379:6379"
     volumes:
       - ./redis-data-dev:/data
       - /etc/localtime:/etc/localtime:ro
@@ -63,25 +63,18 @@ services:
       - OPAC_PROC_DEBUG=True
       - OPAC_PROC_TESTING=False
       - OPAC_PROC_SECRET_KEY="s3cr3t-k3y"
-      # - OPAC_PROC_SENTRY_DSN=
       # mongo processamento
       - OPAC_PROC_MONGODB_NAME=opac_proc
       - OPAC_PROC_MONGODB_HOST=mongo-proc
       - OPAC_PROC_MONGODB_PORT=27017
-      # - OPAC_PROC_MONGODB_USER=
-      # - OPAC_PROC_MONGODB_PASS=
       # mongo db do opac
       - OPAC_MONGODB_NAME=${OPAC_MONGODB_NAME}  # nome do banco mongo do OPAC
       - OPAC_MONGODB_HOST=${OPAC_MONGODB_HOST}  # host do banco mongo do OPAC
       - OPAC_MONGODB_PORT=${OPAC_MONGODB_PORT}  # porta do banco mongo do OPAC
-      # - OPAC_MONGODB_USER=
-      # - OPAC_MONGODB_PASS=
       # mongo logs do opac
       - OPAC_PROC_LOG_MONGODB_NAME=opac_proc_logs
       - OPAC_PROC_LOG_MONGODB_HOST=mongo-logs
       - OPAC_PROC_LOG_MONGODB_PORT=27017
-      # - OPAC_PROC_LOG_MONGODB_USER=
-      # - OPAC_PROC_LOG_MONGODB_PASS=
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
@@ -106,6 +99,7 @@ services:
       - redis:redis
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - .:/app
     ports:
       - "9000:8000"
     environment:

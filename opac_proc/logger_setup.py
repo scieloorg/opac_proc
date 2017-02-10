@@ -28,16 +28,8 @@ def getMongoLogger(name, level='INFO', process_stage='default'):
     logging_level = allowed_levels.get(level, config.OPAC_PROC_LOG_LEVEL)
     logger.setLevel(logging_level)
 
-    mongo_settings = {
-        'collection': "%s_log" % process_stage,
-        'db': config.OPAC_PROC_LOG_MONGODB_NAME,
-        'host': config.MONGODB_SETTINGS['host'],
-        'port': config.MONGODB_SETTINGS['port'],
-    }
-    if 'username' in config.MONGODB_SETTINGS.keys() and 'password' in config.MONGODB_SETTINGS.keys():
-        mongo_settings['username'] = config.MONGODB_SETTINGS['username']
-        mongo_settings['password'] = config.MONGODB_SETTINGS['password']
-
+    mongo_settings = config.OPAC_PROC_LOG_MONGODB_SETTINGS
+    mongo_settings['collection'] = "%s_log" % process_stage
     mongo_handler = MongoHandler.to(**mongo_settings)
     logger.addHandler(mongo_handler)
     return logger
