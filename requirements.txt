@@ -14,7 +14,7 @@ mongolog==0.1.1
 -e git+https://git@github.com/scieloorg/legendarium@v0.1.3#egg=legendarium
 -e git+https://github.com/scieloorg/scieloh5m5@1.3.4#egg=scieloh5m5
 requests==2.13.0
-Flask-DebugToolbar==0.10.0
+Flask-DebugToolbar==0.10.1
 Flask-WTF==0.14.2
 gunicorn==19.6.0
 itsdangerous==0.24
