@@ -27,6 +27,11 @@ class ExtractArticleDetailView(DetailView):
     page_title = u'Extract Article Detail'
 
 
+class ExtractPressReleaseDetailView(DetailView):
+    model_class = models.ExtractPressRelease
+    page_title = u'Extract Press Release Detail'
+
+
 class ExtractLogDetailView(DetailView):
     model_class = models.ExtractLog
     page_title = u'Extract Log Detail'
