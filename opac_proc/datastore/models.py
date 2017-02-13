@@ -7,7 +7,6 @@ from base_mixin import BaseMixin
 
 
 class ExtractCollection(BaseMixin, DynamicDocument):
-
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -24,12 +23,12 @@ class ExtractCollection(BaseMixin, DynamicDocument):
         'collection': 'e_collection'
     }
 
+
 signals.pre_save.connect(ExtractCollection.pre_save, sender=ExtractCollection)
 signals.post_save.connect(ExtractCollection.post_save, sender=ExtractCollection)
 
 
 class ExtractJournal(BaseMixin, DynamicDocument):
-
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -46,12 +45,12 @@ class ExtractJournal(BaseMixin, DynamicDocument):
         'collection': 'e_journal'
     }
 
+
 signals.pre_save.connect(ExtractJournal.pre_save, sender=ExtractJournal)
 signals.post_save.connect(ExtractJournal.post_save, sender=ExtractJournal)
 
 
 class ExtractIssue(BaseMixin, DynamicDocument):
-
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -67,12 +66,13 @@ class ExtractIssue(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'e_issue'
     }
+
+
 signals.pre_save.connect(ExtractIssue.pre_save, sender=ExtractIssue)
 signals.post_save.connect(ExtractIssue.post_save, sender=ExtractIssue)
 
 
 class ExtractArticle(BaseMixin, DynamicDocument):
-
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -88,14 +88,38 @@ class ExtractArticle(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'e_article'
     }
+
+
 signals.pre_save.connect(ExtractArticle.pre_save, sender=ExtractArticle)
 signals.post_save.connect(ExtractArticle.post_save, sender=ExtractArticle)
+
+
+class ExtractPressReleases(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        """
+        Notificamos o modelos com este uuid que tem que ser reprocessado
+        """
+        try:
+            doc = TransformPressReleases.objects.get(uuid=uuid).first()
+        except Exception:
+            pass
+        else:
+            doc['must_reprocess'] = True
+            doc.save()
+
+    meta = {
+        'collection': 'e_press_releases'
+    }
+
+
+signals.pre_save.connect(ExtractPressReleases.pre_save, sender=ExtractPressReleases)
+signals.post_save.connect(ExtractPressReleases.post_save, sender=ExtractPressReleases)
+
 
 # #### TRANFORM MODELS
 
 
 class TransformCollection(BaseMixin, DynamicDocument):
-
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -111,12 +135,13 @@ class TransformCollection(BaseMixin, DynamicDocument):
     meta = {
         'collection': 't_collection'
     }
+
+
 signals.pre_save.connect(TransformCollection.pre_save, sender=TransformCollection)
 signals.post_save.connect(TransformCollection.post_save, sender=TransformCollection)
 
 
 class TransformJournal(BaseMixin, DynamicDocument):
-
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -132,12 +157,13 @@ class TransformJournal(BaseMixin, DynamicDocument):
     meta = {
         'collection': 't_journal'
     }
+
+
 signals.pre_save.connect(TransformJournal.pre_save, sender=TransformJournal)
 signals.post_save.connect(TransformJournal.post_save, sender=TransformJournal)
 
 
 class TransformIssue(BaseMixin, DynamicDocument):
-
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -153,12 +179,13 @@ class TransformIssue(BaseMixin, DynamicDocument):
     meta = {
         'collection': 't_issue'
     }
+
+
 signals.pre_save.connect(TransformIssue.pre_save, sender=TransformIssue)
 signals.post_save.connect(TransformIssue.post_save, sender=TransformIssue)
 
 
 class TransformArticle(BaseMixin, DynamicDocument):
-
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -174,8 +201,32 @@ class TransformArticle(BaseMixin, DynamicDocument):
     meta = {
         'collection': 't_article'
     }
+
+
 signals.pre_save.connect(TransformArticle.pre_save, sender=TransformArticle)
 signals.post_save.connect(TransformArticle.post_save, sender=TransformArticle)
+
+
+class TransformPressReleases(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        """
+        Notificamos o modelos com este uuid que tem que ser reprocessado
+        """
+        try:
+            doc = LoadPressReleases.objects.get(uuid=uuid).first()
+        except Exception:
+            pass
+        else:
+            doc['must_reprocess'] = True
+            doc.save()
+
+    meta = {
+        'collection': 't_press_releases'
+    }
+
+
+signals.pre_save.connect(TransformPressReleases.pre_save, sender=TransformPressReleases)
+signals.post_save.connect(TransformPressReleases.post_save, sender=TransformPressReleases)
 
 
 # #### LOAD MODELS
@@ -185,6 +236,8 @@ class LoadCollection(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'l_collection'
     }
+
+
 signals.pre_save.connect(LoadCollection.pre_save, sender=LoadCollection)
 signals.post_save.connect(LoadCollection.post_save, sender=LoadCollection)
 
@@ -193,6 +246,8 @@ class LoadJournal(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'l_journal'
     }
+
+
 signals.pre_save.connect(LoadJournal.pre_save, sender=LoadJournal)
 signals.post_save.connect(LoadJournal.post_save, sender=LoadJournal)
 
@@ -201,6 +256,8 @@ class LoadIssue(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'l_issue'
     }
+
+
 signals.pre_save.connect(LoadIssue.pre_save, sender=LoadIssue)
 signals.post_save.connect(LoadIssue.post_save, sender=LoadIssue)
 
@@ -209,8 +266,20 @@ class LoadArticle(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'l_article'
     }
+
+
 signals.pre_save.connect(LoadArticle.pre_save, sender=LoadArticle)
 signals.post_save.connect(LoadArticle.post_save, sender=LoadArticle)
+
+
+class LoadPressReleases(BaseMixin, DynamicDocument):
+    meta = {
+        'collection': 'l_press_releases'
+    }
+
+
+signals.pre_save.connect(LoadPressReleases.pre_save, sender=LoadPressReleases)
+signals.post_save.connect(LoadPressReleases.post_save, sender=LoadPressReleases)
 
 
 # #### LOGS
