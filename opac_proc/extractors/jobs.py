@@ -90,7 +90,7 @@ def task_process_all_journals():
     collection = models.ExtractCollection.objects.all().first()
 
     for child in collection.children_ids:
-        r_queues.enqueue(stage, 'collection', task_extract_journal, collection.acronym, child['issn'])
+        r_queues.enqueue(stage, 'journal', task_extract_journal, collection.acronym, child['issn'])
 
 # Issues:
 
