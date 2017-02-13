@@ -94,13 +94,13 @@ signals.pre_save.connect(ExtractArticle.pre_save, sender=ExtractArticle)
 signals.post_save.connect(ExtractArticle.post_save, sender=ExtractArticle)
 
 
-class ExtractPressReleases(BaseMixin, DynamicDocument):
+class ExtractPressRelease(BaseMixin, DynamicDocument):
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = TransformPressReleases.objects.get(uuid=uuid).first()
+            doc = TransformPressRelease.objects.get(uuid=uuid).first()
         except Exception:
             pass
         else:
@@ -108,12 +108,12 @@ class ExtractPressReleases(BaseMixin, DynamicDocument):
             doc.save()
 
     meta = {
-        'collection': 'e_press_releases'
+        'collection': 'e_press_release'
     }
 
 
-signals.pre_save.connect(ExtractPressReleases.pre_save, sender=ExtractPressReleases)
-signals.post_save.connect(ExtractPressReleases.post_save, sender=ExtractPressReleases)
+signals.pre_save.connect(ExtractPressRelease.pre_save, sender=ExtractPressRelease)
+signals.post_save.connect(ExtractPressRelease.post_save, sender=ExtractPressRelease)
 
 
 # #### TRANFORM MODELS
@@ -207,13 +207,13 @@ signals.pre_save.connect(TransformArticle.pre_save, sender=TransformArticle)
 signals.post_save.connect(TransformArticle.post_save, sender=TransformArticle)
 
 
-class TransformPressReleases(BaseMixin, DynamicDocument):
+class TransformPressRelease(BaseMixin, DynamicDocument):
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = LoadPressReleases.objects.get(uuid=uuid).first()
+            doc = LoadPressRelease.objects.get(uuid=uuid).first()
         except Exception:
             pass
         else:
@@ -221,12 +221,12 @@ class TransformPressReleases(BaseMixin, DynamicDocument):
             doc.save()
 
     meta = {
-        'collection': 't_press_releases'
+        'collection': 't_press_release'
     }
 
 
-signals.pre_save.connect(TransformPressReleases.pre_save, sender=TransformPressReleases)
-signals.post_save.connect(TransformPressReleases.post_save, sender=TransformPressReleases)
+signals.pre_save.connect(TransformPressRelease.pre_save, sender=TransformPressRelease)
+signals.post_save.connect(TransformPressRelease.post_save, sender=TransformPressRelease)
 
 
 # #### LOAD MODELS
@@ -272,14 +272,14 @@ signals.pre_save.connect(LoadArticle.pre_save, sender=LoadArticle)
 signals.post_save.connect(LoadArticle.post_save, sender=LoadArticle)
 
 
-class LoadPressReleases(BaseMixin, DynamicDocument):
+class LoadPressRelease(BaseMixin, DynamicDocument):
     meta = {
-        'collection': 'l_press_releases'
+        'collection': 'l_press_release'
     }
 
 
-signals.pre_save.connect(LoadPressReleases.pre_save, sender=LoadPressReleases)
-signals.post_save.connect(LoadPressReleases.post_save, sender=LoadPressReleases)
+signals.pre_save.connect(LoadPressRelease.pre_save, sender=LoadPressRelease)
+signals.post_save.connect(LoadPressRelease.post_save, sender=LoadPressRelease)
 
 
 # #### LOGS
