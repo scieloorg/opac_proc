@@ -27,18 +27,20 @@ class RQueues(Singleton):
             'journal': 'qex_journals',
             'issue': 'qex_issues',
             'article': 'qex_articles',
+            'press_release': 'qex_press_releases',
         },
         'transform': {
             'collection': 'qtr_collections',
             'journal': 'qtr_journals',
             'issue': 'qtr_issues',
-            'article': 'qtr_articles',
+            'press_release': 'qtr_press_releases',
         },
         'load': {
             'collection': 'qlo_collections',
             'journal': 'qlo_journals',
             'issue': 'qlo_issues',
             'article': 'qlo_articles',
+            'press_release': 'qlo_press_releases',
         }
     }
 
@@ -48,18 +50,21 @@ class RQueues(Singleton):
             'journal': None,
             'issue': None,
             'article': None,
+            'press_release': None,
         },
         'transform': {
             'collection': None,
             'journal': None,
             'issue': None,
             'article': None,
+            'press_release': None,
         },
         'load': {
             'collection': None,
             'journal': None,
             'issue': None,
             'article': None,
+            'press_release': None,
         }
     }
 
