@@ -1,6 +1,5 @@
 # coding: utf-8
 import datetime
-from mongoengine.context_managers import switch_db
 from mongoengine import DoesNotExist
 from scieloh5m5 import h5m5
 
