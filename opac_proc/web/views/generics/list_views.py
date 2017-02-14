@@ -17,7 +17,7 @@ class ListView(View):
     panel_title = ''
     template_name = 'object_list/base.html'
     per_page = 20
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -344,7 +344,7 @@ class ListView(View):
             'page_title': self.page_title,
             'page_subtitle': self.page_subtitle,
             'panel_title': self.panel_title,
-            'list_colums': self.list_colums,
+            'list_columns': self.list_columns,
             # objetos:
             'objects': objects.items,
             # paginas:

@@ -30,6 +30,9 @@
             <li {% if request.path == url_for('extract_article_list') %} class="active" {% endif %}>
               <a href="{{ url_for('extract_article_list') }}">Articles</a>
             </li>
+            <li {% if request.path == url_for('extract_article_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('extract_article_list') }}">Articles</a>
+            </li>
             <li role="separator" class="divider"></li>
             <li {% if request.path == url_for('extract_logs_list') %} class="active" {% endif %}>
               <a href="{{ url_for('extract_logs_list') }}">Logs</a>

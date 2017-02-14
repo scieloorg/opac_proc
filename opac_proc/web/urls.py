@@ -84,6 +84,10 @@ url_patterns = (
                 'list_view_class': ExtractArticleListView,
                 'detail_view_class': ExtractArticleDetailView,
             },
+            'press_release': {
+                'list_view_class': ExtractPressReleaseListView,
+                'detail_view_class': ExtractPressReleaseDetailView,
+            },
             'logs': {
                 'list_view_class': ExtractLogListView,
                 'detail_view_class': ExtractLogDetailView,
