@@ -1,8 +1,8 @@
 # coding: utf-8
-from opac_proc.extractors.ex_collections import CollectionExtactor
-from opac_proc.extractors.ex_journals import JournalExtactor
-from opac_proc.extractors.ex_issues import IssueExtactor
-from opac_proc.extractors.ex_articles import ArticleExtactor
+from opac_proc.extractors.ex_collections import CollectionExtractor
+from opac_proc.extractors.ex_journals import JournalExtractor
+from opac_proc.extractors.ex_issues import IssueExtractor
+from opac_proc.extractors.ex_articles import ArticleExtractor
 from opac_proc.datastore import models
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
@@ -18,7 +18,7 @@ else:
 # Collection:
 
 def task_extract_collection(acronym):
-    extractor = CollectionExtactor(acronym)
+    extractor = CollectionExtractor(acronym)
     extractor.extract()
     extractor.save()
 
@@ -55,7 +55,7 @@ def task_process_all_collections(acronym):
 
 
 def task_extract_journal(acronym, issn):
-    extractor = JournalExtactor(acronym, issn)
+    extractor = JournalExtractor(acronym, issn)
     extractor.extract()
     extractor.save()
 
@@ -96,7 +96,7 @@ def task_process_all_journals():
 
 
 def task_extract_issue(acronym, issue_id):
-    extractor = IssueExtactor(acronym, issue_id)
+    extractor = IssueExtractor(acronym, issue_id)
     extractor.extract()
     extractor.save()
 
@@ -140,7 +140,7 @@ def task_process_all_issues():
 
 
 def task_extract_article(acronym, article_id):
-    extractor = ArticleExtactor(acronym, article_id)
+    extractor = ArticleExtractor(acronym, article_id)
     extractor.extract()
     extractor.save()
 
