@@ -34,5 +34,6 @@ class CollectionTransformer(BaseTransformer):
         self.transform_model_instance['acronym'] = self.extract_model_instance.acronym
         self.transform_model_instance['name'] = self.extract_model_instance.name
         self.transform_model_instance['children_ids'] = self.extract_model_instance.children_ids
+        self.transform_model_instance['metrics'] = self.extract_model_instance.metrics
         logger.info(u'Fim CollectionTransformer.transform')
         return self.transform_model_instance
