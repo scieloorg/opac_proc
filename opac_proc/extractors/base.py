@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 import sys
+from email import feedparser
 
 from opac_proc.extractors.source_clients.thrift import am_clients
 from opac_proc.datastore.mongodb_connector import get_db_connection
@@ -38,6 +39,7 @@ class BaseExtractor(object):
         self.articlemeta = am_clients.ArticleMeta(
             config.ARTICLE_META_THRIFT_DOMAIN,
             config.ARTICLE_META_THRIFT_PORT)
+        self.feed_parser = feedparser
 
     def get_extract_model_instance(self):
         if not self.get_instance_query or not isinstance(self.get_instance_query, dict):

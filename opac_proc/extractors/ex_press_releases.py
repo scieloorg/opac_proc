@@ -1,6 +1,6 @@
 # coding: utf-8
 from datetime import datetime
-from opac_proc.datastore.models import ExtractJournal
+from opac_proc.datastore.models import ExtractPressRelease
 from opac_proc.extractors.base import BaseExtractor
 from opac_proc.extractors.decorators import update_metadata
 
@@ -13,18 +13,18 @@ else:
     logger = getMongoLogger(__name__, "INFO", "extract")
 
 
-class JournalExtractor(BaseExtractor):
+class PressReleaseExtractor(BaseExtractor):
     acronym = None
-    issn = None
+    url = None
 
-    extract_model_class = ExtractJournal
+    extract_model_class = ExtractPressRelease
 
-    def __init__(self, acronym, issn):
-        super(JournalExtractor, self).__init__()
+    def __init__(self, acronym, url):
+        super(PressReleaseExtractor, self).__init__()
         self.acronym = acronym
-        self.issn = issn
+        self.url = url
         self.get_instance_query = {
-            'code': self.issn
+            'code': self.acronym
         }
 
     @update_metadata
@@ -32,17 +32,17 @@ class JournalExtractor(BaseExtractor):
         """
         Conecta com a fonte (AM) e extrai todos os dados (coleção).
         """
-        logger.info(u'Inicia JournalExtractor.extract(%s) %s' % (
+        logger.info(u'Inicia PressReleasesExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))
 
-        journal = self.articlemeta.get_journal(collection=self.acronym, code=self.issn)
-        self._raw_data = journal
+        # journal = self.articlemeta.get_journal(collection=self.acronym, code=self.issn)
+        # self._raw_data = journal
 
         if not self._raw_data:
-            msg = u"Não foi possível recuperar o Periódico (issn: %s, acronym: %s). A informação é vazía" % (
-                self.issn, self.acronym)
+            msg = u"Não foi possível recuperar o Press Release (url: %s, acronym: %s). A informação é vazía" % (
+                self.url, self.acronym)
             logger.error(msg)
             raise Exception(msg)
 
-        logger.info(u'Fim JournalExtractor.extract(%s) %s' % (
+        logger.info(u'Fim PressReleasesExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))
