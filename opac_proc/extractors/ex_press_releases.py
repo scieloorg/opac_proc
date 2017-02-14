@@ -1,4 +1,6 @@
 # coding: utf-8
+import feedparser
+
 from datetime import datetime
 from opac_proc.datastore.models import ExtractPressRelease
 from opac_proc.extractors.base import BaseExtractor
@@ -16,6 +18,7 @@ else:
 class PressReleaseExtractor(BaseExtractor):
     acronym = None
     url = None
+    error = None
 
     extract_model_class = ExtractPressRelease
 
@@ -27,22 +30,34 @@ class PressReleaseExtractor(BaseExtractor):
             'code': self.acronym
         }
 
+    def get_items_from_feed(self):
+        feed = feedparser.parse(self.url)
+
+        if feed.bozo == 1:
+            self.error = 'Não é possível parsear o feed (%s)' % self.url
+            self.log_error()
+
+        return feed['items']
+
+    def log_error(self):
+        logger.error(self.error)
+        raise Exception(self.error)
+
     @update_metadata
     def extract(self):
         """
         Conecta com a fonte (AM) e extrai todos os dados (coleção).
         """
-        logger.info(u'Inicia PressReleasesExtractor.extract(%s) %s' % (
-            self.acronym, datetime.now()))
+        # logger.info(u'Inicia PressReleasesExtractor.extract(%s) %s' % (self.acronym, datetime.now()))
 
-        # journal = self.articlemeta.get_journal(collection=self.acronym, code=self.issn)
-        # self._raw_data = journal
+        raw_journal = self.get_items_from_feed()
+        self._raw_data = raw_journal
 
         if not self._raw_data:
-            msg = u"Não foi possível recuperar o Press Release (url: %s, acronym: %s). A informação é vazía" % (
+            return False
+            self.error = u"Não foi possível recuperar o Press Release (url: %s, acronym: %s). A informação é vazía" % (
                 self.url, self.acronym)
-            logger.error(msg)
-            raise Exception(msg)
+            self.log_error()
 
-        logger.info(u'Fim PressReleasesExtractor.extract(%s) %s' % (
+        logger.info(u"Fim PressReleasesExtractor.extract(%s) %s" % (
             self.acronym, datetime.now()))

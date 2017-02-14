@@ -147,5 +147,6 @@ class ExtractProcess(Process):
             self.stage, 'article', jobs.task_process_all_articles)
 
     def process_all_press_releases(self):
+        jobs.task_process_all_press_releases()
         self.r_queues.enqueue(
             self.stage, 'press_release', jobs.task_process_all_press_releases)

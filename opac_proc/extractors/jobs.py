@@ -1,9 +1,12 @@
 # coding: utf-8
+from flask import json
+
 from opac_proc.extractors.ex_collections import CollectionExtractor
 from opac_proc.extractors.ex_journals import JournalExtractor
 from opac_proc.extractors.ex_issues import IssueExtractor
 from opac_proc.extractors.ex_articles import ArticleExtractor
 from opac_proc.extractors.ex_press_releases import PressReleaseExtractor
+from xylose.scielodocument import Journal as xylose_journal
 
 from opac_proc.datastore import models
 from opac_proc.datastore.redis_queues import RQueues
@@ -55,6 +58,7 @@ def task_process_all_collections(acronym):
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
     r_queues.enqueue(stage, 'collection', task_extract_collection, acronym)
+
 
 # --------------------------------------------------- #
 #                   JOURNALS                          #
@@ -193,6 +197,11 @@ def task_process_all_articles():
 # --------------------------------------------------- #
 #               PRESS RELEASES                        #
 # --------------------------------------------------- #
+def task_extract_press_release(acronym, url):
+    extractor = PressReleaseExtractor(acronym, url)
+    extractor.extract()
+    extractor.save()
+
 
 def task_process_all_press_releases():
     get_db_connection()
@@ -200,9 +209,12 @@ def task_process_all_press_releases():
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
-    journal = models.ExtractJournal.objects.all()
+    journals = models.ExtractJournal.objects.all()
 
-    for child in journal.children_ids:
-        articles_ids = child['articles_ids']
-        for article_pid in articles_ids:
-            r_queues.enqueue(stage, 'article', task_extract_article, child.acronym, article_pid)
+    for journal in journals:
+        acronym = xylose_journal(json.loads(journal.to_json())).acronym
+
+        for lang, feed in config.RSS_PRESS_RELEASES_FEEDS_BY_CATEGORY.items():
+            url = feed['url'].format(lang, acronym)
+            task_extract_press_release(acronym=acronym, url=url)
+            # r_queues.enqueue(stage, 'press_release', task_extract_press_release, acronym, url)
