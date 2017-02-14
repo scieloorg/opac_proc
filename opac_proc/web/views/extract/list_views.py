@@ -206,12 +206,44 @@ class ExtractIssueListView(ExtractBaseListView):
             'field_type': 'boolean'
         },
     ]
+    list_filters = [
+        {
+            'field_label': u'UUID',
+            'field_name': 'uuid',
+            'field_type': 'uuid'
+        },
+        {
+            'field_label': u'PID',
+            'field_name': 'code',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Deleted?',
+            'field_name': 'is_deleted',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
 
 
-class ExtractPressReleaseListView(ExtractBaseListView):
-    model_class = models.ExtractPressRelease
-    model_name = 'press_release'
-    page_title = "Extract: Press Releases"
+class ExtractArticleListView(ExtractBaseListView):
+    model_class = models.ExtractArticle
+    model_name = 'article'
+    page_title = "Extract: Articles"
     list_columns = [
         {
             'field_label': u'UUID',
@@ -279,10 +311,10 @@ class ExtractPressReleaseListView(ExtractBaseListView):
     ]
 
 
-class ExtractArticleListView(ExtractBaseListView):
-    model_class = models.ExtractArticle
-    model_name = 'article'
-    page_title = "Extract: Articles"
+class ExtractPressReleaseListView(ExtractBaseListView):
+    model_class = models.ExtractPressRelease
+    model_name = 'press_release'
+    page_title = "Extract: Press Releases"
     list_columns = [
         {
             'field_label': u'UUID',

@@ -131,6 +131,11 @@ class ExtractProcess(Process):
             collection_acronym,
             article_pid)
 
+    def process_press_release(self):
+        self.r_queues.enqueue(
+            self.stage, 'press_releases',
+            jobs.task_extract_press_releases())
+
     def process_all_collections(self):
         self.r_queues.enqueue(
             self.stage, 'collection', jobs.task_process_all_collections, self.collection_acronym)

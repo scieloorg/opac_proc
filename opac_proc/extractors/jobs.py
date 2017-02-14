@@ -194,7 +194,15 @@ def task_process_all_articles():
 #               PRESS RELEASES                        #
 # --------------------------------------------------- #
 
-def task_extract_press_releases(acronym, url):
-    extractor = PressReleaseExtractor(acronym, url)
-    extractor.extract()
-    extractor.save()
+def task_process_all_press_releases():
+    get_db_connection()
+    stage = "extract"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    journal = models.ExtractJournal.objects.all()
+
+    for child in journal.children_ids:
+        articles_ids = child['articles_ids']
+        for article_pid in articles_ids:
+            r_queues.enqueue(stage, 'article', task_extract_article, child.acronym, article_pid)
