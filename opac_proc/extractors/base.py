@@ -20,6 +20,7 @@ else:
 class BaseExtractor(object):
     _db = None
     articlemeta = None
+    blog_rss = None
     get_instance_query = None  # definir na subclasse
     _raw_data = {}
     extract_model_class = None
