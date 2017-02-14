@@ -111,6 +111,9 @@ QUEUES = [
 # Sentry -------------------------------------------------------
 SENTRY_DSN = os.environ.get('OPAC_PROC_SENTRY_DSN', None)
 
+# Metrics  -----------------------------------------------------
+OPAC_METRICS_URL = os.environ.get('OPAC_METRICS_URL', 'http://analytics.scielo.org')
+
 # Build Args ---------------------------------------------------
 OPAC_PROC_BUILD_DATE = os.environ.get('OPAC_PROC_BUILD_DATE', None)
 OPAC_PROC_VCS_REF = os.environ.get('OPAC_PROC_VCS_REF', None)
