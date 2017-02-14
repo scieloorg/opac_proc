@@ -202,6 +202,8 @@ class ListView(View):
             processor.process_all_issues()
         elif self.model_name == 'article':
             processor.process_all_articles()
+        elif self.model_name == 'press_release':
+            processor.process_all_press_releases()
         else:
             raise ValueError('Invalid "model_name" attribute')
         flash("Started process to %s all %s(s)" % (self.stage, self.model_name))
