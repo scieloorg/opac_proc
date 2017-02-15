@@ -218,5 +218,4 @@ def task_process_all_press_releases():
 
         for lang, feed in config.RSS_PRESS_RELEASES_FEEDS_BY_CATEGORY.items():
             url = feed['url'].format(lang, acronym)
-            task_extract_press_release(acronym=acronym, url=url)
-            # r_queues.enqueue(stage, 'press_release', task_extract_press_release, acronym, url)
+            r_queues.enqueue(stage, 'press_release', task_extract_press_release, acronym, url)
