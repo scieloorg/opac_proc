@@ -43,6 +43,13 @@ class PressReleaseExtractor(BaseExtractor):
 
         if len(items) > 0:
             self.is_empty = False
+
+            # clean data
+            items = items[0]
+            items['url_id'] = items['id']
+            del items['id'], items['published_parsed']
+
+            # Set raw data
             self._raw_data = dict(items)
 
     def log_error(self):
