@@ -13,7 +13,8 @@ from opac_proc.web.views.extract.detail_views import (
     ExtractJournalDetailView,
     ExtractIssueDetailView,
     ExtractArticleDetailView,
-    ExtractLogDetailView, ExtractPressReleaseDetailView)
+    ExtractLogDetailView,
+    ExtractPressReleaseDetailView)
 
 from opac_proc.web.views.transform.list_views import (
     TransformCollectionListView,

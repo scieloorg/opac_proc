@@ -199,8 +199,10 @@ def task_process_all_articles():
 # --------------------------------------------------- #
 def task_extract_press_release(acronym, url):
     extractor = PressReleaseExtractor(acronym, url)
-    extractor.extract()
-    extractor.save()
+    extractor.get_items_from_feed()
+    if not extractor.is_empty:
+        extractor.extract()
+        extractor.save()
 
 
 def task_process_all_press_releases():
