@@ -120,7 +120,7 @@ class BaseExtractor(object):
                     self.extract_model_instance = self.extract_model_class(**self._raw_data)
                     self.extract_model_instance.save()
             except Exception, e:
-                msg = u"Não foi possível salvar %s. Exeção: %s" % (
+                msg = u"Não foi possível salvar %s. Exceção: %s" % (
                     self.extract_model_name, e)
                 logger.error(msg)
                 raise e

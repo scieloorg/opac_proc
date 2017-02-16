@@ -71,11 +71,6 @@ class ExtractProcess(Process):
                 journal = models.ExtractJournal.objects.get(code=issn)
             except models.ExtractJournal.DoesNotExist:
                 raise ValueError(u'ExtractJournal com code: %s não encontrado!' % issn)
-
-            uuid = str(journal.uuid)
-
-        elif uuid is not None:
-            uuid = str(uuid)
         else:
             raise ValueError("must provide at least one parameter: issn or uuid")
 
@@ -90,6 +85,10 @@ class ExtractProcess(Process):
             collection_acronym = self.collection_acronym
 
         if issue_pid is not None:
+            # TODO: Remover este código pois não está sendo utilizado
+            # Sugestão de Refatoração:
+            # if issue_pid is None:
+            #     raise ValueError("must provide at least one parameter: issn or uuid")
             try:
                 issue = models.ExtractIssue.objects.get(pid=issue_pid)
             except models.ExtractIssue.DoesNotExist:
@@ -145,4 +144,9 @@ class ExtractProcess(Process):
 
     def process_all_articles(self):
         self.r_queues.enqueue(
-            self.stage, 'issue', jobs.task_process_all_articles)
+            self.stage, 'article', jobs.task_process_all_articles)
+
+    def process_all_press_releases(self):
+        jobs.task_process_all_press_releases()
+        self.r_queues.enqueue(
+            self.stage, 'press_release', jobs.task_process_all_press_releases)

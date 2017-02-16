@@ -22,7 +22,7 @@ ARTICLE_META_THRIFT_DOMAIN = os.environ.get(
     'articlemeta.scielo.org')
 ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_THRIFT_PORT',
-    11620))  # antes 11720
+    11621))
 
 # WEBAPP config: ----------------------------------------------------
 DEBUG = bool(os.environ.get('OPAC_PROC_DEBUG', True))
@@ -111,7 +111,27 @@ QUEUES = [
 # Sentry -------------------------------------------------------
 SENTRY_DSN = os.environ.get('OPAC_PROC_SENTRY_DSN', None)
 
+# Metrics  -----------------------------------------------------
+OPAC_METRICS_URL = os.environ.get('OPAC_METRICS_URL', 'http://analytics.scielo.org')
+
 # Build Args ---------------------------------------------------
 OPAC_PROC_BUILD_DATE = os.environ.get('OPAC_PROC_BUILD_DATE', None)
 OPAC_PROC_VCS_REF = os.environ.get('OPAC_PROC_VCS_REF', None)
 OPAC_PROC_WEBAPP_VERSION = os.environ.get('OPAC_PROC_WEBAPP_VERSION', None)
+
+
+# Press Releases
+RSS_PRESS_RELEASES_FEEDS_BY_CATEGORY = {
+    'pt_BR': {
+        'display_name': 'SciELO em Perspectiva Press Releases',
+        'url': 'http://pressreleases.scielo.org/blog/category/{1}/feed/'
+    },
+    'es': {
+        'display_name': 'SciELO en Perspectiva Press Releases',
+        'url': 'http://pressreleases.scielo.org/{0}/category/press-releases/{1}/feed/',
+    },
+    'en': {
+        'display_name': 'SciELO in Perspective Press Releases',
+        'url': 'http://pressreleases.scielo.org/{0}/category/press-releases/{1}/feed/',
+    },
+}
