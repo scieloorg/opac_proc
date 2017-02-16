@@ -39,7 +39,7 @@
         <th>
           <input id="table_check_all" type="checkbox" name="row_checkbox_all">
         </th>
-        {% for field_label in list_colums|map(attribute='field_label') %}
+        {% for field_label in list_columns|map(attribute='field_label') %}
           <th>{{ field_label }}</th>
         {% endfor %}
       </thead>
@@ -49,7 +49,7 @@
             <th>
               <input type="checkbox" name="row_checkbox" data-rowid="{{ object.pk }}">
             </th>
-            {% for column in list_colums %}
+            {% for column in list_columns %}
               {% if loop.first %}
                 <td {% if column.field_name|lower == 'uuid' %} style="width: 300px" {% endif %}>
                   <a class="row-detail" href="{{ object.pk }}"> {# hack! URL de detail é relativo a URL de listagem #}
@@ -67,7 +67,7 @@
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="{{ list_colums|length + 1 }}" style="text-align:center;">
+          <td colspan="{{ list_columns|length + 1 }}" style="text-align:center;">
             <nav aria-label="pagination">
               <ul class="pagination" >
                 {% if has_prev %}

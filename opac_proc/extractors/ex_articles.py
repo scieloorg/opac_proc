@@ -14,14 +14,14 @@ else:
     logger = getMongoLogger(__name__, "INFO", "extract")
 
 
-class ArticleExtactor(BaseExtractor):
+class ArticleExtractor(BaseExtractor):
     acronym = None
     article_id = None
 
     extract_model_class = ExtractArticle
 
     def __init__(self, acronym, article_id):
-        super(ArticleExtactor, self).__init__()
+        super(ArticleExtractor, self).__init__()
         self.acronym = acronym
         self.article_id = article_id
         self.get_instance_query = {
@@ -34,7 +34,7 @@ class ArticleExtactor(BaseExtractor):
         """
         Conecta com a fonte (AM) e extrai todos os dados (Article).
         """
-        logger.info(u'Inicia ArticleExtactor.extract(%s) %s' % (
+        logger.info(u'Inicia ArticleExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))
 
         article = self.articlemeta.get_article(collection=self.acronym, code=self.article_id)
@@ -45,5 +45,5 @@ class ArticleExtactor(BaseExtractor):
             logger.error(msg)
             raise Exception(msg)
 
-        logger.info(u'Fim ArticleExtactor.extract(%s) %s' % (
+        logger.info(u'Fim ArticleExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))

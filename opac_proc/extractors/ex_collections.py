@@ -16,14 +16,14 @@ else:
 PUBLICATION_SIZE_ENDPOINT = 'ajx/publication/size'
 
 
-class CollectionExtactor(BaseExtractor):
+class CollectionExtractor(BaseExtractor):
     acronym = None
     children_ids = []
 
     extract_model_class = ExtractCollection
 
     def __init__(self, acronym):
-        super(CollectionExtactor, self).__init__()
+        super(CollectionExtractor, self).__init__()
         self.acronym = acronym
         self.get_instance_query = {
             'acronym': self.acronym
@@ -79,8 +79,7 @@ class CollectionExtactor(BaseExtractor):
         """
         Conecta com a fonte (AM) e extrai todos os dados (coleção).
         """
-        # super(CollectionExtactor, self).extract()
-        logger.info(u'Inicia CollectionExtactor.extract(%s) %s' % (
+        logger.info(u'Inicia CollectionExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))
 
         for col in self.articlemeta.collections():
@@ -116,8 +115,9 @@ class CollectionExtactor(BaseExtractor):
         else:
             # atualizo self.metadata para que self.children_ids seja salvo junto com self.raw_data no save()
             self.metadata['children_ids'] = self.children_ids
+        logger.info(u'Fim CollectionExtractor.extract(%s) %s' % (self.acronym, datetime.now()))
 
         # extração de metricas
         self._raw_data['metrics'] = self._extract_metrics()
 
-        logger.info(u'Fim CollectionExtactor.extract(%s) %s' % (self.acronym, datetime.now()))
+        logger.info(u'Fim CollectionExtractor.extract(%s) %s' % (self.acronym, datetime.now()))
