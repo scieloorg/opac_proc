@@ -3,9 +3,9 @@ from mongoengine import DynamicDocument, signals
 from base_mixin import BaseMixin
 
 
-# #### EXTRACT MODELS
-
-
+# ------------------------------------------------------------------------#
+#                           EXTRACT MODELS                                #
+# ------------------------------------------------------------------------#
 class ExtractCollection(BaseMixin, DynamicDocument):
     def update_reprocess_field(self, uuid):
         """
@@ -116,9 +116,9 @@ signals.pre_save.connect(ExtractPressRelease.pre_save, sender=ExtractPressReleas
 signals.post_save.connect(ExtractPressRelease.post_save, sender=ExtractPressRelease)
 
 
-# #### TRANFORM MODELS
-
-
+# ------------------------------------------------------------------------#
+#                           TRANSFORM MODELS                              #
+# ------------------------------------------------------------------------#
 class TransformCollection(BaseMixin, DynamicDocument):
     def update_reprocess_field(self, uuid):
         """
@@ -229,9 +229,9 @@ signals.pre_save.connect(TransformPressRelease.pre_save, sender=TransformPressRe
 signals.post_save.connect(TransformPressRelease.post_save, sender=TransformPressRelease)
 
 
-# #### LOAD MODELS
-
-
+# ------------------------------------------------------------------------#
+#                           LOAD MODELS                                   #
+# ------------------------------------------------------------------------#
 class LoadCollection(BaseMixin, DynamicDocument):
     meta = {
         'collection': 'l_collection'
@@ -282,9 +282,9 @@ signals.pre_save.connect(LoadPressRelease.pre_save, sender=LoadPressRelease)
 signals.post_save.connect(LoadPressRelease.post_save, sender=LoadPressRelease)
 
 
-# #### LOGS
-
-
+# ------------------------------------------------------------------------#
+#                           LOG MODELS                                   #
+# ------------------------------------------------------------------------#
 class ExtractLog(DynamicDocument):
     meta = {
         'collection': 'extract_log',
