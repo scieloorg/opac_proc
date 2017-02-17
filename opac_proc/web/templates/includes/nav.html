@@ -86,6 +86,9 @@
             <li {% if request.path == url_for('load_article_list') %} class="active" {% endif %}>
               <a href="{{ url_for('load_article_list') }}">Articles</a>
             </li>
+            <li {% if request.path == url_for('load_press_release_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('load_press_release_list') }}">Press Releases</a>
+            </li>
             <li role="separator" class="divider"></li>
             <li {% if request.path == url_for('load_logs_list') %} class="active" {% endif %}>
               <a href="{{ url_for('load_logs_list') }}">Logs</a>

@@ -37,6 +37,7 @@ from opac_proc.web.views.load.list_views import (
     LoadJournalListView,
     LoadIssueListView,
     LoadArticleListView,
+    LoadPressReleaseListView,
     LoadLogListView)
 
 from opac_proc.web.views.load.detail_views import (
@@ -44,6 +45,7 @@ from opac_proc.web.views.load.detail_views import (
     LoadJournalDetailView,
     LoadIssueDetailView,
     LoadArticleDetailView,
+    LoadPressReleaseDetailView,
     LoadLogDetailView)
 
 from opac_proc.web.views.opac.list_views import (
@@ -145,6 +147,10 @@ url_patterns = (
             'article': {
                 'list_view_class': LoadArticleListView,
                 'detail_view_class': LoadArticleDetailView,
+            },
+            'press_release': {
+                'list_view_class': LoadPressReleaseListView,
+                'detail_view_class': LoadPressReleaseDetailView,
             },
             'logs': {
                 'list_view_class': LoadLogListView,

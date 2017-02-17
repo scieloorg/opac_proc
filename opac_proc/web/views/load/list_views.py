@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 
 from opac_proc.datastore import models
 from opac_proc.web.helpers.list_generator import get_collection_list_view, get_journal_list_view, get_issue_list_view, \
-    get_article_list_view, get_log_columns_list_view, get_log_filters_list_view
+    get_article_list_view, get_log_columns_list_view, get_log_filters_list_view, get_press_release_list_view
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
 from opac_proc.loaders.process import LoadProcess
@@ -46,6 +46,13 @@ class LoadArticleListView(LoadBaseListView):
     model_name = 'article'
     page_title = "Load: Articles"
     list_columns = list_filters = get_article_list_view()
+
+
+class LoadPressReleaseListView(LoadBaseListView):
+    model_class = models.LoadArticle
+    model_name = 'Press Release'
+    page_title = "Load: Press Releases"
+    list_columns = list_filters = get_press_release_list_view()
 
 
 class LoadLogListView(LoadBaseListView):

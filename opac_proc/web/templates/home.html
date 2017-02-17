@@ -196,6 +196,19 @@
                         {% endif %}
                         {{ load_article_count }}</span>
                     </a>
+                    <a href="{{ url_for('load_press_release_list') }}" class="list-group-item">
+                        Press Releases:
+                        {% if load_press_releases_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif load_press_releases_count < transform_press_releases_count %}
+                            <span class="badge badge-warning">
+                        {% elif load_press_releases_count > transform_press_releases_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ load_press_releases_count }}</span>
+                    </a>
                 </ul>
             </div>
         </div>
