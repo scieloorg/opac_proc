@@ -26,11 +26,12 @@ def home():
     extract_article_count = models.ExtractArticle.objects.all().count()
     extract_press_release_count = models.ExtractPressRelease.objects.all().count()
 
-    # transform counts
+    # transform countsparticle
     transform_collection_count = models.TransformCollection.objects.all().count()
     transform_journal_count = models.TransformJournal.objects.all().count()
     transform_issue_count = models.TransformIssue.objects.all().count()
     transform_article_count = models.TransformArticle.objects.all().count()
+    transform_press_release_count = models.TransformPressRelease.objects.all().count()
 
     # load counts
     load_collection_count = models.LoadCollection.objects.all().count()
@@ -76,6 +77,7 @@ def home():
         'transform_journal_count': transform_journal_count,
         'transform_issue_count': transform_issue_count,
         'transform_article_count': transform_article_count,
+        'transform_press_release_count': transform_press_release_count,
 
         # load
         'load_collection_count': load_collection_count,

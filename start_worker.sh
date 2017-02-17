@@ -1,7 +1,7 @@
 #!/bin/sh
-export REDIS_URL=redis://$OPAC_PROC_REDIS_HOST:$OPAC_PROC_REDIS_PORT/0
+export REDIS_URL=redis://localhost:$OPAC_PROC_REDIS_PORT/0
 export WORKER_NAME=$HOSTNAME-$(cat /proc/sys/kernel/random/uuid)
-export WORKER_PATH="/app/"
+export WORKER_PATH="/home/bruno/projects/opac_proc"
 
 rq worker \
     --url=$REDIS_URL \
