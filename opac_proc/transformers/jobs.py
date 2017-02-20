@@ -6,6 +6,7 @@ from opac_proc.transformers.tr_articles import ArticleTransformer
 from opac_proc.datastore import models
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
+from opac_proc.transformers.tr_press_releases import PressReleaseTransformer
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
 
@@ -13,9 +14,11 @@ if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
 else:
     logger = getMongoLogger(__name__, "INFO", "transform")
-# Collections:
 
 
+# --------------------------------------------------- #
+#               COLLECTIONS                           #
+# --------------------------------------------------- #S
 def task_transform_collection(acronym):
     transformer = CollectionTransformer(extract_model_key=acronym)
     transformer.transform()
@@ -50,9 +53,10 @@ def task_process_all_collections(acronym):
     r_queues.create_queues_for_stage(stage)
     r_queues.enqueue(stage, 'collection', task_transform_collection, acronym)
 
-# Journals:
 
-
+# --------------------------------------------------- #
+#               JOURNALS                              #
+# --------------------------------------------------- #
 def task_transform_journal(acronym, issn):
     transformer = JournalTransformer(extract_model_key=issn)
     transformer.transform()
@@ -68,7 +72,8 @@ def task_reprocess_journals(ids=None):
     if ids is None:  # update all collections
         models.TransformJournal.objects.all().update(must_reprocess=True)
         for journal in models.TransformJournal.objects.all():
-            issn = journal.get('scielo_issn', False) or journal.get('print_issn', False) or journal.get('eletronic_issn', False)
+            issn = journal.get('scielo_issn', False) or journal.get('print_issn', False) or journal.get(
+                'eletronic_issn', False)
             if not issn:
                 raise ValueError(u'Journal sem issn')
             r_queues.enqueue(stage, 'journal', task_transform_journal, collection.acronym, issn)
@@ -97,9 +102,10 @@ def task_process_all_journals():
     for child in collection.children_ids:
         r_queues.enqueue(stage, 'collection', task_transform_journal, collection.acronym, child['issn'])
 
-# Issues:
 
-
+# --------------------------------------------------- #
+#               ISSUES                                #
+# --------------------------------------------------- #
 def task_transform_issue(acronym, issue_id):
     transformer = IssueTransformer(extract_model_key=issue_id)
     transformer.transform()
@@ -141,10 +147,10 @@ def task_process_all_issues():
             r_queues.enqueue(stage, 'issue', task_transform_issue, collection.acronym, issue_pid)
 
 
-# Articles:
-
-
-def task_transform_article(acronym, article_id):
+# --------------------------------------------------- #
+#               ARTICLES                              #
+# --------------------------------------------------- #
+def task_transform_article(article_id):
     transformer = ArticleTransformer(extract_model_key=article_id)
     transformer.transform()
     transformer.save()
@@ -184,4 +190,25 @@ def task_process_all_articles():
     for child in collection.children_ids:
         articles_ids = child['articles_ids']
         for article_pid in articles_ids:
-            r_queues.enqueue(stage, 'article', task_transform_article, collection.acronym, article_pid)
+            r_queues.enqueue(stage, 'article', task_transform_article, article_pid)
+
+
+# --------------------------------------------------- #
+#               PRESS RELEASES                        #
+# --------------------------------------------------- #
+def task_transform_press_release(press_release_id):
+    transformer = PressReleaseTransformer(extract_model_key=press_release_id)
+    transformer.transform()
+    transformer.save()
+
+
+def task_process_all_press_releases():
+    get_db_connection()
+    stage = "transform"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    press_releases = models.ExtractPressRelease.objects.all()
+
+    for press_release in press_releases:
+        r_queues.enqueue(stage, 'press_release', task_transform_press_release, press_release._id)

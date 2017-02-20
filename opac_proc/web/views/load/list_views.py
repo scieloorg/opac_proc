@@ -3,6 +3,8 @@ from mongoengine.context_managers import switch_db
 from bson.objectid import ObjectId
 
 from opac_proc.datastore import models
+from opac_proc.web.helpers.list_generator import get_collection_list_view, get_journal_list_view, get_issue_list_view, \
+    get_article_list_view, get_log_columns_list_view, get_log_filters_list_view, get_press_release_list_view
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
 from opac_proc.loaders.process import LoadProcess
@@ -22,261 +24,35 @@ class LoadCollectionListView(LoadBaseListView):
     model_class = models.LoadCollection
     model_name = 'collection'
     page_title = "Load: Collection"
-    list_columns = [
-        {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Acrônimo',
-            'field_name': 'acronym',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Nome',
-            'field_name': 'name',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
-            'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Process completed?',
-            'field_name': 'process_completed',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
-            'field_type': 'boolean'
-        },
-    ]
-
-    list_filters = [
-        {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Acrônimo',
-            'field_name': 'acronym',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Nome',
-            'field_name': 'name',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
-            'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Process completed?',
-            'field_name': 'process_completed',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
-            'field_type': 'boolean'
-        },
-    ]
+    list_columns = list_filters = get_collection_list_view()
 
 
 class LoadJournalListView(LoadBaseListView):
     model_class = models.LoadJournal
     model_name = 'journal'
     page_title = "Load: Journals"
-    list_columns = [
-        {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Aconym',
-            'field_name': 'acronym',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
-            'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Process completed?',
-            'field_name': 'process_completed',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
-            'field_type': 'boolean'
-        },
-    ]
-
-    list_filters = [
-        {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
-            'field_type': 'uuid'
-        },
-        {
-            'field_label': u'Aconym',
-            'field_name': 'acronym',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
-            'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Process completed?',
-            'field_name': 'process_completed',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
-            'field_type': 'boolean'
-        },
-    ]
+    list_columns = list_filters = get_journal_list_view()
 
 
 class LoadIssueListView(LoadBaseListView):
     model_class = models.LoadIssue
     model_name = 'issue'
     page_title = "Load: Issues"
-    list_columns = [
-        {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'PID',
-            'field_name': 'pid',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
-            'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Process completed?',
-            'field_name': 'process_completed',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
-            'field_type': 'boolean'
-        },
-    ]
+    list_columns = list_filters = get_issue_list_view()
 
 
 class LoadArticleListView(LoadBaseListView):
     model_class = models.LoadArticle
     model_name = 'article'
     page_title = "Load: Articles"
-    list_columns = [
-        {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'PID',
-            'field_name': 'pid',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
-            'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Process completed?',
-            'field_name': 'process_completed',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
-            'field_type': 'boolean'
-        },
-    ]
+    list_columns = list_filters = get_article_list_view()
 
-    list_filters = [
-        {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'PID',
-            'field_name': 'pid',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
-            'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Process completed?',
-            'field_name': 'process_completed',
-            'field_type': 'boolean'
-        },
-        {
-            'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
-            'field_type': 'boolean'
-        },
-    ]
+
+class LoadPressReleaseListView(LoadBaseListView):
+    model_class = models.LoadArticle
+    model_name = 'Press Release'
+    page_title = "Load: Press Releases"
+    list_columns = list_filters = get_press_release_list_view()
 
 
 class LoadLogListView(LoadBaseListView):
@@ -289,73 +65,8 @@ class LoadLogListView(LoadBaseListView):
     page_title = "Load: Logs"
     page_subtitle = "most recent first"
     per_page = 50
-    list_columns = [
-        {
-            'field_label': u'Timestamp',
-            'field_name': 'time',
-            'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Name',
-            'field_name': 'name',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Function',
-            'field_name': 'funcName',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Message',
-            'field_name': 'message',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Line',
-            'field_name': 'lineno',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Level',
-            'field_name': 'levelname',
-            'field_type': 'string'
-        },
-    ]
-
-    list_filters = [
-        {
-            'field_label': u'Timestamp',
-            'field_name': 'time',
-            'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Name',
-            'field_name': 'name',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Function',
-            'field_name': 'funcName',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Message',
-            'field_name': 'message',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Level',
-            'field_name': 'levelname',
-            'field_type': 'choices',
-            'field_options': (
-                ('DEBUG', 'DEBUG'),
-                ('INFO', 'INFO'),
-                ('WARNING', 'WARNING'),
-                ('ERROR', 'ERROR'),
-                ('CRITICAL', 'CRITICAL'),
-            )
-        },
-    ]
+    list_columns = get_log_columns_list_view()
+    list_filters = get_log_filters_list_view()
 
     def get_objects(self):
         register_connections()

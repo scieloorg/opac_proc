@@ -21,6 +21,7 @@ from opac_proc.web.views.transform.list_views import (
     TransformJournalListView,
     TransformIssueListView,
     TransformArticleListView,
+    TransformPressReleaseListView,
     TransformLogListView)
 
 from opac_proc.web.views.transform.detail_views import (
@@ -28,6 +29,7 @@ from opac_proc.web.views.transform.detail_views import (
     TransformJournalDetailView,
     TransformIssueDetailView,
     TransformArticleDetailView,
+    TransformPressReleaseDetailView,
     TransformLogDetailView)
 
 from opac_proc.web.views.load.list_views import (
@@ -35,6 +37,7 @@ from opac_proc.web.views.load.list_views import (
     LoadJournalListView,
     LoadIssueListView,
     LoadArticleListView,
+    LoadPressReleaseListView,
     LoadLogListView)
 
 from opac_proc.web.views.load.detail_views import (
@@ -42,6 +45,7 @@ from opac_proc.web.views.load.detail_views import (
     LoadJournalDetailView,
     LoadIssueDetailView,
     LoadArticleDetailView,
+    LoadPressReleaseDetailView,
     LoadLogDetailView)
 
 from opac_proc.web.views.opac.list_views import (
@@ -115,6 +119,10 @@ url_patterns = (
                 'list_view_class': TransformArticleListView,
                 'detail_view_class': TransformArticleDetailView,
             },
+            'press_release': {
+                'list_view_class': TransformPressReleaseListView,
+                'detail_view_class': TransformPressReleaseDetailView,
+            },
             'logs': {
                 'list_view_class': TransformLogListView,
                 'detail_view_class': TransformLogDetailView,
@@ -139,6 +147,10 @@ url_patterns = (
             'article': {
                 'list_view_class': LoadArticleListView,
                 'detail_view_class': LoadArticleDetailView,
+            },
+            'press_release': {
+                'list_view_class': LoadPressReleaseListView,
+                'detail_view_class': LoadPressReleaseDetailView,
             },
             'logs': {
                 'list_view_class': LoadLogListView,

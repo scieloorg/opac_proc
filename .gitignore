@@ -63,3 +63,10 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+
+#pycharm files
+.idea
+
+#redis-data-dev
+redis-data-dev

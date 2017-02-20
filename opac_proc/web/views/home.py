@@ -26,17 +26,19 @@ def home():
     extract_article_count = models.ExtractArticle.objects.all().count()
     extract_press_release_count = models.ExtractPressRelease.objects.all().count()
 
-    # transform counts
+    # transform countsparticle
     transform_collection_count = models.TransformCollection.objects.all().count()
     transform_journal_count = models.TransformJournal.objects.all().count()
     transform_issue_count = models.TransformIssue.objects.all().count()
     transform_article_count = models.TransformArticle.objects.all().count()
+    transform_press_release_count = models.TransformPressRelease.objects.all().count()
 
     # load counts
     load_collection_count = models.LoadCollection.objects.all().count()
     load_journal_count = models.LoadJournal.objects.all().count()
     load_issue_count = models.LoadIssue.objects.all().count()
     load_article_count = models.LoadArticle.objects.all().count()
+    load_press_releases_count = models.LoadPressRelease.objects.all().count()
 
     # OPAC counts
     with switch_db(OpacCollection, opac_webapp_db_name):
@@ -76,12 +78,14 @@ def home():
         'transform_journal_count': transform_journal_count,
         'transform_issue_count': transform_issue_count,
         'transform_article_count': transform_article_count,
+        'transform_press_release_count': transform_press_release_count,
 
         # load
         'load_collection_count': load_collection_count,
         'load_journal_count': load_journal_count,
         'load_issue_count': load_issue_count,
         'load_article_count': load_article_count,
+        'load_press_releases_count': load_press_releases_count,
 
         # opac
         'opac_collection_count': opac_collection_count,

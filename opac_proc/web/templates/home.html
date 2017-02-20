@@ -118,6 +118,19 @@
                         {% endif %}
                         {{ transform_article_count }}</span>
                     </a>
+                    <a href="{{ url_for('transform_press_release_list') }}" class="list-group-item">
+                        Press Releases:
+                        {% if transform_press_release_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif transform_press_release_count < extract_press_release_count %}
+                            <span class="badge badge-warning">
+                        {% elif transform_press_release_count > extract_press_release_count %}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ transform_press_release_count }}</span>
+                    </a>
                 </ul>
             </div>
         </div>
@@ -182,6 +195,19 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ load_article_count }}</span>
+                    </a>
+                    <a href="{{ url_for('load_press_release_list') }}" class="list-group-item">
+                        Press Releases:
+                        {% if load_press_releases_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif load_press_releases_count < transform_press_releases_count %}
+                            <span class="badge badge-warning">
+                        {% elif load_press_releases_count > transform_press_releases_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ load_press_releases_count }}</span>
                     </a>
                 </ul>
             </div>
