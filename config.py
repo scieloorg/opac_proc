@@ -22,7 +22,7 @@ ARTICLE_META_THRIFT_DOMAIN = os.environ.get(
     'articlemeta.scielo.org')
 ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_THRIFT_PORT',
-    11620))
+    11621))
 
 # caminho absoluto para os XMLs do artigo, caminho até o acrônimo do periódico.
 ARTICLE_FILE_PATH = os.environ.get('OPAC_PROC_ARTICLE_FILE_PATH', 'articles_scielosp_org')

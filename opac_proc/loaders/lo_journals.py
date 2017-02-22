@@ -1,8 +1,7 @@
 # coding: utf-8
 import datetime
 from mongoengine import DoesNotExist
-from scieloh5m5 import h5m5
-
+from mongoengine.context_managers import switch_db
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
 from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.models import (
@@ -15,7 +14,8 @@ from opac_schema.v1.models import (
     Timeline,
     Mission,
     OtherTitle,
-    LastIssue)
+    LastIssue,
+    JounalMetrics)
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
@@ -26,7 +26,6 @@ else:
     logger = getMongoLogger(__name__, "INFO", "load")
 
 OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
-PUBLICATION_SIZE_ENDPOINT = 'ajx/publication/size'
 
 
 class JournalLoader(BaseLoader):
@@ -86,14 +85,14 @@ class JournalLoader(BaseLoader):
         transformed_coll_uuid_str = str(self.transform_model_instance.collection).replace("-", "")
 
         try:
-            with switch_db(Collection, OPAC_WEBAPP_DB_NAME):
-                opac_collection = Collection.objects.get(_id=transformed_coll_uuid_str)
-                logger.debug(u"collection: %s (_id: %s) encontrada" % (opac_collection.name, transformed_coll_uuid_str))
+            with switch_db(Collection, OPAC_WEBAPP_DB_NAME) as OPAC_Collection:
+                opac_collection = OPAC_Collection.objects.get(_id=transformed_coll_uuid_str)
+                return opac_collection
         except DoesNotExist, e:
-            logger.error(u"collection (_id: %s) não encontrada. Já fez o Load Collection?" % transformed_coll_uuid_str)
+            logger.error(
+                u"collection (_id: %s) não encontrada. Já fez o Load Collection?",
+                transformed_coll_uuid_str)
             raise e
-        else:
-            return opac_collection
 
     def prepare_timeline(self):
         """
@@ -192,6 +191,9 @@ class JournalLoader(BaseLoader):
         if hasattr(t_issue, 'label'):
             last_issue_data['label'] = t_issue.label
 
+        if hasattr(t_issue, 'year'):
+            last_issue_data['year'] = t_issue.year
+
         logger.debug(u"criando documento LastIssue: %s" % last_issue_data)
         return LastIssue(**last_issue_data)
 
@@ -202,19 +204,16 @@ class JournalLoader(BaseLoader):
         return issue_count
 
     def prepare_metrics(self):
+        """
+        metodo chamado na preparação dos dados a carregar no opac_schema
+        deve retornar um valor válido para Journal.metrics
+        """
         logger.debug(u"iniciando: prepare_metrics")
+        if hasattr(self.transform_model_instance, 'metrics'):
+            metrics_dict = self.transform_model_instance.metrics
+            metrics_doc = JounalMetrics(**metrics_dict)
+        else:
+            logger.info(u"Não existem 'metrics' transformados. uuid: %s" % self.transform_model_instance.uuid)
 
-        metrics_data = {
-            'total_h5_index': 0,
-            'total_h5_median': 0,
-        }
-
-        year = datetime.datetime.now().year
-        t_journal = self.transform_model_instance
-        _h5m5 = h5m5.get(t_journal.scielo_issn, str(year))
-
-        if _h5m5:
-            metrics_data['total_h5_index'] = _h5m5['h5']
-            metrics_data['total_h5_median'] = _h5m5['m5']
-
-        return metrics_data
+        logger.debug(u"metrics criadas: %s", metrics_dict)
+        return metrics_doc

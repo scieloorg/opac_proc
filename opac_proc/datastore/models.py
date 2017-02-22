@@ -182,6 +182,9 @@ signals.post_save.connect(TransformArticle.post_save, sender=TransformArticle)
 
 
 class LoadCollection(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        pass  # não precisa propagar mais
+
     meta = {
         'collection': 'l_collection'
     }
@@ -190,6 +193,9 @@ signals.post_save.connect(LoadCollection.post_save, sender=LoadCollection)
 
 
 class LoadJournal(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        pass  # não precisa propagar mais
+
     meta = {
         'collection': 'l_journal'
     }
@@ -198,6 +204,9 @@ signals.post_save.connect(LoadJournal.post_save, sender=LoadJournal)
 
 
 class LoadIssue(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        pass  # não precisa propagar mais
+
     meta = {
         'collection': 'l_issue'
     }
@@ -206,6 +215,9 @@ signals.post_save.connect(LoadIssue.post_save, sender=LoadIssue)
 
 
 class LoadArticle(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        pass  # não precisa propagar mais
+
     meta = {
         'collection': 'l_article'
     }

@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 import sys
+import json
 from datetime import datetime
 from mongoengine.context_managers import switch_db
 from opac_proc.datastore.mongodb_connector import (
@@ -8,6 +9,15 @@ from opac_proc.datastore.mongodb_connector import (
     register_connections,
     get_opac_proc_db_name,
     get_opac_webapp_db_name)
+
+from opac_schema.v1.models import Collection as OpacCollection
+from opac_schema.v1.models import Journal as OpacJournal
+from opac_schema.v1.models import Issue as OpacIssue
+from opac_schema.v1.models import Article as OpacArticle
+from opac_schema.v1.models import Sponsor as OpacSponsor
+from opac_schema.v1.models import News as OpacNews
+from opac_schema.v1.models import Pages as OpacPages
+from opac_schema.v1.models import PressRelease as OpacPressRelease
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
@@ -90,7 +100,7 @@ class BaseLoader(object):
         # recuperamos uma instância do transform_model_class
         # correspondente com a **query_dict dict.
         # caso não exista, levantamos uma exeção por não ter o dado fonte
-        with switch_db(self.transform_model_class, OPAC_PROC_DB_NAME):
+        with switch_db(self.transform_model_class, OPAC_PROC_DB_NAME) as transform_model_class:
             logger.debug(u'recuperando modelo: %s' % self.transform_model_name)
             self.transform_model_instance = self.transform_model_class.objects(**query_dict).first()
             logger.debug(u'modelo %s encontrado. query_dict: %s' % (self.transform_model_name, query_dict))
@@ -99,12 +109,12 @@ class BaseLoader(object):
         # recuperamos uma instância do opac_model_class
         # correspondente com a **query_dict dict.
         # caso não exista, retornamos uma nova instância
-        with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
+        with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME) as opac_model_class:
             try:
                 logger.debug(u'recuperando modelo: %s' % self.opac_model_name)
-                self.opac_model_instance = self.opac_model_class.objects.get(**query_dict)
+                self.opac_model_instance = opac_model_class.objects.get(**query_dict)
                 logger.debug(u'modelo %s encontrado. query_dict: %s' % (self.opac_model_name, query_dict))
-            except self.opac_model_class.DoesNotExist:
+            except opac_model_class.DoesNotExist:
                 self.opac_model_instance = None
             except Exception as e:
                 logger.error(e)
@@ -159,21 +169,25 @@ class BaseLoader(object):
         obj_dict = self.transform_model_instance_to_python()
         obj_dict['_id'] = self._uuid_str
 
-        logger.debug(u"recuperando modelo no opac (_id: %s)" % obj_dict['_id'])
-        with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
-            logger.debug(u'tentamos atualizar modelo opac')
-            if self.opac_model_instance is None:
-                logger.debug(u'opac_model_instance is None. criamos nova instância')
-                self.opac_model_instance = self.opac_model_class(**obj_dict)
-                self.opac_model_instance.save()
-                self.opac_model_instance.reload()
-                logger.debug(u'novo modelo opac criado: _id = %s' % self.opac_model_instance._id)
-            else:
-                for k, v in obj_dict.iteritems():
-                    self.opac_model_instance[k] = v
-                self.opac_model_instance.save()
+        with \
+            switch_db(OpacCollection, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacJournal, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacIssue, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacArticle, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacSponsor, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacNews, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacPages, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacPressRelease, OPAC_WEBAPP_DB_NAME):
 
-            logger.debug(u"modelo opac (_id: %s) encontrado. atualizando registro" % obj_dict['_id'])
+                if self.opac_model_instance is None:
+                    # crio uma nova instância
+                    self.opac_model_instance = self.opac_model_class(**obj_dict)
+                    self.opac_model_instance.switch_db(OPAC_WEBAPP_DB_NAME)
+                else:  # já tenho uma instância no banco
+                    self.opac_model_instance.switch_db(OPAC_WEBAPP_DB_NAME)
+                    self.opac_model_instance.modify(**obj_dict)
+
+        logger.debug(u"modelo opac (_id: %s) encontrado. atualizando registro" % obj_dict['_id'])
 
         logger.debug(u"finalizando metodo prepare(uuid: %s)" % self.metadata['uuid'])
         logger.debug(u'opac_model_instance SALVO: %s' % self.opac_model_instance.to_json())
@@ -185,24 +199,31 @@ class BaseLoader(object):
         logger.debug(u"salvando modelo %s no opac (_id: %s)" % (
             self.opac_model_name, self.opac_model_instance._id))
 
-        with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
-            self.opac_model_instance.save()
-            self.opac_model_instance.reload()
-            logger.debug(u"modelo %s no opac (_id: %s) foi salvo" % (
-                self.opac_model_name, self.opac_model_instance._id))
+        with \
+            switch_db(OpacCollection, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacJournal, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacIssue, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacArticle, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacSponsor, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacNews, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacPages, OPAC_WEBAPP_DB_NAME), \
+            switch_db(OpacPressRelease, OPAC_WEBAPP_DB_NAME):
 
-        logger.debug(u"salvando modelo %s no opac_proc (uuid: %s)" % (
-            self.load_model_name, self.metadata['uuid']))
+                self.opac_model_instance.switch_db(OPAC_WEBAPP_DB_NAME)
+                self.opac_model_instance.save()
+                self.opac_model_instance.reload()
 
+        # atualizamos os dados do registro LOAD
         with switch_db(self.load_model_class, OPAC_PROC_DB_NAME):
             self.metadata['process_finish_at'] = datetime.now()
             self.metadata['process_completed'] = True
             self.metadata['must_reprocess'] = False
+            json_opac_data = self.opac_model_instance.to_json()
+            cleaned_json_opac_data = json_opac_data.replace('$', '')  # retiramos o $
+            self.metadata['loaded_data'] = json.loads(cleaned_json_opac_data)
             self.load_model_instance.update(**self.metadata)
-            for field_to_load in self.fields_to_load:
-                opac_field_value = self.opac_model_instance[field_to_load]
-                self.load_model_instance[field_to_load] = opac_field_value
             self.load_model_instance.save()
+            self.load_model_instance.reload()
             logger.debug(u"modelo %s no opac_proc (uuid: %s) foi atualizado" % (
                 self.load_model_name, self.metadata['uuid']))
 

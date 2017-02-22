@@ -6,11 +6,14 @@ from opac_proc.extractors.decorators import update_metadata
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
+from scieloh5m5 import h5m5
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "extract")
 else:
     logger = getMongoLogger(__name__, "INFO", "extract")
+
+PUBLICATION_SIZE_ENDPOINT = 'ajx/publication/size'
 
 
 class JournalExtactor(BaseExtractor):
@@ -26,6 +29,22 @@ class JournalExtactor(BaseExtractor):
         self.get_instance_query = {
             'code': self.issn
         }
+
+    def _extract_metrics(self):
+        logger.debug(u"iniciando: _extract_metrics")
+        metrics_data = {
+            'total_h5_index': 0,
+            'total_h5_median': 0,
+        }
+        year = datetime.now().year
+        _h5m5 = h5m5.get(self.issn, str(year))
+
+        if _h5m5:
+            metrics_data = {
+                'total_h5_index': _h5m5['h5'],
+                'total_h5_median': _h5m5['m5'],
+            }
+        return metrics_data
 
     @update_metadata
     def extract(self):
@@ -44,5 +63,7 @@ class JournalExtactor(BaseExtractor):
             logger.error(msg)
             raise Exception(msg)
 
-        logger.info(u'Fim JournalExtactor.extract(%s) %s' % (
-            self.acronym, datetime.now()))
+        # extração de métricas:
+        self._raw_data['metrics'] = self._extract_metrics()
+
+        logger.info(u'Fim JournalExtactor.extract(%s) %s', self.acronym, datetime.now())
