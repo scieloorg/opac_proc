@@ -22,7 +22,7 @@ class TransformCollectionListView(TransformBaseListView):
     model_class = models.TransformCollection
     model_name = 'collection'
     page_title = "Transform: Collection"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -103,7 +103,7 @@ class TransformJournalListView(TransformBaseListView):
     model_class = models.TransformJournal
     model_name = 'journal'
     page_title = "Transform: Journals"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -174,7 +174,7 @@ class TransformIssueListView(TransformBaseListView):
     model_class = models.TransformIssue
     model_name = 'issue'
     page_title = "Transform: Issues"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -245,7 +245,7 @@ class TransformArticleListView(TransformBaseListView):
     model_class = models.TransformArticle
     model_name = 'article'
     page_title = "Transform: Articles"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -323,7 +323,7 @@ class TransformLogListView(TransformBaseListView):
     page_title = "Transform: Logs"
     page_subtitle = "most recent first"
     per_page = 50
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'Timestamp',
             'field_name': 'time',

@@ -2,7 +2,6 @@ import os
 import sys
 import unittest
 from flask_script import Manager, Shell
-from flask import current_app
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(PROJECT_PATH)

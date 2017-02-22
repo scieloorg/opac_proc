@@ -16,14 +16,14 @@ else:
 PUBLICATION_SIZE_ENDPOINT = 'ajx/publication/size'
 
 
-class JournalExtactor(BaseExtractor):
+class JournalExtractor(BaseExtractor):
     acronym = None
     issn = None
 
     extract_model_class = ExtractJournal
 
     def __init__(self, acronym, issn):
-        super(JournalExtactor, self).__init__()
+        super(JournalExtractor, self).__init__()
         self.acronym = acronym
         self.issn = issn
         self.get_instance_query = {
@@ -51,7 +51,7 @@ class JournalExtactor(BaseExtractor):
         """
         Conecta com a fonte (AM) e extrai todos os dados (coleção).
         """
-        logger.info(u'Inicia JournalExtactor.extract(%s) %s' % (
+        logger.info(u'Inicia JournalExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))
 
         journal = self.articlemeta.get_journal(collection=self.acronym, code=self.issn)
@@ -65,5 +65,5 @@ class JournalExtactor(BaseExtractor):
 
         # extração de métricas:
         self._raw_data['metrics'] = self._extract_metrics()
-
-        logger.info(u'Fim JournalExtactor.extract(%s) %s', self.acronym, datetime.now())
+        logger.info(u'Fim JournalExtractor.extract(%s) %s' % (
+            self.acronym, datetime.now()))

@@ -22,7 +22,7 @@ class LoadCollectionListView(LoadBaseListView):
     model_class = models.LoadCollection
     model_name = 'collection'
     page_title = "Load: Collection"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -103,7 +103,7 @@ class LoadJournalListView(LoadBaseListView):
     model_class = models.LoadJournal
     model_name = 'journal'
     page_title = "Load: Journals"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -174,7 +174,7 @@ class LoadIssueListView(LoadBaseListView):
     model_class = models.LoadIssue
     model_name = 'issue'
     page_title = "Load: Issues"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -212,7 +212,7 @@ class LoadArticleListView(LoadBaseListView):
     model_class = models.LoadArticle
     model_name = 'article'
     page_title = "Load: Articles"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -289,7 +289,7 @@ class LoadLogListView(LoadBaseListView):
     page_title = "Load: Logs"
     page_subtitle = "most recent first"
     per_page = 50
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'Timestamp',
             'field_name': 'time',

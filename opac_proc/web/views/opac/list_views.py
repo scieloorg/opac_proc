@@ -33,7 +33,7 @@ class OpacCollectionListView(OpacBaseListView):
     model_class = models.Collection
     model_name = 'collection'
     page_title = "OPAC: Collections"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'ID',
             'field_name': '_id',
@@ -73,7 +73,7 @@ class OpacJournalListView(OpacBaseListView):
     model_class = models.Journal
     model_name = 'journal'
     page_title = "OPAC: Journals"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'ID',
             'field_name': '_id',
@@ -144,7 +144,7 @@ class OpacIssueListView(OpacBaseListView):
     model_class = models.Issue
     model_name = 'issue'
     page_title = "OPAC: Issues"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'ID',
             'field_name': '_id',
@@ -185,7 +185,7 @@ class OpacArticleListView(OpacBaseListView):
     model_class = models.Article
     model_name = 'article'
     page_title = "OPAC: Articles"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'ID',
             'field_name': '_id',
@@ -236,7 +236,7 @@ class OpacSponsorListView(OpacBaseListView):
     model_class = models.Sponsor
     model_name = 'sponsor'
     page_title = "OPAC: Sponsors"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'ID',
             'field_name': '_id',
@@ -277,7 +277,7 @@ class OpacPageListView(OpacBaseListView):
     model_class = models.Pages
     model_name = 'page'
     page_title = "OPAC: Pages"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'ID',
             'field_name': '_id',
@@ -328,7 +328,7 @@ class OpacPressReleaseListView(OpacBaseListView):
     model_class = models.PressRelease
     model_name = 'PressRelease'
     page_title = "OPAC: Press Release"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'ID',
             'field_name': '_id',
@@ -389,7 +389,7 @@ class OpacNewsListView(OpacBaseListView):
     model_class = models.News
     model_name = 'News'
     page_title = "OPAC: News"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'ID',
             'field_name': '_id',

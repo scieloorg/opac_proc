@@ -13,14 +13,14 @@ else:
     logger = getMongoLogger(__name__, "INFO", "extract")
 
 
-class IssueExtactor(BaseExtractor):
+class IssueExtractor(BaseExtractor):
     acronym = None
     issue_id = None
 
     extract_model_class = ExtractIssue
 
     def __init__(self, acronym, issue_id):
-        super(IssueExtactor, self).__init__()
+        super(IssueExtractor, self).__init__()
         self.acronym = acronym
         self.issue_id = issue_id
         self.get_instance_query = {
