@@ -197,6 +197,7 @@ def task_process_all_articles():
 # --------------------------------------------------- #
 #               PRESS RELEASES                        #
 # --------------------------------------------------- #
+
 def task_extract_press_release(acronym, url):
     extractor = PressReleaseExtractor(acronym, url)
     extractor.get_items_from_feed()
