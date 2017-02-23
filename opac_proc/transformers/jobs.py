@@ -95,7 +95,7 @@ def task_process_all_journals():
     collection = models.TransformCollection.objects.all().first()
 
     for child in collection.children_ids:
-        r_queues.enqueue(stage, 'collection', task_transform_journal, collection.acronym, child['issn'])
+        r_queues.enqueue(stage, 'journal', task_transform_journal, collection.acronym, child['issn'])
 
 # Issues:
 

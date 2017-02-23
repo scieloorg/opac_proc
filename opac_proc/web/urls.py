@@ -5,13 +5,15 @@ from opac_proc.web.views.extract.list_views import (
     ExtractJournalListView,
     ExtractIssueListView,
     ExtractArticleListView,
-    ExtractLogListView)
+    ExtractPressReleaseListView,
+    ExtractLogListView, )
 
 from opac_proc.web.views.extract.detail_views import (
     ExtractCollectionDetailView,
     ExtractJournalDetailView,
     ExtractIssueDetailView,
     ExtractArticleDetailView,
+    ExtractPressReleaseDetailView,
     ExtractLogDetailView)
 
 from opac_proc.web.views.transform.list_views import (
@@ -83,6 +85,10 @@ url_patterns = (
             'article': {
                 'list_view_class': ExtractArticleListView,
                 'detail_view_class': ExtractArticleDetailView,
+            },
+            'press_release': {
+                'list_view_class': ExtractPressReleaseListView,
+                'detail_view_class': ExtractPressReleaseDetailView,
             },
             'logs': {
                 'list_view_class': ExtractLogListView,
@@ -190,6 +196,7 @@ def add_url_rules(app):
         models_data = url_definition['models']
 
         for model_name, view_classes in models_data.iteritems():
+            print "registarando view: ", model_name, "view_class: ", view_classes
             list_view_class = view_classes['list_view_class']
             detail_view_class = view_classes['detail_view_class']
 

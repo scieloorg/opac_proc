@@ -22,7 +22,7 @@ class ExtractCollectionListView(ExtractBaseListView):
     model_class = models.ExtractCollection
     model_name = 'collection'
     page_title = "Extract: Collection"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -42,11 +42,6 @@ class ExtractCollectionListView(ExtractBaseListView):
             'field_label': u'Last update',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -80,11 +75,6 @@ class ExtractCollectionListView(ExtractBaseListView):
             'field_label': u'Last update',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -103,7 +93,7 @@ class ExtractJournalListView(ExtractBaseListView):
     model_class = models.ExtractJournal
     model_name = 'journal'
     page_title = "Extract: Journals"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -118,11 +108,6 @@ class ExtractJournalListView(ExtractBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -151,11 +136,6 @@ class ExtractJournalListView(ExtractBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -174,7 +154,7 @@ class ExtractIssueListView(ExtractBaseListView):
     model_class = models.ExtractIssue
     model_name = 'issue'
     page_title = "Extract: Issues"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -191,11 +171,6 @@ class ExtractIssueListView(ExtractBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -206,7 +181,6 @@ class ExtractIssueListView(ExtractBaseListView):
             'field_type': 'boolean'
         },
     ]
-
     list_filters = [
         {
             'field_label': u'UUID',
@@ -222,11 +196,6 @@ class ExtractIssueListView(ExtractBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -245,7 +214,7 @@ class ExtractArticleListView(ExtractBaseListView):
     model_class = models.ExtractArticle
     model_name = 'article'
     page_title = "Extract: Articles"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -260,11 +229,6 @@ class ExtractArticleListView(ExtractBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -295,9 +259,65 @@ class ExtractArticleListView(ExtractBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
             'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+
+class ExtractPressReleaseListView(ExtractBaseListView):
+    model_class = models.ExtractPressRelease
+    model_name = 'press_release'
+    page_title = "Extract: Press Releases"
+    list_columns = [
+        {
+            'field_label': u'UUID',
+            'field_name': 'uuid',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'PID',
+            'field_name': 'code',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+    list_filters = [
+        {
+            'field_label': u'UUID',
+            'field_name': 'uuid',
+            'field_type': 'uuid'
+        },
+        {
+            'field_label': u'PID',
+            'field_name': 'code',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
@@ -322,7 +342,7 @@ class ExtractLogListView(ExtractBaseListView):
     page_title = "Extract: Logs"
     page_subtitle = "most recent first"
     per_page = 50
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'Timestamp',
             'field_name': 'time',

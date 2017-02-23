@@ -18,21 +18,26 @@ from opac_proc.datastore import models
 def home():
     register_connections()
     opac_webapp_db_name = get_opac_webapp_db_name()
+
     # extract counts
     extract_collection_count = models.ExtractCollection.objects.all().count()
     extract_journal_count = models.ExtractJournal.objects.all().count()
     extract_issue_count = models.ExtractIssue.objects.all().count()
     extract_article_count = models.ExtractArticle.objects.all().count()
+    extract_press_release_count = models.ExtractPressRelease.objects.all().count()
+
     # transform counts
     transform_collection_count = models.TransformCollection.objects.all().count()
     transform_journal_count = models.TransformJournal.objects.all().count()
     transform_issue_count = models.TransformIssue.objects.all().count()
     transform_article_count = models.TransformArticle.objects.all().count()
+
     # load counts
     load_collection_count = models.LoadCollection.objects.all().count()
     load_journal_count = models.LoadJournal.objects.all().count()
     load_issue_count = models.LoadIssue.objects.all().count()
     load_article_count = models.LoadArticle.objects.all().count()
+
     # OPAC counts
     with switch_db(OpacCollection, opac_webapp_db_name):
         opac_collection_count = OpacCollection.objects.all().count()
@@ -64,21 +69,26 @@ def home():
         'extract_journal_count': extract_journal_count,
         'extract_issue_count': extract_issue_count,
         'extract_article_count': extract_article_count,
+        'extract_press_release_count': extract_press_release_count,
+
         # tranform
         'transform_collection_count': transform_collection_count,
         'transform_journal_count': transform_journal_count,
         'transform_issue_count': transform_issue_count,
         'transform_article_count': transform_article_count,
+
         # load
         'load_collection_count': load_collection_count,
         'load_journal_count': load_journal_count,
         'load_issue_count': load_issue_count,
         'load_article_count': load_article_count,
+
         # opac
         'opac_collection_count': opac_collection_count,
         'opac_journal_count': opac_journal_count,
         'opac_issue_count': opac_issue_count,
         'opac_article_count': opac_article_count,
+
         # opac outros modelos
         'opac_sponsor_count': opac_sponsor_count,
         'opac_pressrelease_count': opac_pressrelease_count,

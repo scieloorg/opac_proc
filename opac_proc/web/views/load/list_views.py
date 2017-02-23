@@ -22,7 +22,7 @@ class LoadCollectionListView(LoadBaseListView):
     model_class = models.LoadCollection
     model_name = 'collection'
     page_title = "Load: Collection"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -42,11 +42,6 @@ class LoadCollectionListView(LoadBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -82,11 +77,6 @@ class LoadCollectionListView(LoadBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -103,7 +93,7 @@ class LoadJournalListView(LoadBaseListView):
     model_class = models.LoadJournal
     model_name = 'journal'
     page_title = "Load: Journals"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -118,11 +108,6 @@ class LoadJournalListView(LoadBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -153,11 +138,6 @@ class LoadJournalListView(LoadBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -174,7 +154,7 @@ class LoadIssueListView(LoadBaseListView):
     model_class = models.LoadIssue
     model_name = 'issue'
     page_title = "Load: Issues"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -189,11 +169,6 @@ class LoadIssueListView(LoadBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -212,7 +187,7 @@ class LoadArticleListView(LoadBaseListView):
     model_class = models.LoadArticle
     model_name = 'article'
     page_title = "Load: Articles"
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
@@ -227,11 +202,6 @@ class LoadArticleListView(LoadBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -262,11 +232,6 @@ class LoadArticleListView(LoadBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -289,7 +254,7 @@ class LoadLogListView(LoadBaseListView):
     page_title = "Load: Logs"
     page_subtitle = "most recent first"
     per_page = 50
-    list_colums = [
+    list_columns = [
         {
             'field_label': u'Timestamp',
             'field_name': 'time',
