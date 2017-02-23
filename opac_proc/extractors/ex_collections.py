@@ -119,4 +119,5 @@ class CollectionExtractor(BaseExtractor):
         # extração de metricas
         self._raw_data['metrics'] = self._extract_metrics()
 
-        logger.info(u'Fim CollectionExtractor.extract(%s) %s' % (self.acronym, datetime.now()))
+        logger.info(u'Fim CollectionExtractor.extract(%s) %s' % (
+            self.acronym, datetime.now()))

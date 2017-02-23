@@ -44,11 +44,6 @@ class LoadCollectionListView(LoadBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -80,11 +75,6 @@ class LoadCollectionListView(LoadBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -120,11 +110,6 @@ class LoadJournalListView(LoadBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -151,11 +136,6 @@ class LoadJournalListView(LoadBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -191,11 +171,6 @@ class LoadIssueListView(LoadBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -229,11 +204,6 @@ class LoadArticleListView(LoadBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -260,11 +230,6 @@ class LoadArticleListView(LoadBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',

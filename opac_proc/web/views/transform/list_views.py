@@ -44,11 +44,6 @@ class TransformCollectionListView(TransformBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -80,11 +75,6 @@ class TransformCollectionListView(TransformBaseListView):
             'field_label': u'Last update',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -120,11 +110,6 @@ class TransformJournalListView(TransformBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -151,11 +136,6 @@ class TransformJournalListView(TransformBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -191,11 +171,6 @@ class TransformIssueListView(TransformBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -222,11 +197,6 @@ class TransformIssueListView(TransformBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -262,11 +232,6 @@ class TransformArticleListView(TransformBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -293,11 +258,6 @@ class TransformArticleListView(TransformBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',

@@ -44,11 +44,6 @@ class ExtractCollectionListView(ExtractBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -80,11 +75,6 @@ class ExtractCollectionListView(ExtractBaseListView):
             'field_label': u'Last update',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -120,11 +110,6 @@ class ExtractJournalListView(ExtractBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -151,11 +136,6 @@ class ExtractJournalListView(ExtractBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -191,11 +171,6 @@ class ExtractIssueListView(ExtractBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -221,11 +196,6 @@ class ExtractIssueListView(ExtractBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -261,11 +231,6 @@ class ExtractArticleListView(ExtractBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -292,11 +257,6 @@ class ExtractArticleListView(ExtractBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',
@@ -332,11 +292,6 @@ class ExtractPressReleaseListView(ExtractBaseListView):
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
-        },
-        {
             'field_label': u'Process completed?',
             'field_name': 'process_completed',
             'field_type': 'boolean'
@@ -363,11 +318,6 @@ class ExtractPressReleaseListView(ExtractBaseListView):
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
-        },
-        {
-            'field_label': u'Deleted?',
-            'field_name': 'is_deleted',
-            'field_type': 'boolean'
         },
         {
             'field_label': u'Process completed?',

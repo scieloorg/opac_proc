@@ -160,4 +160,9 @@ class JournalTransformer(BaseTransformer):
                 })
             self.transform_model_instance['other_titles'] = other_titles
 
+        # metrics:
+        if hasattr(self.extract_model_instance, 'metrics'):
+            metrics = self.extract_model_instance.metrics
+            self.transform_model_instance['metrics'] = metrics
+
         return self.transform_model_instance
