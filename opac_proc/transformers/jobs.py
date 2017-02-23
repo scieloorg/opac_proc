@@ -185,3 +185,23 @@ def task_process_all_articles():
         articles_ids = child['articles_ids']
         for article_pid in articles_ids:
             r_queues.enqueue(stage, 'article', task_transform_article, collection.acronym, article_pid)
+
+
+# Press releases
+
+def task_transform_press_release(press_release_id):
+    transformer = PressReleaseTransformer(extract_model_key=press_release_id)
+    transformer.transform()
+    transformer.save()
+
+
+def task_process_all_press_releases():
+    get_db_connection()
+    stage = "transform"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    press_releases = models.ExtractPressRelease.objects.all()
+
+    for press_release in press_releases:
+        r_queues.enqueue(stage, 'press_release', task_transform_press_release, press_release._id)
