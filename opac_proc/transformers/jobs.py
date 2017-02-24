@@ -224,7 +224,7 @@ def task_transform_press_release(press_release_id):
     transformer.save()
 
 
-def task_reprocess_articles(ids=None):
+def task_reprocess_press_release(ids=None):
     raise NotImplementedError
 
 def task_process_all_press_releases():
