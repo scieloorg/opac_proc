@@ -21,6 +21,7 @@ from opac_proc.web.views.transform.list_views import (
     TransformJournalListView,
     TransformIssueListView,
     TransformArticleListView,
+    TransformPressReleaseListView,
     TransformLogListView)
 
 from opac_proc.web.views.transform.detail_views import (
@@ -28,6 +29,7 @@ from opac_proc.web.views.transform.detail_views import (
     TransformJournalDetailView,
     TransformIssueDetailView,
     TransformArticleDetailView,
+    TransformPressReleaseDetailView,
     TransformLogDetailView)
 
 from opac_proc.web.views.load.list_views import (
@@ -114,6 +116,10 @@ url_patterns = (
             'article': {
                 'list_view_class': TransformArticleListView,
                 'detail_view_class': TransformArticleDetailView,
+            },
+            'press_release': {
+                'list_view_class': TransformPressReleaseListView,
+                'detail_view_class': TransformPressReleaseDetailView,
             },
             'logs': {
                 'list_view_class': TransformLogListView,

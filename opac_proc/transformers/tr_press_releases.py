@@ -26,9 +26,17 @@ class PressReleaseTransformer(BaseTransformer):
     def get_extract_model_instance(self, key):
         return self.extract_model_class.objects.get(_id=key)
 
+
+    def get_item_date(self):
+        return datetime.datetime.strptime(
+            self.extract_model_instance.published[5:25], 
+            '%d %b %Y %X')
+
+
     @update_metadata
     def transform(self):
         # aid
         uuid = self.extract_model_instance.uuid
         self.transform_model_instance['uuid'] = uuid
+        self.transform_model_instance['published'] = self.get_item_date()
         return self.transform_model_instance
