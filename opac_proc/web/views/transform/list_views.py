@@ -277,6 +277,7 @@ class TransformPressReleaseListView(TransformBaseListView):
     model_name = 'press_release'
     page_title = "Transform: Press Releases"
 
+
 class TransformLogListView(TransformBaseListView):
     model_class = models.TransformLog
     model_name = 'transformlog'

@@ -19,19 +19,19 @@ else:
 
 class PressReleaseExtractor(BaseExtractor):
     acronym = None
+    lang = None
     url = None
     error = None
     is_empty = True
 
     extract_model_class = ExtractPressRelease
 
-    def __init__(self, acronym, url):
+    def __init__(self, acronym, url, lang):
         super(PressReleaseExtractor, self).__init__()
         self.acronym = acronym
         self.url = url
-        self.get_instance_query = {
-            'code': self.acronym
-        }
+        self.lang = lang
+        self.get_instance_query = {'code': self.acronym}
 
     def get_items_from_feed(self):
         feed = feedparser.parse(self.url)
@@ -51,6 +51,10 @@ class PressReleaseExtractor(BaseExtractor):
 
             # Set raw data
             self._raw_data = dict(items)
+            # extra fields
+            self._raw_data['journal_acronym'] = self.acronym
+            self._raw_data['feed_lang'] = self.lang[:2]
+            self._raw_data['feed_url_used'] = self.url
 
     def log_error(self):
         logger.error(self.error)
@@ -70,4 +74,3 @@ class PressReleaseExtractor(BaseExtractor):
 
         logger.info(u"Fim PressReleasesExtractor.extract(%s) %s" % (
             self.acronym, datetime.now()))
-

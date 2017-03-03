@@ -29,6 +29,8 @@ class ExtractProcess(Process):
             self.collection_acronym = config.OPAC_PROC_COLLECTION
         self.r_queues.create_queues_for_stage(self.stage)
 
+    # Reprocess:
+
     def reprocess_collections(self, ids=None):
         self.r_queues.enqueue(
             self.stage, 'collection', jobs.task_reprocess_collections, ids)
@@ -44,6 +46,8 @@ class ExtractProcess(Process):
     def reprocess_articles(self, ids=None):
         self.r_queues.enqueue(
             self.stage, 'article', jobs.task_reprocess_articles, ids)
+
+    # Process:
 
     def process_collection(self, collection_acronym=None, collection_uuid=None):
         if collection_acronym is None and collection_uuid is None:
@@ -130,9 +134,12 @@ class ExtractProcess(Process):
             collection_acronym,
             article_pid)
 
+    # Process All:
+
     def process_all_collections(self):
         self.r_queues.enqueue(
-            self.stage, 'collection', jobs.task_process_all_collections, self.collection_acronym)
+            self.stage, 'collection',
+            jobs.task_process_all_collections, self.collection_acronym)
 
     def process_all_journals(self):
         self.r_queues.enqueue(
@@ -147,6 +154,6 @@ class ExtractProcess(Process):
             self.stage, 'article', jobs.task_process_all_articles)
 
     def process_all_press_releases(self):
-        jobs.task_process_all_press_releases()
         self.r_queues.enqueue(
-            self.stage, 'press_release', jobs.task_process_all_press_releases)
+            self.stage, 'press_release',
+            jobs.task_process_all_press_releases)
