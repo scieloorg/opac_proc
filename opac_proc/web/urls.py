@@ -21,6 +21,7 @@ from opac_proc.web.views.transform.list_views import (
     TransformJournalListView,
     TransformIssueListView,
     TransformArticleListView,
+    TransformPressReleaseListView,
     TransformLogListView)
 
 from opac_proc.web.views.transform.detail_views import (
@@ -28,6 +29,7 @@ from opac_proc.web.views.transform.detail_views import (
     TransformJournalDetailView,
     TransformIssueDetailView,
     TransformArticleDetailView,
+    TransformPressReleaseDetailView,
     TransformLogDetailView)
 
 from opac_proc.web.views.load.list_views import (
@@ -115,6 +117,10 @@ url_patterns = (
                 'list_view_class': TransformArticleListView,
                 'detail_view_class': TransformArticleDetailView,
             },
+            'press_release': {
+                'list_view_class': TransformPressReleaseListView,
+                'detail_view_class': TransformPressReleaseDetailView,
+            },
             'logs': {
                 'list_view_class': TransformLogListView,
                 'detail_view_class': TransformLogDetailView,
@@ -196,7 +202,7 @@ def add_url_rules(app):
         models_data = url_definition['models']
 
         for model_name, view_classes in models_data.iteritems():
-            print "registarando view: ", model_name, "view_class: ", view_classes
+
             list_view_class = view_classes['list_view_class']
             detail_view_class = view_classes['detail_view_class']
 

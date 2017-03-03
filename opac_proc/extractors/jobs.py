@@ -198,12 +198,44 @@ def task_process_all_articles():
 #               PRESS RELEASES                        #
 # --------------------------------------------------- #
 
-def task_extract_press_release(acronym, url):
-    extractor = PressReleaseExtractor(acronym, url)
+
+def task_extract_press_release(acronym, url, lang):
+    extractor = PressReleaseExtractor(acronym, url, lang)
     extractor.get_items_from_feed()
     if not extractor.is_empty:
         extractor.extract()
         extractor.save()
+
+
+def task_reprocess_press_release(ids=None):
+    get_db_connection()
+    stage = "extract"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    if ids is None:  # update all collections
+        models.ExtractPressRelease.objects.all().update(must_reprocess=True)
+        for pr in models.ExtractPressRelease.objects.all():
+            r_queues.enqueue(
+                stage, 'press_release',
+                task_extract_press_release,
+                acronym=pr.journal_acronym,
+                url=pr.feed_url_used,
+                lang=pr.feed_lang)
+    else:
+        for oid in ids:
+            try:
+                obj = models.ExtractPressRelease.objects.get(pk=oid)
+                obj.update(must_reprocess=True)
+                obj.reload()
+                r_queues.enqueue(
+                    stage, 'press_release',
+                    task_extract_press_release,
+                    acronym=obj.journal_acronym,
+                    url=obj.feed_url_used,
+                    lang=obj.feed_lang)
+            except models.ExtractPressRelease.DoesNotExist as e:
+                logger.error('models.ExtractPressRelease %s. pk: %s' % (str(e), oid))
 
 
 def task_process_all_press_releases():
@@ -215,8 +247,14 @@ def task_process_all_press_releases():
     journals = models.ExtractJournal.objects.all()
 
     for journal in journals:
-        acronym = xylose_journal(json.loads(journal.to_json())).acronym
+        journal_dict = json.loads(journal.to_json())
+        acronym = xylose_journal(journal_dict).acronym
 
         for lang, feed in config.RSS_PRESS_RELEASES_FEEDS_BY_CATEGORY.items():
             url = feed['url'].format(lang, acronym)
-            r_queues.enqueue(stage, 'press_release', task_extract_press_release, acronym, url)
+            r_queues.enqueue(
+                stage, 'press_release',
+                task_extract_press_release,
+                acronym=acronym,
+                url=url,
+                lang=lang)
