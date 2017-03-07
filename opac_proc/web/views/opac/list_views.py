@@ -335,25 +335,30 @@ class OpacPressReleaseListView(OpacBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Journal',
-            'field_name': 'journal',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Issue',
-            'field_name': 'issue',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Article',
-            'field_name': 'article',
-            'field_type': 'string'
-        },
-        {
             'field_label': u'Language',
             'field_name': 'language',
             'field_type': 'string'
-        }
+        },
+        {
+            'field_label': u'URL',
+            'field_name': 'url',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Publication Date',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Created',
+            'field_name': 'created',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Updated',
+            'field_name': 'updated',
+            'field_type': 'date_time'
+        },
     ]
 
     list_filters = [
@@ -363,25 +368,30 @@ class OpacPressReleaseListView(OpacBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Journal',
-            'field_name': 'journal',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Issue',
-            'field_name': 'issue',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Article',
-            'field_name': 'article',
-            'field_type': 'string'
-        },
-        {
             'field_label': u'Language',
             'field_name': 'language',
             'field_type': 'string'
-        }
+        },
+        {
+            'field_label': u'URL',
+            'field_name': 'url',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Publication Date',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Created',
+            'field_name': 'created',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Updated',
+            'field_name': 'updated',
+            'field_type': 'date_time'
+        },
     ]
 
 

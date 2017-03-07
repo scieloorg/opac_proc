@@ -201,9 +201,9 @@ def task_process_all_articles():
 
 def task_extract_press_release(acronym, url, lang):
     extractor = PressReleaseExtractor(acronym, url, lang)
-    extractor.get_items_from_feed()
-    if not extractor.is_empty:
-        extractor.extract()
+    pr_entries = extractor.get_feed_entries()
+    for pr_entry in pr_entries:
+        extractor.extract(pr_entry)
         extractor.save()
 
 
@@ -244,9 +244,7 @@ def task_process_all_press_releases():
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
-    journals = models.ExtractJournal.objects.all()
-
-    for journal in journals:
+    for journal in models.ExtractJournal.objects.all():
         journal_dict = json.loads(journal.to_json())
         acronym = xylose_journal(journal_dict).acronym
 

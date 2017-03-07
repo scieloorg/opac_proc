@@ -285,6 +285,9 @@ signals.post_save.connect(LoadArticle.post_save, sender=LoadArticle)
 
 
 class LoadPressRelease(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        pass  # não precisa propagar mais
+
     meta = {
         'collection': 'l_press_release'
     }

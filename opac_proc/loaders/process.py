@@ -31,6 +31,8 @@ class LoadProcess(Process):
 
         self.r_queues.create_queues_for_stage(self.stage)
 
+    # Reprocess
+
     def reprocess_collections(self, ids=None):
         self.r_queues.enqueue(
             self.stage, 'collection', jobs.task_reprocess_collections, ids)
@@ -46,6 +48,12 @@ class LoadProcess(Process):
     def reprocess_articles(self, ids=None):
         self.r_queues.enqueue(
             self.stage, 'article', jobs.task_reprocess_articles, ids)
+
+    def reprocess_press_releases(self, ids=None):
+        self.r_queues.enqueue(
+            self.stage, 'press_release', jobs.task_reprocess_press_releases, ids)
+
+    # Process
 
     def process_collection(self, collection_acronym=None, collection_uuid=None):
         if not collection_acronym:
@@ -133,6 +141,14 @@ class LoadProcess(Process):
             jobs.task_load_article,
             uuid)
 
+    def process_press_release(self, uuid):
+        self.r_queues.enqueue(
+            self.stage, 'press_release',
+            jobs.task_load_press_release,
+            uuid=uuid)
+
+    # Process All
+
     def process_all_collections(self):
         self.r_queues.enqueue(
             self.stage, 'collection', jobs.task_process_all_collections)
@@ -148,3 +164,7 @@ class LoadProcess(Process):
     def process_all_articles(self):
         self.r_queues.enqueue(
             self.stage, 'issue', jobs.task_process_all_articles)
+
+    def process_all_press_releases(self):
+        self.r_queues.enqueue(
+            self.stage, 'press_release', jobs.task_process_all_press_releases)

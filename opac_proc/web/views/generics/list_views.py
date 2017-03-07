@@ -162,7 +162,6 @@ class ListView(View):
                         flash('filter for: "%s" is invalid' % f_field_label, 'warning')
                         continue  # ignore this filter
 
-            print "result qs_filters: ", qs_filters
             return qs_filters
         else:
             return qs_filters
@@ -218,6 +217,8 @@ class ListView(View):
             processor.reprocess_issues()
         elif self.model_name == 'article':
             processor.reprocess_articles()
+        elif self.model_name == 'press_release':
+            processor.reprocess_press_releases()
         else:
             raise ValueError('Invalid "model_name" attribute')
 
@@ -233,6 +234,8 @@ class ListView(View):
             processor.reprocess_issues(ids)
         elif self.model_name == 'article':
             processor.reprocess_articles(ids)
+        elif self.model_name == 'press_release':
+            processor.reprocess_press_releases(ids)
         else:
             raise ValueError('Invalid "model_name" attribute')
 

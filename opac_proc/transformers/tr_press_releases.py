@@ -24,7 +24,7 @@ class PressReleaseTransformer(BaseTransformer):
     transform_model_instance = None
 
     def get_extract_model_instance(self, key):
-        return self.extract_model_class.objects.get(_id=key)
+        return self.extract_model_class.objects.get(uuid=key)
 
     def get_item_date(self):
         return datetime.datetime.strptime(
