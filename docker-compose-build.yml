@@ -44,10 +44,6 @@ services:
     user: nobody
     restart: always
     hostname: opac-proc-webapp
-    depends_on:
-      - mongo-proc
-      - mongo-logs
-      - redis
     links:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
@@ -88,11 +84,7 @@ services:
         - OPAC_PROC_WEBAPP_VERSION=${OPAC_PROC_WEBAPP_VERSION}    # export OPAC_PROC_WEBAPP_VERSION="v0.1.0-dev"
     user: nobody
     restart: always
-    hostname: opac-proc-webapp
-    depends_on:
-      - mongo-proc
-      - mongo-logs
-      - redis
+    hostname: opac-proc-rqworker
     links:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
@@ -132,6 +124,3 @@ services:
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
-    stdin_open: True
-    tty: true
-

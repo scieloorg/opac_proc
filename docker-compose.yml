@@ -30,31 +30,22 @@ services:
     ports:
         - "6379:6379"  # deve ser o mesmo que a env var: OPAC_PROC_REDIS_PORT
     volumes:
-      - ./redis-data-dev:/data
+      - redis-data-dev:/data
       - /etc/localtime:/etc/localtime:ro
 
   rq-worker:
-    build:
-      context: .
-      args:
-        - OPAC_PROC_BUILD_DATE=${OPAC_PROC_BUILD_DATE}            # export OPAC_PROC_BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
-        - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
-        - OPAC_PROC_WEBAPP_VERSION=${OPAC_PROC_WEBAPP_VERSION}    # export OPAC_PROC_WEBAPP_VERSION="v0.1.0-dev"
+    images: scieloorg/opac_proc
     command: /start_worker.sh
     user: nobody
     restart: always
-    hostname: opac-proc-webapp
-    depends_on:
-      - mongo-proc
-      - mongo-logs
-      - redis
+    hostname: opac-proc-rqworker
     links:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
       - redis:redis
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - .:/app
+      - /mnt/scielosp_org:/data:ro
     environment:
       - OPAC_PROC_LOG_LEVEL=DEBUG
       - OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN=articlemeta.scielo.org
@@ -87,25 +78,17 @@ services:
       - OPAC_PROC_REDIS_PORT=6379
 
   webapp:
-    build:
-      context: .
-      args:
-        - OPAC_PROC_BUILD_DATE=${OPAC_PROC_BUILD_DATE}            # export OPAC_PROC_BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
-        - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
-        - OPAC_PROC_WEBAPP_VERSION=${OPAC_PROC_WEBAPP_VERSION}    # export OPAC_PROC_WEBAPP_VERSION="v0.1.0-dev"
+    images: scieloorg/opac_proc
     user: nobody
     restart: always
     hostname: opac-proc-webapp
-    depends_on:
-      - mongo-proc
-      - mongo-logs
-      - redis
     links:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
       - redis:redis
     volumes:
       - /etc/localtime:/etc/localtime:ro
+      - /mnt/scielosp_org:/data:ro
     ports:
       - "9000:8000"
     environment:
@@ -138,6 +121,4 @@ services:
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
-    stdin_open: True
-    tty: true
 
