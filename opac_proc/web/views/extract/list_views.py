@@ -277,13 +277,23 @@ class ExtractPressReleaseListView(ExtractBaseListView):
     page_title = "Extract: Press Releases"
     list_columns = [
         {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
+            'field_label': u'Journal',
+            'field_name': 'journal_acronym',
             'field_type': 'string'
         },
         {
-            'field_label': u'PID',
-            'field_name': 'code',
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'published',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
             'field_type': 'string'
         },
         {
@@ -305,13 +315,23 @@ class ExtractPressReleaseListView(ExtractBaseListView):
 
     list_filters = [
         {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
-            'field_type': 'uuid'
+            'field_label': u'Journal',
+            'field_name': 'journal_acronym',
+            'field_type': 'string'
         },
         {
-            'field_label': u'PID',
-            'field_name': 'code',
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'published',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
             'field_type': 'string'
         },
         {

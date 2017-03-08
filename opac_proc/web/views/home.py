@@ -38,6 +38,7 @@ def home():
     load_journal_count = models.LoadJournal.objects.all().count()
     load_issue_count = models.LoadIssue.objects.all().count()
     load_article_count = models.LoadArticle.objects.all().count()
+    load_press_release_count = models.LoadPressRelease.objects.all().count()
 
     # OPAC counts
     with switch_db(OpacCollection, opac_webapp_db_name):
@@ -84,6 +85,7 @@ def home():
         'load_journal_count': load_journal_count,
         'load_issue_count': load_issue_count,
         'load_article_count': load_article_count,
+        'load_press_release_count': load_press_release_count,
 
         # opac
         'opac_collection_count': opac_collection_count,

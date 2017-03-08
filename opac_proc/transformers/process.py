@@ -30,6 +30,8 @@ class TransformProcess(Process):
 
         self.r_queues.create_queues_for_stage(self.stage)
 
+    # Reprocess
+
     def reprocess_collections(self, ids=None):
         self.r_queues.enqueue(
             self.stage, 'collection', jobs.task_reprocess_collections, ids)
@@ -48,7 +50,10 @@ class TransformProcess(Process):
 
     def reprocess_press_releases(self, ids=None):
         self.r_queues.enqueue(
-            self.stage, 'article', jobs.task_reprocess_press_releases, ids)
+            self.stage, 'press_release',
+            jobs.task_reprocess_press_releases, ids)
+
+    # Process
 
     def process_collection(self, collection_acronym=None, collection_uuid=None):
         if not collection_acronym:
@@ -143,11 +148,13 @@ class TransformProcess(Process):
             collection_acronym,
             article_pid)
 
-    def process_all_press_releases(self, uuid):
+    def process_press_release(self, press_release_id):
         self.r_queues.enqueue(
             self.stage, 'press_release',
-            jobs.task_transform_press_releases,
-            uuid)
+            jobs.task_transform_press_release,
+            press_release_id=press_release_id)
+
+    # Process All
 
     def process_all_collections(self):
         self.r_queues.enqueue(

@@ -244,6 +244,12 @@ class LoadArticleListView(LoadBaseListView):
     ]
 
 
+class LoadPressReleaseListView(LoadBaseListView):
+    model_class = models.LoadPressRelease
+    model_name = 'press_release'
+    page_title = "Load: Press Releases"
+
+
 class LoadLogListView(LoadBaseListView):
     model_class = models.LoadLog
     model_name = 'loadlog'

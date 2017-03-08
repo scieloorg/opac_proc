@@ -4,6 +4,7 @@ from opac_proc.loaders.lo_collections import CollectionLoader
 from opac_proc.loaders.lo_journals import JournalLoader
 from opac_proc.loaders.lo_issues import IssueLoader
 from opac_proc.loaders.lo_articles import ArticleLoader
+from opac_proc.loaders.lo_press_releases import PressReleaseLoader
 from opac_proc.datastore import models
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
@@ -92,7 +93,9 @@ def task_process_all_journals():
     r_queues.create_queues_for_stage(stage)
 
     for journal in models.TransformJournal.objects.all():
-        r_queues.enqueue(stage, 'collection', task_load_journal, journal.uuid)
+        r_queues.enqueue(
+            stage, 'collection',
+            task_load_journal, uuid=journal.uuid)
 
 
 # Issues:
@@ -113,14 +116,18 @@ def task_reprocess_issues(ids=None):
     if ids is None:  # update all collections
         models.LoadIssue.objects.all().update(must_reprocess=True)
         for issue in models.LoadIssue.objects.all():
-            r_queues.enqueue(stage, 'issue', task_load_issue, issue.uuid)
+            r_queues.enqueue(
+                stage, 'issue',
+                task_load_issue, uuid=issue.uuid)
     else:
         for oid in ids:
             try:
                 obj = models.LoadIssue.objects.get(pk=oid)
                 obj.update(must_reprocess=True)
                 obj.reload()
-                r_queues.enqueue(stage, 'issue', task_load_issue, obj.uuid)
+                r_queues.enqueue(
+                    stage, 'issue',
+                    task_load_issue, uuid=obj.uuid)
             except Exception as e:
                 logger.error('models.LoadIssue %s. pk: %s' % (str(e), oid))
 
@@ -132,7 +139,9 @@ def task_process_all_issues():
     r_queues.create_queues_for_stage(stage)
 
     for issue in models.TransformIssue.objects.all():
-        r_queues.enqueue(stage, 'issue', task_load_issue, issue.uuid)
+        r_queues.enqueue(
+            stage, 'issue',
+            task_load_issue, uuid=issue.uuid)
 
 
 # Articles:
@@ -153,16 +162,20 @@ def task_reprocess_articles(ids=None):
     if ids is None:  # update all collections
         models.LoadArticle.objects.all().update(must_reprocess=True)
         for article in models.LoadArticle.objects.all():
-            r_queues.enqueue(stage, 'article', task_load_article, article.uuid)
+            r_queues.enqueue(
+                stage, 'article',
+                task_load_article, uuid=article.uuid)
     else:
         for oid in ids:
             try:
                 obj = models.LoadArticle.objects.get(pk=oid)
                 obj.update(must_reprocess=True)
                 obj.reload()
-                r_queues.enqueue(stage, 'article', task_load_article, obj.uuid)
+                r_queues.enqueue(
+                    stage, 'article',
+                    task_load_article, uuid=obj.uuid)
             except Exception as e:
-                logger.error('models.LoadArticle %s. pk: %s' % (str(e), oid))
+                logger.error('models.LoadArticle %s. pk: %s', str(e), oid)
 
 
 def task_process_all_articles():
@@ -172,4 +185,52 @@ def task_process_all_articles():
     r_queues.create_queues_for_stage(stage)
 
     for article in models.TransformArticle.objects.all():
-        r_queues.enqueue(stage, 'article', task_load_article, article.uuid)
+        r_queues.enqueue(
+            stage, 'article',
+            task_load_article, uuid=article.uuid)
+
+
+# Press Release:
+
+
+def task_load_press_release(uuid):
+    pr_loader = PressReleaseLoader(uuid)
+    pr_loader.prepare()
+    pr_loader.load()
+
+
+def task_reprocess_press_releases(ids=None):
+    get_db_connection()
+    stage = "load"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    if ids is None:  # update all Press Releases
+        models.LoadPressRelease.objects.all().update(must_reprocess=True)
+        for pr in models.LoadPressRelease.objects.all():
+            r_queues.enqueue(
+                stage, 'press_release',
+                task_load_press_release, uuid=pr.uuid)
+    else:
+        for oid in ids:
+            try:
+                obj = models.LoadPressRelease.objects.get(pk=oid)
+                obj.update(must_reprocess=True)
+                obj.reload()
+                r_queues.enqueue(
+                    stage, 'press_release',
+                    task_load_press_release, uuid=obj.uuid)
+            except Exception as e:
+                logger.error('models.LoadPressRelease %s. pk: %s', str(e), oid)
+
+
+def task_process_all_press_releases():
+    get_db_connection()
+    stage = "load"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    for press_release in models.TransformPressRelease.objects.all():
+        r_queues.enqueue(
+            stage, 'press_release',
+            task_load_press_release, uuid=press_release.uuid)

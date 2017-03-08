@@ -196,6 +196,19 @@
                         {% endif %}
                         {{ load_article_count }}</span>
                     </a>
+                    <a href="{{ url_for('load_press_release_list') }}" class="list-group-item">
+                        Press Releases:
+                        {% if load_press_release_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif load_press_release_count < transform_press_release_count %}
+                            <span class="badge badge-warning">
+                        {% elif load_press_release_count > transform_press_release_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ load_press_release_count }}</span>
+                    </a>
                 </ul>
             </div>
         </div>
@@ -258,14 +271,27 @@
                         {% endif %}
                         {{ opac_article_count }}</span>
                     </a>
+                    <a href="{{ url_for('opac_pressrelease_list') }}" class="list-group-item">
+                        Press Releases:
+                        {% if opac_pressrelease_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif opac_pressrelease_count < load_press_release_count %}
+                            <span class="badge badge-warning">
+                        {% elif opac_pressrelease_count > load_press_release_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ opac_pressrelease_count }}</span>
+                    </a>
+                    <li class="list-group-item list-group-item-info">
+                        <strong>Modelos sem importação:</strong>
+                    </li>
                     <a href="{{ url_for('opac_sponsor_list') }}" class="list-group-item">
                         Sponsors <span class="badge">{{ opac_sponsor_count }}</span>
                     </a>
                     <a href="{{ url_for('opac_page_list') }}" class="list-group-item">
                         Pages <span class="badge">{{ opac_page_count }}</span>
-                    </a>
-                    <a href="{{ url_for('opac_pressrelease_list') }}" class="list-group-item">
-                        Press Releases <span class="badge">{{ opac_pressrelease_count }}</span>
                     </a>
                     <a href="{{ url_for('opac_news_list') }}" class="list-group-item">
                         News <span class="badge">{{ opac_news_count }}</span>

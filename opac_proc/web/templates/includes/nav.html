@@ -30,6 +30,7 @@
             <li {% if request.path == url_for('extract_article_list') %} class="active" {% endif %}>
               <a href="{{ url_for('extract_article_list') }}">Articles</a>
             </li>
+            <li role="separator" class="divider"></li>
             <li {% if request.path == url_for('extract_press_release_list') %} class="active" {% endif %}>
               <a href="{{ url_for('extract_press_release_list') }}">Press Releases</a>
             </li>
@@ -58,6 +59,7 @@
             <li {% if request.path == url_for('transform_article_list') %} class="active" {% endif %}>
               <a href="{{ url_for('transform_article_list') }}">Articles</a>
             </li>
+            <li role="separator" class="divider"></li>
             <li {% if request.path == url_for('transform_press_release_list') %} class="active" {% endif %}>
               <a href="{{ url_for('transform_press_release_list') }}">Press Release</a>
             </li>
@@ -87,6 +89,10 @@
               <a href="{{ url_for('load_article_list') }}">Articles</a>
             </li>
             <li role="separator" class="divider"></li>
+            <li {% if request.path == url_for('load_press_release_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('load_press_release_list') }}">Press Releases</a>
+            </li>
+            <li role="separator" class="divider"></li>
             <li {% if request.path == url_for('load_logs_list') %} class="active" {% endif %}>
               <a href="{{ url_for('load_logs_list') }}">Logs</a>
             </li>
@@ -112,17 +118,18 @@
               <a href="{{ url_for('opac_article_list') }}">Articles</a>
             </li>
             <li role="separator" class="divider"></li>
-            <li {% if request.path == url_for('opac_sponsor_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('opac_sponsor_list') }}">Sponsors</a>
-            </li>
-            <li {% if request.path == url_for('opac_page_list') %} class="active" {% endif %}>
-              <a href="{{ url_for('opac_page_list') }}">Pages</a>
-            </li>
             <li {% if request.path == url_for('opac_pressrelease_list') %} class="active" {% endif %}>
               <a href="{{ url_for('opac_pressrelease_list') }}">Press Releases</a>
             </li>
             <li {% if request.path == url_for('opac_news_list') %} class="active" {% endif %}>
               <a href="{{ url_for('opac_news_list') }}">News</a>
+            </li>
+            <li role="separator" class="divider"></li>
+            <li {% if request.path == url_for('opac_sponsor_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_sponsor_list') }}">Sponsors</a>
+            </li>
+            <li {% if request.path == url_for('opac_page_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('opac_page_list') }}">Pages</a>
             </li>
           </ul>
         </li>

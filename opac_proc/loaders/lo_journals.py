@@ -79,7 +79,7 @@ class JournalLoader(BaseLoader):
     def prepare_collection(self):
         """
         metodo chamado na preparação dos dados a carregar no opac_schema
-        deve retornar um valor válido para Journal.collection do
+        deve retornar um valor válido para Journal.collection
         """
         logger.debug(u"iniciando: prepare_collection")
         transformed_coll_uuid_str = str(self.transform_model_instance.collection).replace("-", "")

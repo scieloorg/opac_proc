@@ -21,8 +21,6 @@ class PressReleaseExtractor(BaseExtractor):
     acronym = None
     lang = None
     url = None
-    error = None
-    is_empty = True
 
     extract_model_class = ExtractPressRelease
 
@@ -31,46 +29,41 @@ class PressReleaseExtractor(BaseExtractor):
         self.acronym = acronym
         self.url = url
         self.lang = lang
-        self.get_instance_query = {'code': self.acronym}
+        self.get_instance_query = {}
 
-    def get_items_from_feed(self):
+    def get_feed_entries(self):
         feed = feedparser.parse(self.url)
-        items = feed['items']
-
         if feed.bozo == 1:
-            self.error = 'Não é possível parsear o feed (%s)' % self.url
-            self.log_error()
-
-        if len(items) > 0:
-            self.is_empty = False
-
-            # clean data
-            items = items[0]
-            items['url_id'] = items['id']
-            del items['id'], items['published_parsed']
-
-            # Set raw data
-            self._raw_data = dict(items)
-            # extra fields
-            self._raw_data['journal_acronym'] = self.acronym
-            self._raw_data['feed_lang'] = self.lang[:2]
-            self._raw_data['feed_url_used'] = self.url
-
-    def log_error(self):
-        logger.error(self.error)
-        raise Exception(self.error)
+            bozo_exception_msg = feed.bozo_exception.getMessage()
+            msg = 'Não é possível parsear o feed (%s). Bozo exception message: %s' % (
+                self.url, bozo_exception_msg)
+            logger.error(msg)
+            raise Exception(msg)
+        else:
+            return feed['entries']
 
     @update_metadata
-    def extract(self):
+    def extract(self, raw_entry):
         """
-        Conecta com a fonte (AM) e extrai todos os dados (coleção).
+        Conecta com a fonte (RSS do blog: scielo press releases) e extrai todos os dados (press releases).
         """
         logger.info(u'Inicia PressReleasesExtractor.extract(%s) %s' % (self.acronym, datetime.now()))
+        self.get_instance_query = {  # update query filter
+            'url_id': raw_entry['id']
+        }
+        self._raw_data = raw_entry
+        self._raw_data['url_id'] = raw_entry['id']
+        del self._raw_data['id']
+        del self._raw_data['published_parsed']
+        # extra fields
+        self._raw_data['journal_acronym'] = self.acronym
+        self._raw_data['feed_lang'] = self.lang  # esperado: 'en' | 'es' | 'pt_BR'
+        self._raw_data['feed_url_used'] = self.url
 
         if not self._raw_data:
-            self.error = u"Não foi possível recuperar o Press Release (url: %s, acronym: %s). A informação é vazía" % (
-                self.url, self.acronym)
-            self.log_error()
+            msg = u"Não foi possível recuperar o Press Release (url: %s, acronym: %s, lang: %s). A informação é vazía" % (self.url, self.acronym, self.lang)
+            logger.error(msg)
+            raise Exception(msg)
 
         logger.info(u"Fim PressReleasesExtractor.extract(%s) %s" % (
             self.acronym, datetime.now()))

@@ -57,6 +57,7 @@ def task_process_all_collections(acronym):
         stage, 'collection',
         task_transform_collection, acronym)
 
+
 # Journals:
 
 
@@ -90,8 +91,8 @@ def task_reprocess_journals(ids=None):
                 obj.update(must_reprocess=True)
                 obj.reload()
                 issn = obj.get('scielo_issn', False) or \
-                       obj.get('print_issn', False) or \
-                       obj.get('eletronic_issn', False)
+                    obj.get('print_issn', False) or \
+                    obj.get('eletronic_issn', False)
                 if not issn:
                     raise ValueError(u'Journal sem issn')
                 r_queues.enqueue(
@@ -113,6 +114,7 @@ def task_process_all_journals():
         r_queues.enqueue(
             stage, 'journal',
             task_transform_journal, collection.acronym, child['issn'])
+
 
 # Issues:
 
@@ -218,14 +220,37 @@ def task_process_all_articles():
 
 # Press releases
 
-def task_transform_press_release(press_release_id):
-    transformer = PressReleaseTransformer(extract_model_key=press_release_id)
+
+def task_transform_press_release(press_release_uuid):
+    transformer = PressReleaseTransformer(extract_model_key=press_release_uuid)
     transformer.transform()
     transformer.save()
 
 
-def task_reprocess_press_release(ids=None):
-    raise NotImplementedError
+def task_reprocess_press_releases(ids=None):
+    get_db_connection()
+    stage = "load"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    if ids is None:  # update all Press Releases
+        models.TransformPressRelease.objects.all().update(must_reprocess=True)
+        for pr in models.TransformPressRelease.objects.all():
+            r_queues.enqueue(
+                stage, 'press_release',
+                task_transform_press_release, press_release_uuid=pr.uuid)
+    else:
+        for oid in ids:
+            try:
+                obj = models.TransformPressRelease.objects.get(pk=oid)
+                obj.update(must_reprocess=True)
+                obj.reload()
+                r_queues.enqueue(
+                    stage, 'press_release',
+                    task_transform_press_release, press_release_uuid=obj.uuid)
+            except Exception as e:
+                logger.error('models.TransformPressRelease %s. pk: %s', str(e), oid)
+
 
 def task_process_all_press_releases():
     get_db_connection()
@@ -233,9 +258,7 @@ def task_process_all_press_releases():
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
-    press_releases = models.ExtractPressRelease.objects.all()
-
-    for press_release in press_releases:
+    for pr in models.ExtractPressRelease.objects.all():
         r_queues.enqueue(
             stage, 'press_release',
-            task_transform_press_release, press_release._id)
+            task_transform_press_release, press_release_uuid=pr.uuid)
