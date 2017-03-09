@@ -25,6 +25,7 @@ def home():
     extract_issue_count = models.ExtractIssue.objects.all().count()
     extract_article_count = models.ExtractArticle.objects.all().count()
     extract_press_release_count = models.ExtractPressRelease.objects.all().count()
+    extract_news_count = models.ExtractNews.objects.all().count()
 
     # transform counts
     transform_collection_count = models.TransformCollection.objects.all().count()
@@ -72,6 +73,7 @@ def home():
         'extract_issue_count': extract_issue_count,
         'extract_article_count': extract_article_count,
         'extract_press_release_count': extract_press_release_count,
+        'extract_news_count': extract_news_count,
 
         # tranform
         'transform_collection_count': transform_collection_count,

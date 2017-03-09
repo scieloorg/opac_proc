@@ -6,6 +6,7 @@ from opac_proc.extractors.ex_journals import JournalExtractor
 from opac_proc.extractors.ex_issues import IssueExtractor
 from opac_proc.extractors.ex_articles import ArticleExtractor
 from opac_proc.extractors.ex_press_releases import PressReleaseExtractor
+from opac_proc.extractors.ex_news import NewsExtractor
 from xylose.scielodocument import Journal as xylose_journal
 
 from opac_proc.datastore import models
@@ -256,3 +257,59 @@ def task_process_all_press_releases():
                 acronym=acronym,
                 url=url,
                 lang=lang)
+
+# --------------------------------------------------- #
+#                    NEWS                             #
+# --------------------------------------------------- #
+
+
+def task_extract_news(url, lang):
+    extractor = NewsExtractor(url, lang)
+    news_entries = extractor.get_feed_entries()
+    for news_entry in news_entries:
+        extractor.extract(news_entry)
+        extractor.save()
+
+
+def task_reprocess_news(ids=None):
+    get_db_connection()
+    stage = "extract"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    if ids is None:  # update all collections
+        models.ExtractNews.objects.all().update(must_reprocess=True)
+        for news in models.ExtractNews.objects.all():
+            r_queues.enqueue(
+                stage, 'news',
+                task_extract_news,
+                url=news.feed_url_used,
+                lang=news.feed_lang)
+    else:
+        for oid in ids:
+            try:
+                obj = models.ExtractNews.objects.get(pk=oid)
+                obj.update(must_reprocess=True)
+                obj.reload()
+                r_queues.enqueue(
+                    stage, 'news',
+                    task_extract_news,
+                    url=obj.feed_url_used,
+                    lang=obj.feed_lang)
+            except models.ExtractNews.DoesNotExist as e:
+                logger.error('models.ExtractNews %s. pk: %s' % (str(e), oid))
+
+
+def task_process_all_news():
+    get_db_connection()
+    stage = "extract"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    for lang, feed in config.RSS_NEWS_FEEDS.items():
+        url = feed['url'].format(lang)
+        r_queues.enqueue(
+            stage, 'news',
+            task_extract_news,
+            url=url,
+            lang=lang)

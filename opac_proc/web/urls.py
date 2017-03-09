@@ -6,6 +6,7 @@ from opac_proc.web.views.extract.list_views import (
     ExtractIssueListView,
     ExtractArticleListView,
     ExtractPressReleaseListView,
+    ExtractNewsListView,
     ExtractLogListView)
 
 from opac_proc.web.views.extract.detail_views import (
@@ -14,6 +15,7 @@ from opac_proc.web.views.extract.detail_views import (
     ExtractIssueDetailView,
     ExtractArticleDetailView,
     ExtractPressReleaseDetailView,
+    ExtractNewsDetailView,
     ExtractLogDetailView)
 
 from opac_proc.web.views.transform.list_views import (
@@ -93,6 +95,10 @@ url_patterns = (
             'press_release': {
                 'list_view_class': ExtractPressReleaseListView,
                 'detail_view_class': ExtractPressReleaseDetailView,
+            },
+            'news': {
+                'list_view_class': ExtractNewsListView,
+                'detail_view_class': ExtractNewsDetailView,
             },
             'logs': {
                 'list_view_class': ExtractLogListView,

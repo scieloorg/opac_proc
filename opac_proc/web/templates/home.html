@@ -53,6 +53,14 @@
                             <span class="badge badge-primary">{{ extract_press_release_count }}</span>
                         {% endif %}
                     </a>
+                    <a href="{{ url_for('extract_news_list') }}" class="list-group-item">
+                        News:
+                        {% if extract_news_count == 0 %}
+                            <span class="badge badge-danger">{{ extract_news_count }}</span>
+                        {% else %}
+                            <span class="badge badge-primary">{{ extract_news_count }}</span>
+                        {% endif %}
+                    </a>
                 </ul>
             </div>
         </div>

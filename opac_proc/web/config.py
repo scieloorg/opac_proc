@@ -135,3 +135,19 @@ RSS_PRESS_RELEASES_FEEDS_BY_CATEGORY = {
         'url': 'http://pressreleases.scielo.org/{0}/category/press-releases/{1}/feed/',
     },
 }
+
+# News
+RSS_NEWS_FEEDS = {
+    'pt_BR': {
+        'display_name': 'SciELO em Perspectiva',
+        'url': 'http://blog.scielo.org/feed/'
+    },
+    'es': {
+        'display_name': 'SciELO en Perspectiva',
+        'url': 'http://blog.scielo.org/es/feed/',
+    },
+    'en': {
+        'display_name': 'SciELO in Perspective',
+        'url': 'http://blog.scielo.org/en/feed/',
+    },
+}
