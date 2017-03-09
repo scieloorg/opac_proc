@@ -33,7 +33,7 @@ class RQueues(Singleton):
             'collection': 'qtr_collections',
             'journal': 'qtr_journals',
             'issue': 'qtr_issues',
-            'article': 'qtr_article',
+            'article': 'qtr_articles',
             'press_release': 'qtr_press_releases',
         },
         'load': {
