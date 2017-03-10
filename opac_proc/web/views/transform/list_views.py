@@ -276,6 +276,152 @@ class TransformPressReleaseListView(TransformBaseListView):
     model_class = models.TransformPressRelease
     model_name = 'press_release'
     page_title = "Transform: Press Releases"
+    list_columns = [
+        {
+            'field_label': u'Journal',
+            'field_name': 'journal_acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+    list_filters = [
+        {
+            'field_label': u'Journal',
+            'field_name': 'journal_acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+
+class TransformNewsListView(TransformBaseListView):
+    model_class = models.TransformNews
+    model_name = 'news'
+    page_title = "Transform: News"
+    list_columns = [
+        {
+            'field_label': u'URL',
+            'field_name': 'url',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'language',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+    list_filters = [
+        {
+            'field_label': u'URL',
+            'field_name': 'url',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'language',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
 
 
 class TransformLogListView(TransformBaseListView):

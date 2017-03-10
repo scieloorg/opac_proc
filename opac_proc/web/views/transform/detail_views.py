@@ -32,6 +32,11 @@ class TransformPressReleaseDetailView(DetailView):
     page_title = u'Transform Press Release Detail'
 
 
+class TransformNewsDetailView(DetailView):
+    model_class = models.TransformNews
+    page_title = u'Transform News Detail'
+
+
 class TransformLogDetailView(DetailView):
     model_class = models.TransformLog
     page_title = u'Transform Log Detail'

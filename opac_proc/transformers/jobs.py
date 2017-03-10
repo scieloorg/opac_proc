@@ -4,6 +4,7 @@ from opac_proc.transformers.tr_journals import JournalTransformer
 from opac_proc.transformers.tr_issues import IssueTransformer
 from opac_proc.transformers.tr_articles import ArticleTransformer
 from opac_proc.transformers.tr_press_releases import PressReleaseTransformer
+from opac_proc.transformers.tr_news import NewsTransformer
 from opac_proc.datastore import models
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
@@ -229,7 +230,7 @@ def task_transform_press_release(press_release_uuid):
 
 def task_reprocess_press_releases(ids=None):
     get_db_connection()
-    stage = "load"
+    stage = "transform"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -262,3 +263,49 @@ def task_process_all_press_releases():
         r_queues.enqueue(
             stage, 'press_release',
             task_transform_press_release, press_release_uuid=pr.uuid)
+
+
+# News
+
+
+def task_transform_news(news_uuid):
+    transformer = NewsTransformer(extract_model_key=news_uuid)
+    transformer.transform()
+    transformer.save()
+
+
+def task_reprocess_news(ids=None):
+    get_db_connection()
+    stage = "transform"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    if ids is None:  # update all News
+        models.TransformNews.objects.all().update(must_reprocess=True)
+        for news in models.TransformNews.objects.all():
+            r_queues.enqueue(
+                stage, 'news',
+                task_transform_news, news_uuid=news.uuid)
+    else:
+        for oid in ids:
+            try:
+                obj = models.TransformNews.objects.get(pk=oid)
+                obj.update(must_reprocess=True)
+                obj.reload()
+                r_queues.enqueue(
+                    stage, 'news',
+                    task_transform_news, news_uuid=obj.uuid)
+            except Exception as e:
+                logger.error('models.TransformNews %s. pk: %s', str(e), oid)
+
+
+def task_process_all_news():
+    get_db_connection()
+    stage = "transform"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    for news in models.ExtractNews.objects.all():
+        r_queues.enqueue(
+            stage, 'news',
+            task_transform_news, news_uuid=news.uuid)

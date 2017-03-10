@@ -139,6 +139,19 @@
                         {% endif %}
                         {{ transform_press_release_count }}</span>
                     </a>
+                    <a href="{{ url_for('transform_news_list') }}" class="list-group-item">
+                        News:
+                        {% if transform_news_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif transform_news_count < extract_news_count %}
+                            <span class="badge badge-warning">
+                        {% elif transform_news_count > extract_news_count %}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ transform_news_count }}</span>
+                    </a>
                 </ul>
             </div>
         </div>

@@ -66,6 +66,9 @@
             <li {% if request.path == url_for('transform_press_release_list') %} class="active" {% endif %}>
               <a href="{{ url_for('transform_press_release_list') }}">Press Release</a>
             </li>
+            <li {% if request.path == url_for('transform_news_list') %} class="active" {% endif %}>
+              <a href="{{ url_for('transform_news_list') }}">News</a>
+            </li>
             <li role="separator" class="divider"></li>
             <li {% if request.path == url_for('transform_logs_list') %} class="active" {% endif %}>
               <a href="{{ url_for('transform_logs_list') }}">Logs</a>
