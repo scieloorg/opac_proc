@@ -352,6 +352,77 @@ class ExtractPressReleaseListView(ExtractBaseListView):
     ]
 
 
+class ExtractNewsListView(ExtractBaseListView):
+    model_class = models.ExtractNews
+    model_name = 'news'
+    page_title = "Extract: News"
+    list_columns = [
+        {
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'published',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+    list_filters = [
+        {
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'published',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+
 class ExtractLogListView(ExtractBaseListView):
     model_class = models.ExtractLog
     model_name = 'loadlog'

@@ -116,6 +116,28 @@ signals.pre_save.connect(ExtractPressRelease.pre_save, sender=ExtractPressReleas
 signals.post_save.connect(ExtractPressRelease.post_save, sender=ExtractPressRelease)
 
 
+class ExtractNews(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        """
+        Notificamos o modelos com este uuid que tem que ser reprocessado
+        """
+        try:
+            doc = TransformNews.objects.get(uuid=uuid).first()
+        except Exception:
+            pass
+        else:
+            doc['must_reprocess'] = True
+            doc.save()
+
+    meta = {
+        'collection': 'e_news'
+    }
+
+
+signals.pre_save.connect(ExtractNews.pre_save, sender=ExtractNews)
+signals.post_save.connect(ExtractNews.post_save, sender=ExtractNews)
+
+
 # #### TRANFORM MODELS
 
 
@@ -229,6 +251,28 @@ signals.pre_save.connect(TransformPressRelease.pre_save, sender=TransformPressRe
 signals.post_save.connect(TransformPressRelease.post_save, sender=TransformPressRelease)
 
 
+class TransformNews(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        """
+        Notificamos o modelos com este uuid que tem que ser reprocessado
+        """
+        try:
+            doc = LoadNews.objects.get(uuid=uuid).first()
+        except Exception:
+            pass
+        else:
+            doc['must_reprocess'] = True
+            doc.save()
+
+    meta = {
+        'collection': 't_news'
+    }
+
+
+signals.pre_save.connect(TransformNews.pre_save, sender=TransformNews)
+signals.post_save.connect(TransformNews.post_save, sender=TransformNews)
+
+
 # #### LOAD MODELS
 
 
@@ -295,6 +339,19 @@ class LoadPressRelease(BaseMixin, DynamicDocument):
 
 signals.pre_save.connect(LoadPressRelease.pre_save, sender=LoadPressRelease)
 signals.post_save.connect(LoadPressRelease.post_save, sender=LoadPressRelease)
+
+
+class LoadNews(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        pass  # não precisa propagar mais
+
+    meta = {
+        'collection': 'l_news'
+    }
+
+
+signals.pre_save.connect(LoadNews.pre_save, sender=LoadNews)
+signals.post_save.connect(LoadNews.post_save, sender=LoadNews)
 
 
 # #### LOGS

@@ -53,6 +53,14 @@
                             <span class="badge badge-primary">{{ extract_press_release_count }}</span>
                         {% endif %}
                     </a>
+                    <a href="{{ url_for('extract_news_list') }}" class="list-group-item">
+                        News:
+                        {% if extract_news_count == 0 %}
+                            <span class="badge badge-danger">{{ extract_news_count }}</span>
+                        {% else %}
+                            <span class="badge badge-primary">{{ extract_news_count }}</span>
+                        {% endif %}
+                    </a>
                 </ul>
             </div>
         </div>
@@ -130,6 +138,19 @@
                             <span class="badge badge-success">
                         {% endif %}
                         {{ transform_press_release_count }}</span>
+                    </a>
+                    <a href="{{ url_for('transform_news_list') }}" class="list-group-item">
+                        News:
+                        {% if transform_news_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif transform_news_count < extract_news_count %}
+                            <span class="badge badge-warning">
+                        {% elif transform_news_count > extract_news_count %}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ transform_news_count }}</span>
                     </a>
                 </ul>
             </div>
@@ -209,6 +230,19 @@
                         {% endif %}
                         {{ load_press_release_count }}</span>
                     </a>
+                    <a href="{{ url_for('load_news_list') }}" class="list-group-item">
+                        News:
+                        {% if load_news_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif load_news_count < transform_news_count %}
+                            <span class="badge badge-warning">
+                        {% elif load_news_count > transform_news_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ load_news_count }}</span>
+                    </a>
                 </ul>
             </div>
         </div>
@@ -284,6 +318,19 @@
                         {% endif %}
                         {{ opac_pressrelease_count }}</span>
                     </a>
+                    <a href="{{ url_for('opac_news_list') }}" class="list-group-item">
+                        News
+                        {% if opac_news_count == 0 %}
+                            <span class="badge badge-danger">
+                        {% elif opac_news_count < load_news_count %}
+                            <span class="badge badge-warning">
+                        {% elif opac_news_count > load_news_count%}
+                            <span class="badge badge-danger">
+                        {% else %}
+                            <span class="badge badge-success">
+                        {% endif %}
+                        {{ opac_news_count }}</span>
+                    </a>
                     <li class="list-group-item list-group-item-info">
                         <strong>Modelos sem importação:</strong>
                     </li>
@@ -292,9 +339,6 @@
                     </a>
                     <a href="{{ url_for('opac_page_list') }}" class="list-group-item">
                         Pages <span class="badge">{{ opac_page_count }}</span>
-                    </a>
-                    <a href="{{ url_for('opac_news_list') }}" class="list-group-item">
-                        News <span class="badge">{{ opac_news_count }}</span>
                     </a>
                 </ul>
             </div>

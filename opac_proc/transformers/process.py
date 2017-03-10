@@ -53,6 +53,11 @@ class TransformProcess(Process):
             self.stage, 'press_release',
             jobs.task_reprocess_press_releases, ids)
 
+    def reprocess_news(self, ids=None):
+        self.r_queues.enqueue(
+            self.stage, 'news',
+            jobs.task_reprocess_news, ids)
+
     # Process
 
     def process_collection(self, collection_acronym=None, collection_uuid=None):
@@ -148,11 +153,17 @@ class TransformProcess(Process):
             collection_acronym,
             article_pid)
 
-    def process_press_release(self, press_release_id):
+    def process_press_release(self, press_release_uuid):
         self.r_queues.enqueue(
             self.stage, 'press_release',
             jobs.task_transform_press_release,
-            press_release_id=press_release_id)
+            press_release_uuid=press_release_uuid)
+
+    def process_news(self, news_uuid):
+        self.r_queues.enqueue(
+            self.stage, 'news',
+            jobs.task_transform_news,
+            news_uuid=news_uuid)
 
     # Process All
 
@@ -175,3 +186,7 @@ class TransformProcess(Process):
     def process_all_press_releases(self):
             self.r_queues.enqueue(
                 self.stage, 'press_release', jobs.task_process_all_press_releases)
+
+    def process_all_news(self):
+        self.r_queues.enqueue(
+            self.stage, 'news', jobs.task_process_all_news)

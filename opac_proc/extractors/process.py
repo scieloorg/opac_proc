@@ -33,19 +33,33 @@ class ExtractProcess(Process):
 
     def reprocess_collections(self, ids=None):
         self.r_queues.enqueue(
-            self.stage, 'collection', jobs.task_reprocess_collections, ids)
+            self.stage, 'collection',
+            jobs.task_reprocess_collections, ids=ids)
 
     def reprocess_journals(self, ids=None):
         self.r_queues.enqueue(
-            self.stage, 'journal', jobs.task_reprocess_journals, ids)
+            self.stage, 'journal',
+            jobs.task_reprocess_journals, ids=ids)
 
     def reprocess_issues(self, ids=None):
         self.r_queues.enqueue(
-            self.stage, 'issue', jobs.task_reprocess_issues, ids)
+            self.stage, 'issue',
+            jobs.task_reprocess_issues, ids=ids)
 
     def reprocess_articles(self, ids=None):
         self.r_queues.enqueue(
-            self.stage, 'article', jobs.task_reprocess_articles, ids)
+            self.stage, 'article',
+            jobs.task_reprocess_articles, ids=ids)
+
+    def reprocess_press_releases(self, ids=None):
+        self.r_queues.enqueue(
+            self.stage, 'press_release',
+            jobs.task_reprocess_press_release, ids=ids)
+
+    def reprocess_news(self, ids=None):
+        self.r_queues.enqueue(
+            self.stage, 'news',
+            jobs.task_reprocess_news, ids=ids)
 
     # Process:
 
@@ -64,7 +78,7 @@ class ExtractProcess(Process):
         self.r_queues.enqueue(
             self.stage, 'collection',
             jobs.task_extract_collection,
-            collection_acronym)
+            acronym=collection_acronym)
 
     def process_journal(self, collection_acronym=None, issn=None, uuid=None):
         if not collection_acronym:
@@ -81,8 +95,8 @@ class ExtractProcess(Process):
         self.r_queues.enqueue(
             self.stage, 'journal',
             jobs.task_extract_journal,
-            collection_acronym,
-            issn)
+            acronym=collection_acronym,
+            issn=issn)
 
     def process_issue(self, collection_acronym=None, issue_pid=None, uuid=None):
         if not collection_acronym:
@@ -108,8 +122,8 @@ class ExtractProcess(Process):
         self.r_queues.enqueue(
             self.stage, 'issue',
             jobs.task_extract_issue,
-            collection_acronym,
-            issue_pid)
+            acronym=collection_acronym,
+            issue_id=issue_pid)
 
     def process_article(self, collection_acronym=None, article_pid=None, uuid=None):
         if not collection_acronym:
@@ -131,8 +145,53 @@ class ExtractProcess(Process):
         self.r_queues.enqueue(
             self.stage, 'article',
             jobs.task_extract_article,
-            collection_acronym,
-            article_pid)
+            acronym=collection_acronym,
+            article_id=article_pid)
+
+    def process_press_releases(self, journal_acronym=None, lang=None, feed_url=None, uuid=None):
+        if uuid is not None:
+            try:
+                press_release = models.ExtractPressRelease.objects.get(uuid=uuid)
+            except models.ExtractPressRelease.DoesNotExist:
+                raise ValueError(u'ExtractPressRelease com uuid: %s não encontrado!' % uuid)
+            else:
+                target_journal_acronym = press_release.journal_acronym
+                target_feed_url = press_release.feed_lang
+                target_lang = press_release.feed_url_used
+        elif journal_acronym is not None and lang is not None and feed_url is not None:
+            target_journal_acronym = journal_acronym
+            target_feed_url = lang
+            target_lang = feed_url
+        else:
+            raise ValueError("must provide at least one parameter: (journal_acronym and lang and feed_url), or uuid")
+
+        self.r_queues.enqueue(
+            self.stage, 'press_release',
+            jobs.task_extract_press_release,
+            target_journal_acronym,
+            url=target_feed_url,
+            lang=target_lang)
+
+    def process_news(self, lang=None, feed_url=None, uuid=None):
+        if uuid is not None:
+            try:
+                news = models.ExtractNews.objects.get(uuid=uuid)
+            except models.ExtractNews.DoesNotExist:
+                raise ValueError(u'ExtractNews com uuid: %s não encontrado!' % uuid)
+            else:
+                target_feed_url = news.feed_lang
+                target_lang = news.feed_url_used
+        elif lang is not None and feed_url is not None:
+            target_feed_url = lang
+            target_lang = feed_url
+        else:
+            raise ValueError("must provide at least one parameter: (lang and feed_url), or uuid")
+
+        self.r_queues.enqueue(
+            self.stage, 'news',
+            jobs.task_extract_news,
+            url=target_feed_url,
+            lang=target_lang)
 
     # Process All:
 
@@ -157,3 +216,8 @@ class ExtractProcess(Process):
         self.r_queues.enqueue(
             self.stage, 'press_release',
             jobs.task_process_all_press_releases)
+
+    def process_all_news(self):
+        self.r_queues.enqueue(
+            self.stage, 'news',
+            jobs.task_process_all_news)

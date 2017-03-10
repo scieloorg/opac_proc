@@ -6,6 +6,7 @@ from opac_proc.web.views.extract.list_views import (
     ExtractIssueListView,
     ExtractArticleListView,
     ExtractPressReleaseListView,
+    ExtractNewsListView,
     ExtractLogListView)
 
 from opac_proc.web.views.extract.detail_views import (
@@ -14,6 +15,7 @@ from opac_proc.web.views.extract.detail_views import (
     ExtractIssueDetailView,
     ExtractArticleDetailView,
     ExtractPressReleaseDetailView,
+    ExtractNewsDetailView,
     ExtractLogDetailView)
 
 from opac_proc.web.views.transform.list_views import (
@@ -22,6 +24,7 @@ from opac_proc.web.views.transform.list_views import (
     TransformIssueListView,
     TransformArticleListView,
     TransformPressReleaseListView,
+    TransformNewsListView,
     TransformLogListView)
 
 from opac_proc.web.views.transform.detail_views import (
@@ -30,6 +33,7 @@ from opac_proc.web.views.transform.detail_views import (
     TransformIssueDetailView,
     TransformArticleDetailView,
     TransformPressReleaseDetailView,
+    TransformNewsDetailView,
     TransformLogDetailView)
 
 from opac_proc.web.views.load.list_views import (
@@ -38,6 +42,7 @@ from opac_proc.web.views.load.list_views import (
     LoadIssueListView,
     LoadArticleListView,
     LoadPressReleaseListView,
+    LoadNewsListView,
     LoadLogListView)
 
 from opac_proc.web.views.load.detail_views import (
@@ -46,6 +51,7 @@ from opac_proc.web.views.load.detail_views import (
     LoadIssueDetailView,
     LoadArticleDetailView,
     LoadPressReleaseDetailView,
+    LoadNewsDetailView,
     LoadLogDetailView)
 
 from opac_proc.web.views.opac.list_views import (
@@ -94,6 +100,10 @@ url_patterns = (
                 'list_view_class': ExtractPressReleaseListView,
                 'detail_view_class': ExtractPressReleaseDetailView,
             },
+            'news': {
+                'list_view_class': ExtractNewsListView,
+                'detail_view_class': ExtractNewsDetailView,
+            },
             'logs': {
                 'list_view_class': ExtractLogListView,
                 'detail_view_class': ExtractLogDetailView,
@@ -123,6 +133,10 @@ url_patterns = (
                 'list_view_class': TransformPressReleaseListView,
                 'detail_view_class': TransformPressReleaseDetailView,
             },
+            'news': {
+                'list_view_class': TransformNewsListView,
+                'detail_view_class': TransformNewsDetailView,
+            },
             'logs': {
                 'list_view_class': TransformLogListView,
                 'detail_view_class': TransformLogDetailView,
@@ -151,6 +165,10 @@ url_patterns = (
             'press_release': {
                 'list_view_class': LoadPressReleaseListView,
                 'detail_view_class': LoadPressReleaseDetailView,
+            },
+            'news': {
+                'list_view_class': LoadNewsListView,
+                'detail_view_class': LoadNewsDetailView,
             },
             'logs': {
                 'list_view_class': LoadLogListView,

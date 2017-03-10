@@ -4,7 +4,7 @@ import json
 import feedparser
 
 from datetime import datetime
-from opac_proc.datastore.models import ExtractPressRelease
+from opac_proc.datastore.models import ExtractNews
 from opac_proc.extractors.base import BaseExtractor
 from opac_proc.extractors.decorators import update_metadata
 
@@ -17,16 +17,14 @@ else:
     logger = getMongoLogger(__name__, "INFO", "extract")
 
 
-class PressReleaseExtractor(BaseExtractor):
-    acronym = None
+class NewsExtractor(BaseExtractor):
     lang = None
     url = None
 
-    extract_model_class = ExtractPressRelease
+    extract_model_class = ExtractNews
 
-    def __init__(self, acronym, url, lang):
-        super(PressReleaseExtractor, self).__init__()
-        self.acronym = acronym
+    def __init__(self, url, lang):
+        super(NewsExtractor, self).__init__()
         self.url = url
         self.lang = lang
         self.get_instance_query = {}
@@ -45,10 +43,10 @@ class PressReleaseExtractor(BaseExtractor):
     @update_metadata
     def extract(self, raw_entry):
         """
-        Conecta com a fonte (RSS do blog: scielo press releases) e extrai todos os dados (press releases).
+        Conecta com a fonte (RSS do blog: scielo em perspectiva) e extrai todas as noticias.
         """
-        logger.debug(u'Inicia PressReleasesExtractor.extract(%s, %s, %s) %s',
-                     self.acronym, self.url, self.lang, datetime.now())
+        logger.debug(u'Inicia NewsExtractor.extract(%s, %s) %s',
+                     self.url, self.lang, datetime.now())
         self.get_instance_query = {  # update query filter
             'url_id': raw_entry['id']
         }
@@ -57,7 +55,6 @@ class PressReleaseExtractor(BaseExtractor):
         del self._raw_data['id']
         del self._raw_data['published_parsed']
         # extra fields
-        self._raw_data['journal_acronym'] = self.acronym
         self._raw_data['feed_lang'] = self.lang  # esperado: 'en' | 'es' | 'pt_BR'
         self._raw_data['feed_url_used'] = self.url
 
@@ -66,5 +63,5 @@ class PressReleaseExtractor(BaseExtractor):
             logger.error(msg)
             raise Exception(msg)
 
-        logger.debug(u'Fim PressReleasesExtractor.extract(%s, %s, %s) %s',
-                     self.acronym, self.url, self.lang, datetime.now())
+        logger.debug(u'Fim NewsExtractor.extract(%s, %s) %s',
+                     self.url, self.lang, datetime.now())

@@ -32,6 +32,11 @@ class LoadPressReleaseDetailView(DetailView):
     page_title = u'Load Press Release Detail'
 
 
+class LoadNewsDetailView(DetailView):
+    model_class = models.LoadNews
+    page_title = u'Load News Detail'
+
+
 class LoadLogDetailView(DetailView):
     model_class = models.LoadLog
     page_title = u'Load Log Detail'

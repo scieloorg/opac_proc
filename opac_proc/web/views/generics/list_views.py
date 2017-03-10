@@ -203,6 +203,8 @@ class ListView(View):
             processor.process_all_articles()
         elif self.model_name == 'press_release':
             processor.process_all_press_releases()
+        elif self.model_name == 'news':
+            processor.process_all_news()
         else:
             raise ValueError('Invalid "model_name" attribute')
         flash("Started process to %s all %s(s)" % (self.stage, self.model_name))
@@ -219,6 +221,8 @@ class ListView(View):
             processor.reprocess_articles()
         elif self.model_name == 'press_release':
             processor.reprocess_press_releases()
+        elif self.model_name == 'news':
+            processor.reprocess_news()
         else:
             raise ValueError('Invalid "model_name" attribute')
 
@@ -236,6 +240,8 @@ class ListView(View):
             processor.reprocess_articles(ids)
         elif self.model_name == 'press_release':
             processor.reprocess_press_releases(ids)
+        elif self.model_name == 'news':
+            processor.reprocess_news(ids)
         else:
             raise ValueError('Invalid "model_name" attribute')
 
