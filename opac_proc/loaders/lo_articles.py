@@ -56,6 +56,9 @@ class ArticleLoader(BaseLoader):
         'htmls',
         'pdfs',
         'pid',
+        'fpage',
+        'lpage',
+        'elocation',
     ]
 
     def prepare_issue(self):
