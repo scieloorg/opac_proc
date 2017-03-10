@@ -41,6 +41,7 @@ def home():
     load_issue_count = models.LoadIssue.objects.all().count()
     load_article_count = models.LoadArticle.objects.all().count()
     load_press_release_count = models.LoadPressRelease.objects.all().count()
+    load_news_count = models.LoadNews.objects.all().count()
 
     # OPAC counts
     with switch_db(OpacCollection, opac_webapp_db_name):
@@ -90,17 +91,18 @@ def home():
         'load_issue_count': load_issue_count,
         'load_article_count': load_article_count,
         'load_press_release_count': load_press_release_count,
+        'load_news_count': load_news_count,
 
         # opac
         'opac_collection_count': opac_collection_count,
         'opac_journal_count': opac_journal_count,
         'opac_issue_count': opac_issue_count,
         'opac_article_count': opac_article_count,
+        'opac_pressrelease_count': opac_pressrelease_count,
+        'opac_news_count': opac_news_count,
 
         # opac outros modelos
         'opac_sponsor_count': opac_sponsor_count,
-        'opac_pressrelease_count': opac_pressrelease_count,
         'opac_page_count': opac_page_count,
-        'opac_news_count': opac_news_count,
     }
     return render_template("home.html", **context)
