@@ -199,7 +199,8 @@ class JournalLoader(BaseLoader):
 
     def prepare_issue_count(self):
         logger.debug(u"iniciando: prepare_issue_count")
-        issue_count = TransformIssue.objects.filter(journal=self.transform_model_instance).count()
+        issue_count = TransformIssue.objects.filter(
+            journal=self.transform_model_instance.uuid).count()
         logger.debug(u"Quantidade de issues encontradas: %s" % issue_count)
         return issue_count
 
