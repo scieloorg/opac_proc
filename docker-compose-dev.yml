@@ -30,7 +30,7 @@ services:
     ports:
         - "6379:6379"
     volumes:
-      - ./redis-data-dev:/data
+      - .:/data
       - /etc/localtime:/etc/localtime:ro
 
   rq-worker:
@@ -44,11 +44,7 @@ services:
     command: /start_worker.sh
     user: nobody
     restart: always
-    hostname: opac-proc-webapp
-    depends_on:
-      - mongo-proc
-      - mongo-logs
-      - redis
+    hostname: opac-proc-rqworker
     links:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
@@ -98,10 +94,6 @@ services:
     user: nobody
     restart: always
     hostname: opac-proc-webapp
-    depends_on:
-      - mongo-proc
-      - mongo-logs
-      - redis
     links:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
@@ -143,4 +135,3 @@ services:
       - OPAC_PROC_REDIS_PORT=6379
     stdin_open: True
     tty: true
-
