@@ -15,6 +15,10 @@ from opac_proc.extractors.decorators import update_metadata
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
 
+from . import source_files_handler
+from . import assets_handler
+
+
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
 else:
@@ -158,6 +162,24 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['htmls'] = htmls
             self.transform_model_instance['pdfs'] = pdfs
 
+        self.transform_model_instance['assets'] = {}
+
+        source_files = source_files_handler.SourceFiles(xylose_article)
+        assets_items = {}
+        for lang, texts_info in source_files.pdf_files.items():
+            assets_items[lang] = {}
+            
+            file_metadata = {'lang': lang}
+            file_metadata.update(source_files.article_metadata)
+           
+            asset = assets_handler.Asset(texts_info.location, 'pdf', file_metadata, source_files.bucket_name)
+            asset.register()
+            asset.wait_registration()
+            assets_items[lang] = asset.data
+            if asset.is_registered_url:
+                texts_info.delete()
+            
+        self.transform_model_instance['assets']['pdf'] = assets_items
         # pid
         if hasattr(xylose_article, 'publisher_id'):
             self.transform_model_instance['pid'] = xylose_article.publisher_id

@@ -65,4 +65,3 @@ if OPAC_MONGODB_USER and OPAC_MONGODB_PASS:
     OPAC_MONGODB_SETTINGS['username'] = OPAC_MONGODB_USER
     OPAC_MONGODB_SETTINGS['password'] = OPAC_MONGODB_PASS
 
-OPAC_METRICS_URL = os.environ.get('OPAC_METRICS_URL', 'http://analytics.scielo.org')

@@ -76,7 +76,7 @@ services:
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
-
+      
   webapp:
     images: scieloorg/opac_proc
     user: nobody

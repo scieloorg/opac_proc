@@ -45,7 +45,7 @@ dev_compose_build: get_opac_mongo_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) build
 
 dev_compose_up: get_opac_mongo_info
-	@docker-compose -f $(COMPOSE_FILE_DEV) up -d
+	@docker-compose -f $(COMPOSE_FILE_DEV) up
 
 dev_compose_logs: get_opac_mongo_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) logs -f $1
@@ -66,7 +66,7 @@ dev_compose_make_test: dev_compose_up
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec webapp python opac_proc/manage.py test
 
 dev_compose_scale_workers: dev_compose_up
-	@docker-compose -f $(COMPOSE_FILE_DEV) scale rq-worker=4
+	@docker-compose -f $(COMPOSE_FILE_DEV) scale rq-worker=1
 
 test:
 	@python opac_proc/manage.py test

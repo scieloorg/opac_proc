@@ -135,3 +135,13 @@ RSS_PRESS_RELEASES_FEEDS_BY_CATEGORY = {
         'url': 'http://pressreleases.scielo.org/{0}/category/press-releases/{1}/feed/',
     },
 }
+
+OPAC_METRICS_URL = os.environ.get('OPAC_METRICS_URL', 'http://analytics.scielo.org')
+
+OPAC_SSM_GRPC_SERVER_HOST = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST', 'localhost')
+OPAC_SSM_GRPC_SERVER_HOST_CLI = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST_CLI', OPAC_SSM_GRPC_SERVER_HOST)
+OPAC_SSM_GRPC_SERVER_PORT = os.environ.get('OPAC_SSM_GRPC_SERVER_PORT', '8005')
+
+ASSETS_SOURCE_PATH = HERE + '/_assets_source_files'
+
+
