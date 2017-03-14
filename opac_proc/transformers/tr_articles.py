@@ -184,4 +184,16 @@ class ArticleTransformer(BaseTransformer):
         if hasattr(xylose_article, 'publisher_id'):
             self.transform_model_instance['pid'] = xylose_article.publisher_id
 
+        # fpage
+        if hasattr(xylose_article, 'start_page'):
+            self.transform_model_instance['fpage'] = xylose_article.start_page
+
+        # lpage
+        if hasattr(xylose_article, 'end_page'):
+            self.transform_model_instance['lpage'] = xylose_article.end_page
+
+        # elocation
+        if hasattr(xylose_article, 'elocation'):
+            self.transform_model_instance['elocation'] = xylose_article.elocation
+
         return self.transform_model_instance

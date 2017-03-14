@@ -136,6 +136,22 @@ RSS_PRESS_RELEASES_FEEDS_BY_CATEGORY = {
     },
 }
 
+# News
+RSS_NEWS_FEEDS = {
+    'pt_BR': {
+        'display_name': 'SciELO em Perspectiva',
+        'url': 'http://blog.scielo.org/feed/'
+    },
+    'es': {
+        'display_name': 'SciELO en Perspectiva',
+        'url': 'http://blog.scielo.org/es/feed/',
+    },
+    'en': {
+        'display_name': 'SciELO in Perspective',
+        'url': 'http://blog.scielo.org/en/feed/',
+    },
+}
+
 OPAC_METRICS_URL = os.environ.get('OPAC_METRICS_URL', 'http://analytics.scielo.org')
 
 OPAC_SSM_GRPC_SERVER_HOST = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST', 'localhost')
@@ -143,5 +159,3 @@ OPAC_SSM_GRPC_SERVER_HOST_CLI = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST_CLI', 
 OPAC_SSM_GRPC_SERVER_PORT = os.environ.get('OPAC_SSM_GRPC_SERVER_PORT', '8005')
 
 ASSETS_SOURCE_PATH = HERE + '/_assets_source_files'
-
-

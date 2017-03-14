@@ -5,6 +5,7 @@ from opac_proc.loaders.lo_journals import JournalLoader
 from opac_proc.loaders.lo_issues import IssueLoader
 from opac_proc.loaders.lo_articles import ArticleLoader
 from opac_proc.loaders.lo_press_releases import PressReleaseLoader
+from opac_proc.loaders.lo_news import NewsLoader
 from opac_proc.datastore import models
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
@@ -234,3 +235,49 @@ def task_process_all_press_releases():
         r_queues.enqueue(
             stage, 'press_release',
             task_load_press_release, uuid=press_release.uuid)
+
+
+# Press Release:
+
+
+def task_load_news(uuid):
+    news_loader = NewsLoader(uuid)
+    news_loader.prepare()
+    news_loader.load()
+
+
+def task_reprocess_news(ids=None):
+    get_db_connection()
+    stage = "load"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    if ids is None:  # update all Press Releases
+        models.LoadNews.objects.all().update(must_reprocess=True)
+        for news in models.LoadNews.objects.all():
+            r_queues.enqueue(
+                stage, 'news',
+                task_load_news, uuid=news.uuid)
+    else:
+        for oid in ids:
+            try:
+                obj = models.LoadNews.objects.get(pk=oid)
+                obj.update(must_reprocess=True)
+                obj.reload()
+                r_queues.enqueue(
+                    stage, 'news',
+                    task_load_news, uuid=obj.uuid)
+            except Exception as e:
+                logger.error('models.LoadNews %s. pk: %s', str(e), oid)
+
+
+def task_process_all_news():
+    get_db_connection()
+    stage = "load"
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    for news in models.TransformNews.objects.all():
+        r_queues.enqueue(
+            stage, 'news',
+            task_load_news, uuid=news.uuid)

@@ -25,6 +25,7 @@ def home():
     extract_issue_count = models.ExtractIssue.objects.all().count()
     extract_article_count = models.ExtractArticle.objects.all().count()
     extract_press_release_count = models.ExtractPressRelease.objects.all().count()
+    extract_news_count = models.ExtractNews.objects.all().count()
 
     # transform counts
     transform_collection_count = models.TransformCollection.objects.all().count()
@@ -32,6 +33,7 @@ def home():
     transform_issue_count = models.TransformIssue.objects.all().count()
     transform_article_count = models.TransformArticle.objects.all().count()
     transform_press_release_count = models.TransformPressRelease.objects.all().count()
+    transform_news_count = models.TransformNews.objects.all().count()
 
     # load counts
     load_collection_count = models.LoadCollection.objects.all().count()
@@ -39,6 +41,7 @@ def home():
     load_issue_count = models.LoadIssue.objects.all().count()
     load_article_count = models.LoadArticle.objects.all().count()
     load_press_release_count = models.LoadPressRelease.objects.all().count()
+    load_news_count = models.LoadNews.objects.all().count()
 
     # OPAC counts
     with switch_db(OpacCollection, opac_webapp_db_name):
@@ -72,6 +75,7 @@ def home():
         'extract_issue_count': extract_issue_count,
         'extract_article_count': extract_article_count,
         'extract_press_release_count': extract_press_release_count,
+        'extract_news_count': extract_news_count,
 
         # tranform
         'transform_collection_count': transform_collection_count,
@@ -79,6 +83,7 @@ def home():
         'transform_issue_count': transform_issue_count,
         'transform_article_count': transform_article_count,
         'transform_press_release_count': transform_press_release_count,
+        'transform_news_count': transform_news_count,
 
         # load
         'load_collection_count': load_collection_count,
@@ -86,17 +91,18 @@ def home():
         'load_issue_count': load_issue_count,
         'load_article_count': load_article_count,
         'load_press_release_count': load_press_release_count,
+        'load_news_count': load_news_count,
 
         # opac
         'opac_collection_count': opac_collection_count,
         'opac_journal_count': opac_journal_count,
         'opac_issue_count': opac_issue_count,
         'opac_article_count': opac_article_count,
+        'opac_pressrelease_count': opac_pressrelease_count,
+        'opac_news_count': opac_news_count,
 
         # opac outros modelos
         'opac_sponsor_count': opac_sponsor_count,
-        'opac_pressrelease_count': opac_pressrelease_count,
         'opac_page_count': opac_page_count,
-        'opac_news_count': opac_news_count,
     }
     return render_template("home.html", **context)

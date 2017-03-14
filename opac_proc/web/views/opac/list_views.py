@@ -185,51 +185,51 @@ class OpacArticleListView(OpacBaseListView):
     model_class = models.Article
     model_name = 'article'
     page_title = "OPAC: Articles"
-    list_columns = [
-        {
-            'field_label': u'ID',
-            'field_name': '_id',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Journal',
-            'field_name': 'journal',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Issue',
-            'field_name': 'issue',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'PID',
-            'field_name': 'pid',
-            'field_type': 'string'
-        }
-    ]
+    # list_columns = [
+    #     {
+    #         'field_label': u'ID',
+    #         'field_name': '_id',
+    #         'field_type': 'string'
+    #     },
+    #     {
+    #         'field_label': u'Journal',
+    #         'field_name': 'journal',
+    #         'field_type': 'string'
+    #     },
+    #     {
+    #         'field_label': u'Issue',
+    #         'field_name': 'issue',
+    #         'field_type': 'string'
+    #     },
+    #     {
+    #         'field_label': u'PID',
+    #         'field_name': 'pid',
+    #         'field_type': 'string'
+    #     }
+    # ]
 
-    list_filters = [
-        {
-            'field_label': u'ID',
-            'field_name': '_id',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Journal',
-            'field_name': 'journal',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'Issue',
-            'field_name': 'issue',
-            'field_type': 'string'
-        },
-        {
-            'field_label': u'PID',
-            'field_name': 'pid',
-            'field_type': 'string'
-        }
-    ]
+    # list_filters = [
+    #     {
+    #         'field_label': u'ID',
+    #         'field_name': '_id',
+    #         'field_type': 'string'
+    #     },
+    #     {
+    #         'field_label': u'Journal',
+    #         'field_name': 'journal',
+    #         'field_type': 'string'
+    #     },
+    #     {
+    #         'field_label': u'Issue',
+    #         'field_name': 'issue',
+    #         'field_type': 'string'
+    #     },
+    #     {
+    #         'field_label': u'PID',
+    #         'field_name': 'pid',
+    #         'field_type': 'string'
+    #     }
+    # ]
 
 
 class OpacSponsorListView(OpacBaseListView):
