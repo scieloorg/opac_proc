@@ -6,17 +6,20 @@ import rq_dashboard
 import rq_scheduler_dashboard
 
 from werkzeug.contrib.fixers import ProxyFix
-from flask import Flask
-from flask_mongoengine import MongoEngine
+from flask import Flask, request, flash, redirect, url_for
+from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_login import LoginManager, current_user
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
 from opac_proc.web import urls
+from opac_proc.accounts import accounts as accounts_bp
 
 db = MongoEngine()
 toolbar = DebugToolbarExtension()
+login_manager = LoginManager()
 
 
 def create_app(test_mode=False):
@@ -36,11 +39,24 @@ def create_app(test_mode=False):
         app.config['TESTING'] = True
         app.config['DEBUG'] = False
 
+    # login
+    from opac_proc.accounts.handlers import *  # NOQA vem aqui: check_user_logged_in_or_redirect
+    login_manager.session_protection = 'strong'
+    login_manager.login_view = 'accounts.login'
+    login_manager.init_app(app)
+
+    db.init_app(app)
+    # http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/#session-interface
+    app.session_interface = MongoEngineSessionInterface(db)
+    toolbar.init_app(app)
+
+    # blueprints
+    rq_scheduler_dashboard.blueprint.before_request(check_user_logged_in_or_redirect)
+    rq_dashboard.blueprint.before_request(check_user_logged_in_or_redirect)
+    app.register_blueprint(accounts_bp)
     app.register_blueprint(rq_scheduler_dashboard.blueprint, url_prefix='/scheduler')
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/dashboard')
 
-    db.init_app(app)
-    toolbar.init_app(app)
     app.wsgi_app = ProxyFix(app.wsgi_app)
     urls.add_url_rules(app)
 

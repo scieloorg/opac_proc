@@ -1,5 +1,5 @@
 # coding: utf-8
-
+from flask_login import login_required
 from opac_proc.web.views.extract.list_views import (
     ExtractCollectionListView,
     ExtractJournalListView,
@@ -218,7 +218,7 @@ url_patterns = (
 
 def add_url_rules(app):
     # first add home page:
-    app.add_url_rule('/', 'home', home)
+    app.add_url_rule('/', 'home', login_required(home))
 
     # then iterate over url_patterns to add each view:
     for url_definition in url_patterns:
@@ -239,11 +239,15 @@ def add_url_rules(app):
             # add list rule
             app.add_url_rule(
                 list_url_path,
-                view_func=list_view_class.as_view(list_view_name)
+                view_func=login_required(
+                    list_view_class.as_view(list_view_name)
+                )
             )
 
             # add detail rule
             app.add_url_rule(
                 detail_url_path,
-                view_func=detail_view_class.as_view(detail_view_name)
+                view_func=login_required(
+                    detail_view_class.as_view(detail_view_name)
+                )
             )
