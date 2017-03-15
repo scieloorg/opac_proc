@@ -50,6 +50,8 @@ class Asset(object):
         response = client_status()
         if response is True:
             self.metadata['registration-date'] = now()
+            if self.pfile is None:
+                return {'error message': u'Valor inválido de arquivo para registrar em SSM'}
             self._status = 'queued'
             self.ID = cli.add_asset(self.pfile, self.name, self.filetype, self.metadata, self.bucket_name)
         else:

@@ -168,16 +168,15 @@ class ArticleTransformer(BaseTransformer):
         assets_items = {}
         for lang, texts_info in source_files.pdf_files.items():
             assets_items[lang] = {}
-            
             file_metadata = {'lang': lang}
             file_metadata.update(source_files.article_metadata)
-           
-            asset = assets_handler.Asset(texts_info.location, 'pdf', file_metadata, source_files.bucket_name)
-            asset.register()
-            asset.wait_registration()
-            assets_items[lang] = asset.data
-            if asset.is_registered_url:
-                texts_info.delete()
+            if texts_info.location is not None:
+                asset = assets_handler.Asset(texts_info.location, 'pdf', file_metadata, source_files.bucket_name)
+                asset.register()
+                asset.wait_registration()
+                assets_items[lang] = asset.data
+                if asset.is_registered_url:
+                    texts_info.delete()
             
         self.transform_model_instance['assets']['pdf'] = assets_items
         # pid

@@ -159,3 +159,4 @@ OPAC_SSM_GRPC_SERVER_HOST_CLI = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST_CLI', 
 OPAC_SSM_GRPC_SERVER_PORT = os.environ.get('OPAC_SSM_GRPC_SERVER_PORT', '8005')
 
 ASSETS_SOURCE_PATH = HERE + '/_assets_source_files'
+ASSETS_SOURCE_PDF_PATH = HERE + '/_assets_source_files'

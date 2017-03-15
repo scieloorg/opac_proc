@@ -1,7 +1,7 @@
 # code = utf-8
 
 import os
-import urllib
+import urllib2
 
 from opac_proc.web import config
 
@@ -88,6 +88,13 @@ class SourceFiles(object):
     def pdf_files(self):
         return self._texts_info.get('pdf', {})
 
+    def fullpath(self, folders):
+        return '/'.join([folder for folder in folders if folder is not None])
+
+    @property
+    def pdf_folder_path(self):
+        return self.fullpath([config.ASSETS_SOURCE_PDF_PATH, self.journal_folder_name, self.issue_folder_name])
+
     def _get_data_from_sgm_version(self):
         fulltext_files = {}
         if hasattr(self.xylose_article, 'fulltexts'):
@@ -100,9 +107,7 @@ class SourceFiles(object):
                             prefix = lang+'_'
                         fulltext_files[fileformat][lang] = SourceTextFile(
                             url, 
-                            self.journal_folder_name, 
-                            self.issue_folder_name, 
-                            self.article_folder_name, 
+                            self.pdf_folder_path, 
                             prefix + self.article_folder_name + '.' + fileformat)
         return fulltext_files 
 
@@ -115,7 +120,7 @@ class SourceFiles(object):
                     for lang in self.xylose_article.xml_languages():
                         prefix = '' if lang == self.xylose_article.original_language else lang+'_'
                         url = self.pdf_former_url(prefix)
-                        fulltext_files['pdf'][lang] = SourceTextFile(url, self.journal_folder_name, self.issue_folder_name, self.article_folder_name, prefix+self.article_folder_name+'.pdf')
+                        fulltext_files['pdf'][lang] = SourceTextFile(url, self.pdf_folder_path, prefix+self.article_folder_name+'.pdf')
         return fulltext_files
 
     def pdf_former_url(self, lang_prefix):
@@ -128,20 +133,27 @@ class SourceFiles(object):
             )
 
 
-def py2_get_web_page_content(url):
-    req = urllib.urlopen(url)
-    if req is not None:
-        return req.read()
-
-
-def get_web_page_content(url):
-    return py2_get_web_page_content(url)
+def get_web_page_content(url, timeout=30):
+    response = None
+    req = urllib2.Request(url)
+    error_message = ''
+    try:
+        response = urllib2.urlopen(req, timeout=timeout).read()
+    except urllib2.HTTPError as e:
+        if e.code == 407:
+        error_message = e.read()
+    except urllib2.URLError as e:
+        error_message = 'URLError'
+    except urllib2.socket.timeout:
+        error_message = 'Time out!'
+    except Exception as e:
+        error_message = 'Unknown!'
+    return (response, error_message)
 
 
 def download(url, fullpath):
-    content = get_web_page_content(url)
+    content, error_message = get_web_page_content(url)
     if content is not None:
-        #import pdb; pdb.set_trace();
         path = os.path.dirname(fullpath)
         if not os.path.isdir(path):
             os.makedirs(path)
