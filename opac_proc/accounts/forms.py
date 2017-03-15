@@ -42,3 +42,9 @@ class EmailForm(FlaskForm):
             validators.DataRequired(),
             validators.Email()
         ])
+
+
+class PasswordForm(FlaskForm):
+    password = PasswordField(
+        'password',
+        validators=[validators.Required()])

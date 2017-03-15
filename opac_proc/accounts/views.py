@@ -30,9 +30,9 @@ def login():
             user = user_obj.get_by_email_w_password(email)
             if user is None:
                 flash(u"User with this email Does Not Exists", "error")
-            elif not user.is_active:
+            elif not user.active:
                 flash(u"This user is inactive", "warning")
-            elif if current_app.config['ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION'] and not user.email_confirmed:
+            elif current_app.config['ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION'] and not user.email_confirmed:
                 flash(u"This user has unconfirmed email", "warning")
             else:
                 password_is_valid = check_password_hash(user.password, password_as_plain_text)
@@ -116,6 +116,7 @@ def logout():
 
 @accounts.route("/accounts/reset/password/<token>", methods=["GET", "POST"])
 def reset_password_with_token(token):
+    form = forms.PasswordForm(request.form)
     try:
         ts = get_timed_serializer()
         email = ts.loads(
@@ -124,16 +125,25 @@ def reset_password_with_token(token):
             max_age=current_app.config['TOKEN_MAX_AGE'])
     except Exception:
         abort(404)
-
-    form = forms.PasswordForm(request.form)
-    if admin.helpers.validate_form_on_submit(form):
-        user = controllers.get_user_by_email(email=email)
-        if not user.email_confirmed:
-            return render_template("accounts/unconfirm_email.html")
-
-        controllers.set_user_password(user, form.password.data)
-        flash(u"New password saved successfully!", "success")
-        return redirect(url_for('accounts.login'))
+    else:
+        if request.method == 'POST':
+            if form.validate():
+                new_password = request.form['password']
+                user_obj = User()
+                user = user_obj.get_by_email(email)
+                if not user:
+                    abort(404, "User not found")
+                elif not user.active:
+                    flash('This user: %s is inactive!' % email)
+                    return redirect(url_for('accounts.login'))
+                elif current_app.config['ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION'] and not user.email_confirmed:
+                    return render_template("accounts/unconfirm_email.html")
+                else:
+                    user.set_new_password(new_password)
+                    flash(u"New password saved successfully!", "success")
+                    return redirect(url_for('accounts.login'))
+            else:
+                flash(u"Fix form errors")
     context = {
         'form': form,
         'token': token,
@@ -150,22 +160,20 @@ def reset_password():
             email = request.form['email']
             user_obj = User()
             user = user_obj.get_by_email(email)
-
             if not user:
                 abort(404, "User not found")
-
-            if not user.email_confirmed:
+            elif not user.email_confirmed:
+                flash('This user: %s is inactive!' % email)
+                return redirect(url_for('accounts.login'))
+            elif current_app.config['ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION'] and not user.email_confirmed:
                 return render_template("accounts/unconfirm_email.html")
-
-            msg_sent, error_msg = user.send_reset_password_email()
-            if msg_sent:
-                msg = u"Enviamos as instruções para recuperar a senha para: %s" % user.email
-                flash(msg, 'success')
             else:
-                msg = u"Ocorreu um erro no envio das instruções por email para: %s. Erro: %s" % (
-                    user.email, error_msg)
-                flash(msg, 'error'),
-            return redirect(url_for('accounts.login'))
+                msg_sent, msg_error = user.send_reset_password_email()
+                if msg_sent:
+                    flash(u"Email sent (to: %s) with the instructions to reset your password!" % email, "success")
+                else:
+                    flash(u"Can't sent the email (to: %s) with instructions! Error: %s" % (email, msg_error), "error")
+                return redirect(url_for('accounts.login'))
         else:
             flash(u"Fix form errors", "error")
 

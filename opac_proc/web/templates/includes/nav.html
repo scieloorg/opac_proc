@@ -161,7 +161,7 @@
               {{ current_user.email }} <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="#">Password Reset</a></li>
+              <li><a href="{{ url_for('accounts.reset_password') }}">Password Reset</a></li>
               <li><a href="{{ url_for('accounts.logout') }}">Logout</a></li>
             </ul>
           </li>
