@@ -133,5 +133,6 @@ services:
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
+      - OPAC_PROC_WEB_REGISTRATION_ENABLED=True
     stdin_open: True
     tty: true

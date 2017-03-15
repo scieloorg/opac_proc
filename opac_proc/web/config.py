@@ -25,8 +25,8 @@ ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     11621))
 
 # WEBAPP config: ----------------------------------------------------
-DEBUG = bool(os.environ.get('OPAC_PROC_DEBUG', True))
-TESTING = bool(os.environ.get('OPAC_PROC_TESTING', False))
+DEBUG = os.environ.get('OPAC_PROC_DEBUG', 'False') == 'True'
+TESTING = os.environ.get('OPAC_PROC_TESTING', 'False') == 'True'
 SECRET_KEY = os.environ.get('OPAC_PROC_SECRET_KEY', "s3cr3t-k3y")
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')
@@ -151,3 +151,6 @@ RSS_NEWS_FEEDS = {
         'url': 'http://blog.scielo.org/en/feed/',
     },
 }
+
+# Habilitar/Desabilitar o form de registro
+WEB_REGISTRATION_ENABLED = os.environ.get('OPAC_PROC_WEB_REGISTRATION_ENABLED', 'False') == 'True'

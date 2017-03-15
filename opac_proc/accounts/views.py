@@ -2,7 +2,7 @@
 import os
 import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import render_template, request, flash, redirect, url_for
+from flask import current_app, render_template, request, flash, redirect, url_for
 from opac_proc.web.webapp import login_manager
 from flask_login import (
     current_user,
@@ -50,36 +50,44 @@ def login():
     return render_template("accounts/login.html", **context)
 
 
+@accounts.route("/accounts/register/disabled")
+def register_disabled():
+    return render_template("accounts/registration_disabled.html")
+
+
 @accounts.route("/accounts/register", methods=["GET", "POST"])
 def register():
 
-    form = forms.RegisterForm(request.form)
+    if current_app.config['WEB_REGISTRATION_ENABLED']:
+        form = forms.RegisterForm(request.form)
 
-    if request.method == 'POST':
-        if form.validate():
-            email = request.form['email']
-            password_as_plain_text = request.form['password']
-            next_url = request.form.get("next", request.args.get("next", "/"))
-            # generate password hash
-            password_hash = generate_password_hash(password_as_plain_text)
-            # prepare User
-            user = User(email, password_hash)
-            try:
-                user.save()
-                if login_user(user, remember="no"):
-                    flash("Logged in!")
-                    return redirect(next_url)
-                else:
-                    flash("unable to log you in")
-            except:
-                flash("unable to register with that email address")
-        else:
-            flash("Fix form errors")
+        if request.method == 'POST':
+            if form.validate():
+                email = request.form['email']
+                password_as_plain_text = request.form['password']
+                next_url = request.form.get("next", request.args.get("next", "/"))
+                # generate password hash
+                password_hash = generate_password_hash(password_as_plain_text)
+                # prepare User
+                user = User(email, password_hash)
+                try:
+                    user.save()
+                    if login_user(user, remember="no"):
+                        flash("Logged in!")
+                        return redirect(next_url)
+                    else:
+                        flash("unable to log you in")
+                except:
+                    flash("unable to register with that email address")
+            else:
+                flash("Fix form errors")
 
-    context = {
-        'form': form
-    }
-    return render_template("accounts/register.html", **context)
+        context = {
+            'form': form
+        }
+        return render_template("accounts/register.html", **context)
+    else:
+        return redirect(url_for('accounts.register_disabled'))
 
 
 @accounts.route("/accounts/logout")
