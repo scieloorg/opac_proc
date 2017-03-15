@@ -10,6 +10,7 @@ from flask import Flask, request, flash, redirect, url_for
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager, current_user
+from flask_mail import Mail
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
@@ -20,6 +21,7 @@ from opac_proc.accounts import accounts as accounts_bp
 db = MongoEngine()
 toolbar = DebugToolbarExtension()
 login_manager = LoginManager()
+mail = Mail()
 
 
 def create_app(test_mode=False):
@@ -49,6 +51,7 @@ def create_app(test_mode=False):
     # http://docs.mongoengine.org/projects/flask-mongoengine/en/latest/#session-interface
     app.session_interface = MongoEngineSessionInterface(db)
     toolbar.init_app(app)
+    mail.init_app(app)
 
     # blueprints
     rq_scheduler_dashboard.blueprint.before_request(check_user_logged_in_or_redirect)

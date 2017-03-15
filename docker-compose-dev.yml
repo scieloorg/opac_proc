@@ -2,6 +2,14 @@ version: '2'
 
 services:
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    hostname: mailhog
+    ports:
+        - "8025:8025"
+    volumes:
+        - /etc/localtime:/etc/localtime:ro
+
   mongo-proc:
     image: mongo:latest
     restart: always
@@ -49,6 +57,7 @@ services:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
       - redis:redis
+      - mailhog:mailhog
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - .:/app
@@ -82,6 +91,12 @@ services:
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
+      # Accounts:
+      - OPAC_PROC_WEB_REGISTRATION_ENABLED=True
+      - OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION=True
+      # Email:
+      - OPAC_PROC_MAIL_SERVER=mailhog
+      - OPAC_PROC_MAIL_PORT=1025
 
   webapp:
     build:
@@ -98,6 +113,7 @@ services:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
       - redis:redis
+      - mailhog:mailhog
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - .:/app
@@ -133,6 +149,11 @@ services:
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
+      # Accounts:
       - OPAC_PROC_WEB_REGISTRATION_ENABLED=True
+      - OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION=True
+      # Email:
+      - OPAC_PROC_MAIL_SERVER=mailhog
+      - OPAC_PROC_MAIL_PORT=1025
     stdin_open: True
     tty: true

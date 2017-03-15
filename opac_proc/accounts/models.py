@@ -13,3 +13,4 @@ class User(Document):
     password = StringField(default=True)
     active = BooleanField(default=True)
     timestamp = DateTimeField(default=datetime.now())
+    email_confirmed = BooleanField(default=False)

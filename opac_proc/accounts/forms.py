@@ -1,14 +1,22 @@
 # coding: utf-8
 import models
+from flask_wtf import FlaskForm
 from flask_mongoengine.wtf import model_form
 from flask_mongoengine.wtf.orm import validators
 from wtforms.fields import PasswordField, BooleanField
+from wtforms.fields.html5 import EmailField
 
-user_form = model_form(models.User, exclude=['password', 'active', 'timestamp'])
+
+UserForm = model_form(models.User, exclude=[
+    'password',
+    'active',
+    'timestamp',
+    'email_confirmed'
+])
 
 
-# Signup Form created from user_form
-class RegisterForm(user_form):
+# Signup Form created from UserForm
+class RegisterForm(UserForm):
     password = PasswordField(
         'password',
         validators=[
@@ -19,9 +27,18 @@ class RegisterForm(user_form):
 
 
 # Login form will provide a Password field (WTForm form field)
-class LoginForm(user_form):
+class LoginForm(UserForm):
     password = PasswordField(
         'password',
         validators=[validators.Required()])
     remember = BooleanField(
         'remember')
+
+
+class EmailForm(FlaskForm):
+    email = email = EmailField(
+        'email',
+        validators=[
+            validators.DataRequired(),
+            validators.Email()
+        ])

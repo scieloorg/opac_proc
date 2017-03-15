@@ -27,7 +27,7 @@
             </form>
           </div>
           <div class="panel-footer">
-            <a href="#">Esqueci a senha?</a>
+            <a href="{{ url_for('accounts.reset_password') }}">Esqueci a senha?</a>
             <a class="pull-right" href="{{ url_for('accounts.login') }}">Já tem uma conta?</a>
           </div>
         </div>
