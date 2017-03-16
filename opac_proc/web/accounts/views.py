@@ -3,7 +3,6 @@ import os
 import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import abort, current_app, render_template, request, flash, redirect, url_for
-from opac_proc.web.webapp import login_manager
 from flask_login import (
     current_user,
     login_required,
@@ -14,7 +13,7 @@ from flask_login import (
 import forms
 from mixins import User
 from utils import get_timed_serializer
-from . import accounts
+from . import accounts  # accounts blueprint
 
 
 @accounts.route("/accounts/login", methods=["GET", "POST"])
