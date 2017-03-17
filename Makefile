@@ -85,6 +85,9 @@ travis_compose_up: get_opac_mongo_info get_build_info
 travis_compose_make_test: get_opac_mongo_info get_build_info
 	@docker-compose -f $(COMPOSE_FILE_BUILD) exec webapp python opac_proc/manage.py test
 
+travis_compose_exec_shell_webapp: travis_compose_up
+	@docker-compose -f $(COMPOSE_FILE_BUILD) exec webapp sh
+
 travis_run_audit:
 	@docker run \
 	-it --net host --pid host \
