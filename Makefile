@@ -19,7 +19,7 @@ get_opac_mongo_info:
 	@echo "***************************************"
 	@echo "* OPAC_MONGODB_NAME: \t" $(OPAC_MONGODB_NAME)
 	@echo "* OPAC_MONGODB_HOST: \t" $(OPAC_MONGODB_HOST)
-	@echo "* OPAC_MONGODB_PORT; \t" $(OPAC_MONGODB_PORT)
+	@echo "* OPAC_MONGODB_PORT: \t" $(OPAC_MONGODB_PORT)
 	@echo "***************************************"
 
 opac_proc_version:

@@ -25,8 +25,8 @@ ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     11621))
 
 # WEBAPP config: ----------------------------------------------------
-DEBUG = bool(os.environ.get('OPAC_PROC_DEBUG', True))
-TESTING = bool(os.environ.get('OPAC_PROC_TESTING', False))
+DEBUG = os.environ.get('OPAC_PROC_DEBUG', 'False') == 'True'
+TESTING = os.environ.get('OPAC_PROC_TESTING', 'False') == 'True'
 SECRET_KEY = os.environ.get('OPAC_PROC_SECRET_KEY', "s3cr3t-k3y")
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')
@@ -151,3 +151,24 @@ RSS_NEWS_FEEDS = {
         'url': 'http://blog.scielo.org/en/feed/',
     },
 }
+
+# Habilitar/Desabilitar o form de registro
+WEB_REGISTRATION_ENABLED = os.environ.get('OPAC_PROC_WEB_REGISTRATION_ENABLED', 'False') == 'True'
+# True/False para requerir ou não confirmação de email no processo de registro/login
+ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION = os.environ.get('OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION', 'True') == 'True'
+
+# Tempo de expiração para os tokens. Valor en segundos: 86400 = 60*60*24 = 1 dia
+TOKEN_MAX_AGE = 86400
+
+# Credenciais para envio de emails:
+DEFAULT_EMAIL = os.environ.get('OPAC_PROC_DEFAULT_EMAIL', 'scielo@scielo.org')
+MAIL_SERVER = os.environ.get('OPAC_PROC_MAIL_SERVER', 'localhost')
+MAIL_PORT = int(os.environ.get('OPAC_PROC_MAIL_PORT', 1025))
+MAIL_USE_TLS = bool(os.environ.get('OPAC_PROC_MAIL_USE_TLS', False))
+MAIL_USE_SSL = bool(os.environ.get('OPAC_PROC_MAIL_USE_SSL', False))
+MAIL_DEBUG = DEBUG
+MAIL_USERNAME = os.environ.get('OPAC_PROC_MAIL_USERNAME', None)
+MAIL_PASSWORD = os.environ.get('OPAC_PROC_MAIL_PASSWORD', None)
+MAIL_DEFAULT_SENDER = DEFAULT_EMAIL
+MAIL_MAX_EMAILS = None
+MAIL_ASCII_ATTACHMENTS = False

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Reset Password{% endblock title %}
+{% block content %}
+  <h1></h1>
+  <div class="row">
+    <div class="col-md-5 col-md-offset-4">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Reset Password</div>
+        <div class="panel-body">
+          <form method="POST" action="{{ url_for('accounts.reset_password_with_token', token=token) }}" class="form-horizontal">
+            {% include "accounts/forms.html" %}
+            <button class="btn btn-primary pull-right" type="submit">Enviar</button>
+          </form>
+        </div>
+        <div class="panel-footer">
+          &nbsp;
+        </div>
+      </div>
+
+    </div>
+  </div>
+{% endblock content %}
