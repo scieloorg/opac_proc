@@ -41,7 +41,7 @@ services:
     hostname: opac-proc-rqworker
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /mnt/scielosp_org:/data:ro
+      - /mnt/scielosp_org:/app/data:ro
     environment:
       - OPAC_PROC_LOG_LEVEL=DEBUG
       - OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN=articlemeta.scielo.org
@@ -86,7 +86,7 @@ services:
     hostname: opac-proc-webapp
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /mnt/scielosp_org:/data:ro
+      - /mnt/scielosp_org:/app/data:ro
     ports:
       - "9000:8000"
     environment:
