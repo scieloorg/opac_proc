@@ -19,7 +19,7 @@ get_opac_mongo_info:
 	@echo "***************************************"
 	@echo "* OPAC_MONGODB_NAME: \t" $(OPAC_MONGODB_NAME)
 	@echo "* OPAC_MONGODB_HOST: \t" $(OPAC_MONGODB_HOST)
-	@echo "* OPAC_MONGODB_PORT; \t" $(OPAC_MONGODB_PORT)
+	@echo "* OPAC_MONGODB_PORT: \t" $(OPAC_MONGODB_PORT)
 	@echo "***************************************"
 
 opac_proc_version:
@@ -84,6 +84,9 @@ travis_compose_up: get_opac_mongo_info get_build_info
 
 travis_compose_make_test: get_opac_mongo_info get_build_info
 	@docker-compose -f $(COMPOSE_FILE_BUILD) exec webapp python opac_proc/manage.py test
+
+travis_compose_exec_shell_webapp: travis_compose_up
+	@docker-compose -f $(COMPOSE_FILE_BUILD) exec webapp sh
 
 travis_run_audit:
 	@docker run \
