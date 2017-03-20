@@ -1,4 +1,4 @@
-# code = utf-8
+# coding: utf-8
 
 import os
 import time
@@ -35,11 +35,6 @@ class Asset(object):
         self.filetype = filetype
         self.metadata = metadata
         self.bucket_name = bucket_name
-        try:
-            self.pfile = open(file_location, 'rb')
-        except:
-            raise
-
         self.name = self.pfile.name
         self.ID = None
         self.registered_url = None
@@ -50,7 +45,7 @@ class Asset(object):
         if response is True:
             self.metadata['registration-date'] = now()
             if self.pfile is None:
-                return {'error message': u'Valor invalido de arquivo para registrar em SSM'}
+                return {'error message': u'Valor inválido de arquivo para registrar em SSM'}
             self._status = 'queued'
             self.ID = cli.add_asset(self.pfile, self.name, self.filetype, self.metadata, self.bucket_name)
         else:

@@ -157,7 +157,7 @@ OPAC_SSM_GRPC_SERVER_HOST = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST', 'localho
 OPAC_SSM_GRPC_SERVER_HOST_CLI = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST_CLI', OPAC_SSM_GRPC_SERVER_HOST)
 OPAC_SSM_GRPC_SERVER_PORT = os.environ.get('OPAC_SSM_GRPC_SERVER_PORT', '8005')
 
-OPAC_ASSETS_SOURCE_PDF_PATH = os.environ.get('OPAC_ASSETS_SOURCE_PDF_PATH', HERE + '/_assets_source_files/pdf')
+OPAC_PROC_ASSETS_SOURCE_PDF_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_PDF_PATH', HERE + '/_assets_source_files/pdf')
 
 # Habilitar/Desabilitar o form de registro
 WEB_REGISTRATION_ENABLED = os.environ.get('OPAC_PROC_WEB_REGISTRATION_ENABLED', 'False') == 'True'

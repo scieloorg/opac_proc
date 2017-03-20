@@ -106,6 +106,8 @@ services:
       - OPAC_SSM_PROTO_FILE_PORT=80
       - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
 
+      - OPAC_PROC_ASSETS_SOURCE_PDF_PATH=/app/data/pdf
+
   webapp:
     build:
       context: .
@@ -170,5 +172,8 @@ services:
       - OPAC_SSM_PROTO_FILE_HOST=raw.githubusercontent.com
       - OPAC_SSM_PROTO_FILE_PORT=80
       - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
+
+      - OPAC_PROC_ASSETS_SOURCE_PDF_PATH=/app/data/pdf
+
     stdin_open: True
     tty: true

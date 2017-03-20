@@ -71,7 +71,7 @@ class SourceFiles(object):
 
     @property
     def pdf_folder_path(self):
-        return '/'.join([config.OPAC_ASSETS_SOURCE_PDF_PATH, self.issue_folder_rel_path])
+        return '/'.join([config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH, self.issue_folder_rel_path])
 
     def _get_data_from_sgm_version(self):
         fulltext_files = {}

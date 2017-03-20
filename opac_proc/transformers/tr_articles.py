@@ -171,10 +171,16 @@ class ArticleTransformer(BaseTransformer):
             file_metadata = {'lang': lang}
             file_metadata.update(source_files.article_metadata)
             if texts_info.location is not None:
-                asset = assets_handler.Asset(texts_info.location, 'pdf', file_metadata, source_files.bucket_name)
-                asset.register()
-                asset.wait_registration()
-                assets_items[lang] = asset.data
+                try:
+                    pfile = open(texts_info.location, 'rb')
+                except Exception, e:
+                    logger.error(u'Não foi possível abrir o arquivo {}'.format(texts_info.location))
+                    raise e
+                else:
+                    asset = assets_handler.Asset(pfile, 'pdf', file_metadata, source_files.bucket_name)
+                    asset.register()
+                    asset.wait_registration()
+                    assets_items[lang] = asset.data
         self.transform_model_instance['assets']['pdf'] = assets_items
 
         # pid
