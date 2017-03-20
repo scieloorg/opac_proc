@@ -167,7 +167,7 @@ class ArticleTransformer(BaseTransformer):
         source_files = source_files_handler.SourceFiles(xylose_article)
         assets_items = {}
         for lang, texts_info in source_files.pdf_files.items():
-            assets_items[lang] = {}
+            assets_items[lang] = {'source': texts_info.source_location}
             file_metadata = {'lang': lang}
             file_metadata.update(source_files.article_metadata)
             if texts_info.location is not None:
@@ -175,10 +175,8 @@ class ArticleTransformer(BaseTransformer):
                 asset.register()
                 asset.wait_registration()
                 assets_items[lang] = asset.data
-                if asset.is_registered_url:
-                    texts_info.delete()
-            
         self.transform_model_instance['assets']['pdf'] = assets_items
+
         # pid
         if hasattr(xylose_article, 'publisher_id'):
             self.transform_model_instance['pid'] = xylose_article.publisher_id

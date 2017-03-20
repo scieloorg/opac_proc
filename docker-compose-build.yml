@@ -71,7 +71,7 @@ services:
       - OPAC_PROC_LOG_MONGODB_NAME=opac_proc_logs
       - OPAC_PROC_LOG_MONGODB_HOST=mongo-logs
       - OPAC_PROC_LOG_MONGODB_PORT=27017
-      # Redis
+      # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
       # Opac_ssm_server
@@ -127,7 +127,7 @@ services:
       - OPAC_PROC_LOG_MONGODB_PORT=27017
       # - OPAC_PROC_LOG_MONGODB_USER=
       # - OPAC_PROC_LOG_MONGODB_PASS=
-      # Redis
+      # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
       # Opac_ssm_server
@@ -137,3 +137,4 @@ services:
       - OPAC_SSM_PROTO_FILE_HOST=raw.githubusercontent.com
       - OPAC_SSM_PROTO_FILE_PORT=80
       - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
+
