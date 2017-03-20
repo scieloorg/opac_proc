@@ -30,12 +30,12 @@ def now():
 
 class Asset(object):
 
-    def __init__(self, file_location, filetype, metadata, bucket_name):
-        self.file_location = file_location
+    def __init__(self, pfile, filename, filetype, metadata, bucket_name):
+        self.pfile = pfile
         self.filetype = filetype
         self.metadata = metadata
         self.bucket_name = bucket_name
-        self.name = self.pfile.name
+        self.name = filename
         self.ID = None
         self.registered_url = None
         self.registration_error = None

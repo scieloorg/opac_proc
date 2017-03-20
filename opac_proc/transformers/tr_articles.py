@@ -165,23 +165,8 @@ class ArticleTransformer(BaseTransformer):
         self.transform_model_instance['assets'] = {}
 
         source_files = source_files_handler.SourceFiles(xylose_article)
-        assets_items = {}
-        for lang, texts_info in source_files.pdf_files.items():
-            assets_items[lang] = {'source': texts_info.source_location}
-            file_metadata = {'lang': lang}
-            file_metadata.update(source_files.article_metadata)
-            if texts_info.location is not None:
-                try:
-                    pfile = open(texts_info.location, 'rb')
-                except Exception, e:
-                    logger.error(u'Não foi possível abrir o arquivo {}'.format(texts_info.location))
-                    raise e
-                else:
-                    asset = assets_handler.Asset(pfile, 'pdf', file_metadata, source_files.bucket_name)
-                    asset.register()
-                    asset.wait_registration()
-                    assets_items[lang] = asset.data
-        self.transform_model_instance['assets']['pdf'] = assets_items
+
+        self.transform_model_instance['assets']['pdf'] = self.assets_pdf(source_files)
 
         # pid
         if hasattr(xylose_article, 'publisher_id'):
@@ -200,3 +185,22 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['elocation'] = xylose_article.elocation
 
         return self.transform_model_instance
+
+    def assets_pdf(self, source_files):
+        assets_items = {}
+        for lang, texts_info in source_files.pdf_files.items():
+            assets_items[lang] = {'source': texts_info.source_location}
+            file_metadata = {'lang': lang}
+            file_metadata.update(source_files.article_metadata)
+            if texts_info.location is not None:
+                try:
+                    pfile = open(texts_info.location, 'rb')
+                except Exception, e:
+                    logger.error(u'Não foi possível abrir o arquivo {}'.format(texts_info.location))
+                    continue
+                else:
+                    asset = assets_handler.Asset(pfile, texts_info.filename, 'pdf', file_metadata, source_files.bucket_name)
+                    asset.register()
+                    asset.wait_registration()
+                    assets_items[lang] = asset.data
+        return assets_items

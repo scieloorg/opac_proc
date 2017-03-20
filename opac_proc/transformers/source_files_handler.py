@@ -1,7 +1,6 @@
 # code = utf-8
 
 import os
-import urllib2
 
 from opac_proc.web import config
 
@@ -28,6 +27,8 @@ class SourceTextFile(object):
 
     def __init__(self, source_location):
         self.source_location = source_location
+        self.path = os.path.dirname(source_location)
+        self.filename = os.path.basename(source_location)
 
     @property
     def location(self):
