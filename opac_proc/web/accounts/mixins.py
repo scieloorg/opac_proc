@@ -1,7 +1,7 @@
 # coding: utf-8
 import os
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import (
     LoginManager, current_user, login_required,
     login_user, logout_user, UserMixin, AnonymousUserMixin,
@@ -110,6 +110,19 @@ class User(UserMixin):
         db_user.password = password_hash
         db_user.save()
         db_user.reload()
+
+    @staticmethod
+    def generate_password_hash(password_as_plain_text):
+        """
+        Return a password hash from a password_as_plain_text string
+        """
+        return generate_password_hash(password_as_plain_text)
+
+    def check_password_hash(self, password_as_plain_text):
+        """
+        Return True or False if password_as_plain_text match with self.password
+        """
+        return check_password_hash(self.password, password_as_plain_text)
 
 
 class Anonymous(AnonymousUserMixin):
