@@ -152,6 +152,12 @@ RSS_NEWS_FEEDS = {
     },
 }
 
+
+OPAC_SSM_GRPC_SERVER_HOST = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST', 'homolog.grpc.ssm.scielo.org')
+OPAC_SSM_GRPC_SERVER_PORT = os.environ.get('OPAC_SSM_GRPC_SERVER_PORT', '8005')
+
+OPAC_PROC_ASSETS_SOURCE_PDF_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_PDF_PATH', '%s/%s' % (HERE, '/data/pdf'))
+
 # Habilitar/Desabilitar o form de registro
 WEB_REGISTRATION_ENABLED = os.environ.get('OPAC_PROC_WEB_REGISTRATION_ENABLED', 'False') == 'True'
 # True/False para requerir ou não confirmação de email no processo de registro/login
