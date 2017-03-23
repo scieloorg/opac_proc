@@ -52,9 +52,11 @@ class AssetHandler(object):
 
         Return None or UUID
 
-        Retunr example:
+        Return example:
 
         u'd452d954-db28-4c1d-b60f-5851a56fe8db' or None
+
+        Raise Exception when server is down.
         """
         counter = 0
 
