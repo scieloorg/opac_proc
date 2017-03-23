@@ -1,7 +1,6 @@
 # coding: utf-8
 import os
 import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask import abort, current_app, render_template, request, flash, redirect, url_for
 from flask_login import (
     current_user,
@@ -34,7 +33,7 @@ def login():
             elif current_app.config['ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION'] and not user.email_confirmed:
                 flash(u"This user has unconfirmed email", "warning")
             else:
-                password_is_valid = check_password_hash(user.password, password_as_plain_text)
+                password_is_valid = user_obj.check_password_hash(password_as_plain_text)
                 if password_is_valid:
                     if login_user(user, remember=remember):
                         flash(u"Logged in!", "success")
@@ -69,7 +68,7 @@ def register():
                 password_as_plain_text = request.form['password']
                 next_url = request.form.get("next", request.args.get("next", "/"))
                 # generate password hash
-                password_hash = generate_password_hash(password_as_plain_text)
+                password_hash = User.generate_password_hash(password_as_plain_text)
                 # prepare User
                 user = User(email, password_hash)
                 try:
