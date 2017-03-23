@@ -17,7 +17,3 @@ def trydate(str_date):
         return datetime.datetime.strptime(str_date, '%Y-%M')
     elif len(list_date) == 3:
         return datetime.datetime.strptime(str_date, '%Y-%M-%d')
-
-
-def split_list(li, col):
-    return [li[i:i + col] for i in range(0, len(li), col)]

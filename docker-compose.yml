@@ -74,8 +74,9 @@ services:
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
+
       # Opac_ssm_server
-      - OPAC_SSM_GRPC_SERVER_HOST=homolog.ssm.scielo.org
+      - OPAC_SSM_GRPC_SERVER_HOST=homolog.grpc.ssm.scielo.org
       - OPAC_SSM_GRPC_SERVER_PORT=8005
       # Opac_ssm_api
       - OPAC_SSM_PROTO_FILE_HOST=raw.githubusercontent.com
@@ -91,6 +92,9 @@ services:
       - OPAC_PROC_MAIL_USE_SSL='False'
       - OPAC_PROC_MAIL_USERNAME=None
       - OPAC_PROC_MAIL_PASSWORD=None
+
+      - OPAC_PROC_ASSETS_SOURCE_PDF_PATH=/app/data/pdf
+
   webapp:
     images: scieloorg/opac_proc
     user: nobody
@@ -134,7 +138,7 @@ services:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
       # Opac_ssm_server
-      - OPAC_SSM_GRPC_SERVER_HOST=homolog.ssm.scielo.org
+      - OPAC_SSM_GRPC_SERVER_HOST=homolog.grpc.ssm.scielo.org
       - OPAC_SSM_GRPC_SERVER_PORT=8005
       # Opac_ssm_api
       - OPAC_SSM_PROTO_FILE_HOST=raw.githubusercontent.com
@@ -151,3 +155,4 @@ services:
       - OPAC_PROC_MAIL_USERNAME=None
       - OPAC_PROC_MAIL_PASSWORD=None
 
+      - OPAC_PROC_ASSETS_SOURCE_PDF_PATH=/app/data/pdf
