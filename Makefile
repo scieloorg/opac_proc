@@ -84,6 +84,11 @@ dev_compose_scale_workers: dev_compose_up
 test:
 	@python opac_proc/manage.py test
 
+dev_create_superuser:
+	@docker-compose -f $(COMPOSE_FILE_DEV) exec webapp make create_superuser
+
+create_superuser:
+	@python opac_proc/manage.py create_superuser
 
 #####################################################
 ## atalhos docker-compose build e testes no traivs ##

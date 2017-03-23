@@ -36,7 +36,7 @@ class LoginForm(UserForm):
 
 
 class EmailForm(FlaskForm):
-    email = email = EmailField(
+    email = EmailField(
         'email',
         validators=[
             validators.DataRequired(),
