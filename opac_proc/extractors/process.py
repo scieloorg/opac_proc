@@ -86,7 +86,7 @@ class ExtractProcess(Process):
 
         if issn is not None:
             try:
-                journal = models.ExtractJournal.objects.get(code=issn)
+                models.ExtractJournal.objects.get(code=issn)
             except models.ExtractJournal.DoesNotExist:
                 raise ValueError(u'ExtractJournal com code: %s não encontrado!' % issn)
         else:

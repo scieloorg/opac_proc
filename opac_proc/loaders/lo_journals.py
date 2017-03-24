@@ -1,5 +1,4 @@
 # coding: utf-8
-import datetime
 from mongoengine import DoesNotExist
 from mongoengine.context_managers import switch_db
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name

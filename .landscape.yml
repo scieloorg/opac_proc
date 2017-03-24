@@ -14,4 +14,4 @@ pep8:
 pylint:
   full: true
   disable:
-- line-too-long
+    - line-too-long

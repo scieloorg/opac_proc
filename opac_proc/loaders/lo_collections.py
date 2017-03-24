@@ -1,5 +1,4 @@
 # coding: utf-8
-from mongoengine.context_managers import switch_db
 from opac_proc.datastore.models import (
     TransformCollection,
     LoadCollection)

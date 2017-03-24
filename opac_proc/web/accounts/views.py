@@ -1,9 +1,7 @@
 # coding: utf-8
-import os
-import datetime
+
 from flask import abort, current_app, render_template, request, flash, redirect, url_for
 from flask_login import (
-    current_user,
     login_required,
     login_user,
     logout_user

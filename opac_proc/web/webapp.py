@@ -2,14 +2,15 @@
 import os
 import sys
 from raven.contrib.flask import Sentry
+import logging
 import rq_dashboard
 import rq_scheduler_dashboard
 
 from werkzeug.contrib.fixers import ProxyFix
-from flask import Flask, request, flash, redirect, url_for
+from flask import Flask, redirect, url_for
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_login import LoginManager, current_user
+from flask_login import LoginManager
 from flask_mail import Mail
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))

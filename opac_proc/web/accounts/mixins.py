@@ -1,13 +1,16 @@
 # coding: utf-8
-import os
+
+import logging
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import (
-    LoginManager, current_user, login_required,
-    login_user, logout_user, UserMixin, AnonymousUserMixin,
+    current_user, login_required, logout_user,
+    UserMixin, AnonymousUserMixin,
     confirm_login, fresh_login_required)
 import models
 import notifications
+
+logger = logging.getLogger(__name__)
 
 
 class User(UserMixin):
@@ -32,7 +35,7 @@ class User(UserMixin):
         try:
             db_user = models.User.objects.get(email=email)
         except models.User.DoesNotExist as e:
-            # logger
+            logger.warning(str(e))
             return None
         else:
             self.email = db_user.email
@@ -53,10 +56,10 @@ class User(UserMixin):
                 self.email_confirmed = db_user.email_confirmed
                 return self
             else:
-                # logger
+                logger.error(u"Can not retrieve user by email from email: %s", email)
                 return None
         except models.User.DoesNotExist as e:
-            # logger
+            logger.warning(str(e))
             return None
 
     def get_user_db_instance(self):

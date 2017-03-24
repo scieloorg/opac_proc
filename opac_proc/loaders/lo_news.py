@@ -1,6 +1,4 @@
 # coding: utf-8
-from mongoengine.context_managers import switch_db
-from mongoengine import DoesNotExist
 
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
 from opac_proc.loaders.base import BaseLoader

@@ -2,7 +2,7 @@
 import re
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
-from flask import current_app, url_for
+from flask import current_app
 
 
 REGEX_EMAIL = re.compile(
