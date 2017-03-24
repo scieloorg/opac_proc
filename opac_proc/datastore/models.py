@@ -356,6 +356,9 @@ signals.post_save.connect(LoadNews.post_save, sender=LoadNews)
 
 # #### LOGS
 
+# TODO: Usar Capped Collections nos docuemntos de Logs
+# https://github.com/MongoEngine/mongoengine/blob/master/mongoengine/document.py#L112
+
 
 class ExtractLog(DynamicDocument):
     meta = {

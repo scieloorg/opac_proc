@@ -100,8 +100,18 @@ class TransformJournalListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'ISSN',
+            'field_label': u'Acronym',
             'field_name': 'acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'P-ISSN',
+            'field_name': 'print_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'E-ISSN',
+            'field_name': 'eletronic_issn',
             'field_type': 'string'
         },
         {
@@ -128,8 +138,18 @@ class TransformJournalListView(TransformBaseListView):
             'field_type': 'uuid'
         },
         {
-            'field_label': u'ISSN',
-            'field_name': 'code',
+            'field_label': u'Acronym',
+            'field_name': 'acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'P-ISSN',
+            'field_name': 'print_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'E-ISSN',
+            'field_name': 'eletronic_issn',
             'field_type': 'string'
         },
         {
@@ -158,6 +178,11 @@ class TransformIssueListView(TransformBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'PID',
+            'field_name': 'pid',
             'field_type': 'string'
         },
         {
@@ -191,6 +216,11 @@ class TransformIssueListView(TransformBaseListView):
         {
             'field_label': u'PID',
             'field_name': 'code',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Label',
+            'field_name': 'label',
             'field_type': 'string'
         },
         {
@@ -251,7 +281,7 @@ class TransformArticleListView(TransformBaseListView):
         },
         {
             'field_label': u'PID',
-            'field_name': 'code',
+            'field_name': 'pid',
             'field_type': 'string'
         },
         {
@@ -284,7 +314,7 @@ class TransformPressReleaseListView(TransformBaseListView):
         },
         {
             'field_label': u'URL',
-            'field_name': 'url_id',
+            'field_name': 'url',
             'field_type': 'string'
         },
         {
@@ -294,7 +324,7 @@ class TransformPressReleaseListView(TransformBaseListView):
         },
         {
             'field_label': u'Language',
-            'field_name': 'feed_lang',
+            'field_name': 'language',
             'field_type': 'string'
         },
         {
@@ -322,7 +352,7 @@ class TransformPressReleaseListView(TransformBaseListView):
         },
         {
             'field_label': u'URL',
-            'field_name': 'url_id',
+            'field_name': 'url',
             'field_type': 'string'
         },
         {
@@ -332,7 +362,7 @@ class TransformPressReleaseListView(TransformBaseListView):
         },
         {
             'field_label': u'Language',
-            'field_name': 'feed_lang',
+            'field_name': 'language',
             'field_type': 'string'
         },
         {
