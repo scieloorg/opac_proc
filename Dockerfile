@@ -40,4 +40,4 @@ USER nobody
 EXPOSE 8000
 WORKDIR /app
 
-CMD gunicorn --workers 3 --bind 0.0.0.0:8000 webapp:app --chdir=opac_proc/web/ --log-level INFO
+CMD gunicorn -k gevent --workers 3 --bind 0.0.0.0:8000 webapp:app --chdir=opac_proc/web/ --log-level INFO
