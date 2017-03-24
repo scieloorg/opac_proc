@@ -2,6 +2,7 @@
 import os
 import sys
 from raven.contrib.flask import Sentry
+import logging
 import rq_dashboard
 import rq_scheduler_dashboard
 
