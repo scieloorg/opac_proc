@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import os
 import time
 from datetime import datetime
 
@@ -104,3 +105,53 @@ class AssetHandler(object):
             raise Exception(data['error_message'])
 
         return data
+
+    def register_async(self):
+        """
+        Register asset to opac_ssm.
+
+        This method \add asset without waiting
+
+        Return None or UUID
+
+        Return example:
+
+        u'd452d954-db28-4c1d-b60f-5851a56fe8db' or None
+
+        Raise Exception when server is down.
+        """
+        counter = 0
+
+        client_status = self.ssm_client.status()
+
+        if client_status == 'SERVING':
+
+            self.metadata['registration_date'] = datetime.now().isoformat()
+
+            self.uuid = self.ssm_client.add_asset(self.pfile, self.name,
+                                                  self.filetype, self.metadata,
+                                                  self.bucket_name)
+
+        else:
+            raise Exception("Server status: {} {} {}".format(client_status, config.OPAC_SSM_GRPC_SERVER_HOST,
+                                 config.OPAC_SSM_GRPC_SERVER_PORT))
+
+    def registration_status(self):
+        """
+        - **Pending**
+        a tarefa foi enfilerada e ainda não foi processada
+        - **Started**
+        a tarefa  enfilerada acabou de começar a ser processada
+        - **Retry**
+        a tarefa falhou e esta marcada para ser reprocessada
+        - **Failure**
+        a tarefa teve algum erro e não tem mais retries, falhou de vez
+        - **Success**
+        """
+        if self.uuid is None:
+            raise ValueError('uuid is not str')
+        return self.ssm_client.get_task_state(self.uuid)
+
+    @property
+    def url(self):
+        return self.get_urls().get('url')
