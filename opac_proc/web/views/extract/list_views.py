@@ -425,7 +425,7 @@ class ExtractNewsListView(ExtractBaseListView):
 
 class ExtractLogListView(ExtractBaseListView):
     model_class = models.ExtractLog
-    model_name = 'loadlog'
+    model_name = 'extractlog'
     process_class = None  # logs somente tem o Delete
     can_create = False
     can_update = False
