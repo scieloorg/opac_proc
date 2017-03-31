@@ -54,8 +54,8 @@ class ArticleSourceFiles(object):
         return '/'.join([config.OPAC_PROC_ASSETS_SOURCE_XML_PATH, self.issue_folder_rel_path])
 
     @property
-    def pdf_filenames(self):
-        filenames = {}
+    def pdf_files(self):
+        fulltext_files = {}
         langs = []
         if hasattr(self.xylose_article, 'fulltexts'):
             langs.extend(self.xylose_article.fulltexts().get('pdf', {}).keys())
@@ -65,36 +65,15 @@ class ArticleSourceFiles(object):
             prefix = '' if lang == self.xylose_article.original_language else lang+'_'
             file_metadata = self.article_metadata.copy()
             file_metadata.update({'lang': lang})
-            filenames[lang] = '{}{}.pdf'.format(prefix, self.article_folder_name)
-        return filenames 
-
-    @property
-    def pdf_files(self):
-        pdfs = {}
-        for lang, filename in self.pdf_filenames:
-            file_metadata = self.article_metadata.copy()
-            file_metadata.update({'lang': lang})
-            pdfs[lang] = ('{}/{}'.format(self.pdf_folder_path, filename), file_metadata)
-        return pdfs
-
-    @property
-    def supplementary_files(self):
-        return [f for f in os.listdir(self.pdf_folder_path) if f.startswith(self.article_folder_name) and not f in self.pdf_filenames]
+            fulltext_files[lang] = ('{}/{}{}.pdf'.format(self.pdf_folder_path, prefix, self.article_folder_name), file_metadata)
+        return fulltext_files 
 
     @property
     def media_files(self):
-        """
-        Returns the media files found in htdocs/img/revistas, htdocs/img/revistas/html, bases/pdf, 
-        which are referenced in the article files (XML or HTML)
-        """
         files = {}
         for path in [self.media_folder_path, self.media_folder_path + '/html']:    
             if os.path.isdir(path):
                 files.update({fname: (path + '/' + fname, self.article_metadata) for fname in os.listdir(path) if fname.startswith(self.article_folder_name)})
-        for f in self.supplementary_files:
-            file_metadata = self.article_metadata.copy()
-            file_metadata.update({'label': f})
-            files.update({f: (self.pdf_folder_path + '/' + f, file_metadata)})
         return files
 
     @property
