@@ -62,7 +62,7 @@ class ArticleSourceFiles(object):
         elif self.xylose_article.data_model_version == 'xml':
             langs.extend(self.xylose_article.xml_languages())
         for lang in langs:
-            prefix = '' if lang != self.xylose_article.original_language else lang+'_'
+            prefix = '' if lang == self.xylose_article.original_language else lang+'_'
             file_metadata = self.article_metadata.copy()
             file_metadata.update({'lang': lang})
             filenames[lang] = '{}{}.pdf'.format(prefix, self.article_folder_name)
