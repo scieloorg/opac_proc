@@ -153,19 +153,30 @@ RSS_NEWS_FEEDS = {
 }
 
 
-OPAC_SSM_GRPC_SERVER_HOST = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST', 'homolog.grpc.ssm.scielo.org')
-OPAC_SSM_GRPC_SERVER_PORT = os.environ.get('OPAC_SSM_GRPC_SERVER_PORT', '8005')
+OPAC_SSM_GRPC_SERVER_HOST = os.environ.get(
+    'OPAC_SSM_GRPC_SERVER_HOST', 'homolog.grpc.ssm.scielo.org')
+OPAC_SSM_GRPC_SERVER_PORT = os.environ.get(
+    'OPAC_SSM_GRPC_SERVER_PORT', '8005')
 
-OPAC_PROC_ASSETS_SOURCE_PDF_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_PDF_PATH', '%s/%s' % (HERE, '/data/pdf'))
-OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH', '%s/%s' % (HERE, '/data/img/revistas'))
-OPAC_PROC_ASSETS_SOURCE_XML_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_XML_PATH', '%s/%s' % (HERE, '/data/xml'))
-OPAC_PROC_CSS_PATH = os.environ.get('OPAC_PROC_CSS_PATH', '%s/%s' % (HERE, '/css'))
-
+OPAC_PROC_ASSETS_SOURCE_PDF_PATH = os.environ.get(
+    'OPAC_PROC_ASSETS_SOURCE_PDF_PATH',
+    '%s/%s' % (HERE, '/data/pdf'))
+OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH = os.environ.get(
+    'OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH',
+    '%s/%s' % (HERE, '/data/img/revistas'))
+OPAC_PROC_ASSETS_SOURCE_XML_PATH = os.environ.get(
+    'OPAC_PROC_ASSETS_SOURCE_XML_PATH',
+    '%s/%s' % (HERE, '/data/xml'))
+OPAC_PROC_CSS_PATH = os.environ.get(
+    'OPAC_PROC_CSS_PATH',
+    '%s/%s' % (HERE, '/css'))
 
 # Habilitar/Desabilitar o form de registro
-WEB_REGISTRATION_ENABLED = os.environ.get('OPAC_PROC_WEB_REGISTRATION_ENABLED', 'False') == 'True'
+WEB_REGISTRATION_ENABLED = os.environ.get(
+    'OPAC_PROC_WEB_REGISTRATION_ENABLED', 'False') == 'True'
 # True/False para requerir ou não confirmação de email no processo de registro/login
-ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION = os.environ.get('OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION', 'True') == 'True'
+ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION = os.environ.get(
+    'OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION', 'True') == 'True'
 
 # Tempo de expiração para os tokens. Valor en segundos: 86400 = 60*60*24 = 1 dia
 TOKEN_MAX_AGE = 86400
@@ -182,3 +193,12 @@ MAIL_PASSWORD = os.environ.get('OPAC_PROC_MAIL_PASSWORD', None)
 MAIL_DEFAULT_SENDER = DEFAULT_EMAIL
 MAIL_MAX_EMAILS = None
 MAIL_ASCII_ATTACHMENTS = False
+
+CURRENT_PATH = os.path.dirname(os.path.realpath(__file__)).replace('\\', '/')
+
+OPAC_SSM_GRPC_SERVER_HOST = 'homolog.ssm.scielo.org'
+OPAC_SSM_GRPC_SERVER_PORT = '8005'
+OPAC_PROC_ASSETS_SOURCE_PDF_PATH = '%s/%s' % (CURRENT_PATH + '/../..', 'data/pdf')
+OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH = '%s/%s' % (CURRENT_PATH + '/../..', 'data/img/revistas')
+OPAC_PROC_ASSETS_SOURCE_XML_PATH = '%s/%s' % (CURRENT_PATH + '/../..', 'data/xml')
+OPAC_PROC_CSS_PATH = '%s/%s' % (CURRENT_PATH + '/../..', 'data/xml')

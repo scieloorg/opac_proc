@@ -1,18 +1,24 @@
 # coding: utf-8
 
-import os
 import time
 from datetime import datetime
 
 from opac_ssm_api.client import Client
 
 from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
+
+
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "transform")
+else:
+    logger = getMongoLogger(__name__, "INFO", "transform")
 
 
 class AssetHandler(object):
 
     def __init__(self, pfile, filename, filetype, metadata, bucket_name,
-                attempts=5, sleep_attempts=2):
+            attempts=5, sleep_attempts=2):
         """
         Asset handler.
 
@@ -23,7 +29,8 @@ class AssetHandler(object):
             :param filename: filename is mandatory
             :param bucket_name: name of bucket
             :param attempts: number of attemtps to add any asset.
-            :param attempts: sleep time for each attemtps to add any asset (second).
+            :param attempts: sleep time for each attemtps
+                to add any asset (second).
         """
 
         if pfile is None:
@@ -100,9 +107,19 @@ class AssetHandler(object):
             raise ValueError('uuid is not str')
 
         success, data = self.ssm_client.get_asset_info(self.uuid)
+        if success is False:
+            if self.is_registered() is True:
+                success, data = self.ssm_client.get_asset_info(self.uuid)
 
         if not success:
-            raise Exception(data['error_message'])
+            raise Exception(
+                '{} {} {} {} {} {} {}'.format(data['error_message'],
+                        self.uuid,
+                        self.ssm_client.get_task_state(self.uuid),
+                        self.pfile,
+                        self.name,
+                        data,
+                        success))
 
         return data
 
@@ -120,7 +137,6 @@ class AssetHandler(object):
 
         Raise Exception when server is down.
         """
-        counter = 0
 
         client_status = self.ssm_client.status()
 
@@ -133,10 +149,13 @@ class AssetHandler(object):
                                                   self.bucket_name)
 
         else:
-            raise Exception("Server status: {} {} {}".format(client_status, config.OPAC_SSM_GRPC_SERVER_HOST,
-                                 config.OPAC_SSM_GRPC_SERVER_PORT))
+            raise Exception(
+                "Server status: {} {} {}".format(
+                    client_status,
+                    config.OPAC_SSM_GRPC_SERVER_HOST,
+                    config.OPAC_SSM_GRPC_SERVER_PORT))
 
-    def registration_status(self):
+    def is_registered(self):
         """
         - **Pending**
         a tarefa foi enfilerada e ainda não foi processada
@@ -148,10 +167,18 @@ class AssetHandler(object):
         a tarefa teve algum erro e não tem mais retries, falhou de vez
         - **Success**
         """
-        if self.uuid is None:
-            raise ValueError('uuid is not str')
-        return self.ssm_client.get_task_state(self.uuid)
+        counter = 0
+        while counter < self.attempts:
+            if self.ssm_client.get_task_state(self.uuid) == 'SUCCESS':
+                return True
+            elif self.ssm_client.get_task_state(self.uuid) == 'FAILURE':
+                break
+            else:
+                time.sleep(counter * self.sleep_attempts)
+            counter += 1
 
     @property
     def url(self):
-        return self.get_urls().get('url')
+        _url = self.get_urls()
+        if _url is not None:
+            return _url.get('url')
