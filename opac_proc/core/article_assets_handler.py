@@ -73,7 +73,7 @@ class ArticleSourceFiles(object):
     @property
     def pdf_folder_path(self):
         """
-        Returns the path of article PDF files
+        Returns the folder path of article PDF files
         """
         return '/'.join([
                 config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH,
@@ -95,7 +95,7 @@ class ArticleSourceFiles(object):
     @property
     def xml_folder_path(self):
         """
-        Returns the path of article XML file
+        Returns the folder path of article XML file
         """
         return '/'.join([
                 config.OPAC_PROC_ASSETS_SOURCE_XML_PATH,
@@ -116,7 +116,7 @@ class ArticleSourceFiles(object):
     @property
     def pdf_filenames(self):
         """
-        Returns pairs of language and PDF file name
+        Returns pairs key, value of {language: PDF file name}
         """
         filenames = {}
         for lang in self.text_languages:
@@ -178,7 +178,7 @@ class ArticleSourceFiles(object):
     @property
     def fixed_xml(self):
         """
-        Returns full path of XML file, which had the media path changed
+        Returns fixed XML content, which had the media paths changed
         """
         if self.xml_fullpath is not None:
             _xml = open(self.xml_fullpath, 'rb').read().decode('utf-8')
@@ -211,9 +211,9 @@ class ArticleSourceFiles(object):
     @property
     def html_filenames(self):
         """
-        Returns XML file info, formed by pairs of:
-         * xml
-         * tuple (pfile, filename, file metadata)
+        Returns HTML filenames, formed by pairs of:
+         * language
+         * HTML filename
         """
         filenames = {}
         for lang in self.text_languages:
@@ -268,7 +268,7 @@ class ArticleSourceFiles(object):
 
     def generate_htmls(self):
         """
-        Generates HTML contents for all the text languages
+        Generates HTML contents from XML for all the text languages
         Returns them as pairs of:
          * language
          * HTML content
