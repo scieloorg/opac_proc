@@ -171,14 +171,14 @@ def task_reprocess_articles(ids=None):
     if ids is None:  # update all collections
         models.ExtractArticle.objects.all().update(must_reprocess=True)
         for article in models.ExtractArticle.objects.all():
-            r_queues.enqueue(stage, 'article', task_extract_article, article.code)
+            r_queues.enqueue(stage, 'article', task_extract_article, collection.acronym, article.code)
     else:
         for oid in ids:
             try:
                 obj = models.ExtractArticle.objects.get(pk=oid)
                 obj.update(must_reprocess=True)
                 obj.reload()
-                r_queues.enqueue(stage, 'article', task_extract_article, obj.code)
+                r_queues.enqueue(stage, 'article', task_extract_article, collection.acronym, obj.code)
             except Exception as e:
                 logger.error('models.ExtractArticle %s. pk: %s' % (str(e), oid))
 
