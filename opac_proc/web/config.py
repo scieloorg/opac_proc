@@ -152,7 +152,8 @@ RSS_NEWS_FEEDS = {
     },
 }
 
-OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY = os.environ.get('OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY', 'True') == 'True'
+OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY = os.environ.get(
+    'OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY', 'True') == 'True'
 
 OPAC_SSM_GRPC_SERVER_HOST = os.environ.get(
     'OPAC_SSM_GRPC_SERVER_HOST', 'homolog.grpc.ssm.scielo.org')
@@ -194,12 +195,3 @@ MAIL_PASSWORD = os.environ.get('OPAC_PROC_MAIL_PASSWORD', None)
 MAIL_DEFAULT_SENDER = DEFAULT_EMAIL
 MAIL_MAX_EMAILS = None
 MAIL_ASCII_ATTACHMENTS = False
-
-CURRENT_PATH = os.path.dirname(os.path.realpath(__file__)).replace('\\', '/')
-
-OPAC_SSM_GRPC_SERVER_HOST = 'homolog.ssm.scielo.org'
-OPAC_SSM_GRPC_SERVER_PORT = '8005'
-OPAC_PROC_ASSETS_SOURCE_PDF_PATH = '%s/%s' % (CURRENT_PATH + '/../..', 'data/pdf')
-OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH = '%s/%s' % (CURRENT_PATH + '/../..', 'data/img/revistas')
-OPAC_PROC_ASSETS_SOURCE_XML_PATH = '%s/%s' % (CURRENT_PATH + '/../..', 'data/xml')
-OPAC_PROC_CSS_PATH = '%s/%s' % (CURRENT_PATH + '/../..', 'data/xml')
