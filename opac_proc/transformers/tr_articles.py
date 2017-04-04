@@ -125,6 +125,7 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['original_language'] = xylose_article.original_language()
 
         # languages
+        # IMPORTANTE: nesse trecho estamos cadastrando todos os idiomas do texto e do resumo.
         if hasattr(xylose_article, 'languages'):
             lang_set = set(xylose_article.languages() + getattr(self.transform_model_instance, 'abstract_languages', []))
             self.transform_model_instance['languages'] = list(lang_set)
@@ -149,9 +150,9 @@ class ArticleTransformer(BaseTransformer):
                         pid, uuid, article_version)
 
             if article_version == 'xml':
-
-                if hasattr(xylose_article, 'xml_languages'):
-                    for lang in self.transform_model_instance['languages']:
+                # Devemos coletar somente os idiomas do texto completo.
+                if hasattr(xylose_article, 'languages'):
+                    for lang in xylose_article.languages():
                         langs.add(lang)
             else:
 
@@ -203,7 +204,7 @@ class ArticleTransformer(BaseTransformer):
                     issue_folder = xylose_article.assets_code
                     journal_folder = xylose_article.journal.acronym.lower()
 
-                    bucket_name = '-'.join([journal_folder, issue_folder, article_folder])
+                    bucket_name = '/'.join([journal_folder, issue_folder])
 
                     logger.info(u"Bucket name do PDF do artigo com PID: %s e ID: %s, bucket name: %s",
                                 pid, uuid, bucket_name)
