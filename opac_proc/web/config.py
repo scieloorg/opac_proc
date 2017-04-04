@@ -152,6 +152,7 @@ RSS_NEWS_FEEDS = {
     },
 }
 
+OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY = os.environ.get('OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY', 'True') == 'True'
 
 OPAC_SSM_GRPC_SERVER_HOST = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST', 'homolog.grpc.ssm.scielo.org')
 OPAC_SSM_GRPC_SERVER_PORT = os.environ.get('OPAC_SSM_GRPC_SERVER_PORT', '8005')
