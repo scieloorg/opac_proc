@@ -166,6 +166,8 @@ def task_reprocess_articles(ids=None):
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
+    collection = models.ExtractCollection.objects.all().first()
+
     if ids is None:  # update all collections
         models.ExtractArticle.objects.all().update(must_reprocess=True)
         for article in models.ExtractArticle.objects.all():
