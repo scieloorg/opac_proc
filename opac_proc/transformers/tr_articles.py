@@ -42,8 +42,7 @@ class ArticleTransformer(BaseTransformer):
         # assets
         assets = Assets(
             str(self.extract_model_instance.uuid),
-            xylose_article,
-            config.OPAC_PROC_CSS_PATH)
+            xylose_article)
         assets.register()
 
         # aid
@@ -160,12 +159,8 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['elocation'] = xylose_article.elocation
 
         # assets - consulta os dados registrados dos ativos
-        registered_assets = assets.registered_assets()
-        self.transform_model_instance['pdfs'] = registered_assets['pdfs']
-        self.transform_model_instance['xml'] = registered_assets['xml']
-        self.transform_model_instance['htmls'] = registered_assets['htmls']
-        self.transform_model_instance['assets'] = None
-        self.transform_model_instance['teste'] = None
-
+        self.transform_model_instance['pdfs'] = assets.registered_pdf_assets
+        self.transform_model_instance['xml'] = assets.registered_xml_assets
+        self.transform_model_instance['htmls'] = assets.registered_html_assets
 
         return self.transform_model_instance

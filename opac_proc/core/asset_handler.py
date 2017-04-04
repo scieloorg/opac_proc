@@ -107,75 +107,19 @@ class AssetHandler(object):
             raise ValueError('uuid is not str')
 
         success, data = self.ssm_client.get_asset_info(self.uuid)
-        if success is False:
-            if self.is_registered() is True:
-                success, data = self.ssm_client.get_asset_info(self.uuid)
 
         if not success:
             raise Exception(
-                '{} {} {} {} {} {} {}'.format(data['error_message'],
-                        self.uuid,
-                        self.ssm_client.get_task_state(self.uuid),
-                        self.pfile,
-                        self.name,
-                        data,
-                        success))
+                '{} {} {} {} {} {} {}'.format(
+                    data['error_message'],
+                    self.uuid,
+                    self.ssm_client.get_task_state(self.uuid),
+                    self.pfile,
+                    self.name,
+                    data,
+                    success))
 
         return data
-
-    def register_async(self):
-        """
-        Register asset to opac_ssm.
-
-        This method \add asset without waiting
-
-        Return None or UUID
-
-        Return example:
-
-        u'd452d954-db28-4c1d-b60f-5851a56fe8db' or None
-
-        Raise Exception when server is down.
-        """
-
-        client_status = self.ssm_client.status()
-
-        if client_status == 'SERVING':
-
-            self.metadata['registration_date'] = datetime.now().isoformat()
-
-            self.uuid = self.ssm_client.add_asset(self.pfile, self.name,
-                                                  self.filetype, self.metadata,
-                                                  self.bucket_name)
-
-        else:
-            raise Exception(
-                "Server status: {} {} {}".format(
-                    client_status,
-                    config.OPAC_SSM_GRPC_SERVER_HOST,
-                    config.OPAC_SSM_GRPC_SERVER_PORT))
-
-    def is_registered(self):
-        """
-        - **Pending**
-        a tarefa foi enfilerada e ainda não foi processada
-        - **Started**
-        a tarefa  enfilerada acabou de começar a ser processada
-        - **Retry**
-        a tarefa falhou e esta marcada para ser reprocessada
-        - **Failure**
-        a tarefa teve algum erro e não tem mais retries, falhou de vez
-        - **Success**
-        """
-        counter = 0
-        while counter < self.attempts:
-            if self.ssm_client.get_task_state(self.uuid) == 'SUCCESS':
-                return True
-            elif self.ssm_client.get_task_state(self.uuid) == 'FAILURE':
-                break
-            else:
-                time.sleep(counter * self.sleep_attempts)
-            counter += 1
 
     @property
     def url(self):

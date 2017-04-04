@@ -138,7 +138,7 @@ class ArticleMeta(object):
                 code=code,
                 collection=collection,
                 replace_journal_metadata=True,
-                fmt='xylose')
+                fmt='xylose', body=True)
         except Exception, e:
             msg = 'Error retrieving Article: %s_%s. Exception: %s' % (
                 collection, code, str(e))

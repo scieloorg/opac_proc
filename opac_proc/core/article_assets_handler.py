@@ -10,6 +10,7 @@ from opac_proc.transformers import html_generator
 from opac_proc.core.asset_handler import AssetHandler
 from opac_proc.logger_setup import getMongoLogger
 
+
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "assets")
 else:
@@ -28,11 +29,7 @@ def _pfile(filename):
 
 def create_file(content):
     f = NamedTemporaryFile(delete=False)
-    # f.name
-    try:
-        content = content.encode('utf-8')
-    except:
-        content = content.encode('iso-8859-1')
+    content = content.encode('utf-8')
     f.write(content)
     f.close()
     return f.name
@@ -40,54 +37,84 @@ def create_file(content):
 
 class ArticleSourceFiles(object):
     """
-    ArticleSourceFiles
-    PDF, XML, Media, HTML files
+        Handler the article source files such as XML, PDF, HTML files
+        and its media files, such as images, videos, supplementary material etc
+        Params:
+            :param xylose_article: article data returned by xylose api
+            :param article_uuid: string article uuid provided by opac proc
     """
-    def __init__(self, xylose_article, article_uuid, css_path):
+    def __init__(self, xylose_article, article_uuid):
         self.xylose_article = xylose_article
         self.issue_folder_name = self.xylose_article.assets_code
         self.journal_folder_name = self.xylose_article.journal.acronym.lower()
         self.article_folder_name = self.xylose_article.file_code()
         self.article_pid = self.xylose_article.publisher_id
-        self.css_path = css_path
         self.article_uuid = article_uuid
         self.registered_media_assets = None
 
     @property
-    def issue_folder_rel_path(self):
+    def journal_and_issue_folders(self):
+        """
+        Returns relative path formed by journal folder/issue folder
+        """
         return '/'.join([self.journal_folder_name, self.issue_folder_name])
 
     @property
     def article_metadata(self):
+        """
+        Returns the article metadata, formed by:
+         * article_folder
+         * issue_folder
+         * journal_folder
+         * bucket_name
+         * article_pid
+         * article_uuid
+        """
         metadata = {}
         metadata['article_folder'] = self.article_folder_name
         metadata['issue_folder'] = self.issue_folder_name
         metadata['journal_folder'] = self.journal_folder_name
-        metadata['bucket_name'] = self.issue_folder_rel_path
+        metadata['bucket_name'] = self.journal_and_issue_folders
         metadata['article_pid'] = self.article_pid
         metadata['article_uuid'] = self.article_uuid
         return metadata
 
     @property
     def pdf_folder_path(self):
+        """
+        Returns the path of article PDF files
+        """
         return '/'.join([
                 config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH,
-                self.issue_folder_rel_path])
+                self.journal_and_issue_folders])
 
     @property
-    def media_folder_path(self):
-        return '/'.join([
+    def media_folder_paths(self):
+        """
+        Returns a list of paths of article media files
+        """
+        main_path = '/'.join([
                 config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH,
-                self.issue_folder_rel_path])
+                self.journal_and_issue_folders])
+        return [
+                main_path,
+                main_path + '/html',
+                self.pdf_folder_path]
 
     @property
     def xml_folder_path(self):
+        """
+        Returns the path of article XML file
+        """
         return '/'.join([
                 config.OPAC_PROC_ASSETS_SOURCE_XML_PATH,
-                self.issue_folder_rel_path])
+                self.journal_and_issue_folders])
 
     @property
     def text_languages(self):
+        """
+        Returns the list of article text languages
+        """
         langs = []
         if hasattr(self.xylose_article, 'fulltexts'):
             langs.extend(self.xylose_article.fulltexts().get('pdf', {}).keys())
@@ -97,6 +124,9 @@ class ArticleSourceFiles(object):
 
     @property
     def pdf_filenames(self):
+        """
+        Returns pairs of language and PDF file name
+        """
         filenames = {}
         for lang in self.text_languages:
             prefix = '' if lang == self.xylose_article.original_language() else lang+'_'
@@ -106,26 +136,33 @@ class ArticleSourceFiles(object):
         return filenames
 
     @property
-    def pdf_files(self):
-        fulltext_files = {'en': '?'}
+    def pdf_files_data(self):
+        """
+        Returns PDF files data, formed by pairs of:
+         * language
+         * tuple (pfile, filename, file metadata)
+        """
+        files_data = {}
         for lang, filename in self.pdf_filenames.items():
             file_metadata = self.article_metadata.copy()
             file_metadata.update({'lang': lang})
             pfile = _pfile(self.pdf_folder_path + '/' + filename)
             if pfile is not None:
-                fulltext_files[lang] = (
+                files_data[lang] = (
                     pfile,
                     filename,
                     file_metadata)
-        return fulltext_files
+        return files_data
 
     @property
-    def media_files(self):
-        files = {}
-        for path in [
-                self.media_folder_path,
-                self.media_folder_path + '/html',
-                self.pdf_folder_path]:
+    def media_files_data(self):
+        """
+        Returns media files data, formed by pairs of:
+         * filename
+         * tuple (pfile, filename, file metadata)
+        """
+        files_data = {}
+        for path in self.media_folder_paths:
             if os.path.isdir(path):
                 fnames = [fname for fname in os.listdir(path) if fname.startswith(self.article_folder_name)]
                 for fname in fnames:
@@ -133,24 +170,29 @@ class ArticleSourceFiles(object):
                         pfile = _pfile(path + '/' + fname),
                         pfile = path + '/' + fname
                         if pfile is not None:
-                            files[fname] = (
+                            files_data[fname] = (
                                 pfile,
                                 fname,
                                 self.article_metadata)
-        return files
+        return files_data
 
     @property
-    def xml_filename(self):
+    def xml_fullpath(self):
+        """
+        Returns full path of XML file, if exists
+        """
         if self.xylose_article.data_model_version == 'xml':
             return self.xml_folder_path+'/'+self.article_folder_name+'.xml'
 
     @property
-    def xml(self):
-        if self.xml_filename is not None:
-            _xml = open(self.xml_filename, 'rb')
+    def fixed_xml_fullpath(self):
+        """
+        Returns full path of XML file, which had the media path changed
+        """
+        if self.xml_fullpath is not None:
+            _xml = self.xml_fullpath
             if self.registered_media_assets is not None:
-                _xml = _xml.read()
-                _xml = _xml.decode('utf-8')
+                _xml = open(self.xml_fullpath, 'rb').read().decode('utf-8')
                 for media_name, url in self.registered_media_assets.items():
                     href_content = 'href="{}"'.format(media_name)
                     new_href_content = 'href="{}"'.format(url)
@@ -159,15 +201,25 @@ class ArticleSourceFiles(object):
             return _xml
 
     @property
-    def xml_file(self):
-        if self.xml is not None:
+    def xml_file_info(self):
+        """
+        Returns XML file info, formed by pairs of:
+         * xml
+         * tuple (pfile, filename, file metadata)
+        """
+        if self.fixed_xml_fullpath is not None:
             return {'xml': (
-                self.xml,
+                self.fixed_xml_fullpath,
                 self.article_folder_name+'.xml',
                 self.article_metadata)}
 
     @property
     def html_filenames(self):
+        """
+        Returns XML file info, formed by pairs of:
+         * xml
+         * tuple (pfile, filename, file metadata)
+        """
         filenames = {}
         for lang in self.text_languages:
             prefix = '' if lang == self.xylose_article.original_language() else lang+'_'
@@ -177,96 +229,123 @@ class ArticleSourceFiles(object):
         return filenames
 
     @property
-    def html_items(self):
+    def html_content_items(self):
+        """
+        Returns HTML content items, formed by pairs of:
+         * language
+         * html content
+        """
         items = {}
-        if self.xml is None:
+        if self.xml_fullpath is None:
             items = self.xylose_article.translated_htmls() or {}
             items.update(
                 {self.xylose_article.original_language():
                     self.xylose_article.original_html()})
+            for lang, item in items.items():
+                for media_name, url in self.registered_media_assets.items():
+                    href_content = 'src="/img/revistas/{}/{}"'.format(
+                        self.journal_and_issue_folders,
+                        media_name)
+                    new_href_content = 'src="{}"'.format(url)
+                    item = item.replace(href_content, new_href_content)
+                items[lang] = item
         else:
             items = self.generate_htmls()
         return items
 
     @property
-    def html_files(self):
-        files = {}
-        for lang, html in self.html_items.items():
+    def html_files_data(self):
+        """
+        Returns HTML files data, formed by pairs of:
+         * language
+         * tuple (pfile, filename, file metadata)
+        """
+        files_data = {}
+        for lang, html in self.html_content_items.items():
             file_metadata = self.article_metadata.copy()
             file_metadata.update({'lang': lang})
             if html is not None:
-                files[lang] = (
+                files_data[lang] = (
                     StringIO(html.encode('utf-8')),
                     self.html_filenames.get(lang),
                     file_metadata)
-        return files
+        return files_data
 
     def generate_htmls(self):
-        if self.xml is not None:
+        """
+        Generates HTML contents for all the text languages
+        Returns them as pairs of:
+         * language
+         * HTML content
+        """
+        if self.xml_fullpath is not None:
             htmls, errors = html_generator.generate_htmls(
-                self.xml,
-                self.css_path)
+                self.fixed_xml_fullpath,
+                config.OPAC_PROC_CSS_PATH)
             if errors:
                 for error in errors:
                     logger.error(error)
-            else:
-                os.unlink(self.xml)
+            if self.xml_fullpath != self.fixed_xml_fullpath:
+                os.unlink(self.fixed_xml_fullpath)
             return htmls
 
 
 class Assets(object):
+    """
+        Handler the assets of an article such as XML, PDF, HTML files
+        and its media files, such as images, videos, supplementary material etc
+        Asks for their registration in a DAM system
+        Params:
+            :param article_uuid: string article uuid provided by opac proc
+            :param xylose_article: article data returned by xylose api
+    """
 
-    def __init__(self, article_uuid, xylose_article, css_path):
-        self.css_path = css_path
+    def __init__(self, article_uuid, xylose_article):
         self.source_files = ArticleSourceFiles(
             xylose_article,
-            article_uuid,
-            css_path)
+            article_uuid)
+        self.pdf_assets = None
+        self.registered_pdf_assets = None
+        self.xml_assets = None
+        self.registered_xml_assets = None
+        self.html_assets = None
+        self.registered_html_assets = None
 
-    def _create_assets(self, source_files):
+    def _register_assets(self, source_files_data):
+        """
+        Creates assets of a group of source files and
+        Asks for their registration in a DAM system.
+        Params:
+            :param source_files_data: data of source files group
+        """
         assets = []
-        if source_files is not None:
-            for label, source_file_data in source_files.items():
+        if source_files_data is not None:
+            for label, source_file_data in source_files_data.items():
                 pfile, filename, file_metadata = source_file_data
                 _, filetype = os.path.splitext(filename)
                 if pfile is not None:
-                    assets.append(
-                        AssetHandler(
+                    asset = AssetHandler(
                             pfile,
                             filename,
                             filetype[1:],
                             file_metadata,
-                            self.source_files.issue_folder_rel_path))
+                            self.source_files.journal_and_issue_folders)
+                    asset.register()
+                    assets.append(asset)
                 else:
                     logger.error(
-                        u'Não foi possível ler o arquivo {} correspondente a {} {} '.format(
+                        u'Não foi possível ler o arquivo {} ({} {})'.format(
                             filename,
                             filetype,
                             label if label != filetype else ''))
         return assets
 
-    def register(self, assets=None):
-        media_assets = self._create_assets(self.source_files.media_files)
-        for asset in media_assets:
-            asset.register()
-
-        self.pdf_assets = self._create_assets(self.source_files.pdf_files)
-        for asset in self.pdf_assets:
-            asset.register()
-
-        self.xml_assets = None
-        if self.source_files.xml_filename is not None:
-            self.source_files.registered_media_assets = self._registered_assets_type(media_assets)
-            self.xml_assets = self._create_assets(
-                self.source_files.xml_file)
-            for asset in self.xml_assets:
-                asset.register()
-
-        self.html_assets = self._create_assets(self.source_files.html_files)
-        for asset in self.html_assets:
-            asset.register()
-
-    def _registered_assets_type(self, assets):
+    def _registered_assets_data(self, assets):
+        """
+        Returns the data of an assets group.
+        Params:
+            :param assets: group of assets
+        """
         data = None
         if assets is not None:
             for asset in assets:
@@ -287,9 +366,31 @@ class Assets(object):
                         data[asset.name] = asset.url
         return data
 
-    def registered_assets(self):
-        assets = {}
-        assets['pdfs'] = self._registered_assets_type(self.pdf_assets)
-        assets['xml'] = self._registered_assets_type(self.xml_assets)
-        assets['htmls'] = self._registered_assets_type(self.html_assets)
-        return assets
+    def register(self):
+        """
+        Creates all the assets of an article,
+        including for the generated HTML from XML files, if apply, and
+        Asks for their registration in a DAM system.
+        """
+        media_assets = self._register_assets(
+            self.source_files.media_files_data)
+        self.source_files.registered_media_assets = self._registered_assets_data(
+                media_assets)
+
+        self.pdf_assets = self._register_assets(
+            self.source_files.pdf_files_data)
+        self.registered_pdf_assets = self._registered_assets_data(
+            self.pdf_assets)
+
+        self.xml_assets = None
+        self.registered_xml_assets = None
+        if self.source_files.xml_fullpath is not None:
+            self.xml_assets = self._register_assets(
+                self.source_files.xml_file_info)
+            self.registered_xml_assets = self._registered_assets_data(
+                self.xml_assets)
+
+        self.html_assets = self._register_assets(
+            self.source_files.html_files_data)
+        self.registered_html_assets = self._registered_assets_data(
+            self.html_assets)
