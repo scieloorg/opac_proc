@@ -10,21 +10,12 @@ class XMLError(Exception):
     """
 
 
-def get_htmlgenerator(xmlpath, no_network, no_checks, css):
-    try:
-        parsed_xml = packtools.XML(xmlpath, no_network=no_network)
-    except IOError as e:
-        raise XMLError(
-            'Error reading {}. Make sure it is a valid file-path or URL.'.format(xmlpath))
-    except etree.XMLSyntaxError as e:
-        raise XMLError(
-            'Error reading {}. Syntax error: {}'.format(xmlpath, e))
-
+def get_htmlgenerator(parsed_xml, no_network, no_checks, css):
     try:
         generator = packtools.HTMLGenerator.parse(
             parsed_xml, valid_only=not no_checks, css=css)
     except ValueError as e:
-        raise XMLError('Error reading %s. %s.' % (xmlpath, e))
+        raise XMLError('Error reading %s. %s.' % (e, ))
 
     return generator
 
@@ -34,7 +25,12 @@ def generate_htmls(xml, css):
     files = {}
     html_generator = None
     try:
-        html_generator = get_htmlgenerator(xml, False, True, css)
+        _xml = etree.parse(xml)
+    except:
+        _xml = xml
+
+    try:
+        html_generator = get_htmlgenerator(_xml, False, True, css)
     except XMLError as e:
         errors.append('Error getting htmlgenerator for {}. '.format(xml))
 

@@ -3,7 +3,6 @@
 import os
 
 from StringIO import StringIO
-from tempfile import NamedTemporaryFile
 
 from opac_proc.web import config
 from opac_proc.transformers import html_generator
@@ -25,14 +24,6 @@ def _pfile(filename):
         raise e
     else:
         return pfile
-
-
-def create_file(content):
-    f = NamedTemporaryFile(delete=False)
-    content = content.encode('utf-8')
-    f.write(content)
-    f.close()
-    return f.name
 
 
 class ArticleSourceFiles(object):
@@ -185,31 +176,35 @@ class ArticleSourceFiles(object):
             return self.xml_folder_path+'/'+self.article_folder_name+'.xml'
 
     @property
-    def fixed_xml_fullpath(self):
+    def fixed_xml(self):
         """
         Returns full path of XML file, which had the media path changed
         """
         if self.xml_fullpath is not None:
-            _xml = self.xml_fullpath
+            _xml = open(self.xml_fullpath, 'rb').read().decode('utf-8')
             if self.registered_media_assets is not None:
-                _xml = open(self.xml_fullpath, 'rb').read().decode('utf-8')
                 for media_name, url in self.registered_media_assets.items():
-                    href_content = 'href="{}"'.format(media_name)
                     new_href_content = 'href="{}"'.format(url)
-                    _xml = _xml.replace(href_content, new_href_content)
-                _xml = create_file(_xml)
-            return _xml
+                    href_content = 'href="{}"'.format(media_name)
+
+                    for alternative in [
+                        href_content,
+                        href_content.replace('.jpg', '.tiff'),
+                        href_content.replace('.jpg', '.tif'),
+                    ]:
+                        _xml = _xml.replace(alternative, new_href_content)
+            return StringIO(_xml.encode('utf-8'))
 
     @property
-    def xml_file_info(self):
+    def xml_file_data(self):
         """
         Returns XML file info, formed by pairs of:
          * xml
          * tuple (pfile, filename, file metadata)
         """
-        if self.fixed_xml_fullpath is not None:
+        if self.fixed_xml is not None:
             return {'xml': (
-                self.fixed_xml_fullpath,
+                self.fixed_xml,
                 self.article_folder_name+'.xml',
                 self.article_metadata)}
 
@@ -278,15 +273,13 @@ class ArticleSourceFiles(object):
          * language
          * HTML content
         """
-        if self.xml_fullpath is not None:
+        if self.fixed_xml is not None:
             htmls, errors = html_generator.generate_htmls(
-                self.fixed_xml_fullpath,
+                self.fixed_xml,
                 config.OPAC_PROC_CSS_PATH)
             if errors:
                 for error in errors:
                     logger.error(error)
-            if self.xml_fullpath != self.fixed_xml_fullpath:
-                os.unlink(self.fixed_xml_fullpath)
             return htmls
 
 
@@ -386,7 +379,7 @@ class Assets(object):
         self.registered_xml_assets = None
         if self.source_files.xml_fullpath is not None:
             self.xml_assets = self._register_assets(
-                self.source_files.xml_file_info)
+                self.source_files.xml_file_data)
             self.registered_xml_assets = self._registered_assets_data(
                 self.xml_assets)
 

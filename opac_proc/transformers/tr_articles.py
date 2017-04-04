@@ -162,5 +162,4 @@ class ArticleTransformer(BaseTransformer):
         self.transform_model_instance['pdfs'] = assets.registered_pdf_assets
         self.transform_model_instance['xml'] = assets.registered_xml_assets
         self.transform_model_instance['htmls'] = assets.registered_html_assets
-
         return self.transform_model_instance
