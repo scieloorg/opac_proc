@@ -130,6 +130,7 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['original_language'] = xylose_article.original_language()
 
         # languages
+        # IMPORTANTE: nesse trecho estamos cadastrando todos os idiomas do texto e do resumo.
         if hasattr(xylose_article, 'languages'):
             lang_set = set(xylose_article.languages() + getattr(self.transform_model_instance, 'abstract_languages', []))
             self.transform_model_instance['languages'] = list(lang_set)
