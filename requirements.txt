@@ -6,7 +6,7 @@ thriftpy==0.3.9
 rq==0.7.1
 rq-dashboard==0.3.7
 rq-scheduler==0.7.0
-rq-scheduler-dashboard==0.0.1
+rq-scheduler-dashboard==0.0.2
 blinker==1.4
 mongolog==0.1.1
 -e git+https://github.com/scieloorg/xylose@1.17.5#egg=xylose
