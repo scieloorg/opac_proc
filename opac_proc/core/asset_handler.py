@@ -6,12 +6,19 @@ from datetime import datetime
 from opac_ssm_api.client import Client
 
 from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
+
+
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "transform")
+else:
+    logger = getMongoLogger(__name__, "INFO", "transform")
 
 
 class AssetHandler(object):
 
     def __init__(self, pfile, filename, filetype, metadata, bucket_name,
-                attempts=5, sleep_attempts=2):
+            attempts=5, sleep_attempts=2):
         """
         Asset handler.
 
@@ -22,7 +29,8 @@ class AssetHandler(object):
             :param filename: filename is mandatory
             :param bucket_name: name of bucket
             :param attempts: number of attemtps to add any asset.
-            :param attempts: sleep time for each attemtps to add any asset (second).
+            :param attempts: sleep time for each attemtps
+                to add any asset (second).
         """
 
         if pfile is None:
@@ -101,6 +109,20 @@ class AssetHandler(object):
         success, data = self.ssm_client.get_asset_info(self.uuid)
 
         if not success:
-            raise Exception(data['error_message'])
+            raise Exception(
+                '{} {} {} {} {} {} {}'.format(
+                    data['error_message'],
+                    self.uuid,
+                    self.ssm_client.get_task_state(self.uuid),
+                    self.pfile,
+                    self.name,
+                    data,
+                    success))
 
         return data
+
+    @property
+    def url(self):
+        _url = self.get_urls()
+        if _url is not None:
+            return _url.get('url')

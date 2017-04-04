@@ -165,6 +165,8 @@ def task_reprocess_articles(ids=None):
     stage = "extract"
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
+    
+    collection = models.ExtractCollection.objects.all().first()
 
     collection = models.ExtractCollection.objects.all().first()
 
