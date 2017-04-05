@@ -144,10 +144,11 @@ class ArticleTransformer(BaseTransformer):
             pdfs = []
             langs = set()
 
+            article_pid = xylose_article.publisher_id
             article_version = xylose_article.data_model_version
 
             logger.info(u"Artigo PID: %s, ID: %s, tem a versão: %s",
-                        pid, uuid, article_version)
+                        article_pid, uuid, article_version)
 
             if article_version == 'xml':
                 # Devemos coletar somente os idiomas do texto completo.
@@ -163,7 +164,7 @@ class ArticleTransformer(BaseTransformer):
                         langs.add(lang)
 
             logger.info(u"Idiomas existentes no artigo PID: %s, ID: %s, idiomas: %s",
-                        pid, uuid, langs)
+                        article_pid, uuid, langs)
 
             for lang in list(langs):
                 file_type = 'pdf'
@@ -171,7 +172,7 @@ class ArticleTransformer(BaseTransformer):
                 original_lang = self.transform_model_instance['original_language']
 
                 logger.info(u"Idioma original do artigo PID: %s, ID: %s, original lang: %s",
-                            pid, uuid, original_lang)
+                            article_pid, uuid, original_lang)
 
                 if lang == original_lang:
                     prefix = ''
@@ -185,7 +186,7 @@ class ArticleTransformer(BaseTransformer):
                                  xylose_article.file_code())
 
                 logger.info(u"Caminho do PDF do artigo com PID: %s e ID: %s, caminho: %s",
-                            pid, uuid, file_path)
+                            article_pid, uuid, file_path)
 
                 try:
                     pfile = open(file_path, 'rb')
@@ -198,7 +199,7 @@ class ArticleTransformer(BaseTransformer):
                     file_name = os.path.basename(file_path)
 
                     logger.info(u"Nome do PDF do artigo com PID: %s e ID: %s, nome: %s",
-                                pid, uuid, file_name)
+                                article_pid, uuid, file_name)
 
                     article_folder = xylose_article.file_code()
                     issue_folder = xylose_article.assets_code
@@ -207,10 +208,10 @@ class ArticleTransformer(BaseTransformer):
                     bucket_name = '/'.join([journal_folder, issue_folder])
 
                     logger.info(u"Bucket name do PDF do artigo com PID: %s e ID: %s, bucket name: %s",
-                                pid, uuid, bucket_name)
+                                article_pid, uuid, bucket_name)
 
                     file_meta = {
-                                 'article_pid': pid,
+                                 'article_pid': article_pid,
                                  'lang': lang,
                                  'bucket_name': bucket_name,
                                  'article_folder': xylose_article.file_code(),
@@ -224,7 +225,7 @@ class ArticleTransformer(BaseTransformer):
                     uuid = asset.register()
 
                     logger.info(u"UUID do artigo com PID: %s e ID: %s, cadastrado no SSM: %s",
-                                pid, uuid, uuid)
+                                article_pid, uuid, uuid)
 
                     pdfs.append({
                         'type': file_type,
@@ -233,7 +234,7 @@ class ArticleTransformer(BaseTransformer):
                     })
 
                 logger.info(u"PDF cadastrado para o artigo com PID: %s e ID: %s, PDF: %s",
-                            pid, uuid, asset.get_urls()['url'])
+                            article_pid, uuid, asset.get_urls()['url'])
 
             self.transform_model_instance['pdfs'] = pdfs
 
