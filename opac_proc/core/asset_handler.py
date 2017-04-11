@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import time
+import hashlib
 from datetime import datetime
 
 from opac_ssm_api.client import Client
@@ -11,7 +12,7 @@ from opac_proc.web import config
 class AssetHandler(object):
 
     def __init__(self, pfile, filename, filetype, metadata, bucket_name,
-                attempts=5, sleep_attempts=2):
+                 attempts=5, sleep_attempts=2):
         """
         Asset handler.
 
@@ -26,7 +27,7 @@ class AssetHandler(object):
         """
 
         if pfile is None:
-            raise ValueError('Valor inválido de arquivo para registrar no SSM')
+            raise ValueError(u'Valor inválido de arquivo para registrar no SSM')
         else:
             self.pfile = pfile
 
@@ -41,6 +42,19 @@ class AssetHandler(object):
         self.uuid = None
         self.attempts = attempts
         self.sleep_attempts = sleep_attempts
+
+    @property
+    def _checksum_sha256(self):
+        """
+        Get sha256 checksum of asset.
+
+        Return a string result of the checksum
+        """
+        file_bytes = self.pfile.read()
+
+        self.pfile.seek(0)  # Refering point to the biginnig of the file
+
+        return hashlib.sha256(file_bytes).hexdigest()
 
     def register(self):
         """
@@ -104,3 +118,28 @@ class AssetHandler(object):
             raise Exception(data['error_message'])
 
         return data
+
+    def exists(self):
+        """
+        Check if asset already exists in backend.
+
+        if it exists return list [asset, asset.....]
+
+        if this not exists return empty list []
+
+        The creteria was use the PID, collection and checksum of asset to
+        determine if it exists
+        """
+
+        #  Utilizamos um lista utilizarmos o arquivo de configuração no futuro.
+        creteria = set(['pid', 'collection'])
+        metadata = set(self.metadata.keys())
+        intersection = set(creteria & metadata)
+
+        if creteria == intersection:
+            return self.ssm_client.query_asset(self._checksum_sha256, {
+                                               'pid': self.metadata['pid'],
+                                               'collection': self.metadata['collection']
+                                               })
+        else:
+            raise ValueError(u'O param metadata do ativo teve conter: %s', ', '.join(creteria))
