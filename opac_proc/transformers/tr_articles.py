@@ -143,6 +143,7 @@ class ArticleTransformer(BaseTransformer):
 
             pdfs = []
             langs = set()
+            list_exits_asset = []
 
             article_pid = xylose_article.publisher_id
             article_version = xylose_article.data_model_version
@@ -179,11 +180,12 @@ class ArticleTransformer(BaseTransformer):
                 else:
                     prefix = '%s_' % lang
 
-                file_path = '%s/%s/%s/%s%s.pdf' % (config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH,
-                                 xylose_article.journal.acronym.lower(),
-                                 xylose_article.assets_code,
-                                 prefix,
-                                 xylose_article.file_code())
+                file_path = '%s/%s/%s/%s%s.pdf' % (
+                    config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH,
+                    xylose_article.journal.acronym.lower(),
+                    xylose_article.assets_code,
+                    prefix,
+                    xylose_article.file_code())
 
                 logger.info(u"Caminho do PDF do artigo com PID: %s e ID: %s, caminho: %s",
                             article_pid, uuid, file_path)
@@ -201,7 +203,6 @@ class ArticleTransformer(BaseTransformer):
                     logger.info(u"Nome do PDF do artigo com PID: %s e ID: %s, nome: %s",
                                 article_pid, uuid, file_name)
 
-                    article_folder = xylose_article.file_code()
                     issue_folder = xylose_article.assets_code
                     journal_folder = xylose_article.journal.acronym.lower()
 
@@ -210,33 +211,43 @@ class ArticleTransformer(BaseTransformer):
                     logger.info(u"Bucket name do PDF do artigo com PID: %s e ID: %s, bucket name: %s",
                                 article_pid, uuid, bucket_name)
 
+                    acron_collection = xylose_article.collection_acronym
+
                     file_meta = {
-                                 'article_pid': article_pid,
+                                 'pid': article_pid,
                                  'lang': lang,
                                  'bucket_name': bucket_name,
-                                 'article_folder': xylose_article.file_code(),
-                                 'issue_folder': xylose_article.assets_code,
-                                 'journal_folder': xylose_article.journal.acronym.lower(),
+                                 'file_path': file_path,
+                                 'file_name': xylose_article.file_code(),
+                                 'collection': acron_collection,
+                                 'issue': xylose_article.assets_code,
+                                 'journal': xylose_article.journal.acronym.lower(),
                                 }
 
                     asset = AssetHandler(pfile, file_name, file_type, file_meta,
                                          bucket_name)
 
-                    uuid = asset.register()
+                    list_exits_asset = asset.exists()
 
-                    logger.info(u"UUID do artigo com PID: %s e ID: %s, cadastrado no SSM: %s",
-                                article_pid, uuid, uuid)
+                    if list_exits_asset:
+                        logger.info(u"Existe ativo(s) cadastrado com o PID: %s na colecao: %s. Ativo(s) existente(s): %s",
+                                    article_pid, acron_collection, list_exits_asset)
+                    else:
+                        uuid = asset.register()
 
-                    pdfs.append({
-                        'type': file_type,
-                        'language': lang,
-                        'url': asset.get_urls()['url']
-                    })
+                        logger.info(u"UUID do artigo com PID: %s e ID: %s, cadastrado no SSM: %s",
+                                    article_pid, uuid, uuid)
 
-                logger.info(u"PDF cadastrado para o artigo com PID: %s e ID: %s, PDF: %s",
-                            article_pid, uuid, asset.get_urls()['url'])
+                        pdfs.append({
+                            'type': file_type,
+                            'language': lang,
+                            'url': asset.get_urls()['url']
+                        })
 
-            self.transform_model_instance['pdfs'] = pdfs
+                        logger.info(u"PDF cadastrado para o artigo com PID: %s e ID: %s, PDF: %s",
+                                    article_pid, uuid, asset.get_urls()['url'])
+            if not list_exits_asset:
+                self.transform_model_instance['pdfs'] = pdfs
 
         # pid
         if hasattr(xylose_article, 'publisher_id'):
