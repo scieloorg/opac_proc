@@ -9,12 +9,12 @@ from opac_ssm_api.client import Client
 from opac_proc.web import config
 
 
-class AssetHandler(object):
+class SSMHandler(object):
 
     def __init__(self, pfile, filename, filetype, metadata, bucket_name,
                  attempts=5, sleep_attempts=2):
         """
-        Asset handler.
+        SSM handler.
 
         Params:
             :param pfile: pfile path (Mandatory) or a file pointer
