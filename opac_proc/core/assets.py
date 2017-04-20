@@ -1,9 +1,13 @@
 # coding: utf-8
+import re
+from StringIO import StringIO
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
 
+# import html_generator
 from ssm_handler import SSMHandler
+
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
@@ -26,17 +30,46 @@ class Assets(object):
 
     def __init__(self, xylose):
         self.xylose = xylose
+        self.content = None  # Must be define in the sub classes
 
-    def _open_asset(self, file_path):
+    def _open_asset(self, file_path, mode='rb'):
         """
         Open asset as file like object(bytes)
         """
         try:
-            return open(file_path, 'rb')
+            return open(file_path, mode)
         except IOError as e:
             logger.error(u'Erro ao tentar abri o ativo: %s, erro: %s',
                          file_path, e)
             raise Exception(u'Erro ao tentar abri o ativo: %s', file_path)
+
+    def _change_img_path(self, medias):
+        """
+        Changes the path of the media in XML so that it is something accessible.
+        """
+        if medias:
+            for media_name, url in medias.items():
+                self.content = self.content.replace(
+                                            media_name.encode('utf-8'),
+                                            url.encode('utf-8'))
+
+    def _extract_media(self):
+        """
+        Return a list of media to be collect from content
+        """
+        regex = 'href="([^/\s]+\.(?:tiff|tif|jpg|jpeg|gif|png))"'
+
+        return re.findall(regex, self.content)
+
+    def _get_media_path(self, name):
+        """
+        Returns the folder path of media.
+        """
+        return '%s/%s/%s/%s' % (
+                            config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH,
+                            self.xylose.journal.acronym.lower(),
+                            self.xylose.assets_code,
+                            name)
 
     @property
     def bucket_name(self):
@@ -49,7 +82,7 @@ class Assets(object):
 
         return '/'.join([journal_folder, issue_folder])
 
-    def get_langs(self):
+    def _get_langs(self):
         """
         This method has as responsibility to obtain the list of languages
         available in the article through the xylose object.
@@ -101,16 +134,12 @@ class Assets(object):
                         {'en': 'en_1413-8123-csc-19-01-00215.pdf'},
                         {'pt': '1413-8123-csc-19-01-00215.pdf'}, # if the lang default
                     ],
-                'xml': [
-                        {'en': 'en_1413-8123-csc-19-01-00215.xml'},
-                        {'pt': '1413-8123-csc-19-01-00215.xml'}, # if the lang default
-                    ]
+                'xml': '1413-8123-csc-19-01-00215.xml'
             }
         """
 
         assets = {}
         pdf_lang = []
-        xml_lang = []
 
         original_lang = self.xylose.original_language()
 
@@ -119,19 +148,18 @@ class Assets(object):
         logger.info(u"Idioma original do artigo PID: %s, original lang: %s",
                     self.xylose.publisher_id, original_lang)
 
-        logger.info(self.get_langs())
-
-        for lang in self.get_langs():
+        for lang in self._get_langs():
 
             prefix = '' if lang == original_lang else '%s_' % lang
 
             pdf_lang.append({lang: '{}{}.pdf'.format(prefix, file_code)})
             assets['pdf'] = pdf_lang
 
-            if self.xylose.data_model_version == 'xml':
-
-                xml_lang.append({lang: '{}{}.xml'.format(prefix, file_code)})
-                assets['xml'] = xml_lang
+        if self.xylose.data_model_version == 'xml':
+            assets['xml'] = '{0}.xml'.format(file_code)
+        else:
+            # importante verificar se é o xylose devolve uma URL
+            pass
 
         return assets
 
@@ -155,7 +183,66 @@ class Assets(object):
 
         return metadata
 
-    def register_pdf(self):
+    def register_media(self):
+        """
+        Return a dictionary with all media added in SSM.
+
+        Example:  {
+                    'a08tab01.gif': 'http://ssm.scielo.org/media/assets/resp/v89n1/a08tab01.gif'
+                    'a08tab3b.gif': 'http://ssm.scielo.org/media/assets/resp/v89n1/a08tab3b.gif'
+                  }
+        """
+        file_type = 'img'  # Not all are images
+
+        registered_medias = {}
+
+        medias = self._extract_media()
+
+        for media in medias:
+            pfile = self._open_asset(self._get_media_path(media))
+
+            metadata = self.get_metadata()
+            metadata.update({'file_path': self._get_media_path(media),
+                             'bucket_name': self.bucket_name,
+                             'type': file_type})
+
+            ssm_asset = SSMHandler(pfile, media, file_type, metadata,
+                                   self.bucket_name)
+
+            if ssm_asset.exists():
+                logger.info(u"Ja existe um media com PID: %s e colecao: %s, cadastrado",
+                            self.xylose.publisher_id, self.xylose.collection_acronym)
+            else:
+                uuid = ssm_asset.register()
+
+                logger.info(u"UUID: %s para media do artigo com PID: %s",
+                            uuid, self.xylose.publisher_id)
+
+                registered_medias.update({media: ssm_asset.get_urls()['url']})
+
+        logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
+                    registered_medias, self.xylose.publisher_id)
+
+        if registered_medias:
+            return registered_medias
+
+    def register(self):
+        raise NotImplementedError()
+
+
+class AssetPDF(Assets):
+
+    def _get_path(self, name):
+        """
+        Returns the folder path of article PDF(s) file.
+        """
+        return '%s/%s/%s/%s' % (
+                            config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH,
+                            self.xylose.journal.acronym.lower(),
+                            self.xylose.assets_code,
+                            name)
+
+    def register(self):
         """
         Method to register the PDF(s) of the asset.
         """
@@ -175,11 +262,7 @@ class Assets(object):
 
         for item in self.get_assets().get('pdf'):
             for lang, pdf_name in item.items():
-                file_path = '%s/%s/%s/%s' % (
-                            config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH,
-                            self.xylose.journal.acronym.lower(),
-                            self.xylose.assets_code,
-                            pdf_name)
+                file_path = self._get_path(pdf_name)
 
                 logger.info(u"Caminho do PDF do artigo PID: %s, idioma:%s, %s",
                             self.xylose.publisher_id, lang, file_path)
@@ -199,7 +282,7 @@ class Assets(object):
                                        self.bucket_name)
 
                 if ssm_asset.exists():
-                    logger.info(u"Já existe um PDF com PID: %s e coleção: %s cadastrado",
+                    logger.info(u"Já existe um PDF com PID: %s e coleção: %s, cadastrado",
                                 self.xylose.publisher_id, self.xylose.collection_acronym)
                 else:
                     uuid = ssm_asset.register()
@@ -213,7 +296,81 @@ class Assets(object):
                         'url': ssm_asset.get_urls()['url']
                     })
 
-                    logger.info(u"PDF(s): %s cadastrado(s) para o artigo com PID: %s",
-                                pdfs, self.xylose.publisher_id)
+        logger.info(u"PDF(s): %s cadastrado(s) para o artigo com PID: %s",
+                    pdfs, self.xylose.publisher_id)
 
-        return pdfs
+        if pdfs:
+            return pdfs
+
+
+class AssetXML(Assets):
+
+    def _get_path(self, name):
+        """
+        Returns the folder path of article XML file.
+        """
+        return '%s/%s/%s/%s' % (
+                            config.OPAC_PROC_ASSETS_SOURCE_XML_PATH,
+                            self.xylose.journal.acronym.lower(),
+                            self.xylose.assets_code,
+                            name)
+
+    def register(self):
+        """
+        Method to register the PDF(s) of the asset.
+
+        To register the xml we must replace the path of the image to paths
+        valid and registered in SSM.
+        """
+        logger.info(u"Iniciando o cadasto do XML do artigo PID: %s",
+                    self.xylose.publisher_id)
+
+        logger.info(u"Registrando as medias para o PID: %s",
+                    self.xylose.publisher_id)
+
+        if 'xml' not in self.get_assets():
+            msg_error = u"Nao existe XML para o artigo PID: %s" % self.xylose.publisher_id
+            logger.info(msg_error)
+            raise Exception(msg_error)
+        else:
+            logger.info(u"Lista de XML existente para o artigo PID: %s",
+                        self.xylose.publisher_id)
+
+        file_name = self.get_assets().get('xml')
+        file_path = self._get_path(self.get_assets().get('xml'))
+
+        self.content = self._open_asset(file_path, mode='r').read()
+
+        registered_media = self.register_media()
+
+        logger.info(u"Medias cadastradas para o PID: %s", registered_media)
+
+        logger.info(u"Alterando as medias:%s no artigo PiD: %s",
+                    registered_media, self.xylose.publisher_id)
+
+        self._change_img_path(registered_media)  # change self.content
+
+        logger.info("File path: %s", file_path)
+
+        ssm_asset = SSMHandler(StringIO(self.content), file_name, 'xml',
+                               self.get_metadata(), self.bucket_name)
+
+        if ssm_asset.exists():
+            logger.info(u"Ja existe um XML com PID: %s e colecao: %s, cadastrado",
+                        self.xylose.publisher_id, self.xylose.collection_acronym)
+        else:
+            uuid = ssm_asset.register()
+
+            logger.info(u"UUID: %s para XML do artigo com PID: %s",
+                        uuid, self.xylose.publisher_id)
+
+            logger.info(u"XML: %s cadastrado(s) para o artigo com PID: %s",
+                        file_name, self.xylose.publisher_id)
+
+            return ssm_asset.get_urls()['url']
+
+
+class AssetHTMLS(Assets):
+
+    def register(self):
+        pass

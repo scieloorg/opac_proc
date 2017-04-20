@@ -14,7 +14,7 @@ from opac_proc.extractors.decorators import update_metadata
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
 
-from opac_proc.core.assets import Assets
+from opac_proc.core.assets import AssetPDF, AssetXML
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
@@ -44,7 +44,8 @@ class ArticleTransformer(BaseTransformer):
         self.transform_model_instance['uuid'] = uuid
         self.transform_model_instance['aid'] = uuid
 
-        assets = Assets(xylose_article)
+        asset_pdf = AssetPDF(xylose_article)
+        asset_xml = AssetXML(xylose_article)
 
         # issue
         pid = xylose_article.issue.publisher_id
@@ -141,7 +142,11 @@ class ArticleTransformer(BaseTransformer):
 
         # PDFs
         if hasattr(xylose_article, 'xml_languages') or hasattr(xylose_article, 'fulltexts'):
-            self.transform_model_instance['pdfs'] = assets.register_pdf()
+            self.transform_model_instance['pdfs'] = asset_pdf.register()
+
+        # XML
+        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
+            self.transform_model_instance['xml'] = asset_xml.register()
 
         # pid
         if hasattr(xylose_article, 'publisher_id'):
