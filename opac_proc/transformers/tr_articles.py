@@ -14,7 +14,7 @@ from opac_proc.extractors.decorators import update_metadata
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
 
-from opac_proc.core.assets import AssetPDF, AssetXML
+from opac_proc.core.assets import AssetPDF, AssetXML, AssetHTMLS
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
@@ -43,9 +43,6 @@ class ArticleTransformer(BaseTransformer):
         uuid = self.extract_model_instance.uuid
         self.transform_model_instance['uuid'] = uuid
         self.transform_model_instance['aid'] = uuid
-
-        asset_pdf = AssetPDF(xylose_article)
-        asset_xml = AssetXML(xylose_article)
 
         # issue
         pid = xylose_article.issue.publisher_id
@@ -142,11 +139,30 @@ class ArticleTransformer(BaseTransformer):
 
         # PDFs
         if hasattr(xylose_article, 'xml_languages') or hasattr(xylose_article, 'fulltexts'):
-            self.transform_model_instance['pdfs'] = asset_pdf.register()
+            asset_pdf = AssetPDF(xylose_article)
 
-        # XML
+            pdfs = asset_pdf.register()
+
+            logger.info("pdf_url %s", pdfs)
+
+            if pdfs:
+                self.transform_model_instance['pdfs'] = pdfs
+
+        asset_html = AssetHTMLS(xylose_article)
+
+        # Versão XML do artigo
         if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
-            self.transform_model_instance['xml'] = asset_xml.register()
+            asset_xml = AssetXML(xylose_article)
+
+            xml_url = asset_xml.register()
+
+            if xml_url:
+                uuid, self.transform_model_instance['xml'] = xml_url
+                self.transform_model_instance['htmls'] = asset_html.register(uuid)
+
+        # Versão HTML do artigo
+        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':
+            self.transform_model_instance['htmls'] = asset_html.register()
 
         # pid
         if hasattr(xylose_article, 'publisher_id'):

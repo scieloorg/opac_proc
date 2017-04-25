@@ -5,7 +5,7 @@ from StringIO import StringIO
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
 
-# import html_generator
+from html_generator import generate_htmls
 from ssm_handler import SSMHandler
 
 
@@ -30,7 +30,7 @@ class Assets(object):
 
     def __init__(self, xylose):
         self.xylose = xylose
-        self.content = None  # Must be define in the sub classes
+        self.content = None
 
     def _open_asset(self, file_path, mode='rb'):
         """
@@ -71,17 +71,6 @@ class Assets(object):
                             self.xylose.assets_code,
                             name)
 
-    @property
-    def bucket_name(self):
-        """
-        Reeturn the bucket name to assets
-        """
-
-        issue_folder = self.xylose.assets_code
-        journal_folder = self.xylose.journal.acronym.lower()
-
-        return '/'.join([journal_folder, issue_folder])
-
     def _get_langs(self):
         """
         This method has as responsibility to obtain the list of languages
@@ -112,6 +101,17 @@ class Assets(object):
                     self.xylose.publisher_id, langs)
 
         return list(langs)
+
+    @property
+    def bucket_name(self):
+        """
+        Reeturn the bucket name to assets
+        """
+
+        issue_folder = self.xylose.assets_code
+        journal_folder = self.xylose.journal.acronym.lower()
+
+        return '/'.join([journal_folder, issue_folder])
 
     def get_assets(self):
         """
@@ -209,9 +209,17 @@ class Assets(object):
             ssm_asset = SSMHandler(pfile, media, file_type, metadata,
                                    self.bucket_name)
 
-            if ssm_asset.exists():
-                logger.info(u"Ja existe um media com PID: %s e colecao: %s, cadastrado",
-                            self.xylose.publisher_id, self.xylose.collection_acronym)
+            existing_asset = ssm_asset.exists()
+
+            if existing_asset:
+                logger.info(u"Já existe um media com PID: %s e colecao: %s, cadastrado: %s",
+                            self.xylose.publisher_id, self.xylose.collection_acronym, existing_asset)
+
+                for asset in existing_asset:
+                    registered_medias.update({asset['filename']:
+                                              asset['full_absolute_url']})
+
+                break  # Finaliza o laço mais externo (medias)
             else:
                 uuid = ssm_asset.register()
 
@@ -220,11 +228,10 @@ class Assets(object):
 
                 registered_medias.update({media: ssm_asset.get_urls()['url']})
 
-        logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
-                    registered_medias, self.xylose.publisher_id)
+                logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
+                            registered_medias, self.xylose.publisher_id)
 
-        if registered_medias:
-            return registered_medias
+        return registered_medias
 
     def register(self):
         raise NotImplementedError()
@@ -250,7 +257,7 @@ class AssetPDF(Assets):
                     self.xylose.publisher_id)
 
         file_type = 'pdf'
-        pdfs = []
+        pdfs = {}
 
         if 'pdf' not in self.get_assets():
             msg_error = u"Não existe PDF para o artigo PID: %s" % self.xylose.publisher_id
@@ -258,18 +265,18 @@ class AssetPDF(Assets):
             raise Exception(msg_error)
         else:
             logger.info(u"Lista de PDF(s) existente para o artigo PID: %s",
-                        self.xylose.publisher_id)
+                        self.get_assets().get('pdf'))
 
         for item in self.get_assets().get('pdf'):
             for lang, pdf_name in item.items():
                 file_path = self._get_path(pdf_name)
 
-                logger.info(u"Caminho do PDF do artigo PID: %s, idioma:%s, %s",
+                logger.info(u"Caminho do PDF do artigo PID: %s, idioma: %s, %s",
                             self.xylose.publisher_id, lang, file_path)
 
                 pfile = self._open_asset(file_path)
 
-                logger.info(u"Bucket name:%s do PDF: %s", self.bucket_name,
+                logger.info(u"Bucket name: %s do PDF: %s", self.bucket_name,
                             file_path)
 
                 metadata = self.get_metadata()
@@ -290,14 +297,14 @@ class AssetPDF(Assets):
                     logger.info(u"UUID: %s para o PDF do artigo com PID: %s",
                                 uuid, self.xylose.publisher_id)
 
-                    pdfs.append({
+                    pdfs.update({
                         'type': file_type,
                         'language': lang,
                         'url': ssm_asset.get_urls()['url']
                     })
 
-        logger.info(u"PDF(s): %s cadastrado(s) para o artigo com PID: %s",
-                    pdfs, self.xylose.publisher_id)
+                    logger.info(u"PDF(s): %s cadastrado(s) para o artigo com PID: %s",
+                                pdfs, self.xylose.publisher_id)
 
         if pdfs:
             return pdfs
@@ -329,12 +336,12 @@ class AssetXML(Assets):
                     self.xylose.publisher_id)
 
         if 'xml' not in self.get_assets():
-            msg_error = u"Nao existe XML para o artigo PID: %s" % self.xylose.publisher_id
+            msg_error = u"Nao existe XML para o artigo, PID: %s" % self.xylose.publisher_id
             logger.info(msg_error)
             raise Exception(msg_error)
         else:
-            logger.info(u"Lista de XML existente para o artigo PID: %s",
-                        self.xylose.publisher_id)
+            logger.info(u"XML existente para o artigo, PID: %s",
+                        self.get_assets().get('xml'))
 
         file_name = self.get_assets().get('xml')
         file_path = self._get_path(self.get_assets().get('xml'))
@@ -356,7 +363,7 @@ class AssetXML(Assets):
                                self.get_metadata(), self.bucket_name)
 
         if ssm_asset.exists():
-            logger.info(u"Ja existe um XML com PID: %s e colecao: %s, cadastrado",
+            logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado",
                         self.xylose.publisher_id, self.xylose.collection_acronym)
         else:
             uuid = ssm_asset.register()
@@ -367,10 +374,117 @@ class AssetXML(Assets):
             logger.info(u"XML: %s cadastrado(s) para o artigo com PID: %s",
                         file_name, self.xylose.publisher_id)
 
-            return ssm_asset.get_urls()['url']
+            return (uuid, ssm_asset.get_urls()['url'])
 
 
 class AssetHTMLS(Assets):
 
-    def register(self):
-        pass
+    def _get_name(self, lang):
+
+        original_lang = self.xylose.original_language()
+
+        file_code = self.xylose.file_code()
+
+        prefix = '' if lang == original_lang else '%s_' % lang
+
+        return '{}{}.html'.format(prefix, file_code)
+
+    def generate_htmls(self, content):
+        """
+        Generates HTML contents from XML for all the text languages.
+        """
+        htmls, errors = generate_htmls(content)
+
+        if errors:
+            for error in errors:
+                logger.error("Erro gerando o HTML: ", error)
+
+        return htmls
+
+    def add_htmls(self, htmls, xml_version=True):
+        """
+        Method to add html from a dictionary with language as key and the html
+        as value.
+
+        Params:
+            :param htmls: Dictionary {'lang': 'html'}
+            :param version: Indicates whether the html version is xml or not
+
+        Return a dictionary with all asset registered.
+        """
+
+        file_type = 'html'
+        registered_htmls = {}
+
+        for lang, html in htmls.items():
+
+            metadata = self.get_metadata()
+            metadata.update({'bucket_name': self.bucket_name,
+                             'type': file_type,
+                             'version': 'html' if not xml_version else 'xml'})
+
+            # Se for versão HTML
+            if not xml_version:
+
+                # É necessário fazer o mesmo procedicmento que é relizado no XML
+                # Cadastrar as medias e alterar o caminho diretamente no HTML
+                self.content = html
+                registered_media = self.register_media()
+
+                logger.info(u"Medias cadastradas para o PID: %s", registered_media)
+
+                self._change_img_path(registered_media)  # change self.content
+
+                html = self.content
+
+            ssm_asset = SSMHandler(StringIO(html.encode('utf-8')),
+                                   self._get_name(lang),
+                                   file_type,
+                                   metadata,
+                                   self.bucket_name)
+
+            if ssm_asset.exists():
+                logger.info(u"Já existe um HTML com PID: %s e coleção: %s, cadastrado",
+                            self.xylose.publisher_id, self.xylose.collection_acronym)
+            else:
+                uuid = ssm_asset.register()
+
+                logger.info(u"UUID: %s para XML do artigo com PID: %s",
+                            uuid, self.xylose.publisher_id)
+
+                registered_htmls.update({'type': file_type,
+                                         'language': lang,
+                                         'url': ssm_asset.get_urls()['url']
+                                         })
+        return registered_htmls
+
+    def register(self, uuid=None):
+        """
+        Method to register the HTML(s) of the asset.
+
+        This method consider if not uuid: It`s a HTML version else: is a XML
+        version.
+        """
+
+        if uuid:
+
+            ssm_handler = SSMHandler()  # asset handler "vazio"
+
+            exists, asset = ssm_handler.get_asset(uuid)
+
+            if exists:
+                generated_htmls = self.generate_htmls(StringIO(asset['file']))
+
+                return self.add_htmls(generated_htmls)
+
+            else:
+                logger.error("Ativo não existente: %s", asset)
+
+        else:
+            htmls = self.xylose.translated_htmls()
+
+            if htmls:
+                return self.add_htmls(htmls, False)
+            else:
+                logger.info(u"Artigo com o PID: %s, não tem HTML",
+                            self.xylose.publisher_id)

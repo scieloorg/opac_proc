@@ -5,7 +5,7 @@ from lxml import etree
 
 
 class XMLError(Exception):
-    """ Represents errors that would block HTMLGenerator instance from
+    """Represents errors that would block HTMLGenerator instance from
     being created.
     """
 
@@ -20,10 +20,11 @@ def get_htmlgenerator(parsed_xml, no_network, no_checks, css):
     return generator
 
 
-def generate_htmls(xml, css):
+def generate_htmls(xml, css=None):
     errors = []
     files = {}
     html_generator = None
+
     try:
         _xml = etree.parse(xml)
     except:
