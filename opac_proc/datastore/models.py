@@ -2,6 +2,7 @@
 from mongoengine import DynamicDocument, signals
 from base_mixin import BaseMixin
 
+from opac_proc.web import config
 
 # #### EXTRACT MODELS
 
@@ -362,27 +363,35 @@ signals.post_save.connect(LoadNews.post_save, sender=LoadNews)
 
 class ExtractLog(DynamicDocument):
     meta = {
+        'max_size': 104857600,  # 100 MB (104857600 Bytes)
+        'max_documents': 100000,
         'collection': 'extract_log',
-        'db_alias': 'opac_proc_logs',
+        'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
     }
 
 
 class TransformLog(DynamicDocument):
     meta = {
+        'max_size': 104857600,  # 100 MB (104857600 Bytes)
+        'max_documents': 100000,
         'collection': 'transform_log',
-        'db_alias': 'opac_proc_logs',
+        'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
     }
 
 
 class LoadLog(DynamicDocument):
     meta = {
+        'max_size': 104857600,  # 100 MB (104857600 Bytes)
+        'max_documents': 100000,
         'collection': 'load_log',
-        'db_alias': 'opac_proc_logs',
+        'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
     }
 
 
 class DefaultLog(DynamicDocument):
     meta = {
+        'max_size': 104857600,  # 100 MB (104857600 Bytes)
+        'max_documents': 100000,
         'collection': 'default_log',
-        'db_alias': 'opac_proc_logs',
+        'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
     }
