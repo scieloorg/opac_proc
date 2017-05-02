@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import time
+import hashlib
 from datetime import datetime
 
 from opac_ssm_api.client import Client
@@ -8,15 +9,15 @@ from opac_ssm_api.client import Client
 from opac_proc.web import config
 
 
-class AssetHandler(object):
+class SSMHandler(object):
 
-    def __init__(self, pfile, filename, filetype, metadata, bucket_name,
-                attempts=5, sleep_attempts=2):
+    def __init__(self, pfile=None, filename=None, filetype=None, metadata=None,
+                 bucket_name=None, attempts=5, sleep_attempts=2):
         """
-        Asset handler.
+        SSM handler.
 
         Params:
-            :param pfile: pfile path (Mandatory) or a file pointer
+            :param pfile: must be always a file pointer
             :param filetype: string
             :param metadata: dict
             :param filename: filename is mandatory
@@ -25,10 +26,7 @@ class AssetHandler(object):
             :param attempts: sleep time for each attemtps to add any asset (second).
         """
 
-        if pfile is None:
-            raise ValueError('Valor inválido de arquivo para registrar no SSM')
-        else:
-            self.pfile = pfile
+        self.pfile = pfile
 
         self.ssm_client = Client(config.OPAC_SSM_GRPC_SERVER_HOST,
                                  config.OPAC_SSM_GRPC_SERVER_PORT)
@@ -41,6 +39,28 @@ class AssetHandler(object):
         self.uuid = None
         self.attempts = attempts
         self.sleep_attempts = sleep_attempts
+
+    @property
+    def _checksum_sha256(self):
+        """
+        Get sha256 checksum of asset.
+
+        Return a string result of the checksum
+        """
+        position = self.pfile.tell()
+
+        try:
+            content = self.pfile.read()
+
+            _hex = hashlib.sha256(content).hexdigest()
+
+        finally:
+            self.pfile.seek(position)
+
+        return _hex
+
+    def get_asset(self, uuid):
+        return self.ssm_client.get_asset(uuid)
 
     def register(self):
         """
@@ -104,3 +124,28 @@ class AssetHandler(object):
             raise Exception(data['error_message'])
 
         return data
+
+    def exists(self):
+        """
+        Check if asset already exists in backend.
+
+        if it exists return list [asset, asset.....]
+
+        if this not exists return empty list []
+
+        The creteria was use the PID, collection and checksum of asset to
+        determine if it exists
+        """
+
+        #  Utilizamos um lista utilizarmos o arquivo de configuração no futuro.
+        creteria = set(['pid', 'collection'])
+        metadata = set(self.metadata.keys())
+        intersection = set(creteria & metadata)
+
+        if creteria == intersection:
+            return self.ssm_client.query_asset(self._checksum_sha256, {
+                                               'pid': self.metadata['pid'],
+                                               'collection': self.metadata['collection']
+                                               })
+        else:
+            raise ValueError(u'O param metadata do ativo teve conter: %s', ', '.join(creteria))

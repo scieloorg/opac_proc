@@ -1,5 +1,4 @@
 # coding: utf-8
-import os
 from datetime import datetime
 
 from xylose.scielodocument import Article
@@ -15,7 +14,7 @@ from opac_proc.extractors.decorators import update_metadata
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
 
-from opac_proc.core.asset_handler import AssetHandler
+from opac_proc.core.assets import AssetPDF, AssetXML, AssetHTMLS
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
@@ -140,103 +139,28 @@ class ArticleTransformer(BaseTransformer):
 
         # PDFs
         if hasattr(xylose_article, 'xml_languages') or hasattr(xylose_article, 'fulltexts'):
+            asset_pdf = AssetPDF(xylose_article)
 
-            pdfs = []
-            langs = set()
+            pdfs = asset_pdf.register()
 
-            article_pid = xylose_article.publisher_id
-            article_version = xylose_article.data_model_version
+            if pdfs:
+                self.transform_model_instance['pdfs'] = pdfs
 
-            logger.info(u"Artigo PID: %s, ID: %s, tem a versão: %s",
-                        article_pid, uuid, article_version)
+        asset_html = AssetHTMLS(xylose_article)
 
-            if article_version == 'xml':
-                # Devemos coletar somente os idiomas do texto completo.
-                if hasattr(xylose_article, 'languages'):
-                    for lang in xylose_article.languages():
-                        langs.add(lang)
-            else:
+        # Versão XML do artigo
+        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
+            asset_xml = AssetXML(xylose_article)
 
-                if hasattr(xylose_article, 'fulltexts') and \
-                   'pdf' in xylose_article.fulltexts().keys():
+            uuid, xml_url = asset_xml.register()
 
-                    for lang in xylose_article.fulltexts().get('pdf').keys():
-                        langs.add(lang)
+            if xml_url:
+                self.transform_model_instance['xml'] = xml_url
+                self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
 
-            logger.info(u"Idiomas existentes no artigo PID: %s, ID: %s, idiomas: %s",
-                        article_pid, uuid, langs)
-
-            for lang in list(langs):
-                file_type = 'pdf'
-
-                original_lang = self.transform_model_instance['original_language']
-
-                logger.info(u"Idioma original do artigo PID: %s, ID: %s, original lang: %s",
-                            article_pid, uuid, original_lang)
-
-                if lang == original_lang:
-                    prefix = ''
-                else:
-                    prefix = '%s_' % lang
-
-                file_path = '%s/%s/%s/%s%s.pdf' % (config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH,
-                                 xylose_article.journal.acronym.lower(),
-                                 xylose_article.assets_code,
-                                 prefix,
-                                 xylose_article.file_code())
-
-                logger.info(u"Caminho do PDF do artigo com PID: %s e ID: %s, caminho: %s",
-                            article_pid, uuid, file_path)
-
-                try:
-                    pfile = open(file_path, 'rb')
-                except IOError as e:
-                    logger.error(u'Erro ao tentar abri o PDF: %s, do artigo com PID: %s',
-                                 file_path, pid)
-                    raise Exception(u'Erro ao tentar abri o PDF: %s', file_path)
-                else:
-
-                    file_name = os.path.basename(file_path)
-
-                    logger.info(u"Nome do PDF do artigo com PID: %s e ID: %s, nome: %s",
-                                article_pid, uuid, file_name)
-
-                    article_folder = xylose_article.file_code()
-                    issue_folder = xylose_article.assets_code
-                    journal_folder = xylose_article.journal.acronym.lower()
-
-                    bucket_name = '/'.join([journal_folder, issue_folder])
-
-                    logger.info(u"Bucket name do PDF do artigo com PID: %s e ID: %s, bucket name: %s",
-                                article_pid, uuid, bucket_name)
-
-                    file_meta = {
-                                 'article_pid': article_pid,
-                                 'lang': lang,
-                                 'bucket_name': bucket_name,
-                                 'article_folder': xylose_article.file_code(),
-                                 'issue_folder': xylose_article.assets_code,
-                                 'journal_folder': xylose_article.journal.acronym.lower(),
-                                }
-
-                    asset = AssetHandler(pfile, file_name, file_type, file_meta,
-                                         bucket_name)
-
-                    uuid = asset.register()
-
-                    logger.info(u"UUID do artigo com PID: %s e ID: %s, cadastrado no SSM: %s",
-                                article_pid, uuid, uuid)
-
-                    pdfs.append({
-                        'type': file_type,
-                        'language': lang,
-                        'url': asset.get_urls()['url']
-                    })
-
-                logger.info(u"PDF cadastrado para o artigo com PID: %s e ID: %s, PDF: %s",
-                            article_pid, uuid, asset.get_urls()['url'])
-
-            self.transform_model_instance['pdfs'] = pdfs
+        # Versão HTML do artigo
+        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':
+            self.transform_model_instance['htmls'] = asset_html.register()
 
         # pid
         if hasattr(xylose_article, 'publisher_id'):
