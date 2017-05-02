@@ -9,15 +9,15 @@ from opac_ssm_api.client import Client
 from opac_proc.web import config
 
 
-class AssetHandler(object):
+class SSMHandler(object):
 
-    def __init__(self, pfile, filename, filetype, metadata, bucket_name,
-                 attempts=5, sleep_attempts=2):
+    def __init__(self, pfile=None, filename=None, filetype=None, metadata=None,
+                 bucket_name=None, attempts=5, sleep_attempts=2):
         """
-        Asset handler.
+        SSM handler.
 
         Params:
-            :param pfile: pfile path (Mandatory) or a file pointer
+            :param pfile: must be always a file pointer
             :param filetype: string
             :param metadata: dict
             :param filename: filename is mandatory
@@ -26,10 +26,7 @@ class AssetHandler(object):
             :param attempts: sleep time for each attemtps to add any asset (second).
         """
 
-        if pfile is None:
-            raise ValueError(u'Valor inválido de arquivo para registrar no SSM')
-        else:
-            self.pfile = pfile
+        self.pfile = pfile
 
         self.ssm_client = Client(config.OPAC_SSM_GRPC_SERVER_HOST,
                                  config.OPAC_SSM_GRPC_SERVER_PORT)
@@ -50,11 +47,20 @@ class AssetHandler(object):
 
         Return a string result of the checksum
         """
-        file_bytes = self.pfile.read()
+        position = self.pfile.tell()
 
-        self.pfile.seek(0)  # Refering point to the biginnig of the file
+        try:
+            content = self.pfile.read()
 
-        return hashlib.sha256(file_bytes).hexdigest()
+            _hex = hashlib.sha256(content).hexdigest()
+
+        finally:
+            self.pfile.seek(position)
+
+        return _hex
+
+    def get_asset(self, uuid):
+        return self.ssm_client.get_asset(uuid)
 
     def register(self):
         """
