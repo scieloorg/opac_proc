@@ -19,7 +19,7 @@ Flask-WTF==0.14.2
 gunicorn==19.7.1
 gevent==1.2.1
 itsdangerous==0.24
-python-slugify==1.2.1
+python-slugify==1.2.3
 -e git+https://github.com/robertatakenaka/packtools.git@master#egg=packtools
 -e git+https://github.com/scieloorg/opac_ssm_api@v0.2.0#egg=opac_ssm_api
 raven[flask]==6.0.0
