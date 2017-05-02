@@ -143,8 +143,6 @@ class ArticleTransformer(BaseTransformer):
 
             pdfs = asset_pdf.register()
 
-            logger.info("pdf_url %s", pdfs)
-
             if pdfs:
                 self.transform_model_instance['pdfs'] = pdfs
 
@@ -154,11 +152,11 @@ class ArticleTransformer(BaseTransformer):
         if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
             asset_xml = AssetXML(xylose_article)
 
-            xml_url = asset_xml.register()
+            uuid, xml_url = asset_xml.register()
 
             if xml_url:
-                uuid, self.transform_model_instance['xml'] = xml_url
-                self.transform_model_instance['htmls'] = asset_html.register(uuid)
+                self.transform_model_instance['xml'] = xml_url
+                self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
 
         # Versão HTML do artigo
         if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':

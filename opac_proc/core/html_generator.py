@@ -48,11 +48,8 @@ def generate_htmls(xml, css=None):
                 errors.append(
                     'Error converting etree {} to string. '.format(lang))
             else:
-                try:
-                    files[lang] = s.decode('utf-8')
-                except Exception as e:
-                    errors.append(
-                        'Error decoding html {} to string. '.format(lang))
+                files[lang] = s
+
     except Exception as e:
         errors.append('Error generating html for {}. '.format(xml))
         errors.append('{}'.format(e))

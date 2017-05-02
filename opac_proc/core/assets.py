@@ -1,6 +1,6 @@
 # coding: utf-8
 import re
-from StringIO import StringIO
+from io import BytesIO
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
@@ -47,6 +47,7 @@ class Assets(object):
         """
         Changes the path of the media in XML so that it is something accessible.
         """
+
         if medias:
             for media_name, url in medias.items():
                 self.content = self.content.replace(
@@ -193,7 +194,7 @@ class Assets(object):
                   }
         """
         file_type = 'img'  # Not all are images
-
+        existing_list = []
         registered_medias = {}
 
         medias = self._extract_media()
@@ -211,15 +212,12 @@ class Assets(object):
 
             existing_asset = ssm_asset.exists()
 
+            logger.info("Será que sempre existe as images? %s", existing_asset)
+
             if existing_asset:
                 logger.info(u"Já existe um media com PID: %s e colecao: %s, cadastrado: %s",
                             self.xylose.publisher_id, self.xylose.collection_acronym, existing_asset)
-
-                for asset in existing_asset:
-                    registered_medias.update({asset['filename']:
-                                              asset['full_absolute_url']})
-
-                break  # Finaliza o laço mais externo (medias)
+                existing_list = [asset for asset in existing_asset]
             else:
                 uuid = ssm_asset.register()
 
@@ -230,6 +228,14 @@ class Assets(object):
 
                 logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
                             registered_medias, self.xylose.publisher_id)
+
+        if existing_list:
+
+            for asset in existing_list:
+                registered_medias.update({asset['filename']:
+                                          asset['full_absolute_url']})
+
+            logger.info("Medias já existentes: %s", registered_medias)
 
         return registered_medias
 
@@ -352,15 +358,15 @@ class AssetXML(Assets):
 
         logger.info(u"Medias cadastradas para o PID: %s", registered_media)
 
-        logger.info(u"Alterando as medias:%s no artigo PiD: %s",
+        logger.info(u"Alterando as medias:%s no artigo PID: %s",
                     registered_media, self.xylose.publisher_id)
+
+        logger.info("Medias registradas %s", registered_media)
 
         self._change_img_path(registered_media)  # change self.content
 
-        logger.info("File path: %s", file_path)
-
-        ssm_asset = SSMHandler(StringIO(self.content), file_name, 'xml',
-                               self.get_metadata(), self.bucket_name)
+        ssm_asset = SSMHandler(BytesIO(self.content), file_name,
+                               'xml', self.get_metadata(), self.bucket_name)
 
         if ssm_asset.exists():
             logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado",
@@ -437,11 +443,14 @@ class AssetHTMLS(Assets):
 
                 html = self.content
 
-            ssm_asset = SSMHandler(StringIO(html.encode('utf-8')),
+            # XML or HTML
+            ssm_asset = SSMHandler(BytesIO(html),
                                    self._get_name(lang),
                                    file_type,
                                    metadata,
                                    self.bucket_name)
+
+            logger.info("Verificando se o asset existe: %s", ssm_asset.exists())
 
             if ssm_asset.exists():
                 logger.info(u"Já existe um HTML com PID: %s e coleção: %s, cadastrado",
@@ -458,33 +467,32 @@ class AssetHTMLS(Assets):
                                          })
         return registered_htmls
 
-    def register(self, uuid=None):
+    def register_from_xml(self, uuid):
         """
-        Method to register the HTML(s) of the asset.
+        Method to register the HTML(s) of the asset from XML version.
 
         This method consider if not uuid: It`s a HTML version else: is a XML
         version.
         """
 
-        if uuid:
+        ssm_handler = SSMHandler()  # asset handler "vazio"
 
-            ssm_handler = SSMHandler()  # asset handler "vazio"
+        exists, asset = ssm_handler.get_asset(uuid)
 
-            exists, asset = ssm_handler.get_asset(uuid)
+        if exists:
+            generated_htmls = self.generate_htmls(BytesIO(asset['file']))
 
-            if exists:
-                generated_htmls = self.generate_htmls(StringIO(asset['file']))
-
-                return self.add_htmls(generated_htmls)
-
-            else:
-                logger.error("Ativo não existente: %s", asset)
+            return self.add_htmls(generated_htmls)
 
         else:
-            htmls = self.xylose.translated_htmls()
+            logger.error("XML não existente: %s", asset)
 
-            if htmls:
-                return self.add_htmls(htmls, False)
-            else:
-                logger.info(u"Artigo com o PID: %s, não tem HTML",
-                            self.xylose.publisher_id)
+    def register(self):
+
+        htmls = self.xylose.translated_htmls()
+
+        if htmls:
+            return self.add_htmls(htmls, False)
+        else:
+            logger.info(u"Artigo com o PID: %s, não tem HTML",
+                        self.xylose.publisher_id)

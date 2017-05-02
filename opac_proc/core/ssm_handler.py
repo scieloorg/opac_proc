@@ -3,7 +3,6 @@
 import time
 import hashlib
 from datetime import datetime
-from StringIO import StringIO
 
 from opac_ssm_api.client import Client
 
@@ -12,7 +11,7 @@ from opac_proc.web import config
 
 class SSMHandler(object):
 
-    def __init__(self, pfile='', filename=None, filetype=None, metadata=None,
+    def __init__(self, pfile=None, filename=None, filetype=None, metadata=None,
                  bucket_name=None, attempts=5, sleep_attempts=2):
         """
         SSM handler.
@@ -27,8 +26,7 @@ class SSMHandler(object):
             :param attempts: sleep time for each attemtps to add any asset (second).
         """
 
-        if hasattr(pfile, 'read'):
-            self.pfile = pfile.read()
+        self.pfile = pfile
 
         self.ssm_client = Client(config.OPAC_SSM_GRPC_SERVER_HOST,
                                  config.OPAC_SSM_GRPC_SERVER_PORT)
@@ -49,11 +47,17 @@ class SSMHandler(object):
 
         Return a string result of the checksum
         """
-        # file_bytes = self.pfile.read()
+        position = self.pfile.tell()
 
-        # self.pfile.seek(0)  # Refering point to the biginnig of the file
+        try:
+            content = self.pfile.read()
 
-        return hashlib.sha256(self.pfile).hexdigest()
+            _hex = hashlib.sha256(content).hexdigest()
+
+        finally:
+            self.pfile.seek(position)
+
+        return _hex
 
     def get_asset(self, uuid):
         return self.ssm_client.get_asset(uuid)
@@ -80,9 +84,8 @@ class SSMHandler(object):
         if client_status == 'SERVING':
 
             self.metadata['registration_date'] = datetime.now().isoformat()
-            self.metadata['bytes'] = len(self.pfile)
 
-            self.uuid = self.ssm_client.add_asset(StringIO(self.pfile), self.name,
+            self.uuid = self.ssm_client.add_asset(self.pfile, self.name,
                                                   self.filetype, self.metadata,
                                                   self.bucket_name)
 
