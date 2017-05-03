@@ -106,9 +106,9 @@ services:
       - OPAC_SSM_PROTO_FILE_PORT=80
       - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
       # Static HTML Generator
-      - OPAC_PROC_ARTICLE_CSS_URL=http://localhost:8001/media/assets/css/scielo-article.css
-      - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://localhost:8001/media/assets/css/scielo-print.css
-      - OPAC_PROC_ARTICLE_JS_URL=http://localhost:8001/media/assets/js/scielo-article.js
+      - OPAC_PROC_ARTICLE_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-article.css
+      - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-print.css
+      - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
 
   webapp:
     build:
@@ -175,9 +175,9 @@ services:
       - OPAC_SSM_PROTO_FILE_PORT=80
       - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
       # Static HTML Generator
-      - OPAC_PROC_ARTICLE_CSS_URL=http://localhost:8001/media/assets/css/scielo-article.css
-      - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://localhost:8001/media/assets/css/scielo-print.css
-      - OPAC_PROC_ARTICLE_JS_URL=http://localhost:8001/media/assets/js/scielo-article.js
+      - OPAC_PROC_ARTICLE_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-article.css
+      - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-print.css
+      - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
 
     stdin_open: True
     tty: true
