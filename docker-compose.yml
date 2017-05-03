@@ -92,9 +92,10 @@ services:
       - OPAC_PROC_MAIL_USE_SSL='False'
       - OPAC_PROC_MAIL_USERNAME=None
       - OPAC_PROC_MAIL_PASSWORD=None
-
-      - OPAC_PROC_ASSETS_SOURCE_PDF_PATH=/app/data/pdf
-
+      # Static HTML Generator
+      - OPAC_PROC_ARTICLE_CSS_URL=http://localhost:8001/media/assets/css/scielo-article.css
+      - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://localhost:8001/media/assets/css/scielo-print.css
+      - OPAC_PROC_ARTICLE_JS_URL=http://localhost:8001/media/assets/js/scielo-article.js
   webapp:
     images: scieloorg/opac_proc
     user: nobody
@@ -154,5 +155,7 @@ services:
       - OPAC_PROC_MAIL_USE_SSL=False
       - OPAC_PROC_MAIL_USERNAME=None
       - OPAC_PROC_MAIL_PASSWORD=None
-
-      - OPAC_PROC_ASSETS_SOURCE_PDF_PATH=/app/data/pdf
+      # Static HTML Generator
+      - OPAC_PROC_ARTICLE_CSS_URL=http://localhost:8001/media/assets/css/scielo-article.css
+      - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://localhost:8001/media/assets/css/scielo-print.css
+      - OPAC_PROC_ARTICLE_JS_URL=http://localhost:8001/media/assets/js/scielo-article.js
