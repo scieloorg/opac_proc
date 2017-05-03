@@ -395,11 +395,18 @@ class AssetHTMLS(Assets):
 
         return '{}{}.html'.format(prefix, file_code)
 
-    def generate_htmls(self, content):
+    def generate_htmls(self, content, css=None, print_css=None, js=None):
         """
         Generates HTML contents from XML for all the text languages.
         """
-        htmls, errors = generate_htmls(content)
+        if not css:
+            css = config.OPAC_PROC_ARTICLE_CSS_URL
+        if not js:
+            js = config.OPAC_PROC_ARTICLE_JS_URL
+        if not print_css:
+            print_css = config.OPAC_PROC_ARTICLE_PRINT_CSS_URL
+
+        htmls, errors = generate_htmls(content, css, print_css, js)
 
         if errors:
             for error in errors:

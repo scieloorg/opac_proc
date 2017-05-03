@@ -10,17 +10,17 @@ class XMLError(Exception):
     """
 
 
-def get_htmlgenerator(parsed_xml, no_network, no_checks, css):
+def get_htmlgenerator(parsed_xml, no_network, no_checks, css, print_css, js):
     try:
         generator = packtools.HTMLGenerator.parse(
-            parsed_xml, valid_only=not no_checks, css=css)
+            parsed_xml, valid_only=not no_checks, css=css, print_css=print_css, js=js)
     except ValueError as e:
         raise XMLError('Error reading %s. %s.' % (e, ))
 
     return generator
 
 
-def generate_htmls(xml, css=None):
+def generate_htmls(xml, css=None, print_css=None, js=None):
     errors = []
     files = {}
     html_generator = None
@@ -31,7 +31,7 @@ def generate_htmls(xml, css=None):
         _xml = xml
 
     try:
-        html_generator = get_htmlgenerator(_xml, False, True, css)
+        html_generator = get_htmlgenerator(_xml, False, True, css, print_css, js)
     except XMLError as e:
         errors.append('Error getting htmlgenerator for {}. '.format(xml))
 
