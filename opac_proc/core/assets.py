@@ -268,7 +268,7 @@ class AssetPDF(Assets):
         if 'pdf' not in self.get_assets():
             msg_error = u"Não existe PDF para o artigo PID: %s" % self.xylose.publisher_id
             logger.info(msg_error)
-            raise Exception(msg_error)
+            # raise Exception(msg_error)
         else:
             logger.info(u"Lista de PDF(s) existente para o artigo PID: %s",
                         self.get_assets().get('pdf'))
@@ -344,7 +344,7 @@ class AssetXML(Assets):
         if 'xml' not in self.get_assets():
             msg_error = u"Nao existe XML para o artigo, PID: %s" % self.xylose.publisher_id
             logger.info(msg_error)
-            raise Exception(msg_error)
+            # raise Exception(msg_error)
         else:
             logger.info(u"XML existente para o artigo, PID: %s",
                         self.get_assets().get('xml'))
