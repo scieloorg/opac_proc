@@ -273,44 +273,44 @@ class AssetPDF(Assets):
             logger.info(u"Lista de PDF(s) existente para o artigo PID: %s",
                         self.get_assets().get('pdf'))
 
-        for item in self.get_assets().get('pdf'):
-            for lang, pdf_name in item.items():
-                file_path = self._get_path(pdf_name)
+            for item in self.get_assets().get('pdf'):
+                for lang, pdf_name in item.items():
+                    file_path = self._get_path(pdf_name)
 
-                logger.info(u"Caminho do PDF do artigo PID: %s, idioma: %s, %s",
-                            self.xylose.publisher_id, lang, file_path)
+                    logger.info(u"Caminho do PDF do artigo PID: %s, idioma: %s, %s",
+                                self.xylose.publisher_id, lang, file_path)
 
-                pfile = self._open_asset(file_path)
+                    pfile = self._open_asset(file_path)
 
-                logger.info(u"Bucket name: %s do PDF: %s", self.bucket_name,
-                            file_path)
+                    logger.info(u"Bucket name: %s do PDF: %s", self.bucket_name,
+                                file_path)
 
-                metadata = self.get_metadata()
-                metadata.update({'lang': lang,
-                                 'file_path': file_path,
-                                 'bucket_name': self.bucket_name,
-                                 'type': file_type})
+                    metadata = self.get_metadata()
+                    metadata.update({'lang': lang,
+                                     'file_path': file_path,
+                                     'bucket_name': self.bucket_name,
+                                     'type': file_type})
 
-                ssm_asset = SSMHandler(pfile, pdf_name, file_type, metadata,
-                                       self.bucket_name)
+                    ssm_asset = SSMHandler(pfile, pdf_name, file_type, metadata,
+                                           self.bucket_name)
 
-                if ssm_asset.exists():
-                    logger.info(u"Já existe um PDF com PID: %s e coleção: %s, cadastrado",
-                                self.xylose.publisher_id, self.xylose.collection_acronym)
-                else:
-                    uuid = ssm_asset.register()
+                    if ssm_asset.exists():
+                        logger.info(u"Já existe um PDF com PID: %s e coleção: %s, cadastrado",
+                                    self.xylose.publisher_id, self.xylose.collection_acronym)
+                    else:
+                        uuid = ssm_asset.register()
 
-                    logger.info(u"UUID: %s para o PDF do artigo com PID: %s",
-                                uuid, self.xylose.publisher_id)
+                        logger.info(u"UUID: %s para o PDF do artigo com PID: %s",
+                                    uuid, self.xylose.publisher_id)
 
-                    pdfs.update({
-                        'type': file_type,
-                        'language': lang,
-                        'url': ssm_asset.get_urls()['url']
-                    })
+                        pdfs.update({
+                            'type': file_type,
+                            'language': lang,
+                            'url': ssm_asset.get_urls()['url']
+                        })
 
-                    logger.info(u"PDF(s): %s cadastrado(s) para o artigo com PID: %s",
-                                pdfs, self.xylose.publisher_id)
+                        logger.info(u"PDF(s): %s cadastrado(s) para o artigo com PID: %s",
+                                    pdfs, self.xylose.publisher_id)
 
         if pdfs:
             return pdfs
@@ -349,38 +349,38 @@ class AssetXML(Assets):
             logger.info(u"XML existente para o artigo, PID: %s",
                         self.get_assets().get('xml'))
 
-        file_name = self.get_assets().get('xml')
-        file_path = self._get_path(self.get_assets().get('xml'))
+            file_name = self.get_assets().get('xml')
+            file_path = self._get_path(self.get_assets().get('xml'))
 
-        self.content = self._open_asset(file_path, mode='r').read()
+            self.content = self._open_asset(file_path, mode='r').read()
 
-        registered_media = self.register_media()
+            registered_media = self.register_media()
 
-        logger.info(u"Medias cadastradas para o PID: %s", registered_media)
+            logger.info(u"Medias cadastradas para o PID: %s", registered_media)
 
-        logger.info(u"Alterando as medias:%s no artigo PID: %s",
-                    registered_media, self.xylose.publisher_id)
+            logger.info(u"Alterando as medias:%s no artigo PID: %s",
+                        registered_media, self.xylose.publisher_id)
 
-        logger.info("Medias registradas %s", registered_media)
+            logger.info("Medias registradas %s", registered_media)
 
-        self._change_img_path(registered_media)  # change self.content
+            self._change_img_path(registered_media)  # change self.content
 
-        ssm_asset = SSMHandler(BytesIO(self.content), file_name,
-                               'xml', self.get_metadata(), self.bucket_name)
+            ssm_asset = SSMHandler(BytesIO(self.content), file_name,
+                                   'xml', self.get_metadata(), self.bucket_name)
 
-        if ssm_asset.exists():
-            logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado",
-                        self.xylose.publisher_id, self.xylose.collection_acronym)
-        else:
-            uuid = ssm_asset.register()
+            if ssm_asset.exists():
+                logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado",
+                            self.xylose.publisher_id, self.xylose.collection_acronym)
+            else:
+                uuid = ssm_asset.register()
 
-            logger.info(u"UUID: %s para XML do artigo com PID: %s",
-                        uuid, self.xylose.publisher_id)
+                logger.info(u"UUID: %s para XML do artigo com PID: %s",
+                            uuid, self.xylose.publisher_id)
 
-            logger.info(u"XML: %s cadastrado(s) para o artigo com PID: %s",
-                        file_name, self.xylose.publisher_id)
+                logger.info(u"XML: %s cadastrado(s) para o artigo com PID: %s",
+                            file_name, self.xylose.publisher_id)
 
-            return (uuid, ssm_asset.get_urls()['url'])
+                return (uuid, ssm_asset.get_urls()['url'])
 
 
 class AssetHTMLS(Assets):
