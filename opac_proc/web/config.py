@@ -161,6 +161,10 @@ OPAC_PROC_ASSETS_SOURCE_PDF_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_PDF_P
 OPAC_PROC_ASSETS_SOURCE_XML_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_XML_PATH', '/app/data/xml')
 OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH', '/app/data/img')
 
+OPAC_PROC_ARTICLE_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_CSS_URL', None)
+OPAC_PROC_ARTICLE_PRINT_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_PRINT_CSS_URL', None)
+OPAC_PROC_ARTICLE_JS_URL = os.environ.get('OPAC_PROC_ARTICLE_JS_URL', None)
+
 # Habilitar/Desabilitar o form de registro
 WEB_REGISTRATION_ENABLED = os.environ.get('OPAC_PROC_WEB_REGISTRATION_ENABLED', 'False') == 'True'
 # True/False para requerir ou não confirmação de email no processo de registro/login
