@@ -5,14 +5,20 @@ from bson.objectid import ObjectId
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
-from opac_proc.extractors.process import ExtractProcess
+from opac_proc.extractors.process import (
+    ProcessExtractCollection,
+    ProcessExtractJournal,
+    ProcessExtractIssue,
+    ProcessExtractArticle,
+    ProcessExtractPressRelease,
+    ProcessExtractNews
+)
 
 OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 
 class ExtractBaseListView(ListView):
     stage = 'extract'
-    process_class = ExtractProcess
     can_create = True
     can_update = True
     can_delete = True
@@ -20,6 +26,7 @@ class ExtractBaseListView(ListView):
 
 class ExtractCollectionListView(ExtractBaseListView):
     model_class = models.ExtractCollection
+    process_class = ProcessExtractCollection
     model_name = 'collection'
     page_title = "Extract: Collection"
     list_columns = [
@@ -91,6 +98,7 @@ class ExtractCollectionListView(ExtractBaseListView):
 
 class ExtractJournalListView(ExtractBaseListView):
     model_class = models.ExtractJournal
+    process_class = ProcessExtractJournal
     model_name = 'journal'
     page_title = "Extract: Journals"
     list_columns = [
@@ -152,6 +160,7 @@ class ExtractJournalListView(ExtractBaseListView):
 
 class ExtractIssueListView(ExtractBaseListView):
     model_class = models.ExtractIssue
+    process_class = ProcessExtractIssue
     model_name = 'issue'
     page_title = "Extract: Issues"
     list_columns = [
@@ -212,6 +221,7 @@ class ExtractIssueListView(ExtractBaseListView):
 
 class ExtractArticleListView(ExtractBaseListView):
     model_class = models.ExtractArticle
+    process_class = ProcessExtractArticle
     model_name = 'article'
     page_title = "Extract: Articles"
     list_columns = [
@@ -273,6 +283,7 @@ class ExtractArticleListView(ExtractBaseListView):
 
 class ExtractPressReleaseListView(ExtractBaseListView):
     model_class = models.ExtractPressRelease
+    process_class = ProcessExtractPressRelease
     model_name = 'press_release'
     page_title = "Extract: Press Releases"
     list_columns = [
@@ -354,6 +365,7 @@ class ExtractPressReleaseListView(ExtractBaseListView):
 
 class ExtractNewsListView(ExtractBaseListView):
     model_class = models.ExtractNews
+    process_class = ProcessExtractNews
     model_name = 'news'
     page_title = "Extract: News"
     list_columns = [

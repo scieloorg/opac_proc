@@ -20,7 +20,9 @@ LABEL org.label-schema.build-date=$OPAC_PROC_BUILD_DATE \
       org.label-schema.version=$OPAC_PROC_WEBAPP_VERSION \
       org.label-schema.schema-version="1.0"
 
-RUN apt-get update && apt-get install -qqy apt-utils libxml2-utils
+RUN apt-get update \
+    && apt-get install -qqy --no-install-recommends apt-utils libxml2-utils \
+    && rm -rf /var/lib/apt/lists/*
 
 # COPY ./requirements.txt /app/requirements.txt
 COPY . /app
