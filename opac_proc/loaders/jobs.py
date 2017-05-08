@@ -32,7 +32,6 @@ def task_collection_update(ids=None):
     stage = 'load'
     model = 'collection'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     if ids is None:  # update all collections
         models.LoadCollection.objects.all().update(must_reprocess=True)
@@ -54,7 +53,6 @@ def task_collection_create():
     stage = 'load'
     model = 'collection'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     for collection in models.TransformCollection.objects.all():
         r_queues.enqueue(stage, model, task_load_collection, collection.uuid)
@@ -73,7 +71,6 @@ def task_journal_update(ids=None):
     stage = 'load'
     model = 'journal'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     if ids is None:  # update all collections
         models.LoadJournal.objects.all().update(must_reprocess=True)
@@ -95,7 +92,6 @@ def task_journal_create():
     stage = 'load'
     model = 'journal'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     for journal in models.TransformJournal.objects.all():
         r_queues.enqueue(
@@ -112,12 +108,11 @@ def task_load_issue(uuid):
     i_loader.load()
 
 
-def task_issue_create(ids=None):
+def task_issue_update(ids=None):
     get_db_connection()
     stage = 'load'
     model = 'issue'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     if ids is None:  # update all collections
         models.LoadIssue.objects.all().update(must_reprocess=True)
@@ -138,12 +133,11 @@ def task_issue_create(ids=None):
                 logger.error('models.LoadIssue %s. pk: %s' % (str(e), oid))
 
 
-def task_issue_update():
+def task_issue_create():
     get_db_connection()
     stage = 'load'
     model = 'issue'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     for issue in models.TransformIssue.objects.all():
         r_queues.enqueue(
@@ -165,7 +159,6 @@ def task_article_update(ids=None):
     stage = 'load'
     model = 'article'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     if ids is None:  # update all collections
         models.LoadArticle.objects.all().update(must_reprocess=True)
@@ -191,7 +184,6 @@ def task_article_create():
     stage = 'load'
     model = 'article'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     for article in models.TransformArticle.objects.all():
         r_queues.enqueue(
@@ -213,7 +205,6 @@ def task_press_release_update(ids=None):
     stage = 'load'
     model = 'press_release'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     if ids is None:  # update all Press Releases
         models.LoadPressRelease.objects.all().update(must_reprocess=True)
@@ -239,7 +230,6 @@ def task_press_release_create():
     stage = 'load'
     model = 'press_release'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     for press_release in models.TransformPressRelease.objects.all():
         r_queues.enqueue(
@@ -261,7 +251,6 @@ def task_news_update(ids=None):
     stage = 'load'
     model = 'news'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     if ids is None:  # update all Press Releases
         models.LoadNews.objects.all().update(must_reprocess=True)
@@ -287,7 +276,6 @@ def task_news_create():
     stage = 'load'
     model = 'news'
     r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
 
     for news in models.TransformNews.objects.all():
         r_queues.enqueue(
