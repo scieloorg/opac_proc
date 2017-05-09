@@ -5,14 +5,20 @@ from bson.objectid import ObjectId
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
-from opac_proc.transformers.process import TransformProcess
+from opac_proc.transformers.process import (
+    ProcessTransformCollection,
+    ProcessTransformJournal,
+    ProcessTransformIssue,
+    ProcessTransformArticle,
+    ProcessTransformPressRelease,
+    ProcessTransformNews
+)
 
 OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 
 class TransformBaseListView(ListView):
     stage = 'transform'
-    process_class = TransformProcess
     can_create = True
     can_update = True
     can_delete = True
@@ -20,6 +26,7 @@ class TransformBaseListView(ListView):
 
 class TransformCollectionListView(TransformBaseListView):
     model_class = models.TransformCollection
+    process_class = ProcessTransformCollection
     model_name = 'collection'
     page_title = "Transform: Collection"
     list_columns = [
@@ -91,6 +98,7 @@ class TransformCollectionListView(TransformBaseListView):
 
 class TransformJournalListView(TransformBaseListView):
     model_class = models.TransformJournal
+    process_class = ProcessTransformJournal
     model_name = 'journal'
     page_title = "Transform: Journals"
     list_columns = [
@@ -172,6 +180,7 @@ class TransformJournalListView(TransformBaseListView):
 
 class TransformIssueListView(TransformBaseListView):
     model_class = models.TransformIssue
+    process_class = ProcessTransformIssue
     model_name = 'issue'
     page_title = "Transform: Issues"
     list_columns = [
@@ -243,6 +252,7 @@ class TransformIssueListView(TransformBaseListView):
 
 class TransformArticleListView(TransformBaseListView):
     model_class = models.TransformArticle
+    process_class = ProcessTransformArticle
     model_name = 'article'
     page_title = "Transform: Articles"
     list_columns = [
@@ -304,6 +314,7 @@ class TransformArticleListView(TransformBaseListView):
 
 class TransformPressReleaseListView(TransformBaseListView):
     model_class = models.TransformPressRelease
+    process_class = ProcessTransformPressRelease
     model_name = 'press_release'
     page_title = "Transform: Press Releases"
     list_columns = [
@@ -385,6 +396,7 @@ class TransformPressReleaseListView(TransformBaseListView):
 
 class TransformNewsListView(TransformBaseListView):
     model_class = models.TransformNews
+    process_class = ProcessTransformNews
     model_name = 'news'
     page_title = "Transform: News"
     list_columns = [

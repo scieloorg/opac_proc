@@ -98,7 +98,7 @@ class RQueues(Singleton):
     def get_queue(self, stage, model):
         queue = self.queues[stage][model]
         if queue is None:
-            queue = self.create_queue(model, stage)
+            queue = self.create_queue(stage, model)
         return queue
 
     def enqueue(self, stage, model, task, *args, **kwargs):

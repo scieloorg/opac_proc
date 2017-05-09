@@ -18,15 +18,17 @@ else:
 # Collections:
 
 
-def task_transform_collection(acronym):
+def task_transform_collection():
+    acronym = config.OPAC_PROC_COLLECTION
     transformer = CollectionTransformer(extract_model_key=acronym)
     transformer.transform()
     transformer.save()
 
 
-def task_reprocess_collections(ids=None):
+def task_collection_update(ids=None):
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'collection'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -34,8 +36,8 @@ def task_reprocess_collections(ids=None):
         models.TransformCollection.objects.all().update(must_reprocess=True)
         for collection in models.TransformCollection.objects.all():
             r_queues.enqueue(
-                stage, 'collection',
-                task_transform_collection, collection.acronym)
+                stage, model,
+                task_transform_collection)
     else:
         for oid in ids:
             try:
@@ -44,19 +46,20 @@ def task_reprocess_collections(ids=None):
                 obj.reload()
                 r_queues.enqueue(
                     stage, 'collection',
-                    task_transform_collection, obj.acronym)
+                    task_transform_collection)
             except Exception as e:
                 logger.error('models.TransformCollection %s. pk: %s', str(e), oid)
 
 
-def task_process_all_collections(acronym):
+def task_collection_create():
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'collection'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
     r_queues.enqueue(
-        stage, 'collection',
-        task_transform_collection, acronym)
+        stage, model,
+        task_transform_collection)
 
 
 # Journals:
@@ -68,9 +71,10 @@ def task_transform_journal(acronym, issn):
     transformer.save()
 
 
-def task_reprocess_journals(ids=None):
+def task_journal_update(ids=None):
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'journal'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
     collection = models.TransformCollection.objects.all().first()
@@ -83,7 +87,7 @@ def task_reprocess_journals(ids=None):
             if not issn:
                 raise ValueError(u'Journal sem issn')
             r_queues.enqueue(
-                stage, 'journal',
+                stage, model,
                 task_transform_journal, collection.acronym, issn)
     else:
         for oid in ids:
@@ -97,15 +101,16 @@ def task_reprocess_journals(ids=None):
                 if not issn:
                     raise ValueError(u'Journal sem issn')
                 r_queues.enqueue(
-                    stage, 'journal',
+                    stage, model,
                     task_transform_journal, collection.acronym, issn)
             except Exception as e:
                 logger.error('models.TransformJournal %s. pk: %s', str(e), oid)
 
 
-def task_process_all_journals():
+def task_journal_create():
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'journal'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -113,7 +118,7 @@ def task_process_all_journals():
 
     for child in collection.children_ids:
         r_queues.enqueue(
-            stage, 'journal',
+            stage, model,
             task_transform_journal, collection.acronym, child['issn'])
 
 
@@ -126,9 +131,10 @@ def task_transform_issue(acronym, issue_id):
     transformer.save()
 
 
-def task_reprocess_issues(ids=None):
+def task_issue_update(ids=None):
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'issue'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -136,7 +142,7 @@ def task_reprocess_issues(ids=None):
         models.TransformIssue.objects.all().update(must_reprocess=True)
         for issue in models.TransformIssue.objects.all():
             r_queues.enqueue(
-                stage, 'issue',
+                stage, model,
                 task_transform_issue, issue.code)
     else:
         for oid in ids:
@@ -145,15 +151,16 @@ def task_reprocess_issues(ids=None):
                 obj.update(must_reprocess=True)
                 obj.reload()
                 r_queues.enqueue(
-                    stage, 'issue',
+                    stage, model,
                     task_transform_issue, obj.code)
             except Exception as e:
                 logger.error('models.TransformIssue %s. pk: %s', str(e), oid)
 
 
-def task_process_all_issues():
+def task_issue_create():
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'issue'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -163,7 +170,7 @@ def task_process_all_issues():
         issues_ids = child['issues_ids']
         for issue_pid in issues_ids:
             r_queues.enqueue(
-                stage, 'issue',
+                stage, model,
                 task_transform_issue, collection.acronym, issue_pid)
 
 
@@ -176,9 +183,10 @@ def task_transform_article(acronym, article_id):
     transformer.save()
 
 
-def task_reprocess_articles(ids=None):
+def task_article_update(ids=None):
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'article'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -188,7 +196,7 @@ def task_reprocess_articles(ids=None):
         models.TransformArticle.objects.all().update(must_reprocess=True)
         for article in models.TransformArticle.objects.all():
             r_queues.enqueue(
-                stage, 'article',
+                stage, model,
                 task_transform_article, collection.acronym, article.pid)
     else:
         for oid in ids:
@@ -197,15 +205,16 @@ def task_reprocess_articles(ids=None):
                 obj.update(must_reprocess=True)
                 obj.reload()
                 r_queues.enqueue(
-                    stage, 'article',
+                    stage, model,
                     task_transform_article, collection.acronym, obj.pid)
             except Exception as e:
                 logger.error('models.TransformArticle %s. pk: %s', str(e), oid)
 
 
-def task_process_all_articles():
+def task_article_create():
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'article'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -215,7 +224,7 @@ def task_process_all_articles():
         articles_ids = child['articles_ids']
         for article_pid in articles_ids:
             r_queues.enqueue(
-                stage, 'article',
+                stage, model,
                 task_transform_article, collection.acronym, article_pid)
 
 
@@ -228,9 +237,10 @@ def task_transform_press_release(press_release_uuid):
     transformer.save()
 
 
-def task_reprocess_press_releases(ids=None):
+def task_press_release_update(ids=None):
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'press_release'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -238,7 +248,7 @@ def task_reprocess_press_releases(ids=None):
         models.TransformPressRelease.objects.all().update(must_reprocess=True)
         for pr in models.TransformPressRelease.objects.all():
             r_queues.enqueue(
-                stage, 'press_release',
+                stage, model,
                 task_transform_press_release, press_release_uuid=pr.uuid)
     else:
         for oid in ids:
@@ -247,21 +257,22 @@ def task_reprocess_press_releases(ids=None):
                 obj.update(must_reprocess=True)
                 obj.reload()
                 r_queues.enqueue(
-                    stage, 'press_release',
+                    stage, model,
                     task_transform_press_release, press_release_uuid=obj.uuid)
             except Exception as e:
                 logger.error('models.TransformPressRelease %s. pk: %s', str(e), oid)
 
 
-def task_process_all_press_releases():
+def task_press_release_create():
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'press_release'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
     for pr in models.ExtractPressRelease.objects.all():
         r_queues.enqueue(
-            stage, 'press_release',
+            stage, model,
             task_transform_press_release, press_release_uuid=pr.uuid)
 
 
@@ -274,9 +285,10 @@ def task_transform_news(news_uuid):
     transformer.save()
 
 
-def task_reprocess_news(ids=None):
+def task_news_update(ids=None):
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'news'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
@@ -284,7 +296,7 @@ def task_reprocess_news(ids=None):
         models.TransformNews.objects.all().update(must_reprocess=True)
         for news in models.TransformNews.objects.all():
             r_queues.enqueue(
-                stage, 'news',
+                stage, model,
                 task_transform_news, news_uuid=news.uuid)
     else:
         for oid in ids:
@@ -293,19 +305,20 @@ def task_reprocess_news(ids=None):
                 obj.update(must_reprocess=True)
                 obj.reload()
                 r_queues.enqueue(
-                    stage, 'news',
+                    stage, model,
                     task_transform_news, news_uuid=obj.uuid)
             except Exception as e:
                 logger.error('models.TransformNews %s. pk: %s', str(e), oid)
 
 
-def task_process_all_news():
+def task_news_create():
     get_db_connection()
-    stage = "transform"
+    stage = 'transform'
+    model = 'news'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
     for news in models.ExtractNews.objects.all():
         r_queues.enqueue(
-            stage, 'news',
+            stage, model,
             task_transform_news, news_uuid=news.uuid)
