@@ -1,0 +1,212 @@
+{% extends "object_detail/base.html" %}
+
+{% block content %}
+  {% include "includes/page_header.html" %}
+  <div class="panel panel-default">
+  <!-- Default panel contents -->
+    <div class="panel-heading">
+      <strong>Assunto:</strong>
+      {{ document.subject }}
+      <span class="pull-right">
+        <strong>Enviado:</strong>
+        {{ document.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+      </span>
+    </div>
+    <!-- Table -->
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Fase do processamento:</th>
+          <th class="col-md-2">Modelo:</th>
+          <th class="col-md-2">Não lida?:</th>
+          <th class="col-md-1">Açoes:</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ document.stage }}</td>
+          <td>{{ document.model_name|upper }}</td>
+          <td>
+            {% if document.unread %}
+              <i class="fa fa-check text-success" aria-hidden="true"></i>
+            {% else %}
+              <i class="fa fa-times text-danger" aria-hidden="true"></i>
+            {% endif %}
+          </td>
+          <td>
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-bars "></i> <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                {% if document.unread %}
+                  <li>
+                    <a id="message_mark_as_read" href="#">
+                      <i class="fa fa-envelope-open-o"></i> Marcar como lida
+                    </a>
+                  </li>
+                {% else %}
+                  <li>
+                    <a  id="message_mark_as_unread"href="#">
+                      <i class="fa fa-envelope-o"></i> Marcar como não lida
+                    </a>
+                  </li>
+                {% endif %}
+                <li>
+                  <a id="message_delete" href="#">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                    Remover
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="panel-body">
+      {% if document.body %}
+        <div class="well">
+          <p>
+            {{ document.body }}
+          </p>
+        </div>
+      {% else %}
+        <div class="alert alert-info" role="alert">
+          <i class="fa fa-info-circle"></i> Esta mensagem não tem conteúdo!
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script type="text/javascript">
+    "use strict";
+
+    var MessageActions = {
+      target_url: "{{ url_for('default.message_detail', object_id=document.id) }}",
+      message_id: "{{ document.id }}",
+      confirmation_msg: {
+        'ask_delete': 'Tem certeza que deseja remover esta mensagem?<br><br><strong>Esta operação não pode ser desfeita!</strong>',
+        'ask_unread': 'Tem certeza que deseja marcar como <strong>não lida</strong> esta mensagem?',
+        'ask_read': 'Tem certeza que deseja marcar como <strong>lida</strong> esta mensagem?',
+      },
+      show_loading_box: function(){
+        var dialog = bootbox.dialog({
+          message: '<p class="text-center">Please wait while we do something...<br><i class="fa fa-spin fa-spinner"></i></p>',
+          closeButton: false
+        });
+        dialog.modal();
+      },
+      show_error_box: function(error_msg){
+        bootbox.alert({
+          message: error_msg,
+          // size: 'small',
+          callback: function () {
+            window.location.reload();
+          }
+        });
+      },
+      ask_confirmation: function(msg, callback){
+        bootbox.confirm({
+          message: msg,
+          size: 'small',
+          buttons: {
+            confirm: {
+              label: '<i class="fa fa-check"></i> Confirm',
+              className: 'btn-success'
+            },
+            cancel: {
+              label: '<i class="fa fa-times"></i> Cancel',
+              className: 'btn-danger'
+            }
+          },
+          callback: function (result) {
+            if (result) {
+              callback();
+              MessageActions.show_loading_box();
+            }
+          }
+        });
+      },
+      ask_delete: function(){
+        this.ask_confirmation(this.confirmation_msg['ask_delete'], MessageActions.do_delete);
+      },
+      do_delete: function(){
+        $.ajax({
+          type: "DELETE",
+          url: MessageActions.target_url
+        }).done(function(data) {
+          window.location = data.location;
+        }).fail(function(jqXHR, textStatus, errorThrown){
+          console.log('AJAX error', jqXHR, textStatus, errorThrown);
+          var msg = 'Não foi possível processar sua ação! Erro: ' + jqXHR.responseText;
+          MessageActions.show_error_box(msg);
+        });
+      },
+      ask_mark_as_unread: function(){
+        this.ask_confirmation(this.confirmation_msg['ask_unread'], MessageActions.do_mark_as_unread);
+      },
+      do_mark_as_unread: function(){
+        $.ajax({
+          type: "PUT",
+          url: MessageActions.target_url,
+          data: { action: "mark_as_unread" },
+          dataType: 'json'
+        }).done(function(data) {
+          window.location = data.location;
+        }).fail(function(jqXHR, textStatus, errorThrown){
+          console.log('AJAX error', jqXHR, textStatus, errorThrown);
+          var msg = 'Não foi possível processar sua ação! Erro: ' + jqXHR.responseText;
+          MessageActions.show_error_box(msg);
+        });
+      },
+      ask_mark_as_read: function(){
+        this.ask_confirmation(this.confirmation_msg['ask_read'], MessageActions.do_mark_as_read);
+      },
+      do_mark_as_read: function(){
+        $.ajax({
+          type: "PUT",
+          url: MessageActions.target_url,
+          data: { action: "mark_as_read" },
+          dataType: 'json'
+        }).done(function(data) {
+          window.location = data.location;
+        }).fail(function(jqXHR, textStatus, errorThrown){
+          console.log('AJAX error', jqXHR, textStatus, errorThrown);
+          var msg = 'Não foi possível processar sua ação! Erro: ' + jqXHR.responseText;
+          MessageActions.show_error_box(msg);
+        });
+      },
+      init: function(delete_selector, set_unread_selector, set_read_selector){
+        var self = this;
+        $(delete_selector).click(function(event) {
+          event.preventDefault();
+          self.ask_delete();
+        });
+
+        $(set_unread_selector).click(function(event) {
+          event.preventDefault();
+          self.ask_mark_as_unread();
+        });
+
+        $(set_read_selector).click(function(event) {
+          event.preventDefault();
+          self.ask_mark_as_read();
+        });
+        return this;
+      }
+    }
+
+    $(function() {
+
+      var message_action = MessageActions.init(
+        '#message_delete',
+        '#message_mark_as_unread',
+        '#message_mark_as_read'
+      );
+
+    });
+  </script>
+{% endblock %}
