@@ -262,8 +262,8 @@ class AssetPDF(Assets):
         logger.info(u"Iniciando o cadasto do(s) PDF(s) do artigo PID: %s",
                     self.xylose.publisher_id)
 
+        pdfs = []
         file_type = 'pdf'
-        pdfs = {}
 
         if 'pdf' not in self.get_assets():
             msg_error = u"Não existe PDF para o artigo PID: %s" % self.xylose.publisher_id
@@ -303,7 +303,7 @@ class AssetPDF(Assets):
                         logger.info(u"UUID: %s para o PDF do artigo com PID: %s",
                                     uuid, self.xylose.publisher_id)
 
-                        pdfs.update({
+                        pdfs.append({
                             'type': file_type,
                             'language': lang,
                             'url': ssm_asset.get_urls()['url']
@@ -424,11 +424,11 @@ class AssetHTMLS(Assets):
             :param htmls: Dictionary {'lang': 'html'}
             :param version: Indicates whether the html version is xml or not
 
-        Return a dictionary with all asset registered.
+        Return a list of dictionary with all asset registered.
         """
 
+        registered_htmls = []
         file_type = 'html'
-        registered_htmls = {}
 
         for lang, html in htmls.items():
 
@@ -469,7 +469,7 @@ class AssetHTMLS(Assets):
                 logger.info(u"UUID: %s para XML do artigo com PID: %s",
                             uuid, self.xylose.publisher_id)
 
-                registered_htmls.update({'type': file_type,
+                registered_htmls.append({'type': file_type,
                                          'language': lang,
                                          'url': ssm_asset.get_urls()['url']
                                          })
