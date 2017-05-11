@@ -43,5 +43,6 @@ class DetailView(MethodView):
                     'page_title': self.page_title,
                     'page_subtitle': u'(%s)' % object_id,
                     'object_json': doc_json,
+                    'document': doc
                 }
                 return self.render_template(context)

@@ -49,6 +49,32 @@
       {% block content %}{% endblock %}
     </div><!-- /.container -->
 
+    <footer>
+      <hr>
+      <div class="text-center">
+        <ul class="list-inline">
+          {% if config.OPAC_PROC_BUILD_DATE %}
+            <li>{{ config.OPAC_PROC_BUILD_DATE }}</li>
+            <li> &bull; </li>
+          {% endif %}
+          {% if config.OPAC_PROC_VCS_REF %}
+            <li>{{ config.OPAC_PROC_VCS_REF }}</li>
+            <li> &bull; </li>
+          {% endif %}
+          {% if config.OPAC_PROC_WEBAPP_VERSION %}
+            <li>{{ config.OPAC_PROC_WEBAPP_VERSION }}</li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="text-center">
+        <i class="fa fa-bug"></i>
+        <a href="https://github.com/scieloorg/opac_proc/issues/new">
+          Reportar um erro
+        </a>
+        <i class="fa fa-bug"></i>
+      </div>
+    </footer>
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

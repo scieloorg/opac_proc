@@ -1,6 +1,5 @@
 # coding: utf-8
 from flask import render_template
-
 from mongoengine.context_managers import switch_db
 from opac_schema.v1.models import Collection as OpacCollection
 from opac_schema.v1.models import Journal as OpacJournal

@@ -1,5 +1,13 @@
 # coding: utf-8
-from mongoengine import DynamicDocument, signals
+from datetime import datetime
+from mongoengine import (
+    Document,
+    DynamicDocument,
+    signals,
+    StringField,
+    DateTimeField,
+    BooleanField
+)
 from base_mixin import BaseMixin
 
 from opac_proc.web import config
@@ -355,10 +363,27 @@ signals.pre_save.connect(LoadNews.pre_save, sender=LoadNews)
 signals.post_save.connect(LoadNews.post_save, sender=LoadNews)
 
 
-# #### LOGS
+# #### NOTIFICATIONS
 
-# TODO: Usar Capped Collections nos docuemntos de Logs
-# https://github.com/MongoEngine/mongoengine/blob/master/mongoengine/document.py#L112
+class Message(Document):
+    subject = StringField(max_length=50, default='')
+    body = StringField(default='')
+    stage = StringField(max_length=10, default='default')   # 'extract' | 'transform' | 'load'
+    model_name = StringField(max_length=15, default='')     # 'collection' | 'journal' | 'issue' | 'article' | 'pree_release' | 'news'
+    created_at = DateTimeField(default=datetime.now)
+    unread = BooleanField(required=True, default=True)
+
+    @classmethod  # signal pre_save (asociar em cada modelo)
+    def pre_save(cls, sender, document, **kwargs):
+        document.created_at = datetime.now()
+
+    meta = {
+        'collection': 'messages',
+    }
+
+signals.pre_save.connect(Message.pre_save, sender=Message)
+
+# #### LOGS
 
 
 class ExtractLog(DynamicDocument):
