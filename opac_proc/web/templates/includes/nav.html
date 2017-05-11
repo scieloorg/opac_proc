@@ -16,31 +16,31 @@
           {# EXTRACT #}
           <li class="dropdown {% if request.path.startswith('/extract/') %} active {% endif %}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              Extract <span class="caret"></span>
+              <i class="fa fa-download"></i> Extract <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li {% if request.path == url_for('extract_collection_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('extract_collection_list') }}">Collections</a>
+              <li {% if request.path == url_for('extract.collection_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('extract.collection_list') }}">Collections</a>
               </li>
-              <li {% if request.path == url_for('extract_journal_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('extract_journal_list') }}">Journals</a>
+              <li {% if request.path == url_for('extract.journal_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('extract.journal_list') }}">Journals</a>
               </li>
-              <li {% if request.path == url_for('extract_issue_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('extract_issue_list') }}">Issues</a>
+              <li {% if request.path == url_for('extract.issue_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('extract.issue_list') }}">Issues</a>
               </li>
-              <li {% if request.path == url_for('extract_article_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('extract_article_list') }}">Articles</a>
-              </li>
-              <li role="separator" class="divider"></li>
-              <li {% if request.path == url_for('extract_press_release_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('extract_press_release_list') }}">Press Releases</a>
-              </li>
-              <li {% if request.path == url_for('extract_news_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('extract_news_list') }}">News</a>
+              <li {% if request.path == url_for('extract.article_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('extract.article_list') }}">Articles</a>
               </li>
               <li role="separator" class="divider"></li>
-              <li {% if request.path == url_for('extract_logs_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('extract_logs_list') }}">Logs</a>
+              <li {% if request.path == url_for('extract.press_release_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('extract.press_release_list') }}">Press Releases</a>
+              </li>
+              <li {% if request.path == url_for('extract.news_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('extract.news_list') }}">News</a>
+              </li>
+              <li role="separator" class="divider"></li>
+              <li {% if request.path == url_for('extract.logs_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('extract.logs_list') }}">Logs</a>
               </li>
             </ul>
           </li>
@@ -48,31 +48,31 @@
           {# TRANSFORM #}
           <li class="dropdown {% if request.path.startswith('/transform/') %} active {% endif %}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              Transform <span class="caret"></span>
+              <i class="fa fa-cogs"></i> Transform <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li {% if request.path == url_for('transform_collection_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('transform_collection_list') }}">Collections</a>
+              <li {% if request.path == url_for('transform.collection_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('transform.collection_list') }}">Collections</a>
               </li>
-              <li {% if request.path == url_for('transform_journal_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('transform_journal_list') }}">Journals</a>
+              <li {% if request.path == url_for('transform.journal_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('transform.journal_list') }}">Journals</a>
               </li>
-              <li {% if request.path == url_for('transform_issue_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('transform_issue_list') }}">Issues</a>
+              <li {% if request.path == url_for('transform.issue_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('transform.issue_list') }}">Issues</a>
               </li>
-              <li {% if request.path == url_for('transform_article_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('transform_article_list') }}">Articles</a>
-              </li>
-              <li role="separator" class="divider"></li>
-              <li {% if request.path == url_for('transform_press_release_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('transform_press_release_list') }}">Press Release</a>
-              </li>
-              <li {% if request.path == url_for('transform_news_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('transform_news_list') }}">News</a>
+              <li {% if request.path == url_for('transform.article_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('transform.article_list') }}">Articles</a>
               </li>
               <li role="separator" class="divider"></li>
-              <li {% if request.path == url_for('transform_logs_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('transform_logs_list') }}">Logs</a>
+              <li {% if request.path == url_for('transform.press_release_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('transform.press_release_list') }}">Press Release</a>
+              </li>
+              <li {% if request.path == url_for('transform.news_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('transform.news_list') }}">News</a>
+              </li>
+              <li role="separator" class="divider"></li>
+              <li {% if request.path == url_for('transform.logs_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('transform.logs_list') }}">Logs</a>
               </li>
             </ul>
           </li>
@@ -80,31 +80,31 @@
           {# LOAD #}
           <li class="dropdown {% if request.path.startswith('/load/') %} active {% endif %}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              Load <span class="caret"></span>
+              <i class="fa fa-upload"></i> Load <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li {% if request.path == url_for('load_collection_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('load_collection_list') }}">Collections</a>
+              <li {% if request.path == url_for('load.collection_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('load.collection_list') }}">Collections</a>
               </li>
-              <li {% if request.path == url_for('load_journal_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('load_journal_list') }}">Journals</a>
+              <li {% if request.path == url_for('load.journal_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('load.journal_list') }}">Journals</a>
               </li>
-              <li {% if request.path == url_for('load_issue_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('load_issue_list') }}">Issues</a>
+              <li {% if request.path == url_for('load.issue_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('load.issue_list') }}">Issues</a>
               </li>
-              <li {% if request.path == url_for('load_article_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('load_article_list') }}">Articles</a>
-              </li>
-              <li role="separator" class="divider"></li>
-              <li {% if request.path == url_for('load_press_release_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('load_press_release_list') }}">Press Releases</a>
-              </li>
-              <li {% if request.path == url_for('load_news_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('load_news_list') }}">News</a>
+              <li {% if request.path == url_for('load.article_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('load.article_list') }}">Articles</a>
               </li>
               <li role="separator" class="divider"></li>
-              <li {% if request.path == url_for('load_logs_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('load_logs_list') }}">Logs</a>
+              <li {% if request.path == url_for('load.press_release_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('load.press_release_list') }}">Press Releases</a>
+              </li>
+              <li {% if request.path == url_for('load.news_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('load.news_list') }}">News</a>
+              </li>
+              <li role="separator" class="divider"></li>
+              <li {% if request.path == url_for('load.logs_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('load.logs_list') }}">Logs</a>
               </li>
             </ul>
           </li>
@@ -112,65 +112,96 @@
           {# OPAC #}
           <li class="dropdown {% if request.path.startswith('/opac/') %} active {% endif %}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              OPAC <span class="caret"></span>
+              <i class="fa fa-globe"></i> OPAC <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li {% if request.path == url_for('opac_collection_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('opac_collection_list') }}">Collections</a>
+              <li {% if request.path == url_for('opac.collection_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('opac.collection_list') }}">Collections</a>
               </li>
-              <li {% if request.path == url_for('opac_journal_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('opac_journal_list') }}">Journals</a>
+              <li {% if request.path == url_for('opac.journal_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('opac.journal_list') }}">Journals</a>
               </li>
-              <li {% if request.path == url_for('opac_issue_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('opac_issue_list') }}">Issues</a>
+              <li {% if request.path == url_for('opac.issue_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('opac.issue_list') }}">Issues</a>
               </li>
-              <li {% if request.path == url_for('opac_article_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('opac_article_list') }}">Articles</a>
-              </li>
-              <li role="separator" class="divider"></li>
-              <li {% if request.path == url_for('opac_pressrelease_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('opac_pressrelease_list') }}">Press Releases</a>
-              </li>
-              <li {% if request.path == url_for('opac_news_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('opac_news_list') }}">News</a>
+              <li {% if request.path == url_for('opac.article_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('opac.article_list') }}">Articles</a>
               </li>
               <li role="separator" class="divider"></li>
-              <li {% if request.path == url_for('opac_sponsor_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('opac_sponsor_list') }}">Sponsors</a>
+              <li {% if request.path == url_for('opac.pressrelease_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('opac.pressrelease_list') }}">Press Releases</a>
               </li>
-              <li {% if request.path == url_for('opac_page_list') %} class="active" {% endif %}>
-                <a href="{{ url_for('opac_page_list') }}">Pages</a>
+              <li {% if request.path == url_for('opac.news_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('opac.news_list') }}">News</a>
+              </li>
+              <li role="separator" class="divider"></li>
+              <li {% if request.path == url_for('opac.sponsor_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('opac.sponsor_list') }}">Sponsors</a>
+              </li>
+              <li {% if request.path == url_for('opac.page_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('opac.page_list') }}">Pages</a>
               </li>
             </ul>
           </li>
-
-          {# DASHBOARDS #}
-          <li {% if request.path == url_for('rq_dashboard.overview') %} class="active" {% endif %}>
-            <a href="{{ url_for('rq_dashboard.overview') }}">RQ Dashboard</a>
-          </li>
-          <li {% if request.path == url_for('rq_scheduler_dashboard.overview') %} class="active" {% endif %}>
-            <a href="{{ url_for('rq_scheduler_dashboard.overview') }}">RQ Scheduler</a>
-          </li>
         </ul>
       {% endif %}
-      {# ACCOUNTS #}
       <ul class="nav navbar-nav navbar-right">
         {% if current_user.is_authenticated %}
+          {# RQ DASHBOARDS #}
+          <li {% if request.path.startswith(url_for('rq_dashboard.overview')) %} class="active" {% endif %}>
+            <a href="{{ url_for('rq_dashboard.overview') }}">
+              <i class="glyphicon glyphicon-blackboard"></i>
+              Dashboard
+            </a>
+          </li>
+          {# RQ SCHEDULER #}
+          <li {% if request.path.startswith(url_for('rq_scheduler_dashboard.overview')) %} class="active" {% endif %}>
+            <a href="{{ url_for('rq_scheduler_dashboard.overview') }}">
+              <i class="glyphicon glyphicon-calendar"></i>
+              Scheduler
+            </a>
+          </li>
+          {# MESSAGES #}
+          <li {% if request.path.startswith(url_for('default.message_list')) %} class="active" {% endif %}>
+            <a href="{{ url_for('default.message_list') }}">
+              <i class="fa fa-envelope"></i>
+              Messages
+            </a>
+          </li>
           <li class="dropdown {% if request.path.startswith('/accounts/') %} active {% endif %}">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              {{ current_user.email }} <span class="caret"></span>
+              <i class="fa fa-user"></i> <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="{{ url_for('accounts.reset_password') }}">Password Reset</a></li>
-              <li><a href="{{ url_for('accounts.logout') }}">Logout</a></li>
+              <li class="dropdown-header">
+                {{ current_user.email }}
+              </li>
+              <li role="separator" class="divider"></li>
+              <li {% if request.path == url_for('accounts.reset_password') %} class="active" {% endif %}>
+                <a href="{{ url_for('accounts.reset_password') }}">
+                  <i class="fa fa-key"></i>
+                  Password Reset
+                </a>
+              </li>
+              <li role="separator" class="divider"></li>
+              <li>
+                <a href="{{ url_for('accounts.logout') }}">
+                  <i class="fa fa-sign-out"></i>
+                  Logout
+                </a>
+              </li>
             </ul>
           </li>
         {% else %}
           <li {% if request.path.startswith('/accounts/register') %} class="active" {% endif %}>
-            <a href="{{ url_for('accounts.register') }}">Register</a>
+            <a href="{{ url_for('accounts.register') }}">
+              <i class="fa fa-user-plus"></i> Register
+            </a>
           </li>
           <li {% if request.path.startswith('/accounts/login') %} class="active" {% endif %}>
-            <a href="{{ url_for('accounts.login') }}">Login</a>
+            <a href="{{ url_for('accounts.login') }}">
+              <i class="fa fa-sign-in"></i> Login
+            </a>
           </li>
         {% endif %}
       </ul>

@@ -74,6 +74,12 @@ from opac_proc.web.views.opac.detail_views import (
     OpacPressReleaseDetailView,
     OpacNewsDetailView)
 
+from opac_proc.web.views.message.list_views import (
+    MessageListView)
+
+from opac_proc.web.views.message.detail_views import (
+    MessageDetailView)
+
 from opac_proc.web.views.home import home
 
 url_patterns = (
@@ -212,6 +218,15 @@ url_patterns = (
                 'detail_view_class': OpacNewsDetailView,
             }
         }
+    },
+    {
+        'stage': 'default',
+        'models': {
+            'message': {
+                'list_view_class': MessageListView,
+                'detail_view_class': MessageDetailView,
+            }
+        }
     }
 )
 
@@ -230,8 +245,8 @@ def add_url_rules(app):
             list_view_class = view_classes['list_view_class']
             detail_view_class = view_classes['detail_view_class']
 
-            list_view_name = "%s_%s_list" % (stage, model_name)
-            detail_view_name = "%s_%s_detail" % (stage, model_name)
+            list_view_name = "%s.%s_list" % (stage, model_name)
+            detail_view_name = "%s.%s_detail" % (stage, model_name)
 
             list_url_path = "/%s/%s/" % (stage, model_name)
             detail_url_path = "/%s/%s/<string:object_id>/" % (stage, model_name)
