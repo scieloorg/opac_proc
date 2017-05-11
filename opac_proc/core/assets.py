@@ -472,7 +472,9 @@ class AssetHTMLS(Assets):
                                          'language': lang,
                                          'url': ssm_asset.get_urls()['url']
                                          })
-        return registered_htmls
+
+        if registered_htmls:
+            return registered_htmls
 
     def register_from_xml(self, uuid):
         """
@@ -480,6 +482,9 @@ class AssetHTMLS(Assets):
 
         This method consider if not uuid: It`s a HTML version else: is a XML
         version.
+
+        Params:
+            :param uuid: uuid do XML
         """
 
         ssm_handler = SSMHandler()  # asset handler "vazio"
