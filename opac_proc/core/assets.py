@@ -212,12 +212,12 @@ class Assets(object):
 
             existing_asset = ssm_asset.exists()
 
-            logger.info("Será que sempre existe as images? %s", existing_asset)
-
             if existing_asset:
                 logger.info(u"Já existe um media com PID: %s e colecao: %s, cadastrado: %s",
                             self.xylose.publisher_id, self.xylose.collection_acronym, existing_asset)
                 existing_list = [asset for asset in existing_asset]
+                logger.info(u"Lista de imagens existente para o artigo com PID: %s, %s",
+                            self.xylose.publisher_id, existing_asset)
             else:
                 uuid = ssm_asset.register()
 
@@ -229,13 +229,13 @@ class Assets(object):
                 logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
                             registered_medias, self.xylose.publisher_id)
 
-        if existing_list:
+            if existing_list:
 
-            for asset in existing_list:
-                registered_medias.update({asset['filename']:
-                                          asset['full_absolute_url']})
+                for asset in existing_list:
+                    registered_medias.update({asset['filename']:
+                                              asset['full_absolute_url']})
 
-            logger.info("Medias já existentes: %s", registered_medias)
+            logger.info("Medias já existente no SSM: %s", registered_medias)
 
         return registered_medias
 
@@ -356,7 +356,8 @@ class AssetXML(Assets):
 
             registered_media = self.register_media()
 
-            logger.info(u"Medias cadastradas para o PID: %s", registered_media)
+            logger.info(u"Medias cadastradas para o XML com PID: %s, %s",
+                        self.xylose.publisher_id, registered_media)
 
             logger.info(u"Alterando as medias:%s no artigo PID: %s",
                         registered_media, self.xylose.publisher_id)
@@ -377,7 +378,7 @@ class AssetXML(Assets):
                 logger.info(u"UUID: %s para XML do artigo com PID: %s",
                             uuid, self.xylose.publisher_id)
 
-                logger.info(u"XML: %s cadastrado(s) para o artigo com PID: %s",
+                logger.info(u"XML: %s cadastrado para o artigo com PID: %s",
                             file_name, self.xylose.publisher_id)
 
                 return (uuid, ssm_asset.get_urls()['url'])
