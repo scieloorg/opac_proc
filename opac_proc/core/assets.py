@@ -470,7 +470,7 @@ class AssetHTMLS(Assets):
                             uuid, self.xylose.publisher_id)
 
                 registered_htmls.append({'type': file_type,
-                                         'language': lang,
+                                         'lang': lang,
                                          'url': ssm_asset.get_urls()['url']
                                          })
 
