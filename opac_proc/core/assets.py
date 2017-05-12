@@ -305,7 +305,7 @@ class AssetPDF(Assets):
 
                         pdfs.append({
                             'type': file_type,
-                            'language': lang,
+                            'lang': lang,
                             'url': ssm_asset.get_urls()['url']
                         })
 
