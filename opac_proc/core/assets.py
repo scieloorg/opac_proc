@@ -440,23 +440,25 @@ class AssetHTMLS(Assets):
             # Se for versão HTML
             if not xml_version:
 
-                # É necessário fazer o mesmo procedicmento que é relizado no XML
+                # É necessário fazer o mesmo procedimento que é relizado no XML
                 # Cadastrar as medias e alterar o caminho diretamente no HTML
+
                 self.content = html
                 registered_media = self.register_media()
 
-                logger.info(u"Medias cadastradas para o PID: %s", registered_media)
+                logger.info(u"O artigo com PID: %s é uma versão HTML.",
+                            self.xylose.publisher_id)
 
                 self._change_img_path(registered_media)  # change self.content
 
                 html = self.content
 
+            if isinstance(html, unicode):
+                html = html.encode('utf-8')
+
             # XML or HTML
-            ssm_asset = SSMHandler(BytesIO(html),
-                                   self._get_name(lang),
-                                   file_type,
-                                   metadata,
-                                   self.bucket_name)
+            ssm_asset = SSMHandler(BytesIO(html), self._get_name(lang), file_type,
+                                   metadata, self.bucket_name)
 
             logger.info("Verificando se o asset existe: %s", ssm_asset.exists())
 
@@ -501,8 +503,18 @@ class AssetHTMLS(Assets):
             logger.error("XML não existente: %s", asset)
 
     def register(self):
+        """
+        Method to register the HTML(s) of the asset from HTML version.
+        """
+        htmls = {}
+        original_html = self.xylose.original_html()
+        translated_htmls = self.xylose.translated_htmls()
 
-        htmls = self.xylose.translated_htmls()
+        if original_html:
+            htmls.update({self.xylose.original_language(): original_html})
+
+        if translated_htmls:
+            htmls.update(translated_htmls)
 
         if htmls:
             return self.add_htmls(htmls, False)
