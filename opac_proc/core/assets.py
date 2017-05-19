@@ -437,6 +437,9 @@ class AssetHTMLS(Assets):
                              'type': file_type,
                              'version': 'html' if not xml_version else 'xml'})
 
+            if isinstance(html, unicode):
+                html = html.encode('utf-8')
+
             # Se for versão HTML
             if not xml_version:
 
@@ -451,7 +454,9 @@ class AssetHTMLS(Assets):
 
                 self._change_img_path(registered_media)  # change self.content
 
-                html = self.content
+                html = '<html><head><meta charset="utf-8"></head><body>' + \
+                       '<div id=“standalonearticle”>' + self.content + "</div>" \
+                       '</body></html>'
 
             if isinstance(html, unicode):
                 html = html.encode('utf-8')
