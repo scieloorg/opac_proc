@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock title %}
+{% block content %}
+  <h1></h1>
+  <div class="row">
+    <div class="col-md-5 col-md-offset-4">
+      {% if current_user.is_authenticated %}
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Registro de usuário</div>
+          <div class="panel-body">
+            <p>
+                Você já iniciou sessão!
+                Para registrar uma nova conta, feche a sessão atual primeiro.
+            </p>
+          </div>
+        </div>
+
+      {% else %}
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Registro de usuário</div>
+          <div class="panel-body">
+            <form method="POST" action="{{ url_for('accounts.register') }}" class="form-horizontal">
+              {% include "accounts/forms.html" %}
+              <button class="btn btn-primary pull-right" type="submit">Enviar</button>
+            </form>
+          </div>
+          <div class="panel-footer">
+            <a href="{{ url_for('accounts.reset_password') }}">Esqueci a senha?</a>
+            <a class="pull-right" href="{{ url_for('accounts.login') }}">Já tem uma conta?</a>
+          </div>
+        </div>
+
+      {% endif %}
+
+    </div>
+  </div>
+{% endblock content %}

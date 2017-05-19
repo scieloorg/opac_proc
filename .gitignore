@@ -9,6 +9,7 @@ __pycache__/
 # Application
 *.py.template
 
+
 # Distribution / packaging
 .Python
 env/
@@ -63,3 +64,9 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# Redis Data volume for development
+redis-data-dev
+
+# Data folder
+data

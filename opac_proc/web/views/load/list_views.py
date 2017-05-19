@@ -5,14 +5,20 @@ from bson.objectid import ObjectId
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
-from opac_proc.loaders.process import LoadProcess
+from opac_proc.loaders.process import (
+    ProcessLoadCollection,
+    ProcessLoadJournal,
+    ProcessLoadIssue,
+    ProcessLoadArticle,
+    ProcessLoadPressRelease,
+    ProcessLoadNews
+)
 
 OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 
 class LoadBaseListView(ListView):
     stage = 'load'
-    process_class = LoadProcess
     can_create = True
     can_update = True
     can_delete = True
@@ -20,6 +26,7 @@ class LoadBaseListView(ListView):
 
 class LoadCollectionListView(LoadBaseListView):
     model_class = models.LoadCollection
+    process_class = ProcessLoadCollection
     model_name = 'collection'
     page_title = "Load: Collection"
     list_columns = [
@@ -91,6 +98,7 @@ class LoadCollectionListView(LoadBaseListView):
 
 class LoadJournalListView(LoadBaseListView):
     model_class = models.LoadJournal
+    process_class = ProcessLoadJournal
     model_name = 'journal'
     page_title = "Load: Journals"
     list_columns = [
@@ -152,6 +160,7 @@ class LoadJournalListView(LoadBaseListView):
 
 class LoadIssueListView(LoadBaseListView):
     model_class = models.LoadIssue
+    process_class = ProcessLoadIssue
     model_name = 'issue'
     page_title = "Load: Issues"
     list_columns = [
@@ -185,6 +194,7 @@ class LoadIssueListView(LoadBaseListView):
 
 class LoadArticleListView(LoadBaseListView):
     model_class = models.LoadArticle
+    process_class = ProcessLoadArticle
     model_name = 'article'
     page_title = "Load: Articles"
     list_columns = [
@@ -242,6 +252,20 @@ class LoadArticleListView(LoadBaseListView):
             'field_type': 'boolean'
         },
     ]
+
+
+class LoadPressReleaseListView(LoadBaseListView):
+    model_class = models.LoadPressRelease
+    process_class = ProcessLoadPressRelease
+    model_name = 'press_release'
+    page_title = "Load: Press Releases"
+
+
+class LoadNewsListView(LoadBaseListView):
+    model_class = models.LoadNews
+    process_class = ProcessLoadNews
+    model_name = 'news'
+    page_title = "Load: News"
 
 
 class LoadLogListView(LoadBaseListView):

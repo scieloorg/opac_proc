@@ -6,7 +6,6 @@ import json
 import logging
 
 from thriftpy.rpc import make_client
-# from xylose.scielodocument import Article, Journal, Issue
 
 LIMIT = 1000
 
@@ -133,13 +132,14 @@ class ArticleMeta(object):
             else:
                 return jissue
 
-    def get_article(self, code, collection):
+    def get_article(self, code, collection, body=True):
         try:
             article = self.client.get_article(
                 code=code,
                 collection=collection,
                 replace_journal_metadata=True,
-                fmt='xylose')
+                fmt='xylose',
+                body=body)
         except Exception, e:
             msg = 'Error retrieving Article: %s_%s. Exception: %s' % (
                 collection, code, str(e))
@@ -171,4 +171,3 @@ class ArticleMeta(object):
             msg = 'Error retrieving Collections. Exception: %s' % (e)
             logger.error(msg)
             raise ServerError(msg)
-        # return [i for i in self.client.get_collection_identifiers()]

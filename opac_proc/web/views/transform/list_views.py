@@ -5,14 +5,20 @@ from bson.objectid import ObjectId
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
-from opac_proc.transformers.process import TransformProcess
+from opac_proc.transformers.process import (
+    ProcessTransformCollection,
+    ProcessTransformJournal,
+    ProcessTransformIssue,
+    ProcessTransformArticle,
+    ProcessTransformPressRelease,
+    ProcessTransformNews
+)
 
 OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 
 class TransformBaseListView(ListView):
     stage = 'transform'
-    process_class = TransformProcess
     can_create = True
     can_update = True
     can_delete = True
@@ -20,6 +26,7 @@ class TransformBaseListView(ListView):
 
 class TransformCollectionListView(TransformBaseListView):
     model_class = models.TransformCollection
+    process_class = ProcessTransformCollection
     model_name = 'collection'
     page_title = "Transform: Collection"
     list_columns = [
@@ -91,6 +98,7 @@ class TransformCollectionListView(TransformBaseListView):
 
 class TransformJournalListView(TransformBaseListView):
     model_class = models.TransformJournal
+    process_class = ProcessTransformJournal
     model_name = 'journal'
     page_title = "Transform: Journals"
     list_columns = [
@@ -100,8 +108,18 @@ class TransformJournalListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'ISSN',
+            'field_label': u'Acronym',
             'field_name': 'acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'P-ISSN',
+            'field_name': 'print_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'E-ISSN',
+            'field_name': 'eletronic_issn',
             'field_type': 'string'
         },
         {
@@ -128,8 +146,18 @@ class TransformJournalListView(TransformBaseListView):
             'field_type': 'uuid'
         },
         {
-            'field_label': u'ISSN',
-            'field_name': 'code',
+            'field_label': u'Acronym',
+            'field_name': 'acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'P-ISSN',
+            'field_name': 'print_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'E-ISSN',
+            'field_name': 'eletronic_issn',
             'field_type': 'string'
         },
         {
@@ -152,12 +180,18 @@ class TransformJournalListView(TransformBaseListView):
 
 class TransformIssueListView(TransformBaseListView):
     model_class = models.TransformIssue
+    process_class = ProcessTransformIssue
     model_name = 'issue'
     page_title = "Transform: Issues"
     list_columns = [
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'PID',
+            'field_name': 'pid',
             'field_type': 'string'
         },
         {
@@ -194,6 +228,11 @@ class TransformIssueListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
+            'field_label': u'Label',
+            'field_name': 'label',
+            'field_type': 'string'
+        },
+        {
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
@@ -213,6 +252,7 @@ class TransformIssueListView(TransformBaseListView):
 
 class TransformArticleListView(TransformBaseListView):
     model_class = models.TransformArticle
+    process_class = ProcessTransformArticle
     model_name = 'article'
     page_title = "Transform: Articles"
     list_columns = [
@@ -251,7 +291,161 @@ class TransformArticleListView(TransformBaseListView):
         },
         {
             'field_label': u'PID',
-            'field_name': 'code',
+            'field_name': 'pid',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+
+class TransformPressReleaseListView(TransformBaseListView):
+    model_class = models.TransformPressRelease
+    process_class = ProcessTransformPressRelease
+    model_name = 'press_release'
+    page_title = "Transform: Press Releases"
+    list_columns = [
+        {
+            'field_label': u'Journal',
+            'field_name': 'journal_acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'URL',
+            'field_name': 'url',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'language',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+    list_filters = [
+        {
+            'field_label': u'Journal',
+            'field_name': 'journal_acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'URL',
+            'field_name': 'url',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'language',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+
+class TransformNewsListView(TransformBaseListView):
+    model_class = models.TransformNews
+    process_class = ProcessTransformNews
+    model_name = 'news'
+    page_title = "Transform: News"
+    list_columns = [
+        {
+            'field_label': u'URL',
+            'field_name': 'url',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'language',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+    list_filters = [
+        {
+            'field_label': u'URL',
+            'field_name': 'url',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'publication_date',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'language',
             'field_type': 'string'
         },
         {

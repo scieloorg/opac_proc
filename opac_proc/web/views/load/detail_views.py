@@ -19,12 +19,22 @@ class LoadJournalDetailView(DetailView):
 
 class LoadIssueDetailView(DetailView):
     model_class = models.LoadIssue
-    page_title = u'Load Journal Detail'
+    page_title = u'Load Issue Detail'
 
 
 class LoadArticleDetailView(DetailView):
     model_class = models.LoadArticle
-    page_title = u'Load Journal Detail'
+    page_title = u'Load Article Detail'
+
+
+class LoadPressReleaseDetailView(DetailView):
+    model_class = models.LoadPressRelease
+    page_title = u'Load Press Release Detail'
+
+
+class LoadNewsDetailView(DetailView):
+    model_class = models.LoadNews
+    page_title = u'Load News Detail'
 
 
 class LoadLogDetailView(DetailView):

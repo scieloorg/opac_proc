@@ -2,11 +2,20 @@ version: '2'
 
 services:
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    hostname: mailhog
+    ports:
+        - "8026:8025"
+        - "1026:1025"
+    volumes:
+        - /etc/localtime:/etc/localtime:ro
+
   mongo-proc:
     image: mongo:latest
     restart: always
     user: mongodb
-    hostname: mongo-proc
+    hostname: opac-proc-mongo-proc
     ports:
         - "27027:27017"
     volumes:
@@ -16,7 +25,7 @@ services:
     image: mongo:latest
     restart: always
     user: mongodb
-    hostname: mongo-logs
+    hostname: opac-proc-mongo-logs
     ports:
         - "27037:27017"
     volumes:
@@ -30,7 +39,7 @@ services:
     ports:
         - "6379:6379"
     volumes:
-      - ./redis-data-dev:/data
+      - .:/data
       - /etc/localtime:/etc/localtime:ro
 
   rq-worker:
@@ -44,15 +53,12 @@ services:
     command: /start_worker.sh
     user: nobody
     restart: always
-    hostname: opac-proc-webapp
-    depends_on:
-      - mongo-proc
-      - mongo-logs
-      - redis
+    hostname: opac-proc-rqworker
     links:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
       - redis:redis
+      - mailhog:mailhog
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - .:/app
@@ -86,6 +92,23 @@ services:
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
+      # Accounts:
+      - OPAC_PROC_WEB_REGISTRATION_ENABLED=True
+      - OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION=True
+      # Email:
+      - OPAC_PROC_MAIL_SERVER=mailhog
+      - OPAC_PROC_MAIL_PORT=1026
+      # Opac_ssm_server
+      - OPAC_SSM_GRPC_SERVER_HOST=${OPAC_GRPC_HOST}
+      - OPAC_SSM_GRPC_SERVER_PORT=${OPAC_GRPC_PORT}
+      # Opac_ssm_api
+      - OPAC_SSM_PROTO_FILE_HOST=raw.githubusercontent.com
+      - OPAC_SSM_PROTO_FILE_PORT=80
+      - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
+      # Static HTML Generator
+      - OPAC_PROC_ARTICLE_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-article.css
+      - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-print.css
+      - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
 
   webapp:
     build:
@@ -98,14 +121,11 @@ services:
     user: nobody
     restart: always
     hostname: opac-proc-webapp
-    depends_on:
-      - mongo-proc
-      - mongo-logs
-      - redis
     links:
       - mongo-proc:mongo-proc
       - mongo-logs:mongo-logs
       - redis:redis
+      - mailhog:mailhog
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - .:/app
@@ -141,6 +161,23 @@ services:
       # Redis:
       - OPAC_PROC_REDIS_HOST=redis
       - OPAC_PROC_REDIS_PORT=6379
+      # Accounts:
+      - OPAC_PROC_WEB_REGISTRATION_ENABLED=True
+      - OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION=True
+      # Email:
+      - OPAC_PROC_MAIL_SERVER=mailhog
+      - OPAC_PROC_MAIL_PORT=1026
+      # Opac_ssm_server
+      - OPAC_SSM_GRPC_SERVER_HOST=${OPAC_GRPC_HOST}
+      - OPAC_SSM_GRPC_SERVER_PORT=${OPAC_GRPC_PORT}
+      # Opac_ssm_api
+      - OPAC_SSM_PROTO_FILE_HOST=raw.githubusercontent.com
+      - OPAC_SSM_PROTO_FILE_PORT=80
+      - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
+      # Static HTML Generator
+      - OPAC_PROC_ARTICLE_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-article.css
+      - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-print.css
+      - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
+
     stdin_open: True
     tty: true
-

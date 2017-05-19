@@ -5,14 +5,20 @@ from bson.objectid import ObjectId
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
-from opac_proc.extractors.process import ExtractProcess
+from opac_proc.extractors.process import (
+    ProcessExtractCollection,
+    ProcessExtractJournal,
+    ProcessExtractIssue,
+    ProcessExtractArticle,
+    ProcessExtractPressRelease,
+    ProcessExtractNews
+)
 
 OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 
 class ExtractBaseListView(ListView):
     stage = 'extract'
-    process_class = ExtractProcess
     can_create = True
     can_update = True
     can_delete = True
@@ -20,6 +26,7 @@ class ExtractBaseListView(ListView):
 
 class ExtractCollectionListView(ExtractBaseListView):
     model_class = models.ExtractCollection
+    process_class = ProcessExtractCollection
     model_name = 'collection'
     page_title = "Extract: Collection"
     list_columns = [
@@ -91,6 +98,7 @@ class ExtractCollectionListView(ExtractBaseListView):
 
 class ExtractJournalListView(ExtractBaseListView):
     model_class = models.ExtractJournal
+    process_class = ProcessExtractJournal
     model_name = 'journal'
     page_title = "Extract: Journals"
     list_columns = [
@@ -152,6 +160,7 @@ class ExtractJournalListView(ExtractBaseListView):
 
 class ExtractIssueListView(ExtractBaseListView):
     model_class = models.ExtractIssue
+    process_class = ProcessExtractIssue
     model_name = 'issue'
     page_title = "Extract: Issues"
     list_columns = [
@@ -212,6 +221,7 @@ class ExtractIssueListView(ExtractBaseListView):
 
 class ExtractArticleListView(ExtractBaseListView):
     model_class = models.ExtractArticle
+    process_class = ProcessExtractArticle
     model_name = 'article'
     page_title = "Extract: Articles"
     list_columns = [
@@ -273,17 +283,28 @@ class ExtractArticleListView(ExtractBaseListView):
 
 class ExtractPressReleaseListView(ExtractBaseListView):
     model_class = models.ExtractPressRelease
+    process_class = ProcessExtractPressRelease
     model_name = 'press_release'
     page_title = "Extract: Press Releases"
     list_columns = [
         {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
+            'field_label': u'Journal',
+            'field_name': 'journal_acronym',
             'field_type': 'string'
         },
         {
-            'field_label': u'PID',
-            'field_name': 'code',
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'published',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
             'field_type': 'string'
         },
         {
@@ -305,13 +326,95 @@ class ExtractPressReleaseListView(ExtractBaseListView):
 
     list_filters = [
         {
-            'field_label': u'UUID',
-            'field_name': 'uuid',
-            'field_type': 'uuid'
+            'field_label': u'Journal',
+            'field_name': 'journal_acronym',
+            'field_type': 'string'
         },
         {
-            'field_label': u'PID',
-            'field_name': 'code',
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'published',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+
+class ExtractNewsListView(ExtractBaseListView):
+    model_class = models.ExtractNews
+    process_class = ProcessExtractNews
+    model_name = 'news'
+    page_title = "Extract: News"
+    list_columns = [
+        {
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'published',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update:',
+            'field_name': 'updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Reprocess?',
+            'field_name': 'must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+    list_filters = [
+        {
+            'field_label': u'URL',
+            'field_name': 'url_id',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Published',
+            'field_name': 'published',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Language',
+            'field_name': 'feed_lang',
             'field_type': 'string'
         },
         {
@@ -334,7 +437,7 @@ class ExtractPressReleaseListView(ExtractBaseListView):
 
 class ExtractLogListView(ExtractBaseListView):
     model_class = models.ExtractLog
-    model_name = 'loadlog'
+    model_name = 'extractlog'
     process_class = None  # logs somente tem o Delete
     can_create = False
     can_update = False

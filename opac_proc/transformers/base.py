@@ -135,11 +135,9 @@ class BaseTransformer(object):
                 # seu codigo aqui ...
 
             def save(self):
-                # implmementar só se for algo deferente
+                # implmementar só se for algo diferente
         """
         raise NotImplementedError
-        # Deve implementar a extração na subclase,
-        # invocando este metodo como mostra a docstring
 
     def save(self):
         """

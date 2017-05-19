@@ -1,12 +1,13 @@
 # coding: utf-8
-
+from flask_login import login_required
 from opac_proc.web.views.extract.list_views import (
     ExtractCollectionListView,
     ExtractJournalListView,
     ExtractIssueListView,
     ExtractArticleListView,
     ExtractPressReleaseListView,
-    ExtractLogListView, )
+    ExtractNewsListView,
+    ExtractLogListView)
 
 from opac_proc.web.views.extract.detail_views import (
     ExtractCollectionDetailView,
@@ -14,6 +15,7 @@ from opac_proc.web.views.extract.detail_views import (
     ExtractIssueDetailView,
     ExtractArticleDetailView,
     ExtractPressReleaseDetailView,
+    ExtractNewsDetailView,
     ExtractLogDetailView)
 
 from opac_proc.web.views.transform.list_views import (
@@ -21,6 +23,8 @@ from opac_proc.web.views.transform.list_views import (
     TransformJournalListView,
     TransformIssueListView,
     TransformArticleListView,
+    TransformPressReleaseListView,
+    TransformNewsListView,
     TransformLogListView)
 
 from opac_proc.web.views.transform.detail_views import (
@@ -28,6 +32,8 @@ from opac_proc.web.views.transform.detail_views import (
     TransformJournalDetailView,
     TransformIssueDetailView,
     TransformArticleDetailView,
+    TransformPressReleaseDetailView,
+    TransformNewsDetailView,
     TransformLogDetailView)
 
 from opac_proc.web.views.load.list_views import (
@@ -35,6 +41,8 @@ from opac_proc.web.views.load.list_views import (
     LoadJournalListView,
     LoadIssueListView,
     LoadArticleListView,
+    LoadPressReleaseListView,
+    LoadNewsListView,
     LoadLogListView)
 
 from opac_proc.web.views.load.detail_views import (
@@ -42,6 +50,8 @@ from opac_proc.web.views.load.detail_views import (
     LoadJournalDetailView,
     LoadIssueDetailView,
     LoadArticleDetailView,
+    LoadPressReleaseDetailView,
+    LoadNewsDetailView,
     LoadLogDetailView)
 
 from opac_proc.web.views.opac.list_views import (
@@ -63,6 +73,12 @@ from opac_proc.web.views.opac.detail_views import (
     OpacPageDetailView,
     OpacPressReleaseDetailView,
     OpacNewsDetailView)
+
+from opac_proc.web.views.message.list_views import (
+    MessageListView)
+
+from opac_proc.web.views.message.detail_views import (
+    MessageDetailView)
 
 from opac_proc.web.views.home import home
 
@@ -90,6 +106,10 @@ url_patterns = (
                 'list_view_class': ExtractPressReleaseListView,
                 'detail_view_class': ExtractPressReleaseDetailView,
             },
+            'news': {
+                'list_view_class': ExtractNewsListView,
+                'detail_view_class': ExtractNewsDetailView,
+            },
             'logs': {
                 'list_view_class': ExtractLogListView,
                 'detail_view_class': ExtractLogDetailView,
@@ -115,6 +135,14 @@ url_patterns = (
                 'list_view_class': TransformArticleListView,
                 'detail_view_class': TransformArticleDetailView,
             },
+            'press_release': {
+                'list_view_class': TransformPressReleaseListView,
+                'detail_view_class': TransformPressReleaseDetailView,
+            },
+            'news': {
+                'list_view_class': TransformNewsListView,
+                'detail_view_class': TransformNewsDetailView,
+            },
             'logs': {
                 'list_view_class': TransformLogListView,
                 'detail_view_class': TransformLogDetailView,
@@ -139,6 +167,14 @@ url_patterns = (
             'article': {
                 'list_view_class': LoadArticleListView,
                 'detail_view_class': LoadArticleDetailView,
+            },
+            'press_release': {
+                'list_view_class': LoadPressReleaseListView,
+                'detail_view_class': LoadPressReleaseDetailView,
+            },
+            'news': {
+                'list_view_class': LoadNewsListView,
+                'detail_view_class': LoadNewsDetailView,
             },
             'logs': {
                 'list_view_class': LoadLogListView,
@@ -182,13 +218,22 @@ url_patterns = (
                 'detail_view_class': OpacNewsDetailView,
             }
         }
+    },
+    {
+        'stage': 'default',
+        'models': {
+            'message': {
+                'list_view_class': MessageListView,
+                'detail_view_class': MessageDetailView,
+            }
+        }
     }
 )
 
 
 def add_url_rules(app):
     # first add home page:
-    app.add_url_rule('/', 'home', home)
+    app.add_url_rule('/', 'home', login_required(home))
 
     # then iterate over url_patterns to add each view:
     for url_definition in url_patterns:
@@ -196,12 +241,12 @@ def add_url_rules(app):
         models_data = url_definition['models']
 
         for model_name, view_classes in models_data.iteritems():
-            print "registarando view: ", model_name, "view_class: ", view_classes
+
             list_view_class = view_classes['list_view_class']
             detail_view_class = view_classes['detail_view_class']
 
-            list_view_name = "%s_%s_list" % (stage, model_name)
-            detail_view_name = "%s_%s_detail" % (stage, model_name)
+            list_view_name = "%s.%s_list" % (stage, model_name)
+            detail_view_name = "%s.%s_detail" % (stage, model_name)
 
             list_url_path = "/%s/%s/" % (stage, model_name)
             detail_url_path = "/%s/%s/<string:object_id>/" % (stage, model_name)
@@ -209,11 +254,15 @@ def add_url_rules(app):
             # add list rule
             app.add_url_rule(
                 list_url_path,
-                view_func=list_view_class.as_view(list_view_name)
+                view_func=login_required(
+                    list_view_class.as_view(list_view_name)
+                )
             )
 
             # add detail rule
             app.add_url_rule(
                 detail_url_path,
-                view_func=detail_view_class.as_view(detail_view_name)
+                view_func=login_required(
+                    detail_view_class.as_view(detail_view_name)
+                )
             )

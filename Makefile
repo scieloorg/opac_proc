@@ -15,11 +15,24 @@ else
 	@echo "$$OPAC_MONGODB_HOST já foi definida previamente"
 endif
 
+ifndef OPAC_GRPC_HOST
+	export OPAC_GRPC_HOST=$(strip $(shell docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' opacssm_grpc_1))
+	export OPAC_GRPC_PORT=5000
+else
+	@echo "$$OPAC_MONGODB_HOST já foi definida previamente"
+endif
+
 get_opac_mongo_info:
 	@echo "***************************************"
 	@echo "* OPAC_MONGODB_NAME: \t" $(OPAC_MONGODB_NAME)
 	@echo "* OPAC_MONGODB_HOST: \t" $(OPAC_MONGODB_HOST)
-	@echo "* OPAC_MONGODB_PORT; \t" $(OPAC_MONGODB_PORT)
+	@echo "* OPAC_MONGODB_PORT: \t" $(OPAC_MONGODB_PORT)
+	@echo "***************************************"
+
+get_opac_grpc_info:
+	@echo "***************************************"
+	@echo "* OPAC_GRPC_HOST: \t" $(OPAC_GRPC_HOST)
+	@echo "* OPAC_GRPC_PORT: \t" $(OPAC_GRPC_PORT)
 	@echo "***************************************"
 
 opac_proc_version:
@@ -41,22 +54,22 @@ get_build_info:
 ## atalhos docker-compose desenvolvimento ##
 ############################################
 
-dev_compose_build: get_opac_mongo_info
+dev_compose_build: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) build
 
-dev_compose_up: get_opac_mongo_info
+dev_compose_up: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) up -d
 
-dev_compose_logs: get_opac_mongo_info
+dev_compose_logs: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) logs -f $1
 
-dev_compose_stop: get_opac_mongo_info
+dev_compose_stop: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) stop
 
-dev_compose_ps: get_opac_mongo_info
+dev_compose_ps: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) ps
 
-dev_compose_rm: get_opac_mongo_info
+dev_compose_rm: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) rm -f $<
 
 dev_compose_exec_shell_webapp: dev_compose_up
@@ -71,6 +84,11 @@ dev_compose_scale_workers: dev_compose_up
 test:
 	@python opac_proc/manage.py test
 
+dev_create_superuser:
+	@docker-compose -f $(COMPOSE_FILE_DEV) exec webapp make create_superuser
+
+create_superuser:
+	@python opac_proc/manage.py create_superuser
 
 #####################################################
 ## atalhos docker-compose build e testes no traivs ##
@@ -84,6 +102,9 @@ travis_compose_up: get_opac_mongo_info get_build_info
 
 travis_compose_make_test: get_opac_mongo_info get_build_info
 	@docker-compose -f $(COMPOSE_FILE_BUILD) exec webapp python opac_proc/manage.py test
+
+travis_compose_exec_shell_webapp: travis_compose_up
+	@docker-compose -f $(COMPOSE_FILE_BUILD) exec webapp sh
 
 travis_run_audit:
 	@docker run \

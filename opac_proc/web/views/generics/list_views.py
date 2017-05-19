@@ -162,7 +162,6 @@ class ListView(View):
                         flash('filter for: "%s" is invalid' % f_field_label, 'warning')
                         continue  # ignore this filter
 
-            print "result qs_filters: ", qs_filters
             return qs_filters
         else:
             return qs_filters
@@ -193,50 +192,31 @@ class ListView(View):
         }
 
     def do_create(self):
-        processor = self.process_class()
-        if self.model_name == 'collection':
-            processor.process_all_collections()
-        elif self.model_name == 'journal':
-            processor.process_all_journals()
-        elif self.model_name == 'issue':
-            processor.process_all_issues()
-        elif self.model_name == 'article':
-            processor.process_all_articles()
-        elif self.model_name == 'press_release':
-            processor.process_all_press_releases()
+        try:
+            processor = self.process_class()
+            processor.create()
+        except Exception as e:
+            flash(u"Erro enquanto processamos a ação de criar. Erro: %s " % unicode(e.message), 'error')
         else:
-            raise ValueError('Invalid "model_name" attribute')
-        flash("Started process to %s all %s(s)" % (self.stage, self.model_name))
+            flash(u"Começou o processo de criação (%s) de todos os registros de %s" % (self.stage, self.model_name))
 
     def do_update_all(self):
-        processor = self.process_class()
-        if self.model_name == 'collection':
-            processor.reprocess_collections()
-        elif self.model_name == 'journal':
-            processor.reprocess_journals()
-        elif self.model_name == 'issue':
-            processor.reprocess_issues()
-        elif self.model_name == 'article':
-            processor.reprocess_articles()
+        try:
+            processor = self.process_class()
+            processor.update()
+        except Exception as e:
+            flash(u"Erro enquanto processamos a ação de atualizar tudo. Erro: %s" % unicode(e), 'error')
         else:
-            raise ValueError('Invalid "model_name" attribute')
-
-        flash("Started reprocess to %s all %s" % (self.stage.upper(), self.model_name.upper()))
+            flash(u"Começou o processo de atualização (%s) de todos os registros de %s" % (self.stage, self.model_name))
 
     def do_update_selected(self, ids):
-        processor = self.process_class()
-        if self.model_name == 'collection':
-            processor.reprocess_collections(ids)
-        elif self.model_name == 'journal':
-            processor.reprocess_journals(ids)
-        elif self.model_name == 'issue':
-            processor.reprocess_issues(ids)
-        elif self.model_name == 'article':
-            processor.reprocess_articles(ids)
+        try:
+            processor = self.process_class()
+            processor.update(ids)
+        except Exception as e:
+            flash(u"Erro enquanto processamos a ação de atualizar tudo. Erro: %s" % unicode(e), 'error')
         else:
-            raise ValueError('Invalid "model_name" attribute')
-
-        flash("Started reprocess to %s %s %s" % (self.stage.upper(), len(ids), self.model_name.upper()))
+            flash(u"Começou o processo de atualização de %s %s" % (len(ids), self.model_name.upper()))
 
     def do_delete_all(self):
         if self.model_class is None:

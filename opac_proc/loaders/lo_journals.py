@@ -1,5 +1,4 @@
 # coding: utf-8
-import datetime
 from mongoengine import DoesNotExist
 from mongoengine.context_managers import switch_db
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
@@ -79,7 +78,7 @@ class JournalLoader(BaseLoader):
     def prepare_collection(self):
         """
         metodo chamado na preparação dos dados a carregar no opac_schema
-        deve retornar um valor válido para Journal.collection do
+        deve retornar um valor válido para Journal.collection
         """
         logger.debug(u"iniciando: prepare_collection")
         transformed_coll_uuid_str = str(self.transform_model_instance.collection).replace("-", "")
@@ -199,7 +198,8 @@ class JournalLoader(BaseLoader):
 
     def prepare_issue_count(self):
         logger.debug(u"iniciando: prepare_issue_count")
-        issue_count = TransformIssue.objects.filter(journal=self.transform_model_instance).count()
+        issue_count = TransformIssue.objects.filter(
+            journal=self.transform_model_instance.uuid).count()
         logger.debug(u"Quantidade de issues encontradas: %s" % issue_count)
         return issue_count
 

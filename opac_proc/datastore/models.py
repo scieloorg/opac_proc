@@ -1,7 +1,16 @@
 # coding: utf-8
-from mongoengine import DynamicDocument, signals
+from datetime import datetime
+from mongoengine import (
+    Document,
+    DynamicDocument,
+    signals,
+    StringField,
+    DateTimeField,
+    BooleanField
+)
 from base_mixin import BaseMixin
 
+from opac_proc.web import config
 
 # #### EXTRACT MODELS
 
@@ -114,6 +123,28 @@ class ExtractPressRelease(BaseMixin, DynamicDocument):
 
 signals.pre_save.connect(ExtractPressRelease.pre_save, sender=ExtractPressRelease)
 signals.post_save.connect(ExtractPressRelease.post_save, sender=ExtractPressRelease)
+
+
+class ExtractNews(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        """
+        Notificamos o modelos com este uuid que tem que ser reprocessado
+        """
+        try:
+            doc = TransformNews.objects.get(uuid=uuid).first()
+        except Exception:
+            pass
+        else:
+            doc['must_reprocess'] = True
+            doc.save()
+
+    meta = {
+        'collection': 'e_news'
+    }
+
+
+signals.pre_save.connect(ExtractNews.pre_save, sender=ExtractNews)
+signals.post_save.connect(ExtractNews.post_save, sender=ExtractNews)
 
 
 # #### TRANFORM MODELS
@@ -229,6 +260,28 @@ signals.pre_save.connect(TransformPressRelease.pre_save, sender=TransformPressRe
 signals.post_save.connect(TransformPressRelease.post_save, sender=TransformPressRelease)
 
 
+class TransformNews(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        """
+        Notificamos o modelos com este uuid que tem que ser reprocessado
+        """
+        try:
+            doc = LoadNews.objects.get(uuid=uuid).first()
+        except Exception:
+            pass
+        else:
+            doc['must_reprocess'] = True
+            doc.save()
+
+    meta = {
+        'collection': 't_news'
+    }
+
+
+signals.pre_save.connect(TransformNews.pre_save, sender=TransformNews)
+signals.post_save.connect(TransformNews.post_save, sender=TransformNews)
+
+
 # #### LOAD MODELS
 
 
@@ -285,6 +338,9 @@ signals.post_save.connect(LoadArticle.post_save, sender=LoadArticle)
 
 
 class LoadPressRelease(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        pass  # não precisa propagar mais
+
     meta = {
         'collection': 'l_press_release'
     }
@@ -294,32 +350,73 @@ signals.pre_save.connect(LoadPressRelease.pre_save, sender=LoadPressRelease)
 signals.post_save.connect(LoadPressRelease.post_save, sender=LoadPressRelease)
 
 
+class LoadNews(BaseMixin, DynamicDocument):
+    def update_reprocess_field(self, uuid):
+        pass  # não precisa propagar mais
+
+    meta = {
+        'collection': 'l_news'
+    }
+
+
+signals.pre_save.connect(LoadNews.pre_save, sender=LoadNews)
+signals.post_save.connect(LoadNews.post_save, sender=LoadNews)
+
+
+# #### NOTIFICATIONS
+
+class Message(Document):
+    subject = StringField(max_length=50, default='')
+    body = StringField(default='')
+    stage = StringField(max_length=10, default='default')   # 'extract' | 'transform' | 'load'
+    model_name = StringField(max_length=15, default='')     # 'collection' | 'journal' | 'issue' | 'article' | 'pree_release' | 'news'
+    created_at = DateTimeField(default=datetime.now)
+    unread = BooleanField(required=True, default=True)
+
+    @classmethod  # signal pre_save (asociar em cada modelo)
+    def pre_save(cls, sender, document, **kwargs):
+        document.created_at = datetime.now()
+
+    meta = {
+        'collection': 'messages',
+    }
+
+signals.pre_save.connect(Message.pre_save, sender=Message)
+
 # #### LOGS
 
 
 class ExtractLog(DynamicDocument):
     meta = {
+        'max_size': 104857600,  # 100 MB (104857600 Bytes)
+        'max_documents': 100000,
         'collection': 'extract_log',
-        'db_alias': 'opac_proc_logs',
+        'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
     }
 
 
 class TransformLog(DynamicDocument):
     meta = {
+        'max_size': 104857600,  # 100 MB (104857600 Bytes)
+        'max_documents': 100000,
         'collection': 'transform_log',
-        'db_alias': 'opac_proc_logs',
+        'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
     }
 
 
 class LoadLog(DynamicDocument):
     meta = {
+        'max_size': 104857600,  # 100 MB (104857600 Bytes)
+        'max_documents': 100000,
         'collection': 'load_log',
-        'db_alias': 'opac_proc_logs',
+        'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
     }
 
 
 class DefaultLog(DynamicDocument):
     meta = {
+        'max_size': 104857600,  # 100 MB (104857600 Bytes)
+        'max_documents': 100000,
         'collection': 'default_log',
-        'db_alias': 'opac_proc_logs',
+        'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
     }

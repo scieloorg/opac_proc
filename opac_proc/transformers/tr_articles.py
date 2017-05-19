@@ -1,7 +1,6 @@
 # coding: utf-8
 from datetime import datetime
 
-from werkzeug.urls import url_fix
 from xylose.scielodocument import Article
 
 from opac_proc.datastore.models import (
@@ -14,6 +13,8 @@ from opac_proc.extractors.decorators import update_metadata
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
+
+from opac_proc.core.assets import AssetPDF, AssetXML, AssetHTMLS
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
@@ -123,6 +124,7 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['original_language'] = xylose_article.original_language()
 
         # languages
+        # IMPORTANTE: nesse trecho estamos cadastrando todos os idiomas do texto e do resumo.
         if hasattr(xylose_article, 'languages'):
             lang_set = set(xylose_article.languages() + getattr(self.transform_model_instance, 'abstract_languages', []))
             self.transform_model_instance['languages'] = list(lang_set)
@@ -135,31 +137,45 @@ class ArticleTransformer(BaseTransformer):
         if hasattr(xylose_article, 'authors') and xylose_article.authors:
             self.transform_model_instance['authors'] = ['%s, %s' % (a['surname'], a['given_names']) for a in xylose_article.authors]
 
-        # fulltexts -> pdfs, htmls
-        if hasattr(xylose_article, 'fulltexts'):
-            htmls = []
-            pdfs = []
-            for text, val in xylose_article.fulltexts().items():
-                if text == 'html':
-                    for lang, url in val.items():
-                        htmls.append({
-                            'type': 'html',
-                            'language': lang,
-                            'url': url_fix(url)
-                        })
-                elif text == 'pdf':
-                    for lang, url in val.items():
-                        pdfs.append({
-                            'type': 'pdf',
-                            'language': lang,
-                            'url': url_fix(url)
-                        })
+        # PDFs
+        if hasattr(xylose_article, 'xml_languages') or hasattr(xylose_article, 'fulltexts'):
+            asset_pdf = AssetPDF(xylose_article)
 
-            self.transform_model_instance['htmls'] = htmls
-            self.transform_model_instance['pdfs'] = pdfs
+            pdfs = asset_pdf.register()
+
+            if pdfs:
+                self.transform_model_instance['pdfs'] = pdfs
+
+        asset_html = AssetHTMLS(xylose_article)
+
+        # Versão XML do artigo
+        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
+            asset_xml = AssetXML(xylose_article)
+
+            uuid, xml_url = asset_xml.register()
+
+            if xml_url:
+                self.transform_model_instance['xml'] = xml_url
+                self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
+
+        # Versão HTML do artigo
+        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':
+            self.transform_model_instance['htmls'] = asset_html.register()
 
         # pid
         if hasattr(xylose_article, 'publisher_id'):
             self.transform_model_instance['pid'] = xylose_article.publisher_id
+
+        # fpage
+        if hasattr(xylose_article, 'start_page'):
+            self.transform_model_instance['fpage'] = xylose_article.start_page
+
+        # lpage
+        if hasattr(xylose_article, 'end_page'):
+            self.transform_model_instance['lpage'] = xylose_article.end_page
+
+        # elocation
+        if hasattr(xylose_article, 'elocation'):
+            self.transform_model_instance['elocation'] = xylose_article.elocation
 
         return self.transform_model_instance

@@ -21,7 +21,7 @@ OPAC_PROC_LOG_FILE_PATH = OPAC_PROC_LOG_FILE_PATH_DEFAULT
 # WEBAPP config: ----------------------------------------------------
 DEBUG = False
 TESTING = True
-SECRET_KEY = 'testing-s3cr3t-k3y'
+SECRET_KEY = 'testing-s3cr3t-k3y'  # noqa
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 
 # CONEXÃO MONGO OPAC PROC --------------------------------------------

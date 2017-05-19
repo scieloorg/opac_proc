@@ -28,13 +28,15 @@ class RQueues(Singleton):
             'issue': 'qex_issues',
             'article': 'qex_articles',
             'press_release': 'qex_press_releases',
+            'news': 'qex_news',
         },
         'transform': {
             'collection': 'qtr_collections',
             'journal': 'qtr_journals',
             'issue': 'qtr_issues',
-            'article': 'qtr_article',
+            'article': 'qtr_articles',
             'press_release': 'qtr_press_releases',
+            'news': 'qtr_news',
         },
         'load': {
             'collection': 'qlo_collections',
@@ -42,6 +44,7 @@ class RQueues(Singleton):
             'issue': 'qlo_issues',
             'article': 'qlo_articles',
             'press_release': 'qlo_press_releases',
+            'news': 'qlo_news',
         }
     }
 
@@ -52,6 +55,7 @@ class RQueues(Singleton):
             'issue': None,
             'article': None,
             'press_release': None,
+            'news': None,
         },
         'transform': {
             'collection': None,
@@ -59,6 +63,7 @@ class RQueues(Singleton):
             'issue': None,
             'article': None,
             'press_release': None,
+            'news': None,
         },
         'load': {
             'collection': None,
@@ -66,6 +71,7 @@ class RQueues(Singleton):
             'issue': None,
             'article': None,
             'press_release': None,
+            'news': None,
         }
     }
 
@@ -92,7 +98,7 @@ class RQueues(Singleton):
     def get_queue(self, stage, model):
         queue = self.queues[stage][model]
         if queue is None:
-            queue = self.create_queue(model, stage)
+            queue = self.create_queue(stage, model)
         return queue
 
     def enqueue(self, stage, model, task, *args, **kwargs):

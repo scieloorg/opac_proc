@@ -1,42 +1,41 @@
 # coding: utf-8
+from opac_proc.datastore.redis_queues import RQueues
+from opac_proc.datastore.mongodb_connector import get_db_connection
+from opac_proc.web import config
+from opac_proc.logger_setup import getMongoLogger
+
+if config.DEBUG:
+    logger = getMongoLogger(__name__, "DEBUG", "extract")
+else:
+    logger = getMongoLogger(__name__, "INFO", "extract")
 
 
 class Process(object):
     stage = 'default'
     collection_acronym = None
+    r_queues = RQueues()
+    db = get_db_connection()
 
-    def reprocess_collections(self, ids=None):
-        raise NotImplementedError
+    def create(self):
+        self.r_queues.enqueue(
+            self.stage,
+            self.model_name,
+            self.create_task)
 
-    def reprocess_journals(self, ids=None):
-        raise NotImplementedError
+    def update(self, ids=None):
+        self.r_queues.enqueue(
+            self.stage,
+            self.model_name,
+            self.update_task, ids)
 
-    def reprocess_issues(self, ids=None):
-        raise NotImplementedError
 
-    def reprocess_articles(self, ids=None):
-        raise NotImplementedError
+class ProcessExtractBase(Process):
+    stage = 'extract'
 
-    def process_collection(self, collection_acronym=None, collection_uuid=None):
-        raise NotImplementedError
 
-    def process_journal(self, collection_acronym=None, issn=None, uuid=None):
-        raise NotImplementedError
+class ProcessTransformBase(Process):
+    stage = 'transform'
 
-    def process_issue(self, collection_acronym=None, issue_pid=None, uuid=None):
-        raise NotImplementedError
 
-    def process_article(self, collection_acronym=None, article_pid=None, uuid=None):
-        raise NotImplementedError
-
-    def process_all_collections(self):
-        raise NotImplementedError
-
-    def process_all_journals(self):
-        raise NotImplementedError
-
-    def process_all_issues(self):
-        raise NotImplementedError
-
-    def process_all_articles(self):
-        raise NotImplementedError
+class ProcessLoadBase(Process):
+    stage = 'load'

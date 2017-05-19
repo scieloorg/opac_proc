@@ -25,8 +25,8 @@ ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     11621))
 
 # WEBAPP config: ----------------------------------------------------
-DEBUG = bool(os.environ.get('OPAC_PROC_DEBUG', True))
-TESTING = bool(os.environ.get('OPAC_PROC_TESTING', False))
+DEBUG = os.environ.get('OPAC_PROC_DEBUG', 'False') == 'True'
+TESTING = os.environ.get('OPAC_PROC_TESTING', 'False') == 'True'
 SECRET_KEY = os.environ.get('OPAC_PROC_SECRET_KEY', "s3cr3t-k3y")
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 OPAC_PROC_COLLECTION = os.environ.get('OPAC_PROC_COLLECTION', 'spa')
@@ -135,3 +135,53 @@ RSS_PRESS_RELEASES_FEEDS_BY_CATEGORY = {
         'url': 'http://pressreleases.scielo.org/{0}/category/press-releases/{1}/feed/',
     },
 }
+
+# News
+RSS_NEWS_FEEDS = {
+    'pt_BR': {
+        'display_name': 'SciELO em Perspectiva',
+        'url': 'http://blog.scielo.org/feed/'
+    },
+    'es': {
+        'display_name': 'SciELO en Perspectiva',
+        'url': 'http://blog.scielo.org/es/feed/',
+    },
+    'en': {
+        'display_name': 'SciELO in Perspective',
+        'url': 'http://blog.scielo.org/en/feed/',
+    },
+}
+
+OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY = os.environ.get('OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY', 'True') == 'True'
+
+OPAC_SSM_GRPC_SERVER_HOST = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST', 'homolog.grpc.ssm.scielo.org')
+OPAC_SSM_GRPC_SERVER_PORT = os.environ.get('OPAC_SSM_GRPC_SERVER_PORT', '8005')
+
+OPAC_PROC_ASSETS_SOURCE_PDF_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_PDF_PATH', '/app/data/pdf')
+OPAC_PROC_ASSETS_SOURCE_XML_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_XML_PATH', '/app/data/xml')
+OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH', '/app/data/img')
+
+OPAC_PROC_ARTICLE_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_CSS_URL', None)
+OPAC_PROC_ARTICLE_PRINT_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_PRINT_CSS_URL', None)
+OPAC_PROC_ARTICLE_JS_URL = os.environ.get('OPAC_PROC_ARTICLE_JS_URL', None)
+
+# Habilitar/Desabilitar o form de registro
+WEB_REGISTRATION_ENABLED = os.environ.get('OPAC_PROC_WEB_REGISTRATION_ENABLED', 'False') == 'True'
+# True/False para requerir ou não confirmação de email no processo de registro/login
+ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION = os.environ.get('OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION', 'True') == 'True'
+
+# Tempo de expiração para os tokens. Valor en segundos: 86400 = 60*60*24 = 1 dia
+TOKEN_MAX_AGE = 86400
+
+# Credenciais para envio de emails:
+DEFAULT_EMAIL = os.environ.get('OPAC_PROC_DEFAULT_EMAIL', 'scielo@scielo.org')
+MAIL_SERVER = os.environ.get('OPAC_PROC_MAIL_SERVER', 'localhost')
+MAIL_PORT = int(os.environ.get('OPAC_PROC_MAIL_PORT', 1025))
+MAIL_USE_TLS = os.environ.get('OPAC_PROC_MAIL_USE_TLS', 'False') == 'True'
+MAIL_USE_SSL = os.environ.get('OPAC_PROC_MAIL_USE_SSL', 'False') == 'True'
+MAIL_DEBUG = DEBUG
+MAIL_USERNAME = os.environ.get('OPAC_PROC_MAIL_USERNAME', None)
+MAIL_PASSWORD = os.environ.get('OPAC_PROC_MAIL_PASSWORD', None)
+MAIL_DEFAULT_SENDER = DEFAULT_EMAIL
+MAIL_MAX_EMAILS = None
+MAIL_ASCII_ATTACHMENTS = False
