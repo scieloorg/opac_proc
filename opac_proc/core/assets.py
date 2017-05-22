@@ -1,6 +1,5 @@
 # coding: utf-8
 import re
-import os
 from io import BytesIO
 
 from opac_proc.web import config
@@ -8,8 +7,6 @@ from opac_proc.logger_setup import getMongoLogger
 
 from html_generator import generate_htmls
 from ssm_handler import SSMHandler
-
-from utils import render_from_template
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
