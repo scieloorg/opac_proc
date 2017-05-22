@@ -8,7 +8,6 @@ from opac_proc.logger_setup import getMongoLogger
 from html_generator import generate_htmls
 from ssm_handler import SSMHandler
 
-
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
 else:
@@ -454,12 +453,23 @@ class AssetHTMLS(Assets):
 
                 self._change_img_path(registered_media)  # change self.content
 
-                html = '<html><head><meta charset="utf-8"></head><body>' + \
-                       '<div id=“standalonearticle”>' + self.content + "</div>" \
-                       '</body></html>'
-
-            if isinstance(html, unicode):
-                html = html.encode('utf-8')
+                html = '''<html>
+                            <head>
+                                <meta charset="utf-8">
+                            </head>
+                            <body>
+                                <div id="standalonearticle">
+                                    <div class="articleTxt">
+                                        <div class="row">
+                                            <article class="col-md-10 col-md-offset-2 col-sm-12 col-sm-offset-0" id="articleText">
+                                                 %s
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </body>
+                            </html>
+                        ''' % self.content
 
             # XML or HTML
             ssm_asset = SSMHandler(BytesIO(html), self._get_name(lang), file_type,
