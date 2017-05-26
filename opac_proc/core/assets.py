@@ -59,17 +59,14 @@ class Assets(object):
 
         Try get imgs by href e src tags.
         """
-        imgs = {}
 
-        regex_xml = 'href="([^/\s]+\.(?:tiff|tif|jpg|jpeg|gif|png))"'
-        regex_html = 'src="([^"]+)"'
+        if self.xylose.data_model_version == 'xml':
+            regex = 'href="([^/\s]+\.(?:tiff|tif|jpg|jpeg|gif|png))"'
 
-        if re.findall(regex_xml, self.content):
-            imgs['xml'] = re.findall(regex_xml, self.content)
-        if re.findall(regex_html, self.content):
-            imgs['html'] = re.findall(regex_html, self.content)
+        if self.xylose.data_model_version != 'xml':
+            regex = 'src="([^"]+)"'
 
-        return imgs
+        return re.findall(regex, self.content)
 
     def _get_media_path(self, name):
         """
@@ -205,76 +202,65 @@ class Assets(object):
         file_type = 'img'  # Not all are images
         existing_list = []
         registered_medias = {}
-        version = None
 
         medias = self._extract_media()
 
-        if 'html' in medias:
-            if medias['html']:
-                version = 'html'
-        elif 'xml' in medias:
-            if medias['xml']:
-                version = 'xml'
+        for media in medias:
 
-        if version:
-            medias = medias[version]
+            # Workaround
+            media.replace('tiff', 'jpg')
 
-            for media in medias:
+            if self.xylose.data_model_version != 'xml':
+                media_html_path = media.replace('/img/revistas',
+                                                config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH)
 
-                # Workaround
-                media.replace('tiff', 'jpg')
+                pfile = self._open_asset(media_html_path)
 
-                if version == 'html':
-                    media_html_path = media.replace('/img/revistas',
-                                                    config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH)
+                metadata = self.get_metadata()
+                metadata.update({'file_path': self._get_media_path(media),
+                                 'bucket_name': self.bucket_name,
+                                 'type': file_type})
+                media_name = media.split('/')[-1:][0]  # Fixme
+            else:
+                media_name = media
+                metadata = self.get_metadata()
+                metadata.update({'file_path': self._get_media_path(media),
+                                 'bucket_name': self.bucket_name,
+                                 'type': file_type})
 
-                    pfile = self._open_asset(media_html_path)
+                pfile = self._open_asset(self._get_media_path(media))
 
-                    metadata = self.get_metadata()
-                    metadata.update({'file_path': self._get_media_path(media),
-                                     'bucket_name': self.bucket_name,
-                                     'type': file_type})
-                    media_name = media.split('/')[-1:][0]
-                else:
-                    media_name = media
-                    metadata = self.get_metadata()
-                    metadata.update({'file_path': self._get_media_path(media),
-                                     'bucket_name': self.bucket_name,
-                                     'type': file_type})
+            ssm_asset = SSMHandler(pfile, media_name, file_type, metadata,
+                                   self.bucket_name)
 
-                    pfile = self._open_asset(self._get_media_path(media))
+            existing_asset = ssm_asset.exists()
 
-                ssm_asset = SSMHandler(pfile, media_name, file_type, metadata,
-                                       self.bucket_name)
+            if existing_asset:
+                logger.info(u"Já existe um media com PID: %s e colecao: %s, cadastrado: %s",
+                            self.xylose.publisher_id, self.xylose.collection_acronym, existing_asset)
+                existing_list = [asset for asset in existing_asset]
+                logger.info(u"Lista de imagens existente para o artigo com PID: %s, %s",
+                            self.xylose.publisher_id, existing_asset)
+            else:
+                uuid = ssm_asset.register()
 
-                existing_asset = ssm_asset.exists()
+                logger.info(u"UUID: %s para media do artigo com PID: %s",
+                            uuid, self.xylose.publisher_id)
 
-                if existing_asset:
-                    logger.info(u"Já existe um media com PID: %s e colecao: %s, cadastrado: %s",
-                                self.xylose.publisher_id, self.xylose.collection_acronym, existing_asset)
-                    existing_list = [asset for asset in existing_asset]
-                    logger.info(u"Lista de imagens existente para o artigo com PID: %s, %s",
-                                self.xylose.publisher_id, existing_asset)
-                else:
-                    uuid = ssm_asset.register()
+                registered_medias.update({media: ssm_asset.get_urls()['url']})
 
-                    logger.info(u"UUID: %s para media do artigo com PID: %s",
-                                uuid, self.xylose.publisher_id)
+                logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
+                            registered_medias, self.xylose.publisher_id)
 
-                    registered_medias.update({media: ssm_asset.get_urls()['url']})
+            if existing_list:
 
-                    logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
-                                registered_medias, self.xylose.publisher_id)
+                for asset in existing_list:
+                    registered_medias.update({asset['filename']:
+                                              asset['full_absolute_url']})
 
-                if existing_list:
+            logger.info("Medias já existente no SSM: %s", registered_medias)
 
-                    for asset in existing_list:
-                        registered_medias.update({asset['filename']:
-                                                  asset['full_absolute_url']})
-
-                logger.info("Medias já existente no SSM: %s", registered_medias)
-
-            return registered_medias
+        return registered_medias
 
     def register(self):
         raise NotImplementedError()
@@ -494,17 +480,23 @@ class AssetHTMLS(Assets):
                 html = '''<html>
                             <head>
                                 <meta charset="utf-8">
+                                <link rel="stylesheet" href="http://ssm.scielo.org/media/assets/css/scielo-article.css">
+                                <link rel="stylesheet" href="http://ssm.scielo.org/media/assets/css/scielo-print.css" media="print">
                             </head>
                             <body>
-                                <div id="standalonearticle">
-                                    <div class="articleTxt">
-                                        <div class="row">
-                                            <article class="col-md-10 col-md-offset-2 col-sm-12 col-sm-offset-0" id="articleText">
-                                                 %s
-                                            </article>
+                                <section class="articleCtt articleCttLeft">
+                                    <div class="container">
+                                        <div id="standalonearticle">
+                                            <div class="articleTxt">
+                                                <div class="row">
+                                                    <article class="col-md-10 col-md-offset-2 col-sm-12 col-sm-offset-0" id="articleText">
+                                                         %s
+                                                    </article>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </section>
                             </body>
                             </html>
                         ''' % self.content
