@@ -1,4 +1,5 @@
 # coding: utf-8
+import os
 import re
 from io import BytesIO
 
@@ -220,7 +221,7 @@ class Assets(object):
                 metadata.update({'file_path': self._get_media_path(media),
                                  'bucket_name': self.bucket_name,
                                  'type': file_type})
-                media_name = media.split('/')[-1:][0]  # Fixme
+                media_name = os.path.basename(media)
             else:
                 media_name = media
                 metadata = self.get_metadata()
@@ -480,8 +481,8 @@ class AssetHTMLS(Assets):
                 html = '''<html>
                             <head>
                                 <meta charset="utf-8">
-                                <link rel="stylesheet" href="http://ssm.scielo.org/media/assets/css/scielo-article.css">
-                                <link rel="stylesheet" href="http://ssm.scielo.org/media/assets/css/scielo-print.css" media="print">
+                                <link rel="stylesheet" href="%s">
+                                <link rel="stylesheet" href="%s" media="print">
                             </head>
                             <body>
                                 <section class="articleCtt articleCttLeft">
@@ -499,7 +500,8 @@ class AssetHTMLS(Assets):
                                 </section>
                             </body>
                             </html>
-                        ''' % self.content
+                        ''' % (config.OPAC_PROC_ARTICLE_CSS_URL,
+                               config.OPAC_PROC_ARTICLE_PRINT_CSS_URL, self.content)
 
             if isinstance(html, unicode):
                 html = html.encode('utf-8')
