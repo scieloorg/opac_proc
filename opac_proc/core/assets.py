@@ -210,6 +210,7 @@ class Assets(object):
 
             # Workaround
             media.replace('tiff', 'jpg')
+            media.replace('/img/fbpe', '/img/revistas')
 
             if self.xylose.data_model_version != 'xml':
                 media_html_path = media.replace('/img/revistas',
