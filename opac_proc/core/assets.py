@@ -146,9 +146,8 @@ class Assets(object):
                              ('/img/revistas', source_media_path),
                              ('img/revistas', source_media_path)]
 
-        for replace in change_media_path:
-            _from, _to = replace
-            media_path = media_path.replace(_from, _to)
+        for _from, _to in change_media_path:
+            media_path = media_path.replace(_from, _to.lower())
 
         return (origin_path, media_path)
 
