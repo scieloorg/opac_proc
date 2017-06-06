@@ -1,9 +1,19 @@
 # coding: utf-8
 import re
+import traceback
 from datetime import datetime, timedelta
-from flask import render_template, flash, request
+from flask import render_template, flash, request, url_for
 from flask.views import View
 from flask_mongoengine import Pagination
+from flask_login import current_user
+
+from opac_proc.core.notifications import (
+    # create_default_msg,
+    create_error_msg,
+    # create_warning_msg,
+    create_info_msg,
+    # create_debug_msg,
+)
 
 
 class ListView(View):
@@ -191,32 +201,70 @@ class ListView(View):
             'range': result_range
         }
 
+    def _trigger_messages(self, is_error=False, exception_obj=None, traceback_str='', items_count=None):
+        user = current_user.email
+        if is_error:
+            exception_msg = u"{exception_str} {traceback_str}".format(
+                            exception_str=unicode(exception_obj), traceback_str=traceback_str)
+
+            msg_subject = u"ERRO: Após o usuário: {user} iniciar o processo de: {stage} para o modelo: {model} via web".format(
+                user=user, stage=self.stage, model=self.model_name)
+
+            qty = items_count or 'todos os'
+            msg_body = u"""
+                        <strong>ERRO:</strong><br />
+                        Ocorreu um erro após o usuário: <strong>{user}</strong> iniciar o processo de: <strong>{stage}</strong>
+                        para {qty} registro(s) de: <strong>{model}</strong> via web <br /><br />
+                        {exception_msg}
+                        """.format(user=user, stage=self.stage, model=self.model_name, exception_msg=exception_msg, qty=qty)
+            app_msg = create_error_msg(msg_subject, msg_body, self.stage, self.model_name)
+            msg_link = url_for('default.message_detail', app_msg.pk, _external=True)
+            flask_msg = u'{msg}. Descrição completa do erro <a href="{url}">aqui</a>'.format(msg=msg_subject, url=msg_link)
+            flash(flask_msg, 'error')
+            app_msg.send_email()
+        else:
+            msg_subject = u"Usuário: {user} iniciou o processo de: {stage} para o modelo: {model} via web".format(
+                          user=user, stage=self.stage, model=self.model_name)
+            qty = items_count or 'todos os'
+            msg_body = u"""
+                        Usuário: <strong>{user}</strong> iniciar o processo de: <strong>{stage}</strong>
+                        para {qty} registros de <strong>{model}</strong>, via web.
+                        """.format(user=user, stage=self.stage, model=self.model_name, qty=qty)
+            app_msg = create_info_msg(msg_subject, msg_body, self.stage, self.model_name)
+            msg_link = url_for('default.message_detail', object_id=app_msg.pk, _external=True)
+            flask_msg = u'{msg}. Descrição completa <a href="{url}">aqui</a>'.format(msg=msg_subject, url=msg_link)
+            flash(flask_msg, 'info')
+            app_msg.send_email()
+
     def do_create(self):
         try:
             processor = self.process_class()
             processor.create()
-        except Exception as e:
-            flash(u"Erro enquanto processamos a ação de criar. Erro: %s " % unicode(e.message), 'error')
+        except Exception, e:
+            traceback_str = traceback.format_exc()
+            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str)
         else:
-            flash(u"Começou o processo de criação (%s) de todos os registros de %s" % (self.stage, self.model_name))
+            self._trigger_messages()
 
     def do_update_all(self):
         try:
             processor = self.process_class()
             processor.update()
         except Exception as e:
-            flash(u"Erro enquanto processamos a ação de atualizar tudo. Erro: %s" % unicode(e), 'error')
+            traceback_str = traceback.format_exc()
+            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str)
         else:
-            flash(u"Começou o processo de atualização (%s) de todos os registros de %s" % (self.stage, self.model_name))
+            self._trigger_messages()
 
     def do_update_selected(self, ids):
         try:
             processor = self.process_class()
             processor.update(ids)
         except Exception as e:
-            flash(u"Erro enquanto processamos a ação de atualizar tudo. Erro: %s" % unicode(e), 'error')
+            traceback_str = traceback.format_exc()
+            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=len(ids))
         else:
-            flash(u"Começou o processo de atualização de %s %s" % (len(ids), self.model_name.upper()))
+            self._trigger_messages(items_count=len(ids))
 
     def do_delete_all(self):
         if self.model_class is None:

@@ -67,6 +67,8 @@ def home():
     with switch_db(OpacNews, opac_webapp_db_name):
         opac_news_count = OpacNews.objects.all().count()
 
+    latest_msg = models.Message.objects.filter(unread=True).order_by('-created_at')[:5]
+
     context = {
         # extract
         'extract_collection_count': extract_collection_count,
@@ -103,5 +105,7 @@ def home():
         # opac outros modelos
         'opac_sponsor_count': opac_sponsor_count,
         'opac_page_count': opac_page_count,
+
+        'latest_msg': latest_msg
     }
     return render_template("home.html", **context)
