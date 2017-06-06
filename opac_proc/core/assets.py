@@ -128,6 +128,7 @@ class Assets(object):
                     /img/fbpe/gs/v29n4/original_breve1_t1.jpg
                     ../img/revistas/gs/v29n4/original_breve1_t1.jpg
                     http:/img/revistas/gs/v29n4/original_breve1_t1.jpg
+                    img/revistas/resp/v80n6/seta.gif
                     /img/revistas/resp/v80n6/seta.gif (this media is no registered)
         """
 
@@ -142,7 +143,8 @@ class Assets(object):
 
         change_media_path = [('tif', 'jpg'), ('../', '/'), ('http:', ''),
                              ('/img/fbpe', source_media_path),
-                             ('/img/revistas', source_media_path)]
+                             ('/img/revistas', source_media_path),
+                             ('img/revistas', source_media_path)]
 
         for replace in change_media_path:
             _from, _to = replace
