@@ -1,5 +1,7 @@
 # coding: utf-8
+import os
 import re
+import json
 from io import BytesIO
 
 from opac_proc.web import config
@@ -8,6 +10,7 @@ from opac_proc.logger_setup import getMongoLogger
 from html_generator import generate_htmls
 from ssm_handler import SSMHandler
 
+from opac_proc.core import utils
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
@@ -57,8 +60,15 @@ class Assets(object):
     def _extract_media(self):
         """
         Return a list of media to be collect from content
+
+        Try get imgs by href e src tags.
         """
-        regex = 'href="([^/\s]+\.(?:tiff|tif|jpg|jpeg|gif|png))"'
+
+        if self.xylose.data_model_version == 'xml':
+            regex = config.OPAC_PROC_MEDIA_XML_MATCH_REGEX
+
+        if self.xylose.data_model_version != 'xml':
+            regex = config.OPAC_PROC_MEDIA_HTML_MATCH_REGEX
 
         return re.findall(regex, self.content)
 
@@ -102,6 +112,68 @@ class Assets(object):
                     self.xylose.publisher_id, langs)
 
         return list(langs)
+
+    def _normalize_media_path_html(self, media_path):
+        """
+        This method takes the path to the media and fits to known paths
+        and returns a tuple with the media path in the original html,
+        the path known in the file system.
+
+        In addition to making some extrension adjustments
+
+        Params:
+            :param media_path: the path to the media.
+                Example of paths:
+                    /img/revistas/gs/v29n4/original_breve1_t1.jpg (must common example)
+                    /img/fbpe/gs/v29n4/original_breve1_t1.jpg
+                    ../img/revistas/gs/v29n4/original_breve1_t1.jpg
+                    http:/img/revistas/gs/v29n4/original_breve1_t1.jpg
+                    img/revistas/resp/v80n6/seta.gif
+                    /img/revistas/resp/v80n6/seta.gif (this media is no registered)
+        """
+
+        origin_path = media_path
+
+        exclude_medias = ['seta.jpg', 'seta.gif']
+
+        if os.path.basename(media_path) in exclude_medias:
+            return (origin_path, None)
+
+        source_media_path = config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
+
+        change_media_path = [('tif', 'jpg'), ('../', '/'), ('http:', ''),
+                             ('/img/fbpe', source_media_path),
+                             ('/img/revistas', source_media_path),
+                             ('img/revistas', source_media_path)]
+
+        for _from, _to in change_media_path:
+            media_path = media_path.replace(_from, _to.lower())
+
+        return (origin_path, media_path)
+
+    def _normalize_media_path_xml(self, media_path):
+        """
+        This method takes the path to the media and fits to known paths
+        and returns a tuple with the media path in the original html,
+        the path known in the file system.
+
+        In addition to making some extrension adjustments
+
+        Params:
+            :param media_path: the path to the media.
+                Example of paths:
+                    /img/revistas/rpmesp/v33n4/1726-4642-rpmesp-33-04-00819-gt1.tif
+        """
+
+        origin_path = media_path
+
+        change_media_path = [('tif', 'jpg')]
+
+        for replace in change_media_path:
+            _from, _to = replace
+            media_path = media_path.replace(_from, _to)
+
+        return (origin_path, media_path)
 
     @property
     def bucket_name(self):
@@ -184,7 +256,7 @@ class Assets(object):
 
         return metadata
 
-    def register_media(self):
+    def register_media_xml(self):
         """
         Return a dictionary with all media added in SSM.
 
@@ -200,14 +272,18 @@ class Assets(object):
         medias = self._extract_media()
 
         for media in medias:
-            pfile = self._open_asset(self._get_media_path(media))
+
+            origin_path, media_path = self._normalize_media_path_xml(media)
 
             metadata = self.get_metadata()
-            metadata.update({'file_path': self._get_media_path(media),
+            metadata.update({'file_path': media_path,
                              'bucket_name': self.bucket_name,
-                             'type': file_type})
+                             'type': file_type,
+                             'origin_path': origin_path})
 
-            ssm_asset = SSMHandler(pfile, media, file_type, metadata,
+            pfile = self._open_asset(self._get_media_path(media_path))
+
+            ssm_asset = SSMHandler(pfile, media_path, file_type, metadata,
                                    self.bucket_name)
 
             existing_asset = ssm_asset.exists()
@@ -224,7 +300,7 @@ class Assets(object):
                 logger.info(u"UUID: %s para media do artigo com PID: %s",
                             uuid, self.xylose.publisher_id)
 
-                registered_medias.update({media: ssm_asset.get_urls()['url']})
+                registered_medias.update({origin_path: ssm_asset.get_urls()['url']})
 
                 logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
                             registered_medias, self.xylose.publisher_id)
@@ -232,7 +308,73 @@ class Assets(object):
             if existing_list:
 
                 for asset in existing_list:
-                    registered_medias.update({asset['filename']:
+                    metadata = json.loads(asset['metadata'])
+                    registered_medias.update({metadata['origin_path']:
+                                              asset['full_absolute_url']})
+
+            logger.info("Medias já existente no SSM: %s", registered_medias)
+
+        return registered_medias
+
+    def register_media_html(self):
+        """
+        Return a dictionary with all media added in SSM.
+
+        Example:  {
+                    'a08tab01.gif': 'http://ssm.scielo.org/media/assets/resp/v89n1/a08tab01.gif'
+                    'a08tab3b.gif': 'http://ssm.scielo.org/media/assets/resp/v89n1/a08tab3b.gif'
+                  }
+        """
+        file_type = 'img'  # Not all are images
+        existing_list = []
+        registered_medias = {}
+
+        medias = self._extract_media()
+
+        for media in medias:
+
+            origin_path, media_path = self._normalize_media_path_html(media)
+
+            if not media_path:
+                continue
+
+            pfile = self._open_asset(media_path)
+
+            metadata = self.get_metadata()
+            metadata.update({'file_path': media_path,
+                             'bucket_name': self.bucket_name,
+                             'type': file_type,
+                             'origin_path': origin_path})
+
+            media_name = os.path.basename(media_path)
+
+            ssm_asset = SSMHandler(pfile, media_name, file_type, metadata,
+                                   self.bucket_name)
+
+            existing_asset = ssm_asset.exists()
+
+            if existing_asset:
+                logger.info(u"Já existe um media com PID: %s e colecao: %s, cadastrado: %s",
+                            self.xylose.publisher_id, self.xylose.collection_acronym, existing_asset)
+                existing_list = [asset for asset in existing_asset]
+                logger.info(u"Lista de imagens existente para o artigo com PID: %s, %s",
+                            self.xylose.publisher_id, existing_asset)
+            else:
+                uuid = ssm_asset.register()
+
+                logger.info(u"UUID: %s para media do artigo com PID: %s",
+                            uuid, self.xylose.publisher_id)
+
+                registered_medias.update({origin_path: ssm_asset.get_urls()['url']})
+
+                logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
+                            registered_medias, self.xylose.publisher_id)
+
+            if existing_list:
+
+                for asset in existing_list:
+                    metadata = json.loads(asset['metadata'])
+                    registered_medias.update({metadata['origin_path']:
                                               asset['full_absolute_url']})
 
             logger.info("Medias já existente no SSM: %s", registered_medias)
@@ -279,7 +421,6 @@ class AssetPDF(Assets):
 
                     logger.info(u"Caminho do PDF do artigo PID: %s, idioma: %s, %s",
                                 self.xylose.publisher_id, lang, file_path)
-
                     pfile = self._open_asset(file_path)
 
                     logger.info(u"Bucket name: %s do PDF: %s", self.bucket_name,
@@ -330,7 +471,7 @@ class AssetXML(Assets):
 
     def register(self):
         """
-        Method to register the PDF(s) of the asset.
+        Method to register the XML(s) of the asset.
 
         To register the xml we must replace the path of the image to paths
         valid and registered in SSM.
@@ -354,7 +495,7 @@ class AssetXML(Assets):
 
             self.content = self._open_asset(file_path, mode='r').read()
 
-            registered_media = self.register_media()
+            registered_media = self.register_media_xml()
 
             logger.info(u"Medias cadastradas para o XML com PID: %s, %s",
                         self.xylose.publisher_id, registered_media)
@@ -372,6 +513,7 @@ class AssetXML(Assets):
             if ssm_asset.exists():
                 logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado",
                             self.xylose.publisher_id, self.xylose.collection_acronym)
+                return (None, None)
             else:
                 uuid = ssm_asset.register()
 
@@ -440,23 +582,43 @@ class AssetHTMLS(Assets):
             # Se for versão HTML
             if not xml_version:
 
-                # É necessário fazer o mesmo procedicmento que é relizado no XML
+                # É necessário fazer o mesmo procedimento que é relizado no XML
                 # Cadastrar as medias e alterar o caminho diretamente no HTML
-                self.content = html
-                registered_media = self.register_media()
 
-                logger.info(u"Medias cadastradas para o PID: %s", registered_media)
+                self.content = html
+                registered_media = self.register_media_html()
+
+                logger.info(u"O artigo com PID: %s é uma versão HTML.",
+                            self.xylose.publisher_id)
 
                 self._change_img_path(registered_media)  # change self.content
 
-                html = self.content
+                # Substitui a seta.jpg'
+                patterns = config.OPAC_PROC_MEDIA_ARROW_MATCH_REGEXS.split(',')
+
+                arrow = config.OPAC_PROC_MEDIA_ARROW_REPLACE
+
+                for pattern_string in patterns:
+
+                    pattern = re.compile(pattern_string)
+
+                    if re.search(pattern, self.content):
+                        self.content = re.sub(pattern, arrow, self.content)
+
+                directory = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                         'templates')
+
+                html = utils.render_from_template(directory, 'article.html', {
+                                                  'html': self.content,
+                                                  'css': config.OPAC_PROC_ARTICLE_CSS_URL,
+                                                  'css_print': config.OPAC_PROC_ARTICLE_PRINT_CSS_URL
+                                                  })
+            if isinstance(html, unicode):
+                html = html.encode('utf-8')
 
             # XML or HTML
-            ssm_asset = SSMHandler(BytesIO(html),
-                                   self._get_name(lang),
-                                   file_type,
-                                   metadata,
-                                   self.bucket_name)
+            ssm_asset = SSMHandler(BytesIO(html), self._get_name(lang), file_type,
+                                   metadata, self.bucket_name)
 
             logger.info("Verificando se o asset existe: %s", ssm_asset.exists())
 
@@ -501,8 +663,18 @@ class AssetHTMLS(Assets):
             logger.error("XML não existente: %s", asset)
 
     def register(self):
+        """
+        Method to register the HTML(s) of the asset from HTML version.
+        """
+        htmls = {}
+        original_html = self.xylose.original_html()
+        translated_htmls = self.xylose.translated_htmls()
 
-        htmls = self.xylose.translated_htmls()
+        if original_html:
+            htmls.update({self.xylose.original_language(): original_html})
+
+        if translated_htmls:
+            htmls.update(translated_htmls)
 
         if htmls:
             return self.add_htmls(htmls, False)
