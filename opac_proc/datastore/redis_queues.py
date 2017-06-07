@@ -8,15 +8,7 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
 from opac_proc.web import config
-
-
-class Singleton(object):
-    _instances = {}
-
-    def __new__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__new__(cls, *args, **kwargs)
-        return cls._instances[cls]
+from opac_proc.core.utils import Singleton
 
 
 class RQueues(Singleton):

@@ -16,7 +16,8 @@
     <table class="table">
       <thead>
         <tr>
-          <th>Fase do processamento:</th>
+          <th class="col-md-1">Tipo:</th>
+          <th>Fase:</th>
           <th class="col-md-2">Modelo:</th>
           <th class="col-md-2">Não lida?:</th>
           <th class="col-md-1">Açoes:</th>
@@ -24,7 +25,32 @@
       </thead>
       <tbody>
         <tr>
-          <td>{{ document.stage }}</td>
+          <td>
+            {% if document.msg_type == "ERROR" %}
+              <p class="text-danger">
+                <i class="fa fa-exclamation-circle"></i>
+                {{ document.msg_type }}
+              </p>
+            {% elif document.msg_type == "WARNING" %}
+              <p class="text-warning">
+                <i class="fa fa-exclamation-triangle"></i>
+                {{ document.msg_type }}
+              </p>
+            {% elif document.msg_type == "INFO" %}
+              <p class="text-info">
+                <i class="fa fa-info-circle"></i>
+                {{ document.msg_type }}
+              </p>
+            {% elif document.msg_type == "DEBUG" %}
+              <p class="text-primary">
+                <i class="fa fa-bug"></i>
+                {{ document.msg_type }}
+              </p>
+            {% else %}
+              <p>{{ document.msg_type }}</p>
+            {% endif %}
+          </td>
+          <td>{{ document.stage|upper }}</td>
           <td>{{ document.model_name|upper }}</td>
           <td>
             {% if document.unread %}
@@ -68,7 +94,7 @@
       {% if document.body %}
         <div class="well">
           <p>
-            {{ document.body }}
+            {{ document.body|safe }}
           </p>
         </div>
       {% else %}
