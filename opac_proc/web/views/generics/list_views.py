@@ -359,6 +359,12 @@ class ListView(View):
 
         # listamos os registros
         page = request.args.get('page', 1, type=int)
+
+        new_per_page = request.args.get('per_page', self.per_page, type=int)
+        if self.per_page != new_per_page:
+            if new_per_page in [10, 20, 50, 100, 500, 1000]:
+                self.per_page = new_per_page
+
         objects = Pagination(self.get_objects(), page, self.per_page)
         context = {
             # stage: 'extract' || 'transform' || 'load' || 'opac'
@@ -380,6 +386,7 @@ class ListView(View):
             # paginas:
             'pager_range': self._pager_range(page, objects.pages),
             'current_page': page,
+            'per_page': self.per_page,
             'total_pages': objects.pages,
             'total_records': objects.total,
             'has_prev': objects.has_prev,
