@@ -267,6 +267,11 @@ class TransformArticleListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
+            'field_label': u'Versão (xml/html)',
+            'field_name': 'data_model_version',
+            'field_type': 'string'
+        },
+        {
             'field_label': u'Last update:',
             'field_name': 'updated_at',
             'field_type': 'date_time'
@@ -292,6 +297,11 @@ class TransformArticleListView(TransformBaseListView):
         {
             'field_label': u'PID',
             'field_name': 'pid',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Versão (xml/html)',
+            'field_name': 'data_model_version',
             'field_type': 'string'
         },
         {

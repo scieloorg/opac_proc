@@ -3,10 +3,14 @@ from datetime import datetime
 from mongoengine import (
     Document,
     DynamicDocument,
+    EmbeddedDocument,
+    EmbeddedDocumentField,
+    ReferenceField,
     signals,
     StringField,
     DateTimeField,
-    BooleanField
+    BooleanField,
+    MapField,
 )
 from base_mixin import BaseMixin
 
@@ -365,13 +369,23 @@ signals.post_save.connect(LoadNews.post_save, sender=LoadNews)
 
 # #### NOTIFICATIONS
 
+message_type_choices = [
+    'DEFAULT',
+    'ERROR',
+    'WARNING',
+    'INFO',
+    'DEBUG',
+]
+
+
 class Message(Document):
-    subject = StringField(max_length=50, default='')
+    subject = StringField(max_length=128, default='')
     body = StringField(default='')
     stage = StringField(max_length=10, default='default')   # 'extract' | 'transform' | 'load'
     model_name = StringField(max_length=15, default='')     # 'collection' | 'journal' | 'issue' | 'article' | 'pree_release' | 'news'
     created_at = DateTimeField(default=datetime.now)
     unread = BooleanField(required=True, default=True)
+    msg_type = StringField(max_length=7, required=True, choices=message_type_choices)
 
     @classmethod  # signal pre_save (asociar em cada modelo)
     def pre_save(cls, sender, document, **kwargs):
@@ -419,4 +433,45 @@ class DefaultLog(DynamicDocument):
         'max_documents': 100000,
         'collection': 'default_log',
         'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
+    }
+
+
+# ## FINITE STATE MACHINES & STATES
+
+
+class MachineState(Document):
+    name = StringField(max_length=50, required=True, unique=True)
+    description = StringField(defult='')
+    is_initial_state = BooleanField(default=False)
+    is_final_state = BooleanField(default=False)
+    execution_started_at = DateTimeField(blank=True, null=True)
+    execution_finished_at = DateTimeField(blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
+
+    meta = {
+        'collection': 'fsm_state',
+    }
+
+
+class StateTransition(EmbeddedDocument):
+    on_success = ReferenceField(MachineState, required=True)
+    on_failure = ReferenceField(MachineState, required=True)
+
+
+class FiniteStateMachine(Document):
+    name = StringField(max_length=50, required=True, unique=True)
+    description = StringField(defult='')
+    current_state = ReferenceField(MachineState, null=True, blank=True)
+    execution_started_at = DateTimeField(blank=True, null=True)
+    execution_finished_at = DateTimeField(blank=True, null=True)
+    is_ready_to_run = BooleanField(default=False)
+    transition_map = MapField(EmbeddedDocumentField(StateTransition))
+
+    def __unicode__(self):
+        return self.name
+
+    meta = {
+        'collection': 'fsm',
     }

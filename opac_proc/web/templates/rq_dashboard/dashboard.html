@@ -95,6 +95,12 @@
                 </h1>
 
                 <div class="btn-group pull-right">
+                    {% if queue.name == 'failed' %}
+                        <a href="{{ url_for('export_failed_jobs') }}" class='btn btn-primary'>
+                            <i class="glyphicon glyphicon-download-alt"></i>
+                            Exportar (CSV)
+                        </a>
+                    {% endif %}
                     <a href="{{ url_for('rq_dashboard.compact_queue', queue_name=queue.name) }}"
                        id="compact-btn" class="btn btn-default"
                        data-toggle="tooltip" title="Remove all stale jobs from this queue (non-destructive)" >
@@ -163,6 +169,10 @@
                                 <a href="#" data-role="cancel-job-btn" class="btn btn-danger">
                                     <i class="glyphicon glyphicon-remove"></i> Cancel
                                 </a>
+                                <button class="btn btn-clipboard"
+                                        data-clipboard-text="<%= d.description %>">
+                                    <i class="glyphicon glyphicon-copy"></i> Copiar args
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -212,6 +222,15 @@
 
 
 {% block inline_js %}
+    /* função de copia dos args do job */
+    var clipboard = new Clipboard('.btn-clipboard');
+    clipboard.on('success', function(e) {
+        alert('Os args do job foram copiados!');
+        e.clearSelection();
+    });
+
+
     var POLL_INTERVAL = {{ poll_interval }};
     {% include "rq_dashboard/dashboard.js" with context %}
+
 {% endblock %}

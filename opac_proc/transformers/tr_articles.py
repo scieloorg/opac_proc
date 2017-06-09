@@ -146,6 +146,13 @@ class ArticleTransformer(BaseTransformer):
             if pdfs:
                 self.transform_model_instance['pdfs'] = pdfs
 
+        # salvamos typo de artigo na fonte: xml ou html
+        if hasattr(xylose_article, 'data_model_version'):
+            if xylose_article.data_model_version == 'xml':
+                self.transform_model_instance['data_model_version'] = 'xml'
+            else:
+                self.transform_model_instance['data_model_version'] = 'html'
+
         asset_html = AssetHTMLS(xylose_article)
 
         # Versão XML do artigo

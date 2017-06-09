@@ -161,9 +161,14 @@ OPAC_PROC_ASSETS_SOURCE_PDF_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_PDF_P
 OPAC_PROC_ASSETS_SOURCE_XML_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_XML_PATH', '/app/data/xml')
 OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH = os.environ.get('OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH', '/app/data/img')
 
-OPAC_PROC_ARTICLE_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_CSS_URL', None)
-OPAC_PROC_ARTICLE_PRINT_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_PRINT_CSS_URL', None)
-OPAC_PROC_ARTICLE_JS_URL = os.environ.get('OPAC_PROC_ARTICLE_JS_URL', None)
+OPAC_PROC_ARTICLE_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_CSS_URL', 'https://ssm.scielo.org/media/assets/css/scielo-article.css')
+OPAC_PROC_ARTICLE_PRINT_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_PRINT_CSS_URL', 'https://ssm.scielo.org/media/assets/css/scielo-print.css')
+OPAC_PROC_ARTICLE_JS_URL = os.environ.get('OPAC_PROC_ARTICLE_JS_URL', 'https://ssm.scielo.org/media/assets/js/scielo-article.js')
+
+OPAC_PROC_MEDIA_XML_MATCH_REGEX = os.environ.get('OPAC_PROC_IMG_XML_MATCH_REGEX', 'href="([^/\s]+\.(?:tiff|tif|jpg|jpeg|gif|png))"')
+OPAC_PROC_MEDIA_HTML_MATCH_REGEX = os.environ.get('OPAC_PROC_IMG_HTML_MATCH_REGEX', 'src="([^"]+)"')
+OPAC_PROC_MEDIA_ARROW_MATCH_REGEXS = os.environ.get('OPAC_PROC_MEDIA_ARROW_MATCH_REGEXS', '<a href="#top">(.*?)</a>,<a href="#enda">(.*?)</a>,<a href="#up">(.*?)</a>')
+OPAC_PROC_MEDIA_ARROW_REPLACE = os.environ.get('OPAC_PROC_MEDIA_ARROW_REPLACE', '<a href="#top">&#9650;</a>')
 
 # Habilitar/Desabilitar o form de registro
 WEB_REGISTRATION_ENABLED = os.environ.get('OPAC_PROC_WEB_REGISTRATION_ENABLED', 'False') == 'True'

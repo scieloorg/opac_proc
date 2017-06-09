@@ -19,6 +19,11 @@ class MessageListView(ListView):
             'field_type': 'string'
         },
         {
+            'field_label': u'Tipo',
+            'field_name': 'msg_type',
+            'field_type': 'string'
+        },
+        {
             'field_label': u'Fase',
             'field_name': 'stage',
             'field_type': 'string'
@@ -44,6 +49,11 @@ class MessageListView(ListView):
         {
             'field_label': u'Assunto',
             'field_name': 'subject',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Tipo',
+            'field_name': 'msg_type',
             'field_type': 'string'
         },
         {

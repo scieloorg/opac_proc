@@ -7,7 +7,7 @@ services:
     hostname: mailhog
     ports:
         - "8026:8025"
-        - "1026:1025"
+        - "1025:1025"
     volumes:
         - /etc/localtime:/etc/localtime:ro
 
@@ -166,7 +166,7 @@ services:
       - OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION=True
       # Email:
       - OPAC_PROC_MAIL_SERVER=mailhog
-      - OPAC_PROC_MAIL_PORT=1026
+      - OPAC_PROC_MAIL_PORT=1025
       # Opac_ssm_server
       - OPAC_SSM_GRPC_SERVER_HOST=${OPAC_GRPC_HOST}
       - OPAC_SSM_GRPC_SERVER_PORT=${OPAC_GRPC_PORT}
