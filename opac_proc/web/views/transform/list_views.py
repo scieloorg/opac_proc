@@ -200,7 +200,12 @@ class TransformIssueListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Type',
+            'field_name': 'type',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
@@ -224,7 +229,7 @@ class TransformIssueListView(TransformBaseListView):
         },
         {
             'field_label': u'PID',
-            'field_name': 'code',
+            'field_name': 'pid',
             'field_type': 'string'
         },
         {
@@ -233,7 +238,12 @@ class TransformIssueListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Type',
+            'field_name': 'type',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },

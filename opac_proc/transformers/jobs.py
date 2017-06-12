@@ -137,13 +137,14 @@ def task_issue_update(ids=None):
     model = 'issue'
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
+    collection = models.TransformCollection.objects.all().first()
 
     if ids is None:  # update all collections
         models.TransformIssue.objects.all().update(must_reprocess=True)
         for issue in models.TransformIssue.objects.all():
             r_queues.enqueue(
                 stage, model,
-                task_transform_issue, issue.code)
+                task_transform_issue, collection.acronym, issue.pid)
     else:
         for oid in ids:
             try:
@@ -152,7 +153,7 @@ def task_issue_update(ids=None):
                 obj.reload()
                 r_queues.enqueue(
                     stage, model,
-                    task_transform_issue, obj.code)
+                    task_transform_issue, collection.acronym, obj.pid)
             except Exception as e:
                 logger.error('models.TransformIssue %s. pk: %s', str(e), oid)
 
