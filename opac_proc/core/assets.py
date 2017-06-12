@@ -273,7 +273,9 @@ class Assets(object):
 
         for media in medias:
 
-            origin_path, media_path = self._normalize_media_path_xml(media)
+            # Workaround
+            media = media.replace('tiff', 'jpg')
+            media = media.replace('/img/fbpe', '/img/revistas')
 
             metadata = self.get_metadata()
             metadata.update({'file_path': media_path,
