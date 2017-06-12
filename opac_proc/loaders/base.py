@@ -185,7 +185,9 @@ class BaseLoader(object):
                     self.opac_model_instance.switch_db(OPAC_WEBAPP_DB_NAME)
                 else:  # já tenho uma instância no banco
                     self.opac_model_instance.switch_db(OPAC_WEBAPP_DB_NAME)
-                    self.opac_model_instance.modify(**obj_dict)
+                    for k, v in obj_dict.iteritems():
+                        self.opac_model_instance[k] = v
+                    self.opac_model_instance.save()
 
         logger.debug(u"modelo opac (_id: %s) encontrado. atualizando registro" % obj_dict['_id'])
 
