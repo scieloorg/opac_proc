@@ -14,9 +14,17 @@ class OpacBaseListView(ListView):
     can_delete = True
 
     def get_objects(self):
+        if self.model_class is None:
+            raise ValueError("model class not defined")
+        else:
+            filters = self.get_filters()
+
         register_connections()
         with switch_db(self.model_class, OPAC_WEBAPP_DB_NAME):
-            return self.model_class.objects.order_by('_id')
+            if self.list_filters and filters:
+                return self.model_class.objects.filter(**filters)
+            else:
+                return self.model_class.objects()
 
     def do_delete_all(self):
         register_connections()
@@ -159,6 +167,21 @@ class OpacIssueListView(OpacBaseListView):
             'field_label': u'Label',
             'field_name': 'label',
             'field_type': 'string'
+        },
+        {
+            'field_label': u'Type',
+            'field_name': 'type',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Order',
+            'field_name': 'order',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Year',
+            'field_name': 'year',
+            'field_type': 'string'
         }
     ]
 
@@ -176,6 +199,21 @@ class OpacIssueListView(OpacBaseListView):
         {
             'field_label': u'Label',
             'field_name': 'label',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Type',
+            'field_name': 'type',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Order',
+            'field_name': 'order',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Year',
+            'field_name': 'year',
             'field_type': 'string'
         }
     ]
