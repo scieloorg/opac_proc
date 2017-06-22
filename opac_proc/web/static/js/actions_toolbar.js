@@ -15,6 +15,7 @@ var ActionToolbar = {
   btn_delete_selected: null,
   /* list of rows selected */
   rows_selected: [],
+  custom_actions: [],
   /* helpers */
   get_rows_selected: function(){
     ActionToolbar.rows_selected = []
@@ -24,49 +25,93 @@ var ActionToolbar = {
   },
   show_loading_box: function(){
     var dialog = bootbox.dialog({
-        message: '<p class="text-center">Please wait while we do something...<br><i class="fa fa-spin fa-spinner"></i></p>',
+        message: '<p class="text-center">Por favor aguarde enquanto iniciamos o processo...<br><i class="fa fa-spin fa-spinner"></i></p>',
         closeButton: false
     });
     dialog.modal();
   },
   notify_no_rows_selected:function(){
     bootbox.alert({
-      message: "You must select at least one row!",
+      message: "Você deve selecionar pelo menos um registro!",
       size: 'small',
     });
   },
   notify_invalid_action:function(){
     bootbox.alert({
-      message: "This action is invalid!",
+      message: "Esta ação é inválida!",
       size: 'small',
     });
   },
-  ask_confirmation: function(msg, callback){
+  ask_confirmation: function(msg, callback, callback_args=null, callback_action_type=null){
     bootbox.confirm({
       message: msg,
       size: 'small',
       buttons: {
         confirm: {
-          label: '<i class="fa fa-check"></i> Confirm',
+          label: '<i class="fa fa-check"></i> Confirmar',
           className: 'btn-success'
         },
         cancel: {
-          label: '<i class="fa fa-times"></i> Cancel',
+          label: '<i class="fa fa-times"></i> Cancelar',
           className: 'btn-danger'
         }
       },
       callback: function (result) {
         if (result) {
-          callback();
+          if (callback_args === null) {
+            if (callback_action_type === null) {
+              callback();
+            } else {
+              callback(callback_action_type);
+            }
+          } else {
+            if (callback_action_type === null) {
+              callback(callback_args);
+            } else {
+              callback(callback_args, callback_action_type);
+            }
+          }
           ActionToolbar.show_loading_box();
         }
       }
     });
   },
+  submit_custom_action_form: function(method_name, action_type){
+    /*
+      action_type: 'all' ou 'selected'. Se for 'selected' passamos os ids das rows selecionadas
+    */
+    var self = this;
+    var form = $('#action_form');
+    var action_field = $('input#action_name', form);
+    var custom_action_definition = null;
+
+    for (var i = 0; i < self.custom_actions.length; i++) {
+      if (method_name === self.custom_actions[i]['method_name']) {
+        custom_action_definition = self.custom_actions[i];
+      }
+    }
+
+    if (custom_action_definition == null) {
+      console.log('ação não definida');
+      self.notify_invalid_action();
+      return;
+    }
+
+    action_field.val('custom_action__' + method_name + '__' + action_type);
+    console.log('action_field.value: ', action_field.val());
+    form.attr('method', 'POST');
+    form.attr('action', '.');
+    if (action_type === 'selected') {
+      var rows = ActionToolbar.rows_selected;
+      for (var i = 0; i < rows.length; i++) {
+        form.append( "<input type='text' name='rowid' value='" + rows[i] + " '>" );
+      }
+    }
+    form.submit();
+  },
   submit_action_form: function(action){
     var form = $('#action_form');
     var action_field = $('input#action_name', form);
-
     switch (action) {
       case "create":{
         action_field.val('create');
@@ -132,18 +177,80 @@ var ActionToolbar = {
   submit_delete_selected: function(){
     ActionToolbar.submit_action_form('delete_selected');
   },
+  submit_custom_action: function(method_name, action_type) {
+    console.log('Here call: "ActionToolbar.submit_action_form("method_name");" with method_name: ', method_name);
+    ActionToolbar.submit_custom_action_form(method_name, action_type);
+  },
+  register_custom_action: function(method_name, label, can_select_rows){
+    var self = this;
+    var custom_action_definition = {
+      'method_name': method_name,
+      'label': label,
+      'can_select_rows': can_select_rows,
+      'btn_action_selector': {
+        'btn_alone': '[data-action="' + method_name + '"]:not(".disabled")',
+        'btn_all': '[data-action="' + method_name + '"][data-target="all"]',
+        'btn_selected': '[data-action="' + method_name + '"][data-target="selected"]',
+      }
+    }
+    this.custom_actions.push(custom_action_definition);
+    /* bind click events */
+    if (can_select_rows) {
+      /* o botão que dispara a ação são na verdade 2 botões.
+         temos dropdown com 2 botões: "All" e "Selected"
+         -> usamos os selectores: 'all_records' e 'selected_records' */
+      var btn_action_all = $(custom_action_definition['btn_action_selector']['btn_all']);
+      var btn_action_sel = $(custom_action_definition['btn_action_selector']['btn_selected']);
+
+      btn_action_all.click(function(){
+        var msg = 'Você vai executar o processo de: ' + label + ' sobre todos os registros. Tem certeza?';
+        self.ask_confirmation(
+          msg,
+          ActionToolbar.submit_custom_action,
+          method_name,
+          'all');
+      });
+
+      btn_action_sel.click(function(){
+        self.get_rows_selected();
+        if (self.rows_selected == 0){
+          self.notify_no_rows_selected();
+          return;
+        } else {
+          var selected_count =  self.rows_selected.length;
+          var msg = 'Você vai executar o processo de: ' + label + ' sobre ' + selected_count + ' registro(s). Tem certeza?';
+          self.ask_confirmation(
+            msg,
+            ActionToolbar.submit_custom_action,
+            method_name,
+            'selected');
+        }
+      });
+    } else {
+      /* o botão que dispara a ação é o apontado pelo selector: 'alone' */
+      var btn_action_alone = $(custom_action_definition['btn_action_selector']['btn_alone']);
+      btn_action_alone.click(function(){
+        var msg = 'Você vai executar o processo de: ' + label + ' sobre todos os registros. Tem certeza?';
+        self.ask_confirmation(
+          msg,
+          ActionToolbar.submit_custom_action,
+          method_name,
+          'all');
+      });
+    }
+  },
   init: function(){
     var self = this;
     /* create */
     this.btn_create = $(this.btn_create_selector);
     this.btn_create.click(function(){
-      var msg = 'You will <b>CREATE</b> new records.<br/>Are you sure? ';
+      var msg = 'Você vai executar o processo de: <strong>CRIAR/IMPORTAR</strong> todos os registros. Tem certeza?';
       self.ask_confirmation(msg, ActionToolbar.submit_create);
     });
     /* update all */
     this.btn_update_all = $(this.btn_update_all_selector);
     this.btn_update_all.click(function(){
-      var msg = 'You will <b>UPDATE</b> all records.<br/>Are you sure? ';
+      var msg = 'Você vai executar o processo de: <strong>ATUALIZAÇÃO</strong> sobre todos os registros. Tem certeza?';
       self.ask_confirmation(msg, ActionToolbar.submit_update_all);
     });
     /* update selected */
@@ -155,14 +262,14 @@ var ActionToolbar = {
         return;
       } else {
         var selected_count =  self.rows_selected.length;
-        var msg = 'You will <b>UPDATE</b> selected ' + selected_count + ' record(s).<br/>Are you sure? ';
+        var msg = 'Você vai executar o processo de: <strong>ATUALIZAÇÃO</strong> sobre ' + selected_count + ' registro(s). Tem certeza?';
         self.ask_confirmation(msg, ActionToolbar.submit_update_selected);
       }
     });
     /* delete all*/
     this.btn_delete_all = $(this.btn_delete_all_selector);
     this.btn_delete_all.click(function(){
-      var msg = 'You will <b>DELETE</b> all records.<br/>Are you sure? ';
+      var msg = 'Você vai executar o processo de: <strong>REMOVER</strong> todos os registros. <strong>Esta ação não pode ser desfeita<strong>. Tem certeza?';
       self.ask_confirmation(msg, ActionToolbar.submit_delete_all);
     });
     /* delete selected */
@@ -174,9 +281,11 @@ var ActionToolbar = {
         return;
       } else {
         var selected_count =  self.rows_selected.length;
-        var msg = 'You will <b>DELETE</b> selected ' + selected_count + ' record(s).<br/>re you sure? ';
+        var msg = 'Você vai executar o processo de: <strong>REMOVER</strong> ' + selected_count + ' registro(s).<strong>Esta ação não pode ser desfeita<strong>. Tem certeza?';
         self.ask_confirmation(msg, ActionToolbar.submit_delete_selected);
       }
     });
+
+    return this;
   }
 }
