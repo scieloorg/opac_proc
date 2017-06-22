@@ -1,7 +1,8 @@
 # coding: utf-8
+import traceback
 from mongoengine.context_managers import switch_db
 from bson.objectid import ObjectId
-
+from flask import flash
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
@@ -330,6 +331,27 @@ class TransformArticleListView(TransformBaseListView):
             'field_type': 'boolean'
         },
     ]
+
+    custom_actions = [
+        {
+            'method_name': 'do_reprocess_xml_only',    # nome de função python que implementa a ação
+            'label': 'Reprocessar XMLs',             # nome da ação para mostrar pro usuário
+            'icon_class': 'fa fa-user',     # class CSS para o icone. ex: 'fa fa-gear'
+            'can_select_rows': False,        # boolean, se permite ou não a opção "All/Selected" ou não
+        },
+    ]
+
+    def do_reprocess_xml_only(self):
+        try:
+            processor = self.process_class()
+            # melhorar: caso a query seja muito lenta pode dar timout no request
+            ids = [article._id for article in self.model_class.objects.filter(data_model_version='xml')]
+            processor.update(ids)
+        except Exception as e:
+            traceback_str = traceback.format_exc()
+            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=len(ids))
+        else:
+            self._trigger_messages(items_count=len(ids))
 
 
 class TransformPressReleaseListView(TransformBaseListView):

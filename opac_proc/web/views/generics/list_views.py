@@ -92,6 +92,15 @@ class ListView(View):
         ('iendswith', 'Ends with')
     )
 
+    custom_actions = [
+        # {
+        #     'method_name': 'do_foo_bar',    # nome de função python que implementa a ação
+        #     'label': 'Foo Bar',             # nome da ação para mostrar pro usuário
+        #     'icon_class': 'fa fa-user',     # class CSS para o icone. ex: 'fa fa-gear'
+        #     'can_select_rows': True,        # boolean, se permite ou não a opção "All/Selected" ou não
+        # },
+    ]
+
     def _valid_uuid(self, uuid):
         regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
         match = regex.match(uuid)
@@ -275,7 +284,7 @@ class ListView(View):
 
     def do_delete_selected(self, ids):
         if self.model_class is None:
-            raise ValueError("model class not defined")
+            raise ValueError("atributo 'model_class' não definido!")
 
         delete_errors_count = 0
         for oid in ids:
@@ -285,45 +294,68 @@ class ListView(View):
             except Exception:
                 delete_errors_count += 1
         if delete_errors_count:
-            flash("%s records cannot be deleted" % delete_errors_count, "error")
+            flash("%s registros não podem ser removidos" % delete_errors_count, "error")
         successfully_deleted = len(ids) - delete_errors_count
         if successfully_deleted > 0:
-            flash("%s records deleted successfully!" % successfully_deleted, "success")
+            flash("%s registros removidos com sucesso!" % successfully_deleted, "success")
         else:
-            flash("%s records deleted successfully!" % successfully_deleted, "warning")
+            flash("%s registros removidos com sucesso!" % successfully_deleted, "warning")
 
     def get_selected_ids(self):
         ids = request.form.getlist('rowid')
         if not ids:
-            raise ValueError("No records selected")
+            raise ValueError(u"Não selecionou registros!")
         elif isinstance(ids, list):
             ids = [_id.strip() for _id in ids]
         else:
-            raise ValueError("Invalid selection %s" % ids)
+            raise ValueError("Seleção inválida: %s" % ids)
         return ids
 
     def dispatch_request(self):
         if request.method == 'POST':  # create action
             action_name = request.form['action_name']
-            if action_name not in self._allowed_POST_action_names:
-                flash(u'Invalid operation: %s' % action_name)
-            else:
+            if action_name.startswith('custom_action__'):
+                _, custom_action_method_name, custom_action_target = action_name.split('__')
+                custom_methods_defined = [c_actions['method_name'] for c_actions in self.custom_actions]
+                if custom_action_method_name not in custom_methods_defined:
+                    flash(u'Ação inválida: %s. Nenhum registro foi alterado.' % custom_action_method_name, 'error')
+                elif not hasattr(self, custom_action_method_name):
+                    flash(u'O método: %s não foi implementado, na ListView. Nenhum registro foi alterado.' % custom_action_method_name, 'error')
+                else:
+                    if custom_action_target == 'selected':
+                        try:
+                            ids = self.get_selected_ids()
+                            if ids:
+                                concrete_method = getattr(self, custom_action_method_name)
+                                concrete_method(ids)
+                            else:
+                                flash(u'Seleção inválida de registros. Nenhum registro foi alterado.', 'error')
+                        except Exception as e:
+                            flash(u'ERRO: %s' % str(e), 'error')
+                    else:
+                        try:
+                            concrete_method = getattr(self, custom_action_method_name)
+                            concrete_method()
+                        except Exception as e:
+                            flash(u'ERRO: %s' % str(e), 'error')
+
+            elif action_name in self._allowed_POST_action_names:
                 if action_name == 'create':
                     if self.can_create:
                         try:
                             self.do_create()
                         except Exception as e:
-                            flash(u'ERROR: %s' % str(e), 'error')
+                            flash(u'ERRO: %s' % str(e), 'error')
                     else:
-                        flash(u'This action is disabled', 'error')
+                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
                 elif action_name == 'update_all':
                     if self.can_update:
                         try:
                             self.do_update_all()
                         except Exception as e:
-                            flash(u'ERROR: %s' % str(e), 'error')
+                            flash(u'ERRO: %s' % str(e), 'error')
                     else:
-                        flash(u'This action is disabled', 'error')
+                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
                 elif action_name == 'update_selected':
                     if self.can_update:
                         try:
@@ -331,19 +363,19 @@ class ListView(View):
                             if ids:
                                 self.do_update_selected(ids)
                             else:
-                                flash(u'Invalid selection', 'error')
+                                flash(u'Seleção inválida de registros. Nenhum registro foi alterado.', 'error')
                         except Exception as e:
-                            flash(u'ERROR: %s' % str(e), 'error')
+                            flash(u'ERRO: %s' % str(e), 'error')
                     else:
-                        flash(u'This action is disabled', 'error')
+                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
                 elif action_name == 'delete_all':
                     if self.can_delete:
                         try:
                             self.do_delete_all()
                         except Exception as e:
-                            flash(u'ERROR: %s' % str(e), 'error')
+                            flash(u'ERRO: %s' % str(e), 'error')
                     else:
-                        flash(u'This action is disabled', 'error')
+                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
                 elif action_name == 'delete_selected':
                     if self.can_delete:
                         try:
@@ -351,12 +383,13 @@ class ListView(View):
                             if ids:
                                 self.do_delete_selected(ids)
                             else:
-                                flash(u'Invalid selection', 'error')
+                                flash(u'Seleção inválida de registros', 'error')
                         except Exception as e:
-                            flash(u'ERROR: %s' % str(e), 'error')
+                            flash(u'ERRO: %s' % str(e), 'error')
                     else:
-                        flash(u'This action is disabled', 'error')
-
+                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
+            else:
+                flash(u'Ação inválida: %s. Nenhum registro foi alterado.' % action_name)
         # listamos os registros
         page = request.args.get('page', 1, type=int)
 
@@ -393,5 +426,7 @@ class ListView(View):
             'prev_num': objects.prev_num,
             'has_next': objects.has_next,
             'next_num': objects.next_num,
+            # custom actions:
+            'custom_actions': self.custom_actions
         }
         return self.render_template(context)
