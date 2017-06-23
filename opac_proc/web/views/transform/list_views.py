@@ -206,6 +206,11 @@ class TransformIssueListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
+            'field_label': u'Suppl Text',
+            'field_name': 'suppl_text',
+            'field_type': 'string'
+        },
+        {
             'field_label': u'Last update',
             'field_name': 'updated_at',
             'field_type': 'date_time'

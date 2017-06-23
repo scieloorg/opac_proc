@@ -193,6 +193,12 @@ class JournalLoader(BaseLoader):
         if hasattr(t_issue, 'year'):
             last_issue_data['year'] = t_issue.year
 
+        if hasattr(t_issue, 'type'):
+            last_issue_data['type'] = t_issue.type
+
+        if hasattr(t_issue, 'suppl_text'):
+            last_issue_data['suppl_text'] = t_issue.suppl_text
+
         logger.debug(u"criando documento LastIssue: %s" % last_issue_data)
         return LastIssue(**last_issue_data)
 
