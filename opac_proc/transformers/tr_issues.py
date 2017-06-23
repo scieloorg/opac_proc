@@ -76,6 +76,10 @@ class IssueTransformer(BaseTransformer):
                self.transform_model_instance['type'].lower() != 'pressrelease':
                 self.transform_model_instance['type'] = 'volume_issue'
 
+        # suppl_text
+        if hasattr(xylose_issue, 'supplement_number'):
+            self.transform_model_instance['suppl_text'] = xylose_issue.supplement_number
+
         # start_month
         if hasattr(xylose_issue, 'start_month'):
             self.transform_model_instance['start_month'] = xylose_issue.start_month
