@@ -77,12 +77,3 @@ class IssueLoader(BaseLoader):
                 return 'ahead'
         else:
             return self.transform_model_instance['type']
-
-    def prepare_suppl_text(self):
-        logger.debug(u"iniciando prepare_suppl_text")
-        t_issue = self.transform_model_instance
-        if hasattr(t_issue, 'supplement_number') or \
-           hasattr(t_issue, 'supplement_volume'):
-            return t_issue.supplement_number or t_issue.supplement_volume
-        else:
-            return u''
