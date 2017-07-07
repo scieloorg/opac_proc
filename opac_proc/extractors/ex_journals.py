@@ -35,7 +35,7 @@ class JournalExtractor(BaseExtractor):
         metrics_data = {
             'total_h5_index': 0,
             'total_h5_median': 0,
-            'h5_metric_year': '',
+            'h5_metric_year': 0,
         }
         _h5m5_data = h5m5.get_current_metrics(self.issn)
 

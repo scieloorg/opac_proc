@@ -9,10 +9,10 @@ rq-scheduler==0.7.0
 rq-scheduler-dashboard==0.0.2
 blinker==1.4
 mongolog==0.1.1
--e git+https://github.com/scieloorg/xylose@1.18.6#egg=xylose
--e git+https://git@github.com/scieloorg/opac_schema@v2.28#egg=opac_schema
--e git+https://git@github.com/scieloorg/legendarium@v0.3.1#egg=legendarium
-scieloh5m5==1.9.4
+xylose==1.20.6
+legendarium==1.2.2
+-e git+https://git@github.com/scieloorg/opac_schema@v2.31#egg=opac_schema
+scieloh5m5==1.10.4
 requests==2.18.1
 Flask-DebugToolbar==0.10.1
 Flask-WTF==0.14.2
