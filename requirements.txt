@@ -9,7 +9,7 @@ rq-scheduler==0.7.0
 rq-scheduler-dashboard==0.0.2
 blinker==1.4
 mongolog==0.1.1
-xylose==1.20.6
+xylose==1.21.6
 legendarium==1.2.2
 -e git+https://git@github.com/scieloorg/opac_schema@v2.31#egg=opac_schema
 scieloh5m5==1.10.4
