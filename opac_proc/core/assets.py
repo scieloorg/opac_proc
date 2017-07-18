@@ -300,7 +300,7 @@ class Assets(object):
                 logger.info(u"UUID: %s para media do artigo com PID: %s",
                             uuid, self.xylose.publisher_id)
 
-                registered_medias.update({origin_path: ssm_asset.get_urls()['url']})
+                registered_medias.update({origin_path: ssm_asset.get_urls()['url_path']})
 
                 logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
                             registered_medias, self.xylose.publisher_id)
@@ -310,7 +310,7 @@ class Assets(object):
                 for asset in existing_list:
                     metadata = json.loads(asset['metadata'])
                     registered_medias.update({metadata['origin_path']:
-                                              asset['full_absolute_url']})
+                                              asset['absolute_url']})
 
             logger.info("Medias já existente no SSM: %s", registered_medias)
 
@@ -365,7 +365,7 @@ class Assets(object):
                 logger.info(u"UUID: %s para media do artigo com PID: %s",
                             uuid, self.xylose.publisher_id)
 
-                registered_medias.update({origin_path: ssm_asset.get_urls()['url']})
+                registered_medias.update({origin_path: ssm_asset.get_urls()['url_path']})
 
                 logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
                             registered_medias, self.xylose.publisher_id)
@@ -375,7 +375,7 @@ class Assets(object):
                 for asset in existing_list:
                     metadata = json.loads(asset['metadata'])
                     registered_medias.update({metadata['origin_path']:
-                                              asset['full_absolute_url']})
+                                              asset['absolute_url']})
 
             logger.info("Medias já existente no SSM: %s", registered_medias)
 
