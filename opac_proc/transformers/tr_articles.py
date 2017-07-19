@@ -167,7 +167,9 @@ class ArticleTransformer(BaseTransformer):
 
         # Versão HTML do artigo
         if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':
-            self.transform_model_instance['htmls'] = asset_html.register()
+            htmls = asset_html.register()
+            if htmls:
+                self.transform_model_instance['htmls'] = htmls
 
         # pid
         if hasattr(xylose_article, 'publisher_id'):

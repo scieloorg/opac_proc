@@ -1,5 +1,5 @@
 sudo: required
-
+group: deprecated-2017Q2  # https://blog.travis-ci.com/2017-06-21-trusty-updates-2017-Q2-launch
 language: python
 
 env:
