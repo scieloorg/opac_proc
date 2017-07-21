@@ -189,29 +189,40 @@ class JournalTransformer(BaseTransformer):
         pfile = _open_logo(file_path)
 
         ssm_asset = SSMHandler(pfile, logo_name, 'img',
-                               {
-                                'issn': self.extract_model_instance.code,
+                               {'issn': self.extract_model_instance.code,
                                 'pid': self.extract_model_instance.code,
                                 'collection': transform_col.acronym,
                                 'file_name': logo_name,
                                 'type': 'img',
                                 'bucket_name': acron,
                                 'journal': acron
-                               }, acron)
+                                }, acron)
 
-        existing_asset = ssm_asset.exists()
+        code, existing_asset = ssm_asset.exists()
 
-        if not existing_asset:
+        if code == 2:
+            logger.info(u"Lista de imagens com mesmo filename para o journal: %s", existing_asset)
+
+            logger.info(u"Removendo a lista de images: %s", existing_asset)
+
+            for asset in existing_asset:
+                ssm_asset.remove(asset['uuid'])
+
+        if code == 2 or code == 0:
 
             uuid = ssm_asset.register()
 
-            logger.error(u'Registrado logo do períodico: %s, com uuid: %s', acron,
-                         uuid)
+            logger.info(u'Registrado logo do períodico: %s, com uuid: %s', acron,
+                        uuid)
 
-            logo_url = ssm_asset.get_urls()['url']
+            logo_url = ssm_asset.get_urls()['url_path']
 
             self.transform_model_instance['logo_url'] = logo_url
 
-            logger.error(u'URL para logo do períodico: %s, com acrônimo: %s' % (logo_url, acron))
+            logger.info(u'URL para logo do períodico: %s, com acrônimo: %s' % (logo_url, acron))
+
+        if code == 1:
+            for asset in existing_asset:
+                self.transform_model_instance['logo_url'] = asset['absolute_url']
 
         return self.transform_model_instance
