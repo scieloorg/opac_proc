@@ -129,23 +129,53 @@ class SSMHandler(object):
         """
         Check if asset already exists in backend.
 
-        if it exists return list [asset, asset.....]
+        Returns a tuple, the first param is a code that indicates: No existence
+        or exists or it is identical and exists at least one asset with same filename
 
-        if this not exists return empty list []
+        Returns:
+            (0, []) 0 = dont exists [] = empty list
+            (1, [asset, asset, ...]) 1 = Exists
+            (2, [asset, asset, ...]) 2 = Exists at least one asset with same filename
+
+        Codes:
+            0 = No exists
+            1 = Exists and the asset is identical
+            2 = Exists any asset with the same filename, but dont have same content
 
         The creteria was use the PID, collection and checksum of asset to
         determine if it exists
         """
 
-        #  Utilizamos um lista utilizarmos o arquivo de configuração no futuro.
         creteria = set(['pid', 'collection'])
         metadata = set(self.metadata.keys())
         intersection = set(creteria & metadata)
 
         if creteria == intersection:
-            return self.ssm_client.query_asset(self._checksum_sha256, {
-                                               'pid': self.metadata['pid'],
-                                               'collection': self.metadata['collection']
-                                               })
+
+            assets = self.ssm_client.query_asset({'checksum': self._checksum_sha256},
+                                                 {'pid': self.metadata['pid'],
+                                                 'collection': self.metadata['collection']
+                                                  })
+            if not assets:
+
+                # Check if exists by filename
+                assets_by_filename = self.ssm_client.query_asset({'filename': self.name},
+                                                                 {'pid': self.metadata['pid'],
+                                                                  'collection': self.metadata['collection']
+                                                                  })
+
+                if assets_by_filename:
+                    return (2, assets_by_filename)
+                else:
+                    return (0, assets)
+
+            return (1, assets)
         else:
             raise ValueError(u'O param metadata do ativo teve conter: %s', ', '.join(creteria))
+
+    def remove(self, id):
+        """
+        Return value describing the number of objects deleted,
+        if it does not exists return a tuple with (0, {}).
+        """
+        return self.ssm_client.remove_asset(id)

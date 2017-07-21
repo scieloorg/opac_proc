@@ -238,7 +238,17 @@
 
       /* chamada para mostara fila cuando a pagina é carregada */
       count_checked_rows_and_display();
-      ActionToolbar.init();
+      window.action_toolbar = ActionToolbar.init();
+      {% for custom_action in custom_actions %}
+        /* registramos as custom_acitions */
+        window.action_toolbar.register_custom_action(
+          "{{ custom_action.method_name }}",
+          "{{ custom_action.label }}",
+          {% if custom_action.can_select_rows %}true{% else %}false{% endif %}
+        );
+      {% endfor %}
+
+
       /* filters toolbar */
       {% for field_filter in list_filters %}
         window.FilterToolbar.push_filter("{{field_filter['field_name']}}", "{{field_filter['field_type']}}");

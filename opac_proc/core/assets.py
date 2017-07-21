@@ -266,7 +266,6 @@ class Assets(object):
                   }
         """
         file_type = 'img'  # Not all are images
-        existing_list = []
         registered_medias = {}
 
         medias = self._extract_media()
@@ -286,33 +285,40 @@ class Assets(object):
             ssm_asset = SSMHandler(pfile, media_path, file_type, metadata,
                                    self.bucket_name)
 
-            existing_asset = ssm_asset.exists()
+            code, existing_asset = ssm_asset.exists()
 
-            if existing_asset:
+            # Existe mas não é idêntico (existe com o mesmo nome)
+            if code == 2:
                 logger.info(u"Já existe um media com PID: %s e colecao: %s, cadastrado: %s",
                             self.xylose.publisher_id, self.xylose.collection_acronym, existing_asset)
-                existing_list = [asset for asset in existing_asset]
-                logger.info(u"Lista de imagens existente para o artigo com PID: %s, %s",
+                logger.info(u"Lista de imagens com mesmo filename para o artigo com PID: %s, %s",
                             self.xylose.publisher_id, existing_asset)
-            else:
+                logger.info(u"Removendo a lista de images: %s", existing_asset)
+
+                for asset in existing_asset:
+                    ssm_asset.remove(asset['uuid'])
+
+            # Existe mas não é identico code=2, removido no passo anterior deve ser
+            # recadastrado, também deve ser cadastrado caso não exista, code=0.
+            if code == 2 or code == 0:
                 uuid = ssm_asset.register()
 
                 logger.info(u"UUID: %s para media do artigo com PID: %s",
                             uuid, self.xylose.publisher_id)
 
-                registered_medias.update({origin_path: ssm_asset.get_urls()['url']})
+                registered_medias.update({origin_path: ssm_asset.get_urls()['url_path']})
 
                 logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
                             registered_medias, self.xylose.publisher_id)
 
-            if existing_list:
-
-                for asset in existing_list:
+            # Existe e o ativo e idêntico
+            if code == 1:
+                for asset in existing_asset:
                     metadata = json.loads(asset['metadata'])
                     registered_medias.update({metadata['origin_path']:
-                                              asset['full_absolute_url']})
+                                              asset['absolute_url']})
 
-            logger.info("Medias já existente no SSM: %s", registered_medias)
+                logger.info("Medias já existente no SSM: %s", registered_medias)
 
         return registered_medias
 
@@ -326,7 +332,6 @@ class Assets(object):
                   }
         """
         file_type = 'img'  # Not all are images
-        existing_list = []
         registered_medias = {}
 
         medias = self._extract_media()
@@ -351,33 +356,40 @@ class Assets(object):
             ssm_asset = SSMHandler(pfile, media_name, file_type, metadata,
                                    self.bucket_name)
 
-            existing_asset = ssm_asset.exists()
+            code, existing_asset = ssm_asset.exists()
 
-            if existing_asset:
+            # Existe mas não é identico (existe com o mesmo nome)
+            if code == 2:
                 logger.info(u"Já existe um media com PID: %s e colecao: %s, cadastrado: %s",
                             self.xylose.publisher_id, self.xylose.collection_acronym, existing_asset)
-                existing_list = [asset for asset in existing_asset]
-                logger.info(u"Lista de imagens existente para o artigo com PID: %s, %s",
+                logger.info(u"Lista de imagens com mesmo filename para o artigo com PID: %s, %s",
                             self.xylose.publisher_id, existing_asset)
-            else:
+                logger.info(u"Removendo a lista de images: %s", existing_asset)
+
+                for asset in existing_asset:
+                    ssm_asset.remove(asset['uuid'])
+
+            # Existe mas não é idêntico code=2, removido no passo anterior deve ser
+            # recadastrado, também deve ser cadastrado caso não exista, code=0.
+            if code == 2 or code == 0:
                 uuid = ssm_asset.register()
 
                 logger.info(u"UUID: %s para media do artigo com PID: %s",
                             uuid, self.xylose.publisher_id)
 
-                registered_medias.update({origin_path: ssm_asset.get_urls()['url']})
+                registered_medias.update({origin_path: ssm_asset.get_urls()['url_path']})
 
                 logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
                             registered_medias, self.xylose.publisher_id)
 
-            if existing_list:
-
-                for asset in existing_list:
+            # Existe e o ativo e idêntico
+            if code == 1:
+                for asset in existing_asset:
                     metadata = json.loads(asset['metadata'])
                     registered_medias.update({metadata['origin_path']:
-                                              asset['full_absolute_url']})
+                                              asset['absolute_url']})
 
-            logger.info("Medias já existente no SSM: %s", registered_medias)
+                logger.info("Medias já existente no SSM: %s", registered_medias)
 
         return registered_medias
 
@@ -435,10 +447,21 @@ class AssetPDF(Assets):
                     ssm_asset = SSMHandler(pfile, pdf_name, file_type, metadata,
                                            self.bucket_name)
 
-                    if ssm_asset.exists():
+                    code, assets = ssm_asset.exists()
+
+                    logger.info(u"Código de existência do PDF: %s", code)
+
+                    # Existe mas não é idêntico (existe com o mesmo nome)
+                    if code == 2:
                         logger.info(u"Já existe um PDF com PID: %s e coleção: %s, cadastrado",
                                     self.xylose.publisher_id, self.xylose.collection_acronym)
-                    else:
+
+                        for asset in assets:
+                            ssm_asset.remove(asset['uuid'])
+
+                    # Existe mas não é identico code=2, removido no passo anterior deve ser
+                    # recadastrado, também deve ser cadastrado caso não exista, code=0.
+                    if code == 2 or code == 0:
                         uuid = ssm_asset.register()
 
                         logger.info(u"UUID: %s para o PDF do artigo com PID: %s",
@@ -510,11 +533,15 @@ class AssetXML(Assets):
             ssm_asset = SSMHandler(BytesIO(self.content), file_name,
                                    'xml', self.get_metadata(), self.bucket_name)
 
-            if ssm_asset.exists():
+            code, assets = ssm_asset.exists()
+
+            if code == 2 or code == 1:
                 logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado",
                             self.xylose.publisher_id, self.xylose.collection_acronym)
                 return (None, None)
-            else:
+
+            if code == 0:
+
                 uuid = ssm_asset.register()
 
                 logger.info(u"UUID: %s para XML do artigo com PID: %s",
@@ -622,13 +649,19 @@ class AssetHTMLS(Assets):
 
             logger.info("Verificando se o asset existe: %s", ssm_asset.exists())
 
-            if ssm_asset.exists():
+            code, assets = ssm_asset.exists()
+
+            if code == 2:
                 logger.info(u"Já existe um HTML com PID: %s e coleção: %s, cadastrado",
                             self.xylose.publisher_id, self.xylose.collection_acronym)
-            else:
+
+                for asset in assets:
+                    ssm_asset.remove(asset['uuid'])
+
+            if code == 2 or code == 0:
                 uuid = ssm_asset.register()
 
-                logger.info(u"UUID: %s para XML do artigo com PID: %s",
+                logger.info(u"UUID: %s para XML/HTML do artigo com PID: %s",
                             uuid, self.xylose.publisher_id)
 
                 registered_htmls.append({'type': file_type,

@@ -141,8 +141,8 @@ class JournalTransformer(BaseTransformer):
             self.transform_model_instance['publisher_country'] = xylose_journal.publisher_country[1]
 
         # online_submission_url
-        if hasattr(xylose_journal, 'online_submission_url'):
-            self.transform_model_instance['online_submission_url'] = xylose_journal.online_submission_url
+        if hasattr(xylose_journal, 'submission_url'):
+            self.transform_model_instance['online_submission_url'] = xylose_journal.submission_url
 
         # publisher_state
         if hasattr(xylose_journal, 'publisher_state'):

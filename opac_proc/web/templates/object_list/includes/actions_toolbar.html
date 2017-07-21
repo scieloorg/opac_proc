@@ -3,11 +3,11 @@
     {# create action #}
     {% if can_create %}
       <button type="button" class="btn btn-primary btn-sm" data-action="create">
-        <i class="fa fa-download" aria-hidden="true"></i> Create/Import
+        <i class="fa fa-download" aria-hidden="true"></i> Criar/Importar
       </button>
     {% else %}
       <button type="button" class="btn btn-primary btn-sm disabled" data-action="create">
-        <i class="fa fa-download" aria-hidden="true"></i> Create/Import
+        <i class="fa fa-download" aria-hidden="true"></i> Criar/Importar
       </button>
     {% endif %}
 
@@ -15,11 +15,11 @@
     <div class="btn-group" role="group">
       {% if can_update and objects|length > 0 %}
         <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fa fa-refresh"></i> Update <span class="caret"></span>
+          <i class="fa fa-refresh"></i> Atualizar <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-          <li><a data-action="update" data-target="selected" href="#">Selected</a></li>
-          <li><a data-action="update" data-target="all" href="#">All</a></li>
+          <li><a data-action="update" data-target="selected" href="#">Registros selecionados</a></li>
+          <li><a data-action="update" data-target="all" href="#">Todos os registros</a></li>
         </ul>
       {% else %}
         <button type="button" class="btn btn-info btn-sm disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -32,17 +32,55 @@
     <div class="btn-group" role="group">
       {% if can_delete %}
         <button type="button" class="btn btn-danger btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fa fa-trash" aria-hidden="true"></i> Delete <span class="caret"></span>
+          <i class="fa fa-trash" aria-hidden="true"></i> Remover <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-          <li><a data-action="delete" data-target="selected" href="#">Selected</a></li>
-          <li><a data-action="delete" data-target="all" href="#">All</a></li>
+          <li><a data-action="delete" data-target="selected" href="#">Registros selecionados</a></li>
+          <li><a data-action="delete" data-target="all" href="#">Todos os registros</a></li>
         </ul>
       {% else %}
         <button type="button" class="btn btn-danger btn-sm disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fa fa-trash" aria-hidden="true"></i> Delete <span class="caret"></span>
+          <i class="fa fa-trash" aria-hidden="true"></i> Remover <span class="caret"></span>
         </button>
       {% endif %}
     </div>
   </div>
+
+  {% if custom_actions %}
+    <div class="btn-group pull-right" role="group">
+
+      {% for custom_action in custom_actions %}
+
+        <!-- custom_action: {{ custom_action.method_name }} -->
+        <div class="btn-group" role="group">
+          {% if custom_action.can_select_rows %}
+            {% if can_update and objects|length > 0 %} {# botão dropdown habilitado #}
+              <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="{{ custom_action.icon_class }}"></i> {{ custom_action.label }} <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a data-action="{{ custom_action.method_name }}" data-target="selected" href="#">Registros selecionados</a></li>
+                <li><a data-action="{{ custom_action.method_name }}" data-target="all" href="#">Todos os registros</a></li>
+              </ul>
+            {% else %} {# botão dropdown deshabilitado #}
+              <button type="button" class="btn btn-default btn-sm disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="{{ custom_action.icon_class }}"></i> {{ custom_action.label }} <span class="caret"></span>
+              </button>
+            {% endif %}
+          {% else %} {# botão simples habilitado #}
+            {% if can_update %}
+              <button type="button" class="btn btn-default btn-sm" data-action="{{ custom_action.method_name }}">
+                <i class="{{ custom_action.icon_class }}" aria-hidden="true"></i> {{ custom_action.label }}
+              </button>
+            {% else %} {# botão simples deshabilitado #}
+              <button type="button" class="btn btn-default btn-sm disabled" disabled=disabled  data-action="{{ custom_action.method_name }}">
+                <i class="{{ custom_action.icon_class }}" aria-hidden="true"></i> {{ custom_action.label }}
+              </button>
+            {% endif %}
+          {% endif %}
+        </div>
+        <!-- custom_action: {{ custom_action.method_name }} -->
+      {% endfor %}
+    </div>
+  {% endif %}
 </div>
