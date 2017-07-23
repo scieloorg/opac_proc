@@ -550,7 +550,7 @@ class AssetXML(Assets):
                 logger.info(u"XML: %s cadastrado para o artigo com PID: %s",
                             file_name, self.xylose.publisher_id)
 
-                return (uuid, ssm_asset.get_urls()['url'])
+                return (uuid, ssm_asset.get_urls()['url_path'])
 
 
 class AssetHTMLS(Assets):
