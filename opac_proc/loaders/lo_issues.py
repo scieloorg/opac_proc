@@ -47,6 +47,7 @@ class IssueLoader(BaseLoader):
         'order',
         'pid',
         'suppl_text',
+        'assets_code',
     ]
 
     def prepare_journal(self):

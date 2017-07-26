@@ -123,4 +123,8 @@ class IssueTransformer(BaseTransformer):
 
             self.transform_model_instance['sections'] = t_issue_sections
 
+        # assets_code
+        if hasattr(xylose_issue, 'assets_code'):
+            self.transform_model_instance['assets_code'] = xylose_issue.assets_code
+
         return self.transform_model_instance
