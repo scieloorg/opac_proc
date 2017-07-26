@@ -11,7 +11,7 @@ blinker==1.4
 mongolog==0.1.1
 xylose==1.24.0
 legendarium==2.0.1
--e git+https://git@github.com/scieloorg/opac_schema@v2.33#egg=opac_schema
+-e git+https://git@github.com/scieloorg/opac_schema@v2.34#egg=opac_schema
 scieloh5m5==1.10.4
 requests==2.18.2
 Flask-DebugToolbar==0.10.1
