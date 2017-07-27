@@ -171,6 +171,25 @@ class ArticleTransformer(BaseTransformer):
             if htmls:
                 self.transform_model_instance['htmls'] = htmls
 
+        # publication_date
+        if hasattr(xylose_article, 'publication_date'):
+            self.transform_model_instance['publication_date'] = xylose_article.publication_date
+
+        # type
+        if hasattr(xylose_article, 'document_type'):
+            self.transform_model_instance['type'] = xylose_article.document_type
+
+        # keywords
+        if hasattr(xylose_article, 'keywords'):
+            keywords = []
+
+            if xylose_article.keywords():
+                for lang, keys in xylose_article.keywords().iteritems():
+                    keywords.append({'language': lang,
+                                     'keywords': keys})
+
+                self.transform_model_instance['keywords'] = keywords
+
         # pid
         if hasattr(xylose_article, 'publisher_id'):
             self.transform_model_instance['pid'] = xylose_article.publisher_id
