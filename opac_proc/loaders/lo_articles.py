@@ -12,6 +12,7 @@ from opac_schema.v1.models import Issue as OpacIssue
 from opac_schema.v1.models import Journal as OpacJournal
 from opac_schema.v1.models import TranslatedTitle as OpacTranslatedTitle
 from opac_schema.v1.models import TranslatedSection as OpacTranslatedSection
+from opac_schema.v1.models import ArticleKeyword as OpacArticleKeywords
 
 
 from opac_proc.web import config
@@ -59,6 +60,9 @@ class ArticleLoader(BaseLoader):
         'fpage',
         'lpage',
         'elocation',
+        'keywords',
+        'type',
+        'publication_date'
     ]
 
     def prepare_issue(self):
@@ -118,3 +122,17 @@ class ArticleLoader(BaseLoader):
 
         logger.debug(u"sections criados: %s" % len(sections))
         return sections
+
+    def prepare_keywords(self):
+        logger.debug(u"iniciando prepare_keywords")
+        keywords = []
+
+        if hasattr(self.transform_model_instance, 'keywords'):
+            for keyword in self.transform_model_instance.keywords:
+                opac_keyword = OpacArticleKeywords(**keyword)
+                keywords.append(opac_keyword)
+        else:
+            logger.info(u"Não existem Keywords transformadas. uuid: %s" % self.transform_model_instance.uuid)
+
+        logger.debug(u"palavras chaves criadss: %s" % len(keywords))
+        return keywords
