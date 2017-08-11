@@ -77,7 +77,7 @@ O diretorio de armazenamento do logs, esta disponível como volume (ver exemplo 
 
 ### rodar com docker-compose:
 
-Editar/ajustar os parâmetros no arquivo ``docker-compose.yml`` e executar
+Editar/ajustar os parâmetros no arquivo ``docker-compose.yml`` e executar.
 
 ```
 docker-compose up
