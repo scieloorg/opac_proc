@@ -161,7 +161,7 @@ class ArticleTransformer(BaseTransformer):
 
             uuid, xml_url = asset_xml.register()
 
-            if xml_url:
+            if xml_url and uuid:
                 self.transform_model_instance['xml'] = xml_url
                 self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
 

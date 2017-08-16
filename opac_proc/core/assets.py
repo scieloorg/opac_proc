@@ -535,12 +535,22 @@ class AssetXML(Assets):
 
             code, assets = ssm_asset.exists()
 
-            if code == 2 or code == 1:
+            # Existe o XML e é identico
+            if code == 1:
                 logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado",
                             self.xylose.publisher_id, self.xylose.collection_acronym)
-                return (None, None)
+                if assets:
+                    return (assets[0]['uuid'], assets[0]['absolute_url'])
 
-            if code == 0:
+            if code == 2:
+                logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado,\
+                            porém não é identico", self.xylose.publisher_id,
+                            self.xylose.collection_acronym)
+
+                for asset in assets:
+                    ssm_asset.remove(asset['uuid'])
+
+            if code == 0 or code == 2:
 
                 uuid = ssm_asset.register()
 
