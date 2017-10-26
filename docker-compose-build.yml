@@ -81,7 +81,8 @@ services:
       - OPAC_SSM_PROTO_FILE_HOST=raw.githubusercontent.com
       - OPAC_SSM_PROTO_FILE_PORT=80
       - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
-
+      # Assets
+      - OPAC_PROC_ASSETS_RAISE_ERROR=False
   webapp:
     build:
       context: .
@@ -138,4 +139,5 @@ services:
       - OPAC_SSM_PROTO_FILE_HOST=raw.githubusercontent.com
       - OPAC_SSM_PROTO_FILE_PORT=80
       - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
-
+      # Assets
+      - OPAC_PROC_ASSETS_RAISE_ERROR=False

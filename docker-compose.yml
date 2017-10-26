@@ -96,6 +96,8 @@ services:
       - OPAC_PROC_ARTICLE_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-article.css
       - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-print.css
       - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
+      # Assets
+      - OPAC_PROC_ASSETS_RAISE_ERROR=False
   webapp:
     images: scieloorg/opac_proc
     user: nobody
@@ -159,3 +161,5 @@ services:
       - OPAC_PROC_ARTICLE_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-article.css
       - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-print.css
       - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
+      # Assets
+      - OPAC_PROC_ASSETS_RAISE_ERROR=False
