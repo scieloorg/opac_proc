@@ -42,9 +42,11 @@ class Assets(object):
         try:
             return open(file_path, mode)
         except IOError as e:
-            logger.error(u'Erro ao tentar abri o ativo: %s, erro: %s',
-                         file_path, e)
-            raise Exception(u'Erro ao tentar abri o ativo: %s', file_path)
+            msg_error = u'Erro ao tentar abri o ativo: %s, erro: %s' % (file_path, e)
+            logger.error(msg_error)
+
+            if config.OPAC_PROC_ASSETS_RAISE_ERROR:
+                raise Exception(msg_error)
 
     def _change_img_path(self, medias):
         """
@@ -421,8 +423,12 @@ class AssetPDF(Assets):
 
         if 'pdf' not in self.get_assets():
             msg_error = u"Não existe PDF para o artigo PID: %s" % self.xylose.publisher_id
-            logger.info(msg_error)
-            # raise Exception(msg_error)
+
+            logger.error(msg_error)
+
+            if config.OPAC_PROC_ASSETS_RAISE_ERROR:
+                raise Exception(msg_error)
+
         else:
             logger.info(u"Lista de PDF(s) existente para o artigo PID: %s",
                         self.get_assets().get('pdf'))
@@ -507,8 +513,12 @@ class AssetXML(Assets):
 
         if 'xml' not in self.get_assets():
             msg_error = u"Nao existe XML para o artigo, PID: %s" % self.xylose.publisher_id
-            logger.info(msg_error)
-            # raise Exception(msg_error)
+
+            logger.error(msg_error)
+
+            if config.OPAC_PROC_ASSETS_RAISE_ERROR:
+                raise Exception(msg_error)
+
         else:
             logger.info(u"XML existente para o artigo, PID: %s",
                         self.get_assets().get('xml'))
