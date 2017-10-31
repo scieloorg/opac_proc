@@ -44,6 +44,7 @@ class Assets(object):
         except IOError as e:
             msg_error = u'Erro ao tentar abri o ativo: %s, erro: %s' % (file_path, e)
             logger.error(msg_error)
+            return None
 
             if config.OPAC_PROC_ASSETS_RAISE_ERROR:
                 raise Exception(msg_error)
@@ -284,6 +285,9 @@ class Assets(object):
 
             pfile = self._open_asset(self._get_media_path(media_path))
 
+            if not pfile:
+                continue
+
             ssm_asset = SSMHandler(pfile, media_path, file_type, metadata,
                                    self.bucket_name)
 
@@ -346,6 +350,9 @@ class Assets(object):
                 continue
 
             pfile = self._open_asset(media_path)
+
+            if not pfile:
+                continue
 
             metadata = self.get_metadata()
             metadata.update({'file_path': media_path,
@@ -439,7 +446,11 @@ class AssetPDF(Assets):
 
                     logger.info(u"Caminho do PDF do artigo PID: %s, idioma: %s, %s",
                                 self.xylose.publisher_id, lang, file_path)
+
                     pfile = self._open_asset(file_path)
+
+                    if not pfile:
+                        continue
 
                     logger.info(u"Bucket name: %s do PDF: %s", self.bucket_name,
                                 file_path)
