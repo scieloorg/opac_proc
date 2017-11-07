@@ -23,7 +23,7 @@ services:
         - /etc/localtime:/etc/localtime:ro
 
   redis:
-    image: redis:alpine
+    image: scieloorg/redis
     user: redis
     restart: always
     hostname: opac-proc-redis
