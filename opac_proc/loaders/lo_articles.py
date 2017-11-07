@@ -62,7 +62,8 @@ class ArticleLoader(BaseLoader):
         'elocation',
         'keywords',
         'type',
-        'publication_date'
+        'publication_date',
+        'xml',
     ]
 
     def prepare_issue(self):

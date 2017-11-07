@@ -1,15 +1,15 @@
 Werkzeug==0.12.2
 Flask==0.12.2
-mongoengine==0.14.3
+mongoengine==0.15.0
 flask-mongoengine==0.9.3
 thriftpy==0.3.9
-rq==0.8.2
+rq==0.9.1
 rq-dashboard==0.3.10
 rq-scheduler==0.7.0
 rq-scheduler-dashboard==0.0.2
 blinker==1.4
 mongolog==0.1.1
-xylose==1.28.0
+xylose==1.29.0
 legendarium==2.0.2
 -e git+https://git@github.com/scieloorg/opac_schema@v2.37#egg=opac_schema
 scieloh5m5==1.10.4
