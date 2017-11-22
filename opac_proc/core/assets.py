@@ -46,7 +46,7 @@ class Assets(object):
             logger.error(msg_error)
             return None
 
-            if config.OPAC_PROC_ASSETS_RAISE_ERROR:
+            if config.OPAC_PROC_RAISE_ERROR:
                 raise Exception(msg_error)
 
     def _change_img_path(self, medias):
@@ -433,7 +433,7 @@ class AssetPDF(Assets):
 
             logger.error(msg_error)
 
-            if config.OPAC_PROC_ASSETS_RAISE_ERROR:
+            if config.OPAC_PROC_RAISE_ERROR:
                 raise Exception(msg_error)
 
         else:
@@ -527,7 +527,7 @@ class AssetXML(Assets):
 
             logger.error(msg_error)
 
-            if config.OPAC_PROC_ASSETS_RAISE_ERROR:
+            if config.OPAC_PROC_RAISE_ERROR:
                 raise Exception(msg_error)
 
         else:

@@ -103,7 +103,14 @@ class IssueTransformer(BaseTransformer):
 
         # order
         if hasattr(xylose_issue, 'order'):
-            self.transform_model_instance['order'] = xylose_issue.order
+            try:
+                self.transform_model_instance['order'] = int(xylose_issue.order)
+            except ValueError:
+                msg_error = u'Erro ao tentar converter o campo order para inteiro, PID: %s' % xylose_issue.publisher_id
+                logger.error(msg_error)
+
+                if config.OPAC_PROC_RAISE_ERROR:
+                    raise Exception(msg_error)
 
         # pid
         if hasattr(xylose_issue, 'publisher_id'):
