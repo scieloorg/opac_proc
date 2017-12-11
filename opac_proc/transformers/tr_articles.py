@@ -133,6 +133,19 @@ class ArticleTransformer(BaseTransformer):
         if hasattr(xylose_article, 'original_abstract'):
             self.transform_model_instance['abstract'] = xylose_article.original_abstract()
 
+        # translated_abstracts
+        if xylose_article.translated_abstracts():
+
+            translated_abstracts = []
+
+            for lang, text in xylose_article.translated_abstracts().items():
+                translated_abstracts.append({
+                    'language': lang,
+                    'text': text,
+                })
+
+            self.transform_model_instance['abstracts'] = translated_abstracts
+
         # authors
         if hasattr(xylose_article, 'authors') and xylose_article.authors:
             self.transform_model_instance['authors'] = ['%s, %s' % (a['surname'], a['given_names']) for a in xylose_article.authors]
