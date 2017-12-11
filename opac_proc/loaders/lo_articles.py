@@ -53,6 +53,7 @@ class ArticleLoader(BaseLoader):
         'original_language',
         'languages',
         'abstract',
+        'abstracts',
         'authors',
         'htmls',
         'pdfs',
