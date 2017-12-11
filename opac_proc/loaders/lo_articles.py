@@ -117,7 +117,7 @@ class ArticleLoader(BaseLoader):
         translated_abstracts = []
 
         if hasattr(self.transform_model_instance, 'abstracts'):
-            for lang, text in self.transform_model_instance.translated_abstracts.items():
+            for lang, text in self.transform_model_instance.abstracts.items():
                 translated_abstract = OpacTranslatedAbstracts({'language': lang,
                                                                'text': text})
                 translated_abstracts.append(translated_abstract)
