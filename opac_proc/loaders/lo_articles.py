@@ -13,7 +13,7 @@ from opac_schema.v1.models import Journal as OpacJournal
 from opac_schema.v1.models import TranslatedTitle as OpacTranslatedTitle
 from opac_schema.v1.models import TranslatedSection as OpacTranslatedSection
 from opac_schema.v1.models import ArticleKeyword as OpacArticleKeywords
-from opac_schema.v1.models import Abstracts as OpacTranslatedAbstracts
+from opac_schema.v1.models import Abstract as OpacTranslatedAbstracts
 
 
 from opac_proc.web import config
