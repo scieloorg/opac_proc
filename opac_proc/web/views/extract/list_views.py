@@ -47,17 +47,17 @@ class ExtractCollectionListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -80,17 +80,17 @@ class ExtractCollectionListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -114,17 +114,17 @@ class ExtractJournalListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -142,17 +142,17 @@ class ExtractJournalListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -176,17 +176,17 @@ class ExtractIssueListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -203,17 +203,17 @@ class ExtractIssueListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -237,17 +237,17 @@ class ExtractArticleListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -265,17 +265,17 @@ class ExtractArticleListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -309,17 +309,17 @@ class ExtractPressReleaseListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -347,17 +347,17 @@ class ExtractPressReleaseListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -386,17 +386,17 @@ class ExtractNewsListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -419,17 +419,17 @@ class ExtractNewsListView(ExtractBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]

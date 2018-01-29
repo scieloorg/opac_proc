@@ -121,17 +121,19 @@ def task_issue_update(ids=None):
     model = 'issue'
     r_queues = RQueues()
 
+    collection = models.ExtractCollection.objects.all().first()
+
     if ids is None:  # update all collections
         models.ExtractIssue.objects.all().update(must_reprocess=True)
         for issue in models.ExtractIssue.objects.all():
-            r_queues.enqueue(stage, model, task_extract_issue, issue.code)
+            r_queues.enqueue(stage, model, task_extract_issue, collection.acronym, issue.code)
     else:
         for oid in ids:
             try:
                 obj = models.ExtractIssue.objects.get(pk=oid)
                 obj.update(must_reprocess=True)
                 obj.reload()
-                r_queues.enqueue(stage, model, task_extract_issue, obj.code)
+                r_queues.enqueue(stage, model, task_extract_issue, collection.acronym, obj.code)
             except Exception as e:
                 logger.error('models.ExtractIssue %s. pk: %s' % (str(e), oid))
 

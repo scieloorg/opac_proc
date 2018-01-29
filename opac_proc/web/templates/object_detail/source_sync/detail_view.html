@@ -1,0 +1,115 @@
+{% extends "object_detail/base.html" %}
+{% block content %}
+    {% include "includes/page_header.html" %}
+
+    <div class="container">
+
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#data" aria-controls="table" role="tab" data-toggle="tab">Data</a>
+        </li>
+        <li role="presentation">
+            <a href="#raw" aria-controls="profile" role="tab" data-toggle="tab">Raw</a>
+        </li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="data">
+            <div class="well">
+                <h3>Dados gerais:</h3>
+                <table class="table_object_list table table-striped table-hover">
+                    <tbody>
+                        <tr>
+                            <td><strong>ID:</strong></td>
+                            <td>{{ document.pk }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>UUID:</strong></td>
+                            <td>{{ document.uuid }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Acrônimo da coleção:</strong></td>
+                            <td>{{ document.collection_acronym }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data de criação:</strong></td>
+                            <td>{{ document.created_at.strftime('%Y-%m-%d %H:%M:%S')  }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data de atualização:</strong></td>
+                            <td>{{ document.updated_at.strftime('%Y-%m-%d %H:%M:%S')  }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data de processamento (API):</strong></td>
+                            <td>{{ document.processing_date  }}</td>
+                        </tr>
+
+                        {% if document.journal_issn %}
+                            <tr>
+                                <td><strong>ISSN do Journal:</strong></td>
+                                <td>{{ document.journal_issn }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if document.issue_pid %}
+                            <tr>
+                                <td><strong>PID do Issue:</strong></td>
+                                <td>{{ document.issue_pid }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if document.article_pid %}
+                            <tr>
+                                <td><strong>PID do Artigo:</strong></td>
+                                <td>{{ document.article_pid }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if document.url_id %}
+                            <tr>
+                                <td><strong>URL id:</strong></td>
+                                <td>{{ document.url_id }}</td>
+                            </tr>
+                        {% endif %}
+
+
+                    </tbody>
+                </table>
+                <h3>Metadados de processamento:</h3>
+                <table class="table_object_list table table-striped table-hover">
+                    <tbody>
+
+                        {% if document.extract_execution_date %}
+                            <tr>
+                                <td><strong>Data de extração:</strong></td>
+                                <td>{{ document.extract_execution_date.strftime('%Y-%m-%d %H:%M:%S')  }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if document.transform_execution_date %}
+                            <tr>
+                                <td><strong>Data de transformação:</strong></td>
+                                <td>{{ document.transform_execution_date.strftime('%Y-%m-%d %H:%M:%S')  }}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if document.load_execution_date %}
+                            <tr>
+                                <td><strong>Data de carga:</strong></td>
+                                <td>{{ document.load_execution_date.strftime('%Y-%m-%d %H:%M:%S')  }}</td>
+                            </tr>
+                        {% endif %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="raw">
+            <pre><code>{{ object_json|pprint }}</code></pre>
+        </div>
+      </div>
+
+    </div>
+{% endblock %}

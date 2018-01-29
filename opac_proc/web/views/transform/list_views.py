@@ -2,7 +2,7 @@
 import traceback
 from mongoengine.context_managers import switch_db
 from bson.objectid import ObjectId
-from flask import flash
+
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
@@ -48,17 +48,17 @@ class TransformCollectionListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -81,17 +81,17 @@ class TransformCollectionListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -125,17 +125,17 @@ class TransformJournalListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -163,17 +163,17 @@ class TransformJournalListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -212,17 +212,17 @@ class TransformIssueListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -250,17 +250,17 @@ class TransformIssueListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -289,17 +289,17 @@ class TransformArticleListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -322,17 +322,17 @@ class TransformArticleListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -387,17 +387,17 @@ class TransformPressReleaseListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -425,17 +425,17 @@ class TransformPressReleaseListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -464,17 +464,17 @@ class TransformNewsListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -497,17 +497,17 @@ class TransformNewsListView(TransformBaseListView):
         },
         {
             'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]

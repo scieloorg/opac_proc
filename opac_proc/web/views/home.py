@@ -12,11 +12,20 @@ from opac_schema.v1.models import News as OpacNews
 
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_webapp_db_name
 from opac_proc.datastore import models
+from opac_proc.datastore import identifiers_models
 
 
 def home():
     register_connections()
     opac_webapp_db_name = get_opac_webapp_db_name()
+
+    # identifiers:
+    ids_collection_count = identifiers_models.CollectionIdModel.objects.all().count()
+    ids_journal_count = identifiers_models.JournalIdModel.objects.all().count()
+    ids_issue_count = identifiers_models.IssueIdModel.objects.all().count()
+    ids_article_count = identifiers_models.ArticleIdModel.objects.all().count()
+    ids_press_release_count = identifiers_models.PressReleaseIdModel.objects.all().count()
+    ids_news_count = identifiers_models.NewsIdModel.objects.all().count()
 
     # extract counts
     extract_collection_count = models.ExtractCollection.objects.all().count()
@@ -70,6 +79,14 @@ def home():
     latest_msg = models.Message.objects.filter(unread=True).order_by('-created_at')[:5]
 
     context = {
+        # identifiers
+        'ids_collection_count': ids_collection_count,
+        'ids_journal_count': ids_journal_count,
+        'ids_issue_count': ids_issue_count,
+        'ids_article_count': ids_article_count,
+        'ids_press_release_count': ids_press_release_count,
+        'ids_news_count': ids_news_count,
+
         # extract
         'extract_collection_count': extract_collection_count,
         'extract_journal_count': extract_journal_count,

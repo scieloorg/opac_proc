@@ -9,8 +9,7 @@ def update_metadata(extract_method):
     def wrapped(*args, **kwargs):
         _self = args[0]
 
-        # set is_lock and set start_at time
-        _self.metadata['is_locked'] = True
+        # set start_at time
         _self.metadata['process_start_at'] = datetime.now()
         # call the extract method defined in subclass
         extract_method(*args, **kwargs)
@@ -18,6 +17,6 @@ def update_metadata(extract_method):
         # release is_lock and set finish_at time
         _self.metadata['process_finish_at'] = datetime.now()
         _self.metadata['process_completed'] = True
-        _self.metadata['is_locked'] = False
+        _self.metadata['must_reprocess'] = False
 
     return wrapped

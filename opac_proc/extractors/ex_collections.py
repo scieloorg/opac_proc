@@ -114,10 +114,11 @@ class CollectionExtractor(BaseExtractor):
             raise Exception(msg)
         else:
             # atualizo self.metadata para que self.children_ids seja salvo junto com self.raw_data no save()
-            self.metadata['children_ids'] = self.children_ids
+            self._raw_data['children_ids'] = self.children_ids
 
         # extração de metricas
-        self._raw_data['metrics'] = self._extract_metrics()
+        if self._raw_data['has_analytics']:
+            self._raw_data['metrics'] = self._extract_metrics()
 
         logger.info(u'Fim CollectionExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))

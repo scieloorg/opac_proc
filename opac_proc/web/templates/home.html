@@ -2,353 +2,743 @@
 {% block title %}Home{% endblock title %}
 {% block content %}
   <h1></h1>
-  <div class="row">
-    <div class="col-md-3">
+  <div class="row-fluid">
+    <div class="col-md-12">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <i class="fa fa-download"></i>
-          <strong>Extract:</strong>
-          <a class="pull-right" href="{{ url_for('extract.logs_list') }}" data-toggle="tooltip" data-placement="left" title="View Logs">
-            <span class="glyphicon glyphicon-list-alt"></span>
-          </a>
+          <i class="fa fa-book"></i> Quantidade de Documentos:
         </div>
-        <!-- List group -->
-        <ul class="list-group">
-          <a href="{{ url_for('extract.collection_list') }}" class="list-group-item">
-            Collections:
-            {% if extract_collection_count == 0 %}
-              <span class="badge badge-danger">{{ extract_collection_count }}</span>
-            {% else %}
-              <span class="badge badge-primary">{{ extract_collection_count }}</span>
-            {% endif %}
-          </a>
-          <a href="{{ url_for('extract.journal_list') }}" class="list-group-item">
-            Journals:
-            {% if extract_journal_count == 0 %}
-              <span class="badge badge-danger">{{ extract_journal_count }}</span>
-            {% else %}
-              <span class="badge badge-primary">{{ extract_journal_count }}</span>
-            {% endif %}
-          </a>
-          <a href="{{ url_for('extract.issue_list') }}" class="list-group-item">
-            Issues:
-            {% if extract_issue_count == 0 %}
-              <span class="badge badge-danger">{{ extract_issue_count }}</span>
-            {% else %}
-              <span class="badge badge-primary">{{ extract_issue_count }}</span>
-            {% endif %}
-          </a>
-          <a href="{{ url_for('extract.article_list') }}" class="list-group-item">
-            Articles:
-            {% if extract_article_count == 0 %}
-              <span class="badge badge-danger">{{ extract_article_count }}</span>
-            {% else %}
-              <span class="badge badge-primary">{{ extract_article_count }}</span>
-            {% endif %}
-          </a>
-          <a href="{{ url_for('extract.press_release_list') }}" class="list-group-item">
-            Press Releases:
-            {% if extract_press_release_count == 0 %}
-              <span class="badge badge-danger">{{ extract_press_release_count }}</span>
-            {% else %}
-              <span class="badge badge-primary">{{ extract_press_release_count }}</span>
-            {% endif %}
-          </a>
-          <a href="{{ url_for('extract.news_list') }}" class="list-group-item">
-            News:
-            {% if extract_news_count == 0 %}
-              <span class="badge badge-danger">{{ extract_news_count }}</span>
-            {% else %}
-              <span class="badge badge-primary">{{ extract_news_count }}</span>
-            {% endif %}
-          </a>
-        </ul>
+        <table class="table table-bordered table-striped table-hover table-responsive">
+          <thead>
+            <tr class="info">
+              <th>
+                <i class="fa fa-database"></i> Modelos:
+              </th>
+              <th>
+                <i class="fa fa-info"></i> Identifiers:
+              </th>
+              <th>
+                <i class="fa fa-download"></i> Extract:
+                <a class="pull-right" href="{{ url_for('extract.logs_list') }}" data-toggle="tooltip" data-placement="left" title="View Extract Logs">
+                  <span class="glyphicon glyphicon-list-alt"></span>
+                </a>
+              </th>
+              <th>
+                <i class="fa fa-cogs"></i> Transform:
+                <a class="pull-right" href="{{ url_for('transform.logs_list') }}" data-toggle="tooltip" data-placement="left" title="View Transform Logs">
+                  <span class="glyphicon glyphicon-list-alt"></span>
+                </a>
+              </th>
+              <th>
+                <i class="fa fa-upload"></i>
+                Load:
+                <a class="pull-right" href="{{ url_for('load.logs_list') }}" data-toggle="tooltip" data-placement="left" title="View Load Logs">
+                  <span class="glyphicon glyphicon-list-alt"></span>
+                </a>
+              </th>
+              <th>
+                <i class="fa fa-globe"></i>
+                OPAC schema:
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Collections:</td>
+              <td>
+                <a href="{{ url_for('sync_ids.collection_list') }}">
+                  {% if ids_collection_count < 1 %}
+                    <span class="badge badge-danger">{{ ids_collection_count }}</span>
+                  {% else %}
+                    <span class="badge badge-primary">{{ ids_collection_count }}</span>
+                  {% endif %}
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('extract.collection_list') }}">
+                  {% if extract_collection_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif extract_collection_count < ids_collection_count %}
+                      <span class="badge badge-warning">
+                  {% elif extract_collection_count > ids_collection_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ extract_collection_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('transform.collection_list') }}">
+                  {% if transform_collection_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif transform_collection_count < extract_collection_count %}
+                      <span class="badge badge-warning">
+                  {% elif transform_collection_count > extract_collection_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ transform_collection_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('load.collection_list') }}">
+                  {% if load_collection_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif load_collection_count < transform_collection_count %}
+                    <span class="badge badge-warning">
+                  {% elif load_collection_count > transform_collection_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ load_collection_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('opac.collection_list') }}">
+                  {% if opac_collection_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif opac_collection_count < load_collection_count %}
+                    <span class="badge badge-warning">
+                  {% elif opac_collection_count > load_collection_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ opac_collection_count }}</span>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td>Journals:</td>
+              <td>
+                <a href="{{ url_for('sync_ids.journal_list') }}">
+                  {% if ids_journal_count < 1 %}
+                    <span class="badge badge-danger">{{ ids_journal_count }}</span>
+                  {% else %}
+                    <span class="badge badge-primary">{{ ids_journal_count }}</span>
+                  {% endif %}
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('extract.journal_list') }}">
+                  {% if extract_journal_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif extract_journal_count < ids_journal_count %}
+                      <span class="badge badge-warning">
+                  {% elif extract_journal_count > ids_journal_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ extract_journal_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('transform.journal_list') }}">
+                  {% if transform_journal_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif transform_journal_count < extract_journal_count %}
+                      <span class="badge badge-warning">
+                  {% elif transform_journal_count > extract_journal_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ transform_journal_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('load.journal_list') }}">
+                  {% if load_journal_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif load_journal_count < transform_journal_count %}
+                    <span class="badge badge-warning">
+                  {% elif load_journal_count > transform_journal_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ load_journal_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('opac.journal_list') }}">
+                  {% if opac_journal_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif opac_journal_count < load_journal_count %}
+                    <span class="badge badge-warning">
+                  {% elif opac_journal_count > load_journal_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ opac_journal_count }}</span>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td>Issues:</td>
+              <td>
+                <a href="{{ url_for('sync_ids.issue_list') }}">
+                  {% if ids_issue_count < 1 %}
+                    <span class="badge badge-danger">{{ ids_issue_count }}</span>
+                  {% else %}
+                    <span class="badge badge-primary">{{ ids_issue_count }}</span>
+                  {% endif %}
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('extract.issue_list') }}">
+                  {% if extract_issue_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif extract_issue_count < ids_issue_count %}
+                      <span class="badge badge-warning">
+                  {% elif extract_issue_count > ids_issue_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ extract_issue_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('transform.issue_list') }}">
+                  {% if transform_issue_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif transform_issue_count < extract_issue_count %}
+                      <span class="badge badge-warning">
+                  {% elif transform_issue_count > extract_issue_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ transform_issue_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('load.issue_list') }}">
+                  {% if load_issue_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif load_issue_count < transform_issue_count %}
+                    <span class="badge badge-warning">
+                  {% elif load_issue_count > transform_issue_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ load_issue_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('opac.issue_list') }}">
+                  {% if opac_issue_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif opac_issue_count < load_issue_count %}
+                    <span class="badge badge-warning">
+                  {% elif opac_issue_count > load_issue_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ opac_issue_count }}</span>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td>Articles:</td>
+              <td>
+                <a href="{{ url_for('sync_ids.article_list') }}">
+                  {% if ids_article_count < 1 %}
+                    <span class="badge badge-danger">{{ ids_article_count }}</span>
+                  {% else %}
+                    <span class="badge badge-primary">{{ ids_article_count }}</span>
+                  {% endif %}
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('extract.article_list') }}">
+                  {% if extract_article_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif extract_article_count < ids_article_count %}
+                      <span class="badge badge-warning">
+                  {% elif extract_article_count > ids_article_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ extract_article_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('transform.article_list') }}">
+                  {% if transform_article_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif transform_article_count < extract_article_count %}
+                      <span class="badge badge-warning">
+                  {% elif transform_article_count > extract_article_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ transform_article_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('load.article_list') }}">
+                  {% if load_article_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif load_article_count < transform_article_count %}
+                    <span class="badge badge-warning">
+                  {% elif load_article_count > transform_article_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ load_article_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('opac.article_list') }}">
+                  {% if opac_article_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif opac_article_count < load_article_count %}
+                    <span class="badge badge-warning">
+                  {% elif opac_article_count > load_article_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ opac_article_count }}</span>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td>Press Releases:</td>
+              <td>
+                <a href="{{ url_for('sync_ids.press_release_list') }}">
+                  {% if ids_press_release_count < 1 %}
+                    <span class="badge badge-danger">{{ ids_press_release_count }}</span>
+                  {% else %}
+                    <span class="badge badge-primary">{{ ids_press_release_count }}</span>
+                  {% endif %}
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('extract.press_release_list') }}">
+                  {% if extract_press_release_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif extract_press_release_count < ids_press_release_count %}
+                      <span class="badge badge-warning">
+                  {% elif extract_press_release_count > ids_press_release_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ extract_press_release_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('transform.press_release_list') }}">
+                  {% if transform_press_release_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif transform_press_release_count < extract_press_release_count %}
+                      <span class="badge badge-warning">
+                  {% elif transform_press_release_count > extract_press_release_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ transform_press_release_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('load.press_release_list') }}">
+                  {% if load_press_release_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif load_press_release_count < transform_press_release_count %}
+                    <span class="badge badge-warning">
+                  {% elif load_press_release_count > transform_press_release_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ load_press_release_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('opac.pressrelease_list') }}">
+                  {% if opac_pressrelease_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif opac_pressrelease_count < load_press_release_count %}
+                    <span class="badge badge-warning">
+                  {% elif opac_pressrelease_count > load_press_release_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ opac_pressrelease_count }}</span>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td>News:</td>
+              <td>
+                <a href="{{ url_for('sync_ids.news_list') }}">
+                  {% if ids_news_count < 1 %}
+                    <span class="badge badge-danger">{{ ids_news_count }}</span>
+                  {% else %}
+                    <span class="badge badge-primary">{{ ids_news_count }}</span>
+                  {% endif %}
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('extract.news_list') }}">
+                  {% if extract_news_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif extract_news_count < ids_news_count %}
+                      <span class="badge badge-warning">
+                  {% elif extract_news_count > ids_news_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ extract_news_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('transform.news_list') }}">
+                  {% if transform_news_count < 1 %}
+                      <span class="badge badge-danger">
+                  {% elif transform_news_count < extract_news_count %}
+                      <span class="badge badge-warning">
+                  {% elif transform_news_count > extract_news_count %}
+                      <span class="badge badge-danger">
+                  {% else %}
+                      <span class="badge badge-success">
+                  {% endif %}
+                  {{ transform_news_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('load.news_list') }}">
+                  {% if load_news_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif load_news_count < transform_news_count %}
+                    <span class="badge badge-warning">
+                  {% elif load_news_count > transform_news_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ load_news_count }}</span>
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('opac.news_list') }}">
+                  {% if opac_news_count < 1 %}
+                    <span class="badge badge-danger">
+                  {% elif opac_news_count < load_news_count %}
+                    <span class="badge badge-warning">
+                  {% elif opac_news_count > load_news_count%}
+                    <span class="badge badge-danger">
+                  {% else %}
+                    <span class="badge badge-success">
+                  {% endif %}
+                  {{ opac_news_count }}</span>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td>Sponsors:</td>
+              <td><i class="fa fa-ban"></i></td>
+              <td><i class="fa fa-ban"></i></td>
+              <td><i class="fa fa-ban"></i></td>
+              <td><i class="fa fa-ban"></i></td>
+              <td>
+                <a href="{{ url_for('opac.sponsor_list') }}">
+                  <span class="badge">{{ opac_sponsor_count }}</span>
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td>Pages:</td>
+              <td><i class="fa fa-ban"></i></td>
+              <td><i class="fa fa-ban"></i></td>
+              <td><i class="fa fa-ban"></i></td>
+              <td><i class="fa fa-ban"></i></td>
+              <td>
+                <a href="{{ url_for('opac.page_list') }}">
+                  <span class="badge">{{ opac_page_count }}</span>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </div>
-    <div class="col-md-3">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <i class="fa fa-cogs"></i>
-          <strong>Transform:</strong>
-          <a class="pull-right" href="{{ url_for('transform.logs_list') }}" data-toggle="tooltip" data-placement="left" title="View Logs">
-            <span class="glyphicon glyphicon-list-alt"></span>
-          </a>
-        </div>
-        <!-- List group -->
-        <ul class="list-group">
-          <a href="{{ url_for('transform.collection_list') }}" class="list-group-item">
-            Collections:
-            {% if transform_collection_count == 0 %}
-                <span class="badge badge-danger">
-            {% elif transform_collection_count < extract_collection_count %}
-                <span class="badge badge-warning">
-            {% elif transform_collection_count > extract_collection_count %}
-                <span class="badge badge-danger">
-            {% else %}
-                <span class="badge badge-success">
-            {% endif %}
-            {{ transform_collection_count }}</span>
-          </a>
-          <a href="{{ url_for('transform.journal_list') }}" class="list-group-item">
-            Journals:
-            {% if transform_journal_count == 0 %}
-                <span class="badge badge-danger">
-            {% elif transform_journal_count < extract_journal_count %}
-                <span class="badge badge-warning">
-            {% elif transform_journal_count > extract_journal_count %}
-                <span class="badge badge-danger">
-            {% else %}
-                <span class="badge badge-success">
-            {% endif %}
-            {{ transform_journal_count }}</span>
-          </a>
-          <a href="{{ url_for('transform.issue_list') }}" class="list-group-item">
-            Issues:
-            {% if transform_issue_count == 0 %}
-                <span class="badge badge-danger">
-            {% elif transform_issue_count < extract_issue_count %}
-                <span class="badge badge-warning">
-            {% elif transform_issue_count > extract_issue_count %}
-                <span class="badge badge-danger">
-            {% else %}
-                <span class="badge badge-success">
-            {% endif %}
-            {{ transform_issue_count }}</span>
-          </a>
-          <a href="{{ url_for('transform.article_list') }}" class="list-group-item">
-            Articles:
-            {% if transform_article_count == 0 %}
-                <span class="badge badge-danger">
-            {% elif transform_article_count < extract_article_count %}
-                <span class="badge badge-warning">
-            {% elif transform_article_count > extract_article_count %}
-                <span class="badge badge-danger">
-            {% else %}
-                <span class="badge badge-success">
-            {% endif %}
-            {{ transform_article_count }}</span>
-          </a>
-          <a href="{{ url_for('transform.press_release_list') }}" class="list-group-item">
-            Press Releases:
-            {% if transform_press_release_count == 0 %}
-                <span class="badge badge-danger">
-            {% elif transform_press_release_count < extract_press_release_count %}
-                <span class="badge badge-warning">
-            {% elif transform_press_release_count > extract_press_release_count %}
-                <span class="badge badge-danger">
-            {% else %}
-                <span class="badge badge-success">
-            {% endif %}
-            {{ transform_press_release_count }}</span>
-          </a>
-          <a href="{{ url_for('transform.news_list') }}" class="list-group-item">
-            News:
-            {% if transform_news_count == 0 %}
-                <span class="badge badge-danger">
-            {% elif transform_news_count < extract_news_count %}
-                <span class="badge badge-warning">
-            {% elif transform_news_count > extract_news_count %}
-                <span class="badge badge-danger">
-            {% else %}
-                <span class="badge badge-success">
-            {% endif %}
-            {{ transform_news_count }}</span>
-          </a>
-        </ul>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <i class="fa fa-upload"></i>
-          <strong>Load:</strong>
-          <a class="pull-right" href="{{ url_for('load.logs_list') }}" data-toggle="tooltip" data-placement="left" title="View Logs">
-            <span class="glyphicon glyphicon-list-alt"></span>
-          </a>
-        </div>
-        <!-- List group -->
-        <ul class="list-group">
-          <a href="{{ url_for('load.collection_list') }}" class="list-group-item">
-            Collections:
-            {% if load_collection_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif load_collection_count < transform_collection_count %}
-              <span class="badge badge-warning">
-            {% elif load_collection_count > transform_collection_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ load_collection_count }}</span>
-          </a>
-          <a href="{{ url_for('load.journal_list') }}" class="list-group-item">
-            Journals:
-            {% if load_journal_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif load_journal_count < transform_journal_count %}
-              <span class="badge badge-warning">
-            {% elif load_journal_count > transform_journal_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ load_journal_count }}</span>
-          </a>
-          <a href="{{ url_for('load.issue_list') }}" class="list-group-item">
-            Issues:
-            {% if load_issue_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif load_issue_count < transform_issue_count %}
-              <span class="badge badge-warning">
-            {% elif load_issue_count > transform_issue_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ load_issue_count }}</span>
-          </a>
-          <a href="{{ url_for('load.article_list') }}" class="list-group-item">
-            Articles:
-            {% if load_article_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif load_article_count < transform_article_count %}
-              <span class="badge badge-warning">
-            {% elif load_article_count > transform_article_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ load_article_count }}</span>
-          </a>
-          <a href="{{ url_for('load.press_release_list') }}" class="list-group-item">
-            Press Releases:
-            {% if load_press_release_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif load_press_release_count < transform_press_release_count %}
-              <span class="badge badge-warning">
-            {% elif load_press_release_count > transform_press_release_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ load_press_release_count }}</span>
-          </a>
-          <a href="{{ url_for('load.news_list') }}" class="list-group-item">
-            News:
-            {% if load_news_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif load_news_count < transform_news_count %}
-              <span class="badge badge-warning">
-            {% elif load_news_count > transform_news_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ load_news_count }}</span>
-          </a>
-        </ul>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="panel panel-info">
-        <div class="panel-heading">
-          <i class="fa fa-globe"></i>
-          <strong>OPAC schema:</strong>
-        </div>
-        <!-- List group -->
-        <ul class="list-group">
-          <a href="{{ url_for('opac.collection_list') }}" class="list-group-item">
-            Collections:
-            {% if opac_collection_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif opac_collection_count < load_collection_count %}
-              <span class="badge badge-warning">
-            {% elif opac_collection_count > load_collection_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ opac_collection_count }}</span>
-          </a>
-          <a href="{{ url_for('opac.journal_list') }}" class="list-group-item">
-            Journals:
-            {% if opac_journal_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif opac_journal_count < load_journal_count %}
-              <span class="badge badge-warning">
-            {% elif opac_journal_count > load_journal_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ opac_journal_count }}</span>
-          </a>
-          <a href="{{ url_for('opac.issue_list') }}" class="list-group-item">
-            Issues:
-            {% if opac_issue_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif opac_issue_count < load_issue_count %}
-              <span class="badge badge-warning">
-            {% elif opac_issue_count > load_issue_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ opac_issue_count }}</span>
-          </a>
-          <a href="{{ url_for('opac.article_list') }}" class="list-group-item">
-            Articles:
-            {% if opac_article_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif opac_article_count < load_article_count %}
-              <span class="badge badge-warning">
-            {% elif opac_article_count > load_article_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ opac_article_count }}</span>
-          </a>
-          <a href="{{ url_for('opac.pressrelease_list') }}" class="list-group-item">
-            Press Releases:
-            {% if opac_pressrelease_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif opac_pressrelease_count < load_press_release_count %}
-              <span class="badge badge-warning">
-            {% elif opac_pressrelease_count > load_press_release_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ opac_pressrelease_count }}</span>
-          </a>
-          <a href="{{ url_for('opac.news_list') }}" class="list-group-item">
-            News
-            {% if opac_news_count == 0 %}
-              <span class="badge badge-danger">
-            {% elif opac_news_count < load_news_count %}
-              <span class="badge badge-warning">
-            {% elif opac_news_count > load_news_count%}
-              <span class="badge badge-danger">
-            {% else %}
-              <span class="badge badge-success">
-            {% endif %}
-            {{ opac_news_count }}</span>
-          </a>
-          <li class="list-group-item list-group-item-info">
-            <strong>Sem processamento:</strong>
-          </li>
-          <a href="{{ url_for('opac.sponsor_list') }}" class="list-group-item">
-            Sponsors <span class="badge">{{ opac_sponsor_count }}</span>
-          </a>
-          <a href="{{ url_for('opac.page_list') }}" class="list-group-item">
-            Pages <span class="badge">{{ opac_page_count }}</span>
-          </a>
-        </ul>
-      </div>
-    </div>
+    </div> {# end: col-md-X #}
   </div>
-  <div class="row">
+  <div class="row-fluid">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+          &Delta; Diferências em quantidade de documentos:
+        </div>
+
+        <table class="table table-bordered table-striped table-hover table-responsive">
+          <thead>
+            <tr class="warning">
+              <th>Modelos:</th>
+              <th>Identifiers - Extract</th>
+              <th>Extract - Transform</th>
+              <th>Transform - Load</th>
+              <th>Load - OPAC</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Collections:</td>
+              <td>
+                {% with diff = ids_collection_count - extract_collection_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = extract_collection_count - transform_collection_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = transform_collection_count - load_collection_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = load_collection_count - opac_collection_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+            </tr>
+            <tr>
+              <td>Journals:</td>
+              <td>
+                {% with diff = ids_journal_count - extract_journal_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = extract_journal_count - transform_journal_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = transform_journal_count - load_journal_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = load_journal_count - opac_journal_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+            </tr>
+            <tr>
+              <td>Issue:</td>
+              <td>
+                {% with diff = ids_issue_count - extract_issue_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = extract_issue_count - transform_issue_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = transform_issue_count - load_issue_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = load_issue_count - opac_issue_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+            </tr>
+            <tr>
+              <td>Article:</td>
+              <td>
+                {% with diff = ids_article_count - extract_article_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = extract_article_count - transform_article_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = transform_article_count - load_article_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = load_article_count - opac_article_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+            </tr>
+            <tr>
+              <td>Press Releases:</td>
+              <td>
+                {% with diff = ids_press_release_count - extract_press_release_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = extract_press_release_count - transform_press_release_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = transform_press_release_count - load_press_release_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = load_press_release_count - opac_pressrelease_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+            </tr>
+            <tr>
+              <td>News:</td>
+              <td>
+                {% with diff = ids_news_count - extract_news_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = extract_news_count - transform_news_count  %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = transform_news_count - load_news_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                {% with diff = load_news_count - opac_news_count %}
+                  {% if diff == 0 %}
+                    <span class="badge badge-success">{{ diff }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ diff }}</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div> {# end: col-md-X #}
+  </div>
+  <div class="row-fluid">
     <div class="col-md-12">
       <div class="panel panel-default">
         <div class="panel-heading">

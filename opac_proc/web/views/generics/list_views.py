@@ -35,17 +35,17 @@ class ListView(View):
         },
         {
             'field_label': u'Last update',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -62,17 +62,17 @@ class ListView(View):
         },
         {
             'field_label': u'Last update',
-            'field_name': 'updated_at',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -116,6 +116,9 @@ class ListView(View):
                 f_field_name = list_filter['field_name']
                 f_field_type = list_filter['field_type']
                 f_field_label = list_filter['field_label']
+
+                if '.' in f_field_name:
+                    f_field_name = f_field_name.replace('.', '__')
 
                 qs_filter_value = request.args.get('filter__value__%s' % f_field_name, None)
                 qs_filter_from = request.args.get('filter__value__from__%s' % f_field_name, None)

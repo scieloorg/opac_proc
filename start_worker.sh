@@ -10,4 +10,5 @@ rq worker \
     --name=$WORKER_NAME \
     qex_collections qex_journals qex_issues qex_articles qex_press_releases qex_news \
     qtr_collections qtr_journals qtr_issues qtr_articles qtr_press_releases qtr_news \
-    qlo_collections qlo_journals qlo_issues qlo_articles qlo_press_releases qlo_news
+    qlo_collections qlo_journals qlo_issues qlo_articles qlo_press_releases qlo_news \
+    qss_collections qss_journals qss_issues qss_articles qss_press_releases qss_news

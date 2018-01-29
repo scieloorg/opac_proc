@@ -1,0 +1,26 @@
+
+<h3 class="text-center">{{ events|length }} registros de eventos no total</h3>
+<ul class="cbp_tmtimeline">
+  {% for event_record in events %}
+    <li>
+      <time class="cbp_tmtime" datetime="{{ event_record.created_at.strftime('%Y-%m-%d %H:%M:%S') }}">
+        <span>{{ event_record.created_at.strftime('%Y-%m-%d') }}</span>
+        <span>{{ event_record.created_at.strftime('%H:%M:%S') }}</span>
+      </time>
+      <div class="cbp_tmicon cbp_tmicon-screen"></div>
+      <div class="cbp_tmlabel">
+        <h2>
+          {% if event_record.stage %}
+            {{ event_record.stage }} |
+          {% endif %}
+          {% if  event_record.model_name %}
+            {{ event_record.model_name }}
+          {% endif %}
+        </h2>
+        <p>
+          {{ event_record.description }}
+        </p>
+      </div>
+    </li>
+  {% endfor %}
+</ul>

@@ -163,8 +163,12 @@ class ArticleMeta(object):
             for collection in self.client.get_collection_identifiers():
                 collections_list.append({
                     'code': collection.code,
-                    'name': collection.name,
                     'acronym': collection.acronym,
+                    'acronym2letters': collection.acronym2letters,
+                    'status': collection.status,
+                    'domain': collection.domain,
+                    'name': collection.name,
+                    'has_analytics': collection.has_analytics,
                 })
             return collections_list
         except Exception, e:

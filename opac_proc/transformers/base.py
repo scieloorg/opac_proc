@@ -4,6 +4,7 @@ import sys
 import json
 
 from opac_proc.datastore.mongodb_connector import get_db_connection
+from opac_proc.datastore.base_mixin import ProcessMetada
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
@@ -37,13 +38,7 @@ class BaseTransformer(object):
     exclude_fields = [
         '_id',
         'uuid',
-        'updated_at',
-        'is_locked',
-        'is_deleted',
-        'process_start_at',
-        'process_finish_at',
-        'process_completed',
-        'must_reprocess',
+        'metadata',
     ]
 
     def __init__(self, extract_model_key, transform_model_uuid=None):
@@ -145,9 +140,9 @@ class BaseTransformer(object):
         """
         logger.debug(u"iniciando save()")
         try:
-            self.transform_model_instance.save()
             self.metadata['must_reprocess'] = False
-            self.transform_model_instance.update(**self.metadata)
+            self.transform_model_instance['metadata'] = ProcessMetada(**self.metadata)
+            self.transform_model_instance.save()
             self.transform_model_instance.reload()
         except Exception, e:
             msg = u"Não foi possível salvar %s. Exeção: %s" % (
