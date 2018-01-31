@@ -4,11 +4,19 @@
         {{ object[field_name] }}
     {% elif field_type == 'date' %}
         {% if object[field_name] %}
-            {{ object[field_name].strftime('%Y-%m-%d') }}
+            {% if object[field_name]|string %} {# workarround resolvido no proc parcial #}
+                {{ object[field_name] }}
+            {% else %}
+                {{ object[field_name].strftime('%Y-%m-%d') }}
+            {% endif %}
         {% endif %}
     {% elif field_type == 'date_time' %}
         {% if object[field_name] %}
-            {{ object[field_name].strftime('%Y-%m-%d %H:%M:%S') }}
+            {% if object[field_name]|string %} {# workarround resolvido no proc parcial #}
+                {{ object[field_name] }}
+            {% else %}
+                {{ object[field_name].strftime('%Y-%m-%d %H:%M:%S') }}
+            {% endif %}
         {% endif %}
     {% elif field_type == 'boolean' %}
         {% if object[field_name] %}
