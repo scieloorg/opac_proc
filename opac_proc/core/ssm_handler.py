@@ -152,6 +152,7 @@ class SSMHandler(object):
 
         if creteria == intersection:
 
+            # Check if exists by checksum
             assets = self.ssm_client.query_asset({'checksum': self._checksum_sha256},
                                                  {'pid': self.metadata['pid'],
                                                  'collection': self.metadata['collection']
@@ -165,10 +166,13 @@ class SSMHandler(object):
                                                                   })
 
                 if assets_by_filename:
+                    # Return: (2, [asset, asset, ...]) 2
                     return (2, assets_by_filename)
                 else:
+                    # Return: (0, []) 0
                     return (0, assets)
 
+            # Return: (1, [asset, asset, ...]) 1
             return (1, assets)
         else:
             raise ValueError(u'O param metadata do ativo teve conter: %s', ', '.join(creteria))
