@@ -54,7 +54,7 @@ class ArticleLoader(BaseLoader):
         'original_language',
         'languages',
         'abstract',
-#         'abstracts',
+        'abstracts',
         'authors',
         'htmls',
         'pdfs',
@@ -112,20 +112,19 @@ class ArticleLoader(BaseLoader):
         logger.debug(u"Translated Titles criados: %s" % len(translated_titles))
         return translated_titles
 
-#     def prepare_abstracts(self):
-#         logger.debug(u"iniciando prepare_abstracts")
-#         translated_abstracts = []
+    def prepare_abstracts(self):
+        logger.debug(u"iniciando prepare_abstracts")
+        translated_abstracts = []
 
-#         if hasattr(self.transform_model_instance, 'abstracts'):
-#             for lang, text in self.transform_model_instance.abstracts.items():
-#                 translated_abstract = OpacTranslatedAbstracts({'language': lang,
-#                                                                'text': text})
-#                 translated_abstracts.append(translated_abstract)
-#         else:
-#             logger.info(u"Não existem Translated Abstracts transformados. uuid: %s" % self.transform_model_instance.uuid)
+        if hasattr(self.transform_model_instance, 'abstracts'):
+            for trans in self.transform_model_instance.abstracts:
+                translated_abstract = OpacTranslatedAbstracts(**trans)
+                translated_abstracts.append(translated_abstract)
+        else:
+            logger.info(u"Não existe resumos transformados para o uuid: %s" % self.transform_model_instance.uuid)
 
-#         logger.debug(u"Translated Abstracts criados: %s" % len(translated_abstracts))
-#         return translated_abstracts
+        logger.debug(u"Resumos adicionados: %s" % len(translated_abstracts))
+        return translated_abstracts
 
     def prepare_sections(self):
         logger.debug(u"iniciando prepare_sections")
