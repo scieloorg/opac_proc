@@ -12,6 +12,26 @@ from opac_proc.web.accounts.forms import EmailForm
 from opac_proc.web.accounts.mixins import User as UserMixin
 from opac_proc.web.accounts.models import User as UserModel
 
+from opac_proc.datastore import models
+from opac_proc.datastore.mongodb_connector import get_db_connection
+from opac_proc.datastore.redis_queues import RQueues
+from opac_proc.extractors.jobs import (
+    task_collection_create as ex_task_collection_create,
+    task_journal_create as ex_task_journal_create,
+    task_extract_issue as ex_task_extract_issue,
+    task_extract_article as ex_task_extract_article)
+from opac_proc.transformers.jobs import (
+    task_collection_create as tr_task_collection_create,
+    task_journal_create as tr_task_journal_create,
+    task_transform_issue as tr_task_transform_issue,
+    task_transform_article as tr_task_transform_article)
+from opac_proc.loaders.jobs import (
+    task_collection_create as lo_task_collection_create,
+    task_journal_create as lo_task_journal_create,
+    task_load_issue as lo_task_load_issue,
+    task_load_article as lo_task_load_article)
+
+
 app = create_app()
 manager = Manager(app)
 
@@ -20,6 +40,109 @@ def make_shell_context():
     app_models = {}  # TODO: adicionar os modelos no contexto
     return dict(app=app, **app_models)
 manager.add_command("shell", Shell(make_context=make_shell_context))
+
+
+def process_issue_article(collection, issns, stage, task_issue, task_article):
+    r_queues = RQueues()
+    r_queues.create_queues_for_stage(stage)
+
+    search_issn = [child['issn'] for child in collection['children_ids']]
+
+    print u"Lista de ISSNs: %s" % search_issn
+
+    children_found = [child for child in collection['children_ids'] if child['issn'] in issns]
+
+    print u"ISSNs encontrados: %s" % [child['issn'] for child in children_found]
+
+    for child in children_found:
+
+        # children_ids, pegamos os articles_ids e issues_ids
+        articles_ids = child['articles_ids']
+        issues_ids = child['issues_ids']
+        print u"Processando %s pids de issues do periódico %s" % (len(issues_ids), child['issn'])
+        print u"Processando %s pids de artigos do periódico %s" % (len(articles_ids), child['issn'])
+
+        # para cada pid de issues, enfileramos na queue certa:
+        for issue_pid in issues_ids:
+            r_queues.enqueue(stage, 'issue', task_issue, collection.acronym, issue_pid)
+        print u"Enfilerados %s PIDs de issues do periódico %s" % (len(r_queues.queues[stage]['issue']), child['issn'])
+
+        # para cada pid de artigos, enfileramos na queue certa:
+        for article_pid in articles_ids:
+            r_queues.enqueue(stage, 'article', task_article, collection.acronym, article_pid)
+        print u"Enfilerados %s PIDs de artigos do periódico %s" % (len(r_queues.queues[stage]['article']), child['issn'])
+
+
+@manager.command
+@manager.option('-i', '--issns', dest='issns')
+def process_extract(issns=None):
+    stage = 'extract'
+
+    if not issns:
+        print u'Obrigatório param ``issn``'
+        exit()
+
+    collection = models.ExtractCollection.objects.all().first()
+
+    print u'Colecão que será extraída: %s' % collection.name
+
+    ex_task_collection_create()
+
+    clean_issns = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
+
+    print u'Processando o(s) ISSN(s): %s' % clean_issns
+
+    ex_task_journal_create()
+
+    process_issue_article(collection, clean_issns, stage, ex_task_extract_issue, ex_task_extract_article)
+
+
+@manager.command
+@manager.option('-i', '--issns', dest='issns')
+def process_transform(issns=None):
+    stage = 'transform'
+
+    if not issns:
+        print u'Obrigatório param ``issn``'
+        exit()
+
+    collection = models.TransformCollection.objects.all().first()
+
+    print u'Colecão que será tranformada: %s' % collection.name
+
+    tr_task_collection_create()
+
+    clean_issns = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
+
+    print u'Processando o(s) ISSN(s): %s' % clean_issns
+
+    tr_task_journal_create()
+
+    process_issue_article(collection, clean_issns, stage, tr_task_transform_issue, tr_task_transform_article)
+
+
+@manager.command
+@manager.option('-i', '--issns', dest='issns')
+def process_load(issns=None):
+    stage = 'load'
+
+    if not issns:
+        print u'Obrigatório param ``issn``'
+        exit()
+
+    collection = models.TransformCollection.objects.all().first()
+
+    print u'Colecão que será carregada: %s' % collection.name
+
+    lo_task_collection_create()
+
+    clean_issns = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
+
+    print u'Processando o(s) ISSN(s): %s' % clean_issns
+
+    lo_task_journal_create()
+
+    process_issue_article(collection, clean_issns, stage, lo_task_load_issue, lo_task_load_article)
 
 
 @manager.command
