@@ -57,19 +57,30 @@ def process_issue_article(collection, issns, stage, task_issue, task_article):
     for child in children_found:
 
         # children_ids, pegamos os articles_ids e issues_ids
-        articles_ids = child['articles_ids']
-        issues_ids = child['issues_ids']
+        if stage == 'load':
+            issues_ids = models.TransformIssue.objects.filter(pid__contains=child['issn']).values_list('uuid')
+            articles_ids = models.TransformArticle.objects.filter(pid__contains=child['issn']).values_list('uuid')
+        else:
+            articles_ids = child['articles_ids']
+            issues_ids = child['issues_ids']
+
         print u"Processando %s pids de issues do periódico %s" % (len(issues_ids), child['issn'])
         print u"Processando %s pids de artigos do periódico %s" % (len(articles_ids), child['issn'])
 
         # para cada pid de issues, enfileramos na queue certa:
         for issue_pid in issues_ids:
-            r_queues.enqueue(stage, 'issue', task_issue, collection.acronym, issue_pid)
+            if stage == 'load':
+                r_queues.enqueue(stage, 'issue', task_issue, issue_pid)
+            else:
+                r_queues.enqueue(stage, 'issue', task_issue, collection.acronym, issue_pid)
         print u"Enfilerados %s PIDs de issues do periódico %s" % (len(r_queues.queues[stage]['issue']), child['issn'])
 
         # para cada pid de artigos, enfileramos na queue certa:
         for article_pid in articles_ids:
-            r_queues.enqueue(stage, 'article', task_article, collection.acronym, article_pid)
+            if stage == 'load':
+                r_queues.enqueue(stage, 'article', task_article, article_pid)
+            else:
+                r_queues.enqueue(stage, 'article', task_article, collection.acronym, article_pid)
         print u"Enfilerados %s PIDs de artigos do periódico %s" % (len(r_queues.queues[stage]['article']), child['issn'])
 
 
