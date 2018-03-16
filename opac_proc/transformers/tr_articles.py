@@ -69,8 +69,8 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['title'] = xylose_article.original_title()
 
         # abstract_languages
-        if hasattr(xylose_article, 'translated_abstracts') and xylose_article.translated_abstracts():
-            self.transform_model_instance['abstract_languages'] = xylose_article.translated_abstracts().keys()
+        if hasattr(xylose_article, 'abstracts') and xylose_article.abstracts():
+            self.transform_model_instance['abstract_languages'] = xylose_article.abstracts().keys()
 
         # translated_sections
         if hasattr(xylose_article, 'translated_section') and xylose_article.translated_section():
@@ -133,12 +133,12 @@ class ArticleTransformer(BaseTransformer):
         if hasattr(xylose_article, 'original_abstract'):
             self.transform_model_instance['abstract'] = xylose_article.original_abstract()
 
-        # translated_abstracts
-        if xylose_article.translated_abstracts():
+        # abstracts
+        if xylose_article.abstracts():
 
             translated_abstracts = []
 
-            for lang, text in xylose_article.translated_abstracts().items():
+            for lang, text in xylose_article.abstracts().items():
                 translated_abstracts.append({
                     'language': lang,
                     'text': text,
