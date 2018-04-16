@@ -16,17 +16,17 @@ class Process(object):
     r_queues = RQueues()
     db = get_db_connection()
 
-    def create(self):
+    def selected(self, selected_uuids):
         self.r_queues.enqueue(
             self.stage,
             self.model_name,
-            self.create_task)
+            self.task_for_selected, selected_uuids)
 
-    def update(self, ids=None):
+    def all(self):
         self.r_queues.enqueue(
             self.stage,
             self.model_name,
-            self.update_task, ids)
+            self.task_for_all)
 
 
 class ProcessExtractBase(Process):

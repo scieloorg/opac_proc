@@ -16,16 +16,100 @@ from opac_proc.datastore import diff_models as diff_models
 from opac_proc.web import config
 from opac_proc.source_sync.utils import (
     MODEL_NAME_LIST,
+    STAGE_LIST,
+    ACTION_LIST,
     parse_journal_issn_from_issue_code,
     parse_journal_issn_from_article_code,
     parse_issue_pid_from_article_code,
     parse_date_str_to_datetime_obj,
 )
-
+from opac_proc.extractors.process import (
+    ProcessExtractCollection,
+    ProcessExtractJournal,
+    ProcessExtractIssue,
+    ProcessExtractArticle,
+    ProcessExtractPressRelease,
+    ProcessExtractNews
+)
+from opac_proc.transformers.process import (
+    ProcessTransformCollection,
+    ProcessTransformJournal,
+    ProcessTransformIssue,
+    ProcessTransformArticle,
+    ProcessTransformPressRelease,
+    ProcessTransformNews
+)
+from opac_proc.loaders.process import (
+    ProcessLoadCollection,
+    ProcessLoadJournal,
+    ProcessLoadIssue,
+    ProcessLoadArticle,
+    ProcessLoadPressRelease,
+    ProcessLoadNews
+)
 
 logger = logging.getLogger(__name__)
-logging.config.fileConfig('logging.ini', disable_existing_loggers=False)
-STAGES = ('extract', 'transform', 'load')
+logger_ini = os.path.join(os.path.dirname(__file__), 'logging.ini')
+logging.config.fileConfig(logger_ini, disable_existing_loggers=False)
+
+
+DIFF_APPLY_PROCESSORS = {
+    'add': {
+        'extract': {
+            'collection': ProcessExtractCollection,
+            'journal': ProcessExtractJournal,
+            'issue': ProcessExtractIssue,
+            'article': ProcessExtractArticle,
+            'news': ProcessExtractNews,
+            'press_release': ProcessExtractPressRelease,
+        },
+        'transform': {
+            'collection': ProcessTransformCollection,
+            'journal': ProcessTransformJournal,
+            'issue': ProcessTransformIssue,
+            'article': ProcessTransformArticle,
+            'news': ProcessTransformNews,
+            'press_release': ProcessTransformPressRelease,
+        },
+        'load': {
+            'collection': ProcessLoadCollection,
+            'journal': ProcessLoadJournal,
+            'issue': ProcessLoadIssue,
+            'article': ProcessLoadArticle,
+            'news': ProcessLoadPressRelease,
+            'press_release': ProcessLoadNews,
+        }
+    },
+    'update': {
+        'extract': {
+            'collection': ProcessExtractCollection,
+            'journal': ProcessExtractJournal,
+            'issue': ProcessExtractIssue,
+            'article': ProcessExtractArticle,
+            'news': ProcessExtractNews,
+            'press_release': ProcessExtractPressRelease,
+        },
+        'transform': {
+            'collection': ProcessTransformCollection,
+            'journal': ProcessTransformJournal,
+            'issue': ProcessTransformIssue,
+            'article': ProcessTransformArticle,
+            'news': ProcessTransformNews,
+            'press_release': ProcessTransformPressRelease,
+        },
+        'load': {
+            'collection': ProcessLoadCollection,
+            'journal': ProcessLoadJournal,
+            'issue': ProcessLoadIssue,
+            'article': ProcessLoadArticle,
+            'news': ProcessLoadNews,
+            'press_release': ProcessLoadPressRelease,
+        }
+    },
+    'delete': {
+
+    }
+}
 
 
 class DifferBase(object):
@@ -94,18 +178,38 @@ class DifferBase(object):
             raise Exception(error_msg)
 
     def has_id_retrieved(self, target_uuid):
+        """
+        Retorna True quando o documento com uuid: `target_uuid` do
+        modelo `self.id_model_class` tem exatamente um registro salvo.
+        Isso significa que o registro no IdentifierModel correspondente existe.
+        """
         objs_count = self.id_model_class.objects.filter(uuid=target_uuid).count()
         return objs_count == 1
 
     def is_extracted(self, target_uuid):
+        """
+        Retorna True quando o documento com uuid: `target_uuid` do
+        modelo `self.ex_model` tem exatamente um registro salvo.
+        Isso significa que o registro no modelo Extract correspondente existe.
+        """
         objs_count = self.ex_model_class.objects.filter(uuid=target_uuid).count()
         return objs_count == 1
 
     def is_transformed(self, target_uuid):
+        """
+        Retorna True quando o documento com uuid: `target_uuid` do
+        modelo `self.tr_model` tem exatamente um registro salvo.
+        Isso significa que o registro no modelo Transform correspondente existe.
+        """
         objs_count = self.tr_model_class.objects.filter(uuid=target_uuid).count()
         return objs_count == 1
 
     def is_loaded(self, target_uuid):
+        """
+        Retorna True quando o documento com uuid: `target_uuid` do
+        modelo `self.lo_model` tem exatamente um registro salvo.
+        Isso significa que o registro no modelo Load correspondente existe.
+        """
         objs_count = self.lo_model_class.objects.filter(uuid=target_uuid).count()
         return objs_count == 1
 
@@ -205,7 +309,7 @@ class DifferBase(object):
         Resultado:
             retorna a lista de UUIDs que precisam ser addicionados na fase `stage`
         """
-        if stage in STAGES:
+        if stage in STAGE_LIST:
             if stage == 'extract':
                 extracted_uuids = self.ex_model_class.objects.all().values_list('uuid')
                 return self.id_model_class.objects.filter(uuid__nin=extracted_uuids).values_list('uuid')
@@ -247,7 +351,7 @@ class DifferBase(object):
         elif not isinstance(since_date, datetime):
             raise ValueError(u'Param: since_date deve ser uma instânciade datetime')
 
-        if stage in STAGES:
+        if stage in STAGE_LIST:
             # obtemos os UUID dos modelos identifiers que foram modificados recentemente
             recently_updated_uuids = self.id_model_class.objects(processing_date__gt=since_date).values_list('uuid')
             if stage == 'extract':
@@ -281,7 +385,7 @@ class DifferBase(object):
         Resultado:
             retorna a lista de UUIDs que precisam ser removidos na fase `stage`
         """
-        if stage in STAGES:
+        if stage in STAGE_LIST:
             if stage == 'extract':
                 identifiers_uuids = self.id_model_class.objects.all().values_list('uuid')
                 return self.ex_model_class.objects.filter(uuid__nin=identifiers_uuids).values_list('uuid')
@@ -329,7 +433,7 @@ class DifferBase(object):
             'action': action,
         }
 
-        if stage in STAGES:
+        if stage in STAGE_LIST:
             model_class = self.get_model_class_to_collect_diff_data(stage, action)
             model_instance = model_class.objects.get(uuid=target_uuid)
             diff_data = model_instance.get_diff_model_data
@@ -338,6 +442,33 @@ class DifferBase(object):
             self.diff_model_class(**doc_data).save()
         else:
             raise ValueError(u'Parametro: "stage" inválido! Valores esperados: "extract" ou "transform" ou "load"!')
+
+    def get_uuids_unapplied(self, stage, action):
+        return self.diff_model_class.objects.filter(stage=stage, action=action, done_at=None).values_list('uuid')
+
+    def apply_diff_record(self, stage, action, target_uuid):
+        logger.info(
+            "Aplicando o diff model para: stage: %s, action: %s, modelo: %s, UUID: %s" % (
+                stage, action, self.model_name, target_uuid))
+        # get processor
+        processor_class = DIFF_APPLY_PROCESSORS[action][stage][self.model_name]
+        processor_instance = processor_class()
+        logger.info('Processor: %s' % processor_class)
+
+        if action in ACTION_LIST:
+            if action == 'add':
+                processor_instance.create([target_uuid])
+            elif action == 'update':
+                processor_instance.update([target_uuid])
+            elif action == 'delete':
+                raise NotImplementedError('Precisa implementar ainda!')
+
+            # atualizo registro diff como feito
+            diff_model_instance = self.diff_model_class.objects.get(uuid=target_uuid)
+            diff_model_instance.done_at = datetime.now()
+            diff_model_instance.save()
+        else:
+            raise ValueError(u'Param action com valor inesperado: %s' % action)
 
 
 # --------------------------------------------------- #

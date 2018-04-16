@@ -398,7 +398,7 @@ class Assets(object):
                     registered_medias.update({metadata['origin_path']:
                                               asset['absolute_url']})
 
-                logger.info("Medias já existente no SSM: %s", registered_medias)
+                logger.info(u"Medias já existente no SSM: %s", registered_medias)
 
         return registered_medias
 
@@ -547,7 +547,7 @@ class AssetXML(Assets):
             logger.info(u"Alterando as medias:%s no artigo PID: %s",
                         registered_media, self.xylose.publisher_id)
 
-            logger.info("Medias registradas %s", registered_media)
+            logger.info(u"Medias registradas %s", registered_media)
 
             self._change_img_path(registered_media)  # change self.content
 
@@ -678,7 +678,7 @@ class AssetHTMLS(Assets):
             ssm_asset = SSMHandler(BytesIO(html), self._get_name(lang), file_type,
                                    metadata, self.bucket_name)
 
-            logger.info("Verificando se o asset existe: %s", ssm_asset.exists())
+            logger.info(u"Verificando se o asset existe: %s", ssm_asset.exists())
 
             code, assets = ssm_asset.exists()
 

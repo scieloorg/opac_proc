@@ -19,8 +19,7 @@ OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 class ExtractBaseListView(ListView):
     stage = 'extract'
-    can_create = True
-    can_update = True
+    can_process = True
     can_delete = True
 
 
@@ -439,8 +438,7 @@ class ExtractLogListView(ExtractBaseListView):
     model_class = models.ExtractLog
     model_name = 'extractlog'
     process_class = None  # logs somente tem o Delete
-    can_create = False
-    can_update = False
+    can_process = False
     can_delete = True
     page_title = "Extract: Logs"
     page_subtitle = "most recent first"

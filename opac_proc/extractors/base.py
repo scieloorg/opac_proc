@@ -27,6 +27,10 @@ class BaseExtractor(object):
     extract_model_name = ''
     extract_model_instance = None
 
+    ids_model_class = None
+    ids_model_name = ''
+    ids_model_instance = None
+
     metadata = {
         'updated_at': None,
         'process_start_at': None,
@@ -39,6 +43,23 @@ class BaseExtractor(object):
         self.articlemeta = am_clients.ArticleMeta(
             config.ARTICLE_META_THRIFT_DOMAIN,
             config.ARTICLE_META_THRIFT_PORT)
+
+    def get_identifier_model_instance(self):
+        if not self.get_identifier_query or not isinstance(self.get_identifier_query, dict):
+            raise ValueError("Deve definir self.query como dicionario no __init__ da subclasse")
+
+        try:
+            instance = self.ids_model_class.objects(**self.get_identifier_query)
+        except Exception, e:  # does not exist or multiple objects returned
+            # se existe deveria ser só uma instância do modelo
+            raise e
+        else:
+            if not instance:
+                return None
+            elif instance.count() > 1:
+                raise ValueError("self.get_instance_query retornou muitos resultados")
+            else:
+                return instance.first()
 
     def get_extract_model_instance(self):
         if not self.get_instance_query or not isinstance(self.get_instance_query, dict):
@@ -104,6 +125,12 @@ class BaseExtractor(object):
             logger.error(msg)
             raise Exception(msg)
         else:
+            # obtemos a instância do modelo identifier:
+            self.ids_model_instance = self.get_identifier_model_instance()
+            if not self.ids_model_instance:
+                raise ValueError('Não encontramos um modelo identifier (%s) relaciondo o esta modelo' % self.ids_model_name)
+            # setamos o valor do campo UUID:
+            self._raw_data['uuid'] = self.ids_model_instance.uuid
             # atualizamos as datas no self.metadata
             self.metadata['must_reprocess'] = False
             self._raw_data['metadata'] = ProcessMetada(**self.metadata)

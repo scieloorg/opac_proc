@@ -9,8 +9,7 @@ OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
 
 class OpacBaseListView(ListView):
     stage = 'opac'
-    can_create = False
-    can_update = False
+    can_process = False
     can_delete = True
 
     def get_objects(self):

@@ -11,35 +11,35 @@ else:
 
 class ProcessExtractCollection(ProcessExtractBase):
     model_name = 'collection'
-    create_task = 'opac_proc.extractors.jobs.task_collection_create'
-    update_task = 'opac_proc.extractors.jobs.task_collection_update'
+    task_for_selected = 'opac_proc.extractors.jobs.task_extract_selected_collections'
+    task_for_all = 'opac_proc.extractors.jobs.task_extract_all_collections'
 
 
 class ProcessExtractJournal(ProcessExtractBase):
     model_name = 'journal'
-    create_task = 'opac_proc.extractors.jobs.task_journal_create'
-    update_task = 'opac_proc.extractors.jobs.task_journal_update'
+    task_for_selected = 'opac_proc.extractors.jobs.task_extract_selected_journals'
+    task_for_all = 'opac_proc.extractors.jobs.task_extract_all_journals'
 
 
 class ProcessExtractIssue(ProcessExtractBase):
     model_name = 'issue'
-    create_task = 'opac_proc.extractors.jobs.task_issue_create'
-    update_task = 'opac_proc.extractors.jobs.task_issue_update'
+    task_for_selected = 'opac_proc.extractors.jobs.task_extract_selected_issues'
+    task_for_all = 'opac_proc.extractors.jobs.task_extract_all_issues'
 
 
 class ProcessExtractArticle(ProcessExtractBase):
     model_name = 'article'
-    create_task = 'opac_proc.extractors.jobs.task_article_create'
-    update_task = 'opac_proc.extractors.jobs.task_article_update'
+    task_for_selected = 'opac_proc.extractors.jobs.task_extract_selected_articles'
+    task_for_all = 'opac_proc.extractors.jobs.task_extract_all_articles'
 
 
 class ProcessExtractPressRelease(ProcessExtractBase):
     model_name = 'press_release'
-    create_task = 'opac_proc.extractors.jobs.task_press_release_create'
-    update_task = 'opac_proc.extractors.jobs.task_press_release_update'
+    task_for_selected = 'opac_proc.extractors.jobs.task_extract_selected_press_releases'
+    task_for_all = 'opac_proc.extractors.jobs.task_extract_all_press_releases'
 
 
 class ProcessExtractNews(ProcessExtractBase):
     model_name = 'news'
-    create_task = 'opac_proc.extractors.jobs.task_news_create'
-    update_task = 'opac_proc.extractors.jobs.task_news_update'
+    task_for_selected = 'opac_proc.extractors.jobs.task_extract_selected_news'
+    task_for_all = 'opac_proc.extractors.jobs.task_extract_all_news'

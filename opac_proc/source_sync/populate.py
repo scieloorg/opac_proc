@@ -1,6 +1,8 @@
 # coding: utf-8
 import sys
 import os
+import logging
+import logging.config
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
@@ -37,8 +39,12 @@ from opac_proc.source_sync.utils import (
     parse_date_str_to_datetime_obj,
 )
 
+logger = logging.getLogger(__name__)
+logger_ini = os.path.join(os.path.dirname(__file__), 'logging.ini')
+logging.config.fileConfig(logger_ini, disable_existing_loggers=False)
 
-class PopulateFromExtractBase(object):
+
+class PopulateBase(object):
     collection_acronym = config.OPAC_PROC_COLLECTION
     _db = None
     model_name = None
@@ -63,7 +69,7 @@ class PopulateFromExtractBase(object):
         if self._db is None:
             self._db = get_db_connection()
 
-    def get_id_model_lookup_query_from_extract_data(self, filter_values):
+    def get_id_model_lookup_filters(self, filter_values):
         """
         retorna um dicioario de campos/valores que deve ser usada para recuperar o modelo identifier
         Ex:
@@ -76,7 +82,7 @@ class PopulateFromExtractBase(object):
         """
         raise NotImplementedError(u'deve ser implementada na subclase')
 
-    def prepare_extract_data_to_identifier_data(self, extract_model_instance):
+    def prepare_data_to_identifier_data(self, extract_model_instance):
         """
         metodo que retorna um dicionario pronto para salvar como modelo de identificador (idsmodels instance)
         """
@@ -91,7 +97,7 @@ class PopulateFromExtractBase(object):
         obj_count = obj.count()
 
         if obj_count == 0:
-            return None  # o docuemnto não foi transformado ainda
+            return None  # o docuemnto não foi salvo ainda
         elif obj_count == 1:
             return obj.first()
         else:
@@ -105,7 +111,7 @@ class PopulateFromExtractBase(object):
         if tr_model_instance:
             transform_execution_date = tr_model_instance['metadata']['process_finish_at']
         else:
-            print "transform model instance not found: model name: %s uuid: %s" % (self.model_name, uuid)
+            logger.info("transform model instance not found: model name: %s uuid: %s" % (self.model_name, uuid))
             transform_execution_date = None
         return transform_execution_date
 
@@ -116,7 +122,7 @@ class PopulateFromExtractBase(object):
         if lo_model_instance:
             load_execution_date = lo_model_instance['metadata']['process_finish_at']
         else:
-            print "load model instance not found: model name: %s uuid: %s" % (self.model_name, uuid)
+            logger.info("load model instance not found: model name: %s uuid: %s" % (self.model_name, uuid))
             load_execution_date = None
         return load_execution_date
 
@@ -151,8 +157,8 @@ class PopulateFromExtractBase(object):
         Executa o processo de populate para um modelo de extração.
         Recebe uma instância do modelo: "ex_model_instance"
         """
-        ex_data_dict = self.prepare_extract_data_to_identifier_data(ex_model_instance)
-        id_models_filter = self.get_id_model_lookup_query_from_extract_data(ex_data_dict)
+        ex_data_dict = self.prepare_data_to_identifier_data(ex_model_instance)
+        id_models_filter = self.get_id_model_lookup_filters(ex_data_dict)
         self.save_identifier_model(id_models_filter, ex_data_dict)
 
     def run_for_one_model_instance_by_uuid(self, ex_model_instance_uuid):
@@ -180,7 +186,7 @@ class PopulateFromExtractBase(object):
             self.run_for_one_model_instance(ex_model_instance)
 
 
-class PopulateCollection(PopulateFromExtractBase):
+class PopulateCollection(PopulateBase):
 
     model_name = 'collection'
     id_model_class = idmodels.CollectionIdModel
@@ -188,12 +194,12 @@ class PopulateCollection(PopulateFromExtractBase):
     tr_model_class = TransformCollection
     lo_model_class = LoadCollection
 
-    def get_id_model_lookup_query_from_extract_data(self, filter_values):
+    def get_id_model_lookup_filters(self, filter_values):
         return {
             'collection_acronym': self.collection_acronym
         }
 
-    def prepare_extract_data_to_identifier_data(self, extract_model_instance):
+    def prepare_data_to_identifier_data(self, extract_model_instance):
         processing_date = extract_model_instance['metadata']['process_finish_at']
         extract_execution_date = extract_model_instance['metadata']['process_finish_at']
         # procuparmos preencher os campos de data de execução: Tranform e Load
@@ -211,7 +217,7 @@ class PopulateCollection(PopulateFromExtractBase):
         }
 
 
-class PopulateJournal(PopulateFromExtractBase):
+class PopulateJournal(PopulateBase):
 
     model_name = 'journal'
     id_model_class = idmodels.JournalIdModel
@@ -219,13 +225,13 @@ class PopulateJournal(PopulateFromExtractBase):
     tr_model_class = TransformJournal
     lo_model_class = LoadJournal
 
-    def get_id_model_lookup_query_from_extract_data(self, filter_values):
+    def get_id_model_lookup_filters(self, filter_values):
         return {
             'collection_acronym': self.collection_acronym,
             'journal_issn': filter_values['journal_issn'],
         }
 
-    def prepare_extract_data_to_identifier_data(self, extract_model_instance):
+    def prepare_data_to_identifier_data(self, extract_model_instance):
         extracted_code = extract_model_instance['code']
         processing_date = parse_date_str_to_datetime_obj(extract_model_instance['processing_date'])
         extract_execution_date = extract_model_instance['metadata']['process_finish_at']
@@ -244,7 +250,7 @@ class PopulateJournal(PopulateFromExtractBase):
         }
 
 
-class PopulateIssue(PopulateFromExtractBase):
+class PopulateIssue(PopulateBase):
 
     model_name = 'issue'
     id_model_class = idmodels.IssueIdModel
@@ -252,14 +258,14 @@ class PopulateIssue(PopulateFromExtractBase):
     tr_model_class = TransformIssue
     lo_model_class = LoadIssue
 
-    def get_id_model_lookup_query_from_extract_data(self, filter_values):
+    def get_id_model_lookup_filters(self, filter_values):
         return {
             'collection_acronym': self.collection_acronym,
             'journal_issn': filter_values['journal_issn'],
             'issue_pid': filter_values['issue_pid'],
         }
 
-    def prepare_extract_data_to_identifier_data(self, extract_model_instance):
+    def prepare_data_to_identifier_data(self, extract_model_instance):
         extracted_code = extract_model_instance['code']
         journal_issn = parse_journal_issn_from_issue_code(extracted_code)
         issue_pid = extracted_code
@@ -281,7 +287,7 @@ class PopulateIssue(PopulateFromExtractBase):
         }
 
 
-class PopulateArticle(PopulateFromExtractBase):
+class PopulateArticle(PopulateBase):
 
     model_name = 'article'
     id_model_class = idmodels.ArticleIdModel
@@ -289,7 +295,7 @@ class PopulateArticle(PopulateFromExtractBase):
     tr_model_class = TransformArticle
     lo_model_class = LoadArticle
 
-    def get_id_model_lookup_query_from_extract_data(self, filter_values):
+    def get_id_model_lookup_filters(self, filter_values):
         return {
             'collection_acronym': self.collection_acronym,
             'journal_issn': filter_values['journal_issn'],
@@ -297,7 +303,7 @@ class PopulateArticle(PopulateFromExtractBase):
             'article_pid': filter_values['article_pid'],
         }
 
-    def prepare_extract_data_to_identifier_data(self, extract_model_instance):
+    def prepare_data_to_identifier_data(self, extract_model_instance):
         extracted_code = extract_model_instance['code']
         journal_issn = parse_journal_issn_from_article_code(extracted_code)
         issue_pid = parse_issue_pid_from_article_code(extracted_code)
@@ -321,7 +327,7 @@ class PopulateArticle(PopulateFromExtractBase):
         }
 
 
-class PopulateNews(PopulateFromExtractBase):
+class PopulateNews(PopulateBase):
 
     model_name = 'news'
     id_model_class = idmodels.NewsIdModel
@@ -329,13 +335,13 @@ class PopulateNews(PopulateFromExtractBase):
     tr_model_class = TransformNews
     lo_model_class = LoadNews
 
-    def get_id_model_lookup_query_from_extract_data(self, filter_values):
+    def get_id_model_lookup_filters(self, filter_values):
         return {
             'collection_acronym': self.collection_acronym,
             'url_id': filter_values['url_id'],
         }
 
-    def prepare_extract_data_to_identifier_data(self, extract_model_instance):
+    def prepare_data_to_identifier_data(self, extract_model_instance):
         url_id = extract_model_instance['url_id']
         processing_date = parse_date_str_to_datetime_obj(extract_model_instance['published'])
         extract_execution_date = extract_model_instance['metadata']['process_finish_at']
@@ -354,7 +360,7 @@ class PopulateNews(PopulateFromExtractBase):
         }
 
 
-class PopulatePressRelease(PopulateFromExtractBase):
+class PopulatePressRelease(PopulateBase):
 
     model_name = 'press_release'
     id_model_class = idmodels.PressReleaseIdModel
@@ -362,13 +368,13 @@ class PopulatePressRelease(PopulateFromExtractBase):
     tr_model_class = TransformPressRelease
     lo_model_class = LoadPressRelease
 
-    def get_id_model_lookup_query_from_extract_data(self, filter_values):
+    def get_id_model_lookup_filters(self, filter_values):
         return {
             'collection_acronym': self.collection_acronym,
             'url_id': filter_values['url_id'],
         }
 
-    def prepare_extract_data_to_identifier_data(self, extract_model_instance):
+    def prepare_data_to_identifier_data(self, extract_model_instance):
         url_id = extract_model_instance['url_id']
         processing_date = parse_date_str_to_datetime_obj(extract_model_instance['published'])
         extract_execution_date = extract_model_instance['metadata']['process_finish_at']
@@ -407,19 +413,19 @@ def get_populator_class(model_name):
 
 def main(model_name):
     """ script para roda manualmente """
-    print "main -> model_name: ", model_name
+    logger.info("main -> model_name: %s" % model_name)
     process_all = model_name == 'populate_all'
     if process_all:
         for model in MODEL_NAME_LIST:
             populator = get_populator_class(model)
-            print u"executando retrieve do modelo: %s" % model
+            logger.info(u"executando retrieve do modelo: %s" % model)
             populator.run_serial_for_all()
-            print u"finalizada retrieve do modelo: %s" % model
+            logger.info(u"finalizada retrieve do modelo: %s" % model)
     else:
         populator = get_populator_class(model_name)
-        print u"executando retrieve do modelo: %s" % model_name
+        logger.info(u"executando retrieve do modelo: %s" % model_name)
         populator.run_serial_for_all()
-        print u"finalizada retrieve do modelo: %s" % model_name
+        logger.info(u"finalizada retrieve do modelo: %s" % model_name)
 
 
 if __name__ == '__main__':

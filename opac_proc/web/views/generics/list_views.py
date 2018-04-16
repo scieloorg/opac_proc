@@ -50,8 +50,7 @@ class ListView(View):
         },
     ]
 
-    can_create = False
-    can_update = False
+    can_process = False
     can_delete = False
 
     list_filters = [
@@ -78,9 +77,8 @@ class ListView(View):
     ]
 
     _allowed_POST_action_names = [
-        'create',
-        'update_all',
-        'update_selected',
+        'process_all',
+        'process_selected',
         'delete_all',
         'delete_selected'
     ]
@@ -248,35 +246,26 @@ class ListView(View):
             flash(flask_msg, 'info')
             app_msg.send_email()
 
-    def do_create(self):
+    def do_process_all(self):
         try:
             processor = self.process_class()
-            processor.create()
+            processor.all()
         except Exception, e:
             traceback_str = traceback.format_exc()
             self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str)
         else:
             self._trigger_messages()
 
-    def do_update_all(self):
+    def do_process_selected(self, selected_uuids):
         try:
+            print "selected_uuids: ", selected_uuids
             processor = self.process_class()
-            processor.update()
+            processor.selected(selected_uuids)
         except Exception as e:
             traceback_str = traceback.format_exc()
-            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str)
+            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=len(selected_uuids))
         else:
-            self._trigger_messages()
-
-    def do_update_selected(self, ids):
-        try:
-            processor = self.process_class()
-            processor.update(ids)
-        except Exception as e:
-            traceback_str = traceback.format_exc()
-            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=len(ids))
-        else:
-            self._trigger_messages(items_count=len(ids))
+            self._trigger_messages(items_count=len(selected_uuids))
 
     def do_delete_all(self):
         if self.model_class is None:
@@ -305,14 +294,15 @@ class ListView(View):
             flash("%s registros removidos com sucesso!" % successfully_deleted, "warning")
 
     def get_selected_ids(self):
-        ids = request.form.getlist('rowid')
-        if not ids:
+        uuids = request.form.getlist('rowid')
+        print 'uuids: ', uuids
+        if not uuids:
             raise ValueError(u"Não selecionou registros!")
-        elif isinstance(ids, list):
-            ids = [_id.strip() for _id in ids]
+        elif isinstance(uuids, list):
+            uuids = [_id.strip() for _id in uuids]
         else:
-            raise ValueError("Seleção inválida: %s" % ids)
-        return ids
+            raise ValueError("Seleção inválida: %s" % uuids)
+        return uuids
 
     def dispatch_request(self):
         if request.method == 'POST':  # create action
@@ -343,28 +333,20 @@ class ListView(View):
                             flash(u'ERRO: %s' % str(e), 'error')
 
             elif action_name in self._allowed_POST_action_names:
-                if action_name == 'create':
-                    if self.can_create:
+                if action_name == 'process_all':
+                    if self.can_process:
                         try:
-                            self.do_create()
+                            self.do_process_all()
                         except Exception as e:
                             flash(u'ERRO: %s' % str(e), 'error')
                     else:
                         flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
-                elif action_name == 'update_all':
-                    if self.can_update:
-                        try:
-                            self.do_update_all()
-                        except Exception as e:
-                            flash(u'ERRO: %s' % str(e), 'error')
-                    else:
-                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
-                elif action_name == 'update_selected':
-                    if self.can_update:
+                elif action_name == 'process_selected':
+                    if self.can_process:
                         try:
                             ids = self.get_selected_ids()
                             if ids:
-                                self.do_update_selected(ids)
+                                self.do_process_selected(ids)
                             else:
                                 flash(u'Seleção inválida de registros. Nenhum registro foi alterado.', 'error')
                         except Exception as e:
@@ -409,8 +391,7 @@ class ListView(View):
             'list_filters': self.list_filters,
             'filter_string_options': self.filter_string_options,
             # actions:
-            'can_create': self.can_create,
-            'can_update': self.can_update,
+            'can_process': self.can_process,
             'can_delete': self.can_delete,
             # meta:
             'page_title': self.page_title,

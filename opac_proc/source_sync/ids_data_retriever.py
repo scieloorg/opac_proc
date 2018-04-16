@@ -26,10 +26,11 @@ from opac_proc.source_sync.utils import (
 )
 
 logger = logging.getLogger(__name__)
-logging.config.fileConfig('logging.ini', disable_existing_loggers=False)
+logger_ini = os.path.join(os.path.dirname(__file__), 'logging.ini')
+logging.config.fileConfig(logger_ini, disable_existing_loggers=False)
 
 
-class RetrieveBase(object):
+class BaseIdDataRetriever(object):
     collection_acronym = config.OPAC_PROC_COLLECTION
     _db = None
     api_client = None
@@ -48,7 +49,7 @@ class RetrieveBase(object):
 
         if self.api_client is None:
             self.api_client = RestfulClient()
-        super(RetrieveBase, self).__init__()
+        super(BaseIdDataRetriever, self).__init__()
 
     def get_data_source_identifiers(self):
         """
@@ -127,7 +128,7 @@ class RetrieveBase(object):
 # --------------------------------------------------- #
 
 
-class RetrieveCollectionIds(RetrieveBase):
+class CollectionIdDataRetriever(BaseIdDataRetriever):
     """ Recupera os identifiers da Collection do AM """
     model_name = 'collection'
     idmodel_class = idmodels.CollectionIdModel
@@ -226,7 +227,7 @@ class RetrieveCollectionIds(RetrieveBase):
 # --------------------------------------------------- #
 
 
-class RetrieveJournalIds(RetrieveBase):
+class JournalIdDataRetriever(BaseIdDataRetriever):
     """ Recupera os identifiers dos Journals do AM """
     model_name = 'journal'
     idmodel_class = idmodels.JournalIdModel
@@ -263,7 +264,7 @@ class RetrieveJournalIds(RetrieveBase):
 # --------------------------------------------------- #
 
 
-class RetrieveIssueIds(RetrieveBase):
+class IssueIdDataRetriever(BaseIdDataRetriever):
     """ Recupera os identifiers dos Issues do AM """
     model_name = 'issue'
     idmodel_class = idmodels.IssueIdModel
@@ -309,7 +310,7 @@ class RetrieveIssueIds(RetrieveBase):
 # --------------------------------------------------- #
 
 
-class RetrieveArticleIds(RetrieveBase):
+class ArticleIdDataRetriever(BaseIdDataRetriever):
     """ Recupera os identifiers dos Articles do AM """
     model_name = 'article'
     idmodel_class = idmodels.ArticleIdModel
@@ -353,7 +354,7 @@ class RetrieveArticleIds(RetrieveBase):
 # --------------------------------------------------- #
 
 
-class RetrieveNewsIds(RetrieveBase):
+class NewsIdDataRetriever(BaseIdDataRetriever):
     """ Recupera os identifiers dos News do AM """
     model_name = 'news'
     idmodel_class = idmodels.NewsIdModel
@@ -380,6 +381,7 @@ class RetrieveNewsIds(RetrieveBase):
         """
         _identifiers = []
         for lang, feed in config.RSS_NEWS_FEEDS.items():
+            logger.debug(u"consultando press release (lang: %s), feed: %s" % (lang, feed))
             feed_url_by_lang = feed['url'].format(lang)  # ex: http://blog.scielo.org/en/feed/
             feed_entries_list = self.get_feed_entries(feed_url_by_lang)
             for raw_feed_entry in feed_entries_list:
@@ -402,7 +404,7 @@ class RetrieveNewsIds(RetrieveBase):
 # --------------------------------------------------- #
 
 
-class RetrievePressReleaseIds(RetrieveBase):
+class PressReleaseDataRetriever(BaseIdDataRetriever):
     """ Recupera os identifiers dos Press Release do AM """
     model_name = 'press_release'
     idmodel_class = idmodels.PressReleaseIdModel
@@ -413,17 +415,15 @@ class RetrievePressReleaseIds(RetrieveBase):
         No output capturado de /journals/identifiers não forence o acronym, só o ISSN
         """
         acronyms = []
-        for journal in ExtractJournal.objects.all():
-            journal_dict = json.loads(journal.to_json())
-            acronym = xylose_journal(journal_dict).acronym
-            acronyms.append(acronym)
+        for journal in self.api_client.journals(collection=self.collection_acronym):
+            acronyms.append(journal.acronym)
         return acronyms
 
     def get_feed_entries(self, feed_url):
         feed = feedparser.parse(feed_url)
         if feed.bozo == 1:
             bozo_exception_msg = feed.bozo_exception.getMessage()
-            msg = 'Não é possível parsear o feed (%s). Bozo exception message: %s' % (
+            msg = u'Não é possível parsear o feed (%s). Bozo exception message: %s' % (
                 self.url, bozo_exception_msg)
             raise Exception(msg)
         else:
@@ -458,49 +458,3 @@ class RetrievePressReleaseIds(RetrieveBase):
             'processing_date': identifier_data['published']
         }
         self._update_model_instance(document_selector, new_date)
-
-
-# ---------------------------------------------------- #
-#                    GERAL                             #
-# ---------------------------------------------------- #
-
-
-def get_retriever_class(model_name):
-    if model_name == 'collection':
-        retriever_class = RetrieveCollectionIds()
-    elif model_name == 'journal':
-        retriever_class = RetrieveJournalIds()
-    elif model_name == 'issue':
-        retriever_class = RetrieveIssueIds()
-    elif model_name == 'article':
-        retriever_class = RetrieveArticleIds()
-    elif model_name == 'news':
-        retriever_class = RetrieveNewsIds()
-    elif model_name == 'press_release':
-        retriever_class = RetrievePressReleaseIds()
-    else:
-        raise RuntimeError(u'model_name inválido')
-    return retriever_class
-
-
-def main(model_name):
-    """ script para roda manualmente """
-    print "main -> model_name: ", model_name
-    process_all = model_name == 'all'
-    if process_all:
-        for model in MODEL_NAME_LIST:
-            retriever = get_retriever_class(model)
-            print u"executando retrieve do modelo: %s" % model
-            retriever.run_serial_for_all()
-            print u"finalizada retrieve do modelo: %s" % model
-    else:
-        retriever = get_retriever_class(model_name)
-        print u"executando retrieve do modelo: %s" % model_name
-        retriever.run_serial_for_all()
-        print u"finalizada retrieve do modelo: %s" % model_name
-
-
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print "erro: falta indicar o modulo"
-    main(sys.argv[1])

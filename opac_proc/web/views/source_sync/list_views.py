@@ -6,8 +6,7 @@ from opac_proc.web.views.generics.list_views import ListView
 
 class IdentifiersBaseListView(ListView):
     stage = 'sync_ids'
-    can_create = False
-    can_update = False
+    can_process = False
     can_delete = False
 
 

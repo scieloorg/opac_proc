@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from opac_proc.datastore.models import ExtractArticle
+from opac_proc.datastore.identifiers_models import ArticleIdModel
 from opac_proc.extractors.base import BaseExtractor
 from opac_proc.extractors.decorators import update_metadata
 
@@ -19,14 +20,19 @@ class ArticleExtractor(BaseExtractor):
     article_id = None
 
     extract_model_class = ExtractArticle
+    ids_model_class = ArticleIdModel
+    ids_model_name = 'ArticleIdModel'
 
-    def __init__(self, acronym, article_id):
+    def __init__(self, article_id):
         super(ArticleExtractor, self).__init__()
-        self.acronym = acronym
+        self.acronym = config.OPAC_PROC_COLLECTION
         self.article_id = article_id
         self.get_instance_query = {
             'code': self.article_id,
             'collection': self.acronym,
+        }
+        self.get_identifier_query = {
+            'article_pid': self.article_id
         }
 
     @update_metadata

@@ -99,7 +99,7 @@ class ArticleMeta(object):
             jjournal = None
             try:
                 jjournal = json.loads(journal)
-                logger.info('Journal loaded: %s_%s' % (collection, code))
+                logger.info(u'Journal loaded: %s_%s' % (collection, code))
             except Exception, e:
                 msg = 'Fail to load JSON when retrienving Journal: %s_%s. Exception: %s' % (
                     collection, code, str(e))
@@ -123,7 +123,7 @@ class ArticleMeta(object):
             jissue = None
             try:
                 jissue = json.loads(issue)
-                logger.info('Issue loaded: %s_%s' % (collection, code))
+                logger.info(u'Issue loaded: %s_%s' % (collection, code))
             except Exception, e:
                 msg = 'Fail to load JSON when retrienving Issue: %s_%s. Exception: %s' % (
                     collection, code, str(e))

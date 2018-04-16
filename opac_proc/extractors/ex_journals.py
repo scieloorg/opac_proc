@@ -1,6 +1,7 @@
 # coding: utf-8
 from datetime import datetime
 from opac_proc.datastore.models import ExtractJournal
+from opac_proc.datastore.identifiers_models import JournalIdModel
 from opac_proc.extractors.base import BaseExtractor
 from opac_proc.extractors.decorators import update_metadata
 
@@ -21,13 +22,21 @@ class JournalExtractor(BaseExtractor):
     issn = None
 
     extract_model_class = ExtractJournal
+    ids_model_class = JournalIdModel
+    ids_model_name = 'JournalIdModel'
 
-    def __init__(self, acronym, issn):
+    def __init__(self, issn):
         super(JournalExtractor, self).__init__()
-        self.acronym = acronym
+        self.acronym = config.OPAC_PROC_COLLECTION
         self.issn = issn
         self.get_instance_query = {
             'code': self.issn
+        }
+        self.get_identifier_query = {
+            'journal_issn': self.issn
+        }
+        self.get_identifier_query = {
+            'journal_issn': self.issn
         }
 
     def _extract_metrics(self):

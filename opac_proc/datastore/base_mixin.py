@@ -57,12 +57,12 @@ class BaseMixin(object):
     def post_save(cls, sender, document, **kwargs):
         uuid = document.uuid
         if uuid:
-            if document.metadata.process_completed:
+            if document['metadata']['process_completed']:
                 # atualizamos as datas de processamento no
                 # modelo identifiers só se tiver terminando o processamento
-                updated_at = document.metadata.process_finish_at
+                updated_at = document['metadata']['process_finish_at']
                 document.update_identifier_model(uuid, updated_at)
-            if document.metadata.must_reprocess:
+            if document['metadata']['must_reprocess']:
                 # notificamos o modelo que tem que ser reprocessando
                 document.update_reprocess_field(uuid)
 

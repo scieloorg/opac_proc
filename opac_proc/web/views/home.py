@@ -13,6 +13,7 @@ from opac_schema.v1.models import News as OpacNews
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_webapp_db_name
 from opac_proc.datastore import models
 from opac_proc.datastore import identifiers_models
+from opac_proc.datastore import diff_models
 
 
 def home():
@@ -76,6 +77,81 @@ def home():
     with switch_db(OpacNews, opac_webapp_db_name):
         opac_news_count = OpacNews.objects.all().count()
 
+    # diff models - extract
+    diff_ex_add_collection_count = diff_models.CollectionDiffModel.objects.filter(stage='extract', action='add', done_at=None).count()
+    diff_ex_upd_collection_count = diff_models.CollectionDiffModel.objects.filter(stage='extract', action='update', done_at=None).count()
+    diff_ex_del_collection_count = diff_models.CollectionDiffModel.objects.filter(stage='extract', action='delete', done_at=None).count()
+
+    diff_ex_add_journal_count = diff_models.JournalDiffModel.objects.filter(stage='extract', action='add', done_at=None).count()
+    diff_ex_upd_journal_count = diff_models.JournalDiffModel.objects.filter(stage='extract', action='update', done_at=None).count()
+    diff_ex_del_journal_count = diff_models.JournalDiffModel.objects.filter(stage='extract', action='delete', done_at=None).count()
+
+    diff_ex_add_issue_count = diff_models.IssueDiffModel.objects.filter(stage='extract', action='add', done_at=None).count()
+    diff_ex_upd_issue_count = diff_models.IssueDiffModel.objects.filter(stage='extract', action='update', done_at=None).count()
+    diff_ex_del_issue_count = diff_models.IssueDiffModel.objects.filter(stage='extract', action='delete', done_at=None).count()
+
+    diff_ex_add_article_count = diff_models.ArticleDiffModel.objects.filter(stage='extract', action='add', done_at=None).count()
+    diff_ex_upd_article_count = diff_models.ArticleDiffModel.objects.filter(stage='extract', action='update', done_at=None).count()
+    diff_ex_del_article_count = diff_models.ArticleDiffModel.objects.filter(stage='extract', action='delete', done_at=None).count()
+
+    diff_ex_add_press_release_count = diff_models.PressReleaseDiffModel.objects.filter(stage='extract', action='add', done_at=None).count()
+    diff_ex_upd_press_release_count = diff_models.PressReleaseDiffModel.objects.filter(stage='extract', action='update', done_at=None).count()
+    diff_ex_del_press_release_count = diff_models.PressReleaseDiffModel.objects.filter(stage='extract', action='delete', done_at=None).count()
+
+    diff_ex_add_news_count = diff_models.NewsDiffModel.objects.filter(stage='extract', action='add', done_at=None).count()
+    diff_ex_upd_news_count = diff_models.NewsDiffModel.objects.filter(stage='extract', action='update', done_at=None).count()
+    diff_ex_del_news_count = diff_models.NewsDiffModel.objects.filter(stage='extract', action='delete', done_at=None).count()
+
+    # diff models - transform
+    diff_tr_add_collection_count = diff_models.CollectionDiffModel.objects.filter(stage='transform', action='add', done_at=None).count()
+    diff_tr_upd_collection_count = diff_models.CollectionDiffModel.objects.filter(stage='transform', action='update', done_at=None).count()
+    diff_tr_del_collection_count = diff_models.CollectionDiffModel.objects.filter(stage='transform', action='delete', done_at=None).count()
+
+    diff_tr_add_journal_count = diff_models.JournalDiffModel.objects.filter(stage='transform', action='add', done_at=None).count()
+    diff_tr_upd_journal_count = diff_models.JournalDiffModel.objects.filter(stage='transform', action='update', done_at=None).count()
+    diff_tr_del_journal_count = diff_models.JournalDiffModel.objects.filter(stage='transform', action='delete', done_at=None).count()
+
+    diff_tr_add_issue_count = diff_models.IssueDiffModel.objects.filter(stage='transform', action='add', done_at=None).count()
+    diff_tr_upd_issue_count = diff_models.IssueDiffModel.objects.filter(stage='transform', action='update', done_at=None).count()
+    diff_tr_del_issue_count = diff_models.IssueDiffModel.objects.filter(stage='transform', action='delete', done_at=None).count()
+
+    diff_tr_add_article_count = diff_models.ArticleDiffModel.objects.filter(stage='transform', action='add', done_at=None).count()
+    diff_tr_upd_article_count = diff_models.ArticleDiffModel.objects.filter(stage='transform', action='update', done_at=None).count()
+    diff_tr_del_article_count = diff_models.ArticleDiffModel.objects.filter(stage='transform', action='delete', done_at=None).count()
+
+    diff_tr_add_press_release_count = diff_models.PressReleaseDiffModel.objects.filter(stage='transform', action='add', done_at=None).count()
+    diff_tr_upd_press_release_count = diff_models.PressReleaseDiffModel.objects.filter(stage='transform', action='update', done_at=None).count()
+    diff_tr_del_press_release_count = diff_models.PressReleaseDiffModel.objects.filter(stage='transform', action='delete', done_at=None).count()
+
+    diff_tr_add_news_count = diff_models.NewsDiffModel.objects.filter(stage='transform', action='add', done_at=None).count()
+    diff_tr_upd_news_count = diff_models.NewsDiffModel.objects.filter(stage='transform', action='update', done_at=None).count()
+    diff_tr_del_news_count = diff_models.NewsDiffModel.objects.filter(stage='transform', action='delete', done_at=None).count()
+
+    # diff models - load
+    diff_lo_add_collection_count = diff_models.CollectionDiffModel.objects.filter(stage='load', action='add', done_at=None).count()
+    diff_lo_upd_collection_count = diff_models.CollectionDiffModel.objects.filter(stage='load', action='update', done_at=None).count()
+    diff_lo_del_collection_count = diff_models.CollectionDiffModel.objects.filter(stage='load', action='delete', done_at=None).count()
+
+    diff_lo_add_journal_count = diff_models.JournalDiffModel.objects.filter(stage='load', action='add', done_at=None).count()
+    diff_lo_upd_journal_count = diff_models.JournalDiffModel.objects.filter(stage='load', action='update', done_at=None).count()
+    diff_lo_del_journal_count = diff_models.JournalDiffModel.objects.filter(stage='load', action='delete', done_at=None).count()
+
+    diff_lo_add_issue_count = diff_models.IssueDiffModel.objects.filter(stage='load', action='add', done_at=None).count()
+    diff_lo_upd_issue_count = diff_models.IssueDiffModel.objects.filter(stage='load', action='update', done_at=None).count()
+    diff_lo_del_issue_count = diff_models.IssueDiffModel.objects.filter(stage='load', action='delete', done_at=None).count()
+
+    diff_lo_add_article_count = diff_models.ArticleDiffModel.objects.filter(stage='load', action='add', done_at=None).count()
+    diff_lo_upd_article_count = diff_models.ArticleDiffModel.objects.filter(stage='load', action='update', done_at=None).count()
+    diff_lo_del_article_count = diff_models.ArticleDiffModel.objects.filter(stage='load', action='delete', done_at=None).count()
+
+    diff_lo_add_press_release_count = diff_models.PressReleaseDiffModel.objects.filter(stage='load', action='add', done_at=None).count()
+    diff_lo_upd_press_release_count = diff_models.PressReleaseDiffModel.objects.filter(stage='load', action='update', done_at=None).count()
+    diff_lo_del_press_release_count = diff_models.PressReleaseDiffModel.objects.filter(stage='load', action='delete', done_at=None).count()
+
+    diff_lo_add_news_count = diff_models.NewsDiffModel.objects.filter(stage='load', action='add', done_at=None).count()
+    diff_lo_upd_news_count = diff_models.NewsDiffModel.objects.filter(stage='load', action='update', done_at=None).count()
+    diff_lo_del_news_count = diff_models.NewsDiffModel.objects.filter(stage='load', action='delete', done_at=None).count()
+
     latest_msg = models.Message.objects.filter(unread=True).order_by('-created_at')[:5]
 
     context = {
@@ -122,6 +198,64 @@ def home():
         # opac outros modelos
         'opac_sponsor_count': opac_sponsor_count,
         'opac_page_count': opac_page_count,
+
+        # diff ex:
+        'diff_ex_add_collection_count': diff_ex_add_collection_count,
+        'diff_ex_upd_collection_count': diff_ex_upd_collection_count,
+        'diff_ex_del_collection_count': diff_ex_del_collection_count,
+        'diff_ex_add_journal_count': diff_ex_add_journal_count,
+        'diff_ex_upd_journal_count': diff_ex_upd_journal_count,
+        'diff_ex_del_journal_count': diff_ex_del_journal_count,
+        'diff_ex_add_issue_count': diff_ex_add_issue_count,
+        'diff_ex_upd_issue_count': diff_ex_upd_issue_count,
+        'diff_ex_del_issue_count': diff_ex_del_issue_count,
+        'diff_ex_add_article_count': diff_ex_add_article_count,
+        'diff_ex_upd_article_count': diff_ex_upd_article_count,
+        'diff_ex_del_article_count': diff_ex_del_article_count,
+        'diff_ex_add_press_release_count': diff_ex_add_press_release_count,
+        'diff_ex_upd_press_release_count': diff_ex_upd_press_release_count,
+        'diff_ex_del_press_release_count': diff_ex_del_press_release_count,
+        'diff_ex_add_news_count': diff_ex_add_news_count,
+        'diff_ex_upd_news_count': diff_ex_upd_news_count,
+        'diff_ex_del_news_count': diff_ex_del_news_count,
+        # diff tr:
+        'diff_tr_add_collection_count': diff_tr_add_collection_count,
+        'diff_tr_upd_collection_count': diff_tr_upd_collection_count,
+        'diff_tr_del_collection_count': diff_tr_del_collection_count,
+        'diff_tr_add_journal_count': diff_tr_add_journal_count,
+        'diff_tr_upd_journal_count': diff_tr_upd_journal_count,
+        'diff_tr_del_journal_count': diff_tr_del_journal_count,
+        'diff_tr_add_issue_count': diff_tr_add_issue_count,
+        'diff_tr_upd_issue_count': diff_tr_upd_issue_count,
+        'diff_tr_del_issue_count': diff_tr_del_issue_count,
+        'diff_tr_add_article_count': diff_tr_add_article_count,
+        'diff_tr_upd_article_count': diff_tr_upd_article_count,
+        'diff_tr_del_article_count': diff_tr_del_article_count,
+        'diff_tr_add_press_release_count': diff_tr_add_press_release_count,
+        'diff_tr_upd_press_release_count': diff_tr_upd_press_release_count,
+        'diff_tr_del_press_release_count': diff_tr_del_press_release_count,
+        'diff_tr_add_news_count': diff_tr_add_news_count,
+        'diff_tr_upd_news_count': diff_tr_upd_news_count,
+        'diff_tr_del_news_count': diff_tr_del_news_count,
+        # diff lo:
+        'diff_lo_add_collection_count': diff_lo_add_collection_count,
+        'diff_lo_upd_collection_count': diff_lo_upd_collection_count,
+        'diff_lo_del_collection_count': diff_lo_del_collection_count,
+        'diff_lo_add_journal_count': diff_lo_add_journal_count,
+        'diff_lo_upd_journal_count': diff_lo_upd_journal_count,
+        'diff_lo_del_journal_count': diff_lo_del_journal_count,
+        'diff_lo_add_issue_count': diff_lo_add_issue_count,
+        'diff_lo_upd_issue_count': diff_lo_upd_issue_count,
+        'diff_lo_del_issue_count': diff_lo_del_issue_count,
+        'diff_lo_add_article_count': diff_lo_add_article_count,
+        'diff_lo_upd_article_count': diff_lo_upd_article_count,
+        'diff_lo_del_article_count': diff_lo_del_article_count,
+        'diff_lo_add_press_release_count': diff_lo_add_press_release_count,
+        'diff_lo_upd_press_release_count': diff_lo_upd_press_release_count,
+        'diff_lo_del_press_release_count': diff_lo_del_press_release_count,
+        'diff_lo_add_news_count': diff_lo_add_news_count,
+        'diff_lo_upd_news_count': diff_lo_upd_news_count,
+        'diff_lo_del_news_count': diff_lo_del_news_count,
 
         'latest_msg': latest_msg
     }

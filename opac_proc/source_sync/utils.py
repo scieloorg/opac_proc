@@ -10,6 +10,18 @@ MODEL_NAME_LIST = [
     'press_release'
 ]
 
+STAGE_LIST = [
+    'extract',
+    'transform',
+    'load'
+]
+
+ACTION_LIST = [
+    'add',
+    'update',
+    'delete'
+]
+
 
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""

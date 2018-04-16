@@ -2,15 +2,13 @@
 
 var ActionToolbar = {
   /* action buttons selectors */
-  btn_create_selector: '[data-action="create"]:not(".disabled")',
-  btn_update_all_selector: '[data-action="update"][data-target="all"]',
-  btn_update_selected_selector: '[data-action="update"][data-target="selected"]',
+  btn_process_all_selector: '[data-action="process"][data-target="all"]',
+  btn_process_selected_selector: '[data-action="process"][data-target="selected"]',
   btn_delete_all_selector: '[data-action="delete"][data-target="all"]',
   btn_delete_selected_selector: '[data-action="delete"][data-target="selected"]',
   /* action buttons */
-  btn_create: null,
-  btn_update_all: null,
-  btn_update_selected: null,
+  btn_process_all: null,
+  btn_process_selected: null,
   btn_delete_all: null,
   btn_delete_selected: null,
   /* list of rows selected */
@@ -113,22 +111,15 @@ var ActionToolbar = {
     var form = $('#action_form');
     var action_field = $('input#action_name', form);
     switch (action) {
-      case "create":{
-        action_field.val('create');
+      case "process_all":{
+        action_field.val('process_all');
         form.attr('method', 'POST');
         form.attr('action', '.');
         form.submit();
         break;
       };
-      case "update_all":{
-        action_field.val('update_all');
-        form.attr('method', 'POST');
-        form.attr('action', '.');
-        form.submit();
-        break;
-      };
-      case "update_selected":{
-        action_field.val('update_selected');
+      case "process_selected":{
+        action_field.val('process_selected');
         form.attr('method', 'POST');
         form.attr('action', '.');
         var rows = ActionToolbar.rows_selected;
@@ -162,14 +153,11 @@ var ActionToolbar = {
       }
     }
   },
-  submit_create: function(){
-    ActionToolbar.submit_action_form('create');
+  submit_process_all: function(){
+    ActionToolbar.submit_action_form('process_all');
   },
-  submit_update_all: function(){
-    ActionToolbar.submit_action_form('update_all');
-  },
-  submit_update_selected: function(){
-    ActionToolbar.submit_action_form('update_selected');
+  submit_process_selected: function(){
+    ActionToolbar.submit_action_form('process_selected');
   },
   submit_delete_all: function(){
     ActionToolbar.submit_action_form('delete_all');
@@ -241,21 +229,15 @@ var ActionToolbar = {
   },
   init: function(){
     var self = this;
-    /* create */
-    this.btn_create = $(this.btn_create_selector);
-    this.btn_create.click(function(){
-      var msg = 'Você vai executar o processo de: <strong>CRIAR/IMPORTAR</strong> todos os registros. Tem certeza?';
-      self.ask_confirmation(msg, ActionToolbar.submit_create);
-    });
-    /* update all */
-    this.btn_update_all = $(this.btn_update_all_selector);
-    this.btn_update_all.click(function(){
+    /* process all */
+    this.btn_process_all = $(this.btn_process_all_selector);
+    this.btn_process_all.click(function(){
       var msg = 'Você vai executar o processo de: <strong>ATUALIZAÇÃO</strong> sobre todos os registros. Tem certeza?';
-      self.ask_confirmation(msg, ActionToolbar.submit_update_all);
+      self.ask_confirmation(msg, ActionToolbar.submit_process_all);
     });
-    /* update selected */
-    this.btn_update_selected = $(this.btn_update_selected_selector);
-    this.btn_update_selected.click(function(){
+    /* process selected */
+    this.btn_process_selected = $(this.btn_process_selected_selector);
+    this.btn_process_selected.click(function(){
       self.get_rows_selected();
       if (self.rows_selected == 0){
         self.notify_no_rows_selected();
@@ -263,7 +245,7 @@ var ActionToolbar = {
       } else {
         var selected_count =  self.rows_selected.length;
         var msg = 'Você vai executar o processo de: <strong>ATUALIZAÇÃO</strong> sobre ' + selected_count + ' registro(s). Tem certeza?';
-        self.ask_confirmation(msg, ActionToolbar.submit_update_selected);
+        self.ask_confirmation(msg, ActionToolbar.submit_process_selected);
       }
     });
     /* delete all*/

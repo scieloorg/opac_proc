@@ -25,7 +25,8 @@ from opac_proc.source_sync.populate import (
 
 
 logger = logging.getLogger(__name__)
-logging.config.fileConfig('logging.ini', disable_existing_loggers=False)
+logger_ini = os.path.join(os.path.dirname(__file__), 'logging.ini')
+logging.config.fileConfig(logger_ini, disable_existing_loggers=False)
 
 
 def generic_task_enqueue_from_uuid_iterable(stage, model_name, model_class, r_queues, target_fn, ids):
@@ -44,19 +45,18 @@ def generic_task_enqueue_from_uuid_iterable(stage, model_name, model_class, r_qu
         list_of_list_of_uuids = list(chunks(model_instances_uuid_qs, 1000))
         logger.debug(u"obtive: %s listas de listas de UUIDs" % len(list_of_list_of_uuids))
         for list_of_uuids in list_of_list_of_uuids:
-            print "enfilerando este chunk de UUIDs: ", list_of_uuids
-            # event log - inicio: ##################################
-            create_sync_event_record(stage, model_name, target_fn, u'Iniciando enfileramento de todos os registros (%s) do modelo: %s' % (len(list_of_uuids), model_name))
-            # event log - fim! #####################################
+            logger.info("enfilerando este chunk de UUIDs: %s" % list_of_uuids)
+            create_sync_event_record(
+                stage, model_name, target_fn,
+                u'Iniciando enfileramento de todos os registros (%s) do modelo: %s' % (len(list_of_uuids), model_name))
             map(lambda uuid: r_queues.enqueue(stage, model_name, target_fn, uuid), list_of_uuids)
-            # event log - inicio: ##################################
-            create_sync_event_record(stage, model_name, target_fn, u'Finalizado enfileramento de todos os registros (%s) do modelo: %s' % (len(list_of_uuids), model_name))
-            # event log - fim! #####################################
+            create_sync_event_record(
+                stage, model_name, target_fn,
+                u'Finalizado enfileramento de todos os registros (%s) do modelo: %s' % (len(list_of_uuids), model_name))
     else:
-
-        # event log - inicio: ##################################
-        create_sync_event_record(stage, model_name, target_fn, u'Inciando enfileramento de %s registros do modelo: %s' % (len(ids), model_name))
-        # event log - fim! #####################################
+        create_sync_event_record(
+            stage, model_name, target_fn,
+            u'Inciando enfileramento de %s registros do modelo: %s' % (len(ids), model_name))
 
         for oid in ids:
             try:
@@ -66,9 +66,9 @@ def generic_task_enqueue_from_uuid_iterable(stage, model_name, model_class, r_qu
             except model_class.DoesNotExist as e:
                 logger.error(u'Modelo (%s) não existe: %s. pk: %s' % (model_name, str(e), oid))
 
-        # event log - inicio: ##################################
-        create_sync_event_record(stage, model_name, target_fn, u'Finalizando enfileramento de %s registros do modelo: %s' % (len(ids), model_name))
-        # event log - fim! #####################################
+        create_sync_event_record(
+            stage, model_name, target_fn,
+            u'Finalizando enfileramento de %s registros do modelo: %s' % (len(ids), model_name))
 
 
 # --------------------------------------------------- #
@@ -199,8 +199,12 @@ def task_populate_news(ids=None):
 # ---------------------------------------------------- #
 
 
-def run_full_populate_task_by_model(model_name):
-    logger.info("populate_jobs::run_full_populate_task_by_model -> model_name: ", model_name)
+def enqueue_full_populate_task_by_model(model_name='all'):
+    logger.info("Inicinado: enqueue_full_populate_task_by_model para modelo: %s", model_name)
+    create_sync_event_record(
+        'sync_ids', model_name, 'enqueue_full_populate_task_by_model',
+        u'Inciando enfileramento para preencher datas dos registros diff model: %s' % model_name)
+
     # setup
     get_db_connection()
     stage = 'sync_ids'
@@ -208,25 +212,49 @@ def run_full_populate_task_by_model(model_name):
     model_class = None
     task_fn = None
 
-    if model_name == 'collection':
-        model_class = models.ExtractCollection
-        task_fn = task_populate_collections
-    elif model_name == 'journal':
-        model_class = models.ExtractJournal
-        task_fn = task_populate_journals
-    elif model_name == 'issue':
-        model_class = models.ExtractIssue
-        task_fn = task_populate_issues
-    elif model_name == 'article':
-        model_class = models.ExtractArticle
-        task_fn = task_populate_articles
-    elif model_name == 'news':
-        model_class = models.ExtractNews
-        task_fn = task_populate_news
-    elif model_name == 'press_release':
-        model_class = models.ExtractPressRelease
-        task_fn = task_populate_press_release
+    options = {
+        'collection': {
+            'model_class': models.ExtractCollection,
+            'task_fn': task_populate_collections
+        },
+        'journal': {
+            'model_class': models.ExtractJournal,
+            'task_fn': task_populate_journals
+        },
+        'issue': {
+            'model_class': models.ExtractIssue,
+            'task_fn': task_populate_issues
+        },
+        'article': {
+            'model_class': models.ExtractArticle,
+            'task_fn': task_populate_articles
+        },
+        'news': {
+            'model_class': models.ExtractNews,
+            'task_fn': task_populate_news
+        },
+        'press_release': {
+            'model_class': models.ExtractPressRelease,
+            'task_fn': task_populate_press_release
+        }
+    }
 
-    msg = "enfilerando stage: %s model_name: %s model_class: %s" % (stage, model_name, model_class)
-    logger.info(msg)
-    r_queues.enqueue(stage, model_name, task_fn)
+    if model_name == 'all':
+        for k, v in options.items():
+            model_class = v['model_class']
+            task_fn = v['task_fn']
+            logger.info("enfilerando stage: %s model_name: %s model_class: %s" % (stage, k, model_class))
+            r_queues.enqueue(stage, k, task_fn)
+    elif model_name not in options.keys():
+        raise ValueError('Param: model_name: %s inesperado' % model_name)
+    else:
+        model_class = options[model_name]['model_class']
+        task_fn = options[model_name]['task_fn']
+        logger.info("enfilerando stage: %s model_name: %s model_class: %s" % (stage, model_name, model_class))
+        r_queues.enqueue(stage, model_name, task_fn)
+
+    create_sync_event_record(
+        'sync_ids', model_name, 'enqueue_full_populate_task_by_model',
+        u'Fim do enfileramento para preencher datas dos registros diff model: %s' % model_name)
+
+    logger.info("Fim: enqueue_full_populate_task_by_model para modelo: %s", model_name)

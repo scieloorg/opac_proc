@@ -4,6 +4,7 @@ import feedparser
 
 from datetime import datetime
 from opac_proc.datastore.models import ExtractPressRelease
+from opac_proc.datastore.identifiers_models import PressReleaseIdModel
 from opac_proc.extractors.base import BaseExtractor
 from opac_proc.extractors.decorators import update_metadata
 
@@ -22,6 +23,8 @@ class PressReleaseExtractor(BaseExtractor):
     url = None
 
     extract_model_class = ExtractPressRelease
+    ids_model_class = PressReleaseIdModel
+    ids_model_name = 'PressReleaseIdModel'
 
     def __init__(self, acronym, url, lang):
         super(PressReleaseExtractor, self).__init__()
@@ -29,12 +32,13 @@ class PressReleaseExtractor(BaseExtractor):
         self.url = url
         self.lang = lang
         self.get_instance_query = {}
+        self.get_identifier_query = {}
 
     def get_feed_entries(self):
         feed = feedparser.parse(self.url)
         if feed.bozo == 1:
             bozo_exception_msg = feed.bozo_exception.getMessage()
-            msg = 'Não é possível parsear o feed (%s). Bozo exception message: %s' % (
+            msg = u'Não é possível parsear o feed (%s). Bozo exception message: %s' % (
                 self.url, bozo_exception_msg)
             logger.error(msg)
             raise Exception(msg)
@@ -49,6 +53,9 @@ class PressReleaseExtractor(BaseExtractor):
         logger.debug(u'Inicia PressReleasesExtractor.extract(%s, %s, %s) %s',
                      self.acronym, self.url, self.lang, datetime.now())
         self.get_instance_query = {  # update query filter
+            'url_id': raw_entry['id']
+        }
+        self.get_identifier_query = {  # update query filter
             'url_id': raw_entry['id']
         }
         self._raw_data = raw_entry

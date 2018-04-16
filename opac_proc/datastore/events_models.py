@@ -19,6 +19,7 @@ class BaseEventModel(object):
 class SyncEventModel(BaseEventModel, DynamicDocument):
     meta = {
         'collection': 'events_sync',
+        'ordering': ['-created_at']
     }
 
     def save(self, *args, **kwargs):
