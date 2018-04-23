@@ -91,6 +91,10 @@ class JournalTransformer(BaseTransformer):
         if hasattr(xylose_journal, 'title'):
             self.transform_model_instance['title'] = xylose_journal.title
 
+        # editor_email
+        if hasattr(xylose_journal, 'editor_email'):
+            self.transform_model_instance['editor_email'] = xylose_journal.editor_email
+
         # abbreviated_iso_title
         if hasattr(xylose_journal, 'abbreviated_iso_title'):
             self.transform_model_instance['title_iso'] = xylose_journal.abbreviated_iso_title
