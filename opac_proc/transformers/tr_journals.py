@@ -10,6 +10,7 @@ from opac_proc.transformers.utils import trydate
 from opac_proc.extractors.decorators import update_metadata
 
 from opac_proc.web import config
+from opac_proc.web.accounts.forms import EmailForm
 from opac_proc.logger_setup import getMongoLogger
 
 from opac_proc.core.ssm_handler import SSMHandler
@@ -93,7 +94,14 @@ class JournalTransformer(BaseTransformer):
 
         # editor_email
         if hasattr(xylose_journal, 'editor_email'):
-            self.transform_model_instance['editor_email'] = xylose_journal.editor_email
+            email = xylose_journal.editor_email.strip()
+
+            form = EmailForm(data={'email': email}, csrf_enabled=False)
+
+            if not form.validate():
+                self.transform_model_instance['editor_email'] = email
+            else:
+                self.transform_model_instance['editor_email'] = None
 
         # abbreviated_iso_title
         if hasattr(xylose_journal, 'abbreviated_iso_title'):
