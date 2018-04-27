@@ -6,7 +6,7 @@ from opac_proc.datastore.models import (
     TransformJournal,
     TransformCollection)
 from opac_proc.transformers.base import BaseTransformer
-from opac_proc.transformers.utils import trydate
+from opac_proc.transformers.utils import trydate, validate_email
 from opac_proc.extractors.decorators import update_metadata
 
 from opac_proc.web import config
@@ -99,13 +99,10 @@ class JournalTransformer(BaseTransformer):
 
             if email:
 
-                stripped_email = email.strip()
+                strip_email = email.strip()
 
-                form = EmailForm(data={'email': stripped_email},
-                                 csrf_enabled=False)
-
-                if not form.validate():
-                    self.transform_model_instance['editor_email'] = stripped_email
+                if not validate_email(strip_email):
+                    self.transform_model_instance['editor_email'] = strip_email
                 else:
                     self.transform_model_instance['editor_email'] = None
 
