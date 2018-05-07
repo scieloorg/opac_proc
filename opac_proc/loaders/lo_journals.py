@@ -79,6 +79,7 @@ class JournalLoader(BaseLoader):
         'issue_count',
         'last_issue',
         'metrics',
+        'editor_email',
     ]
 
     def prepare_collection(self):

@@ -9,9 +9,9 @@ rq-scheduler==0.7.0
 rq-scheduler-dashboard==0.0.2
 blinker==1.4
 mongolog==0.1.1
-xylose==1.31.0
+xylose==1.33.0
 legendarium==2.0.2
--e git+https://git@github.com/scieloorg/opac_schema@v2.37#egg=opac_schema
+-e git+https://git@github.com/scieloorg/opac_schema@v2.42#egg=opac_schema
 scieloh5m5==1.10.4
 requests==2.18.4
 Flask-DebugToolbar==0.10.1
@@ -21,7 +21,7 @@ gevent==1.2.2
 itsdangerous==0.24
 python-slugify==1.2.4
 -e git+https://github.com/robertatakenaka/packtools.git@master#egg=packtools
--e git+https://github.com/scieloorg/opac_ssm_api@v1.0.0#egg=opac_ssm_api
+-e git+https://github.com/scieloorg/opac_ssm_api@v1.0.1#egg=opac_ssm_api
 raven[flask]==6.3.0
 Flask-Testing==0.6.2
 Flask-Script==2.0.6

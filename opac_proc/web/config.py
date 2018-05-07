@@ -168,7 +168,7 @@ OPAC_PROC_ARTICLE_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_CSS_URL', 'https:/
 OPAC_PROC_ARTICLE_PRINT_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_PRINT_CSS_URL', 'https://ssm.scielo.org/media/assets/css/scielo-print.css')
 OPAC_PROC_ARTICLE_JS_URL = os.environ.get('OPAC_PROC_ARTICLE_JS_URL', 'https://ssm.scielo.org/media/assets/js/scielo-article.js')
 
-OPAC_PROC_MEDIA_XML_MATCH_REGEX = os.environ.get('OPAC_PROC_IMG_XML_MATCH_REGEX', 'href="([^/\s]+\.(?:tiff|tif|jpg|jpeg|gif|png|svg))"')
+OPAC_PROC_MEDIA_XML_MATCH_REGEX = os.environ.get('OPAC_PROC_IMG_XML_MATCH_REGEX', 'href="([^/\s]+\.(?:tiff|tif|jpg|jpeg|gif|webp|png|svg|mp3|mp4|wav|wma|avi))"')
 OPAC_PROC_MEDIA_HTML_MATCH_REGEX = os.environ.get('OPAC_PROC_IMG_HTML_MATCH_REGEX', 'src="([^"]+)"')
 OPAC_PROC_MEDIA_ARROW_MATCH_REGEXS = os.environ.get('OPAC_PROC_MEDIA_ARROW_MATCH_REGEXS', '<a href="#top">(.*?)</a>,<a href="#enda">(.*?)</a>,<a href="#up">(.*?)</a>')
 OPAC_PROC_MEDIA_ARROW_REPLACE = os.environ.get('OPAC_PROC_MEDIA_ARROW_REPLACE', '<a href="#top">&#9650;</a>')

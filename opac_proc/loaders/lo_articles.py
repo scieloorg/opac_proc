@@ -15,6 +15,7 @@ from opac_schema.v1.models import Journal as OpacJournal
 from opac_schema.v1.models import TranslatedTitle as OpacTranslatedTitle
 from opac_schema.v1.models import TranslatedSection as OpacTranslatedSection
 from opac_schema.v1.models import ArticleKeyword as OpacArticleKeywords
+from opac_schema.v1.models import Abstract as OpacTranslatedAbstracts
 
 
 from opac_proc.web import config
@@ -59,6 +60,7 @@ class ArticleLoader(BaseLoader):
         'original_language',
         'languages',
         'abstract',
+        'abstracts',
         'authors',
         'htmls',
         'pdfs',
@@ -115,6 +117,20 @@ class ArticleLoader(BaseLoader):
 
         logger.debug(u"Translated Titles criados: %s" % len(translated_titles))
         return translated_titles
+
+    def prepare_abstracts(self):
+        logger.debug(u"iniciando prepare_abstracts")
+        translated_abstracts = []
+
+        if hasattr(self.transform_model_instance, 'abstracts'):
+            for trans in self.transform_model_instance.abstracts:
+                translated_abstract = OpacTranslatedAbstracts(**trans)
+                translated_abstracts.append(translated_abstract)
+        else:
+            logger.info(u"Não existe resumos transformados para o uuid: %s" % self.transform_model_instance.uuid)
+
+        logger.debug(u"Resumos adicionados: %s" % len(translated_abstracts))
+        return translated_abstracts
 
     def prepare_sections(self):
         logger.debug(u"iniciando prepare_sections")

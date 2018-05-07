@@ -317,7 +317,7 @@ class Assets(object):
                 logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
                             registered_medias, self.xylose.publisher_id)
 
-            # Existe e o ativo e idêntico
+            # Existe e o ativo é idêntico
             if code == 1:
                 for asset in existing_asset:
                     metadata = json.loads(asset['metadata'])
@@ -391,7 +391,7 @@ class Assets(object):
                 logger.info(u"Medias(s): %s cadastrado(s) para o artigo com PID: %s",
                             registered_medias, self.xylose.publisher_id)
 
-            # Existe e o ativo e idêntico
+            # Existe e o ativo é idêntico
             if code == 1:
                 for asset in existing_asset:
                     metadata = json.loads(asset['metadata'])
@@ -422,7 +422,7 @@ class AssetPDF(Assets):
         """
         Method to register the PDF(s) of the asset.
         """
-        logger.info(u"Iniciando o cadasto do(s) PDF(s) do artigo PID: %s",
+        logger.info(u"Iniciando o cadastro do(s) PDF(s) do artigo PID: %s",
                     self.xylose.publisher_id)
 
         pdfs = []
@@ -449,6 +449,7 @@ class AssetPDF(Assets):
 
                     pfile = self._open_asset(file_path)
 
+                    # Continue if pfile in None
                     if not pfile:
                         continue
 
@@ -468,9 +469,20 @@ class AssetPDF(Assets):
 
                     logger.info(u"Código de existência do PDF: %s", code)
 
+                    # Existe e o ativo é idêntico
+                    if code == 1:
+                        logger.info(u"Já existe um PDF idêntico com PID: %s e coleção: %s, cadastrado!",
+                                    self.xylose.publisher_id, self.xylose.collection_acronym)
+
+                        pdfs.append({
+                            'type': file_type,
+                            'lang': lang,
+                            'url': assets[0]['full_absolute_url']
+                        })
+
                     # Existe mas não é idêntico (existe com o mesmo nome)
                     if code == 2:
-                        logger.info(u"Já existe um PDF com PID: %s e coleção: %s, cadastrado",
+                        logger.info(u"Já existe um PDF não idêntico com PID: %s e coleção: %s, cadastrado!",
                                     self.xylose.publisher_id, self.xylose.collection_acronym)
 
                         for asset in assets:
@@ -490,8 +502,8 @@ class AssetPDF(Assets):
                             'url': ssm_asset.get_urls()['url']
                         })
 
-                        logger.info(u"PDF(s): %s cadastrado(s) para o artigo com PID: %s",
-                                    pdfs, self.xylose.publisher_id)
+                logger.info(u"PDF(s): %s cadastrado(s) para o artigo com PID: %s",
+                            pdfs, self.xylose.publisher_id)
 
         if pdfs:
             return pdfs
@@ -561,7 +573,7 @@ class AssetXML(Assets):
                 logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado",
                             self.xylose.publisher_id, self.xylose.collection_acronym)
                 if assets:
-                    return (assets[0]['uuid'], assets[0]['absolute_url'])
+                    return (assets[0]['uuid'], assets[0]['full_absolute_url'])
 
             if code == 2:
                 logger.info(u"Já existe um XML com PID: %s e coleção: %s, cadastrado,\
@@ -682,8 +694,18 @@ class AssetHTMLS(Assets):
 
             code, assets = ssm_asset.exists()
 
+            # Existe e o ativo é idêntico
+            if code == 1:
+                logger.info(u"Já existe um HML idêntico com PID: %s e coleção: %s, cadastrado!",
+                            self.xylose.publisher_id, self.xylose.collection_acronym)
+
+                registered_htmls.append({'type': file_type,
+                                         'lang': lang,
+                                         'url': assets[0]['full_absolute_url']
+                                         })
+
             if code == 2:
-                logger.info(u"Já existe um HTML com PID: %s e coleção: %s, cadastrado",
+                logger.info(u"Já existe um HTML não idêntico com PID: %s e coleção: %s, cadastrado!",
                             self.xylose.publisher_id, self.xylose.collection_acronym)
 
                 for asset in assets:
