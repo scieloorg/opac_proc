@@ -38,17 +38,21 @@ OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
 
 class BaseLoader(object):
     _db = None
-    transform_model_class = None        # definir no __init__ da sublcasse
+    transform_model_class = None
     transform_model_name = ''
-    transform_model_instance = None     # definir no __init__ da sublcasse
+    transform_model_instance = None
 
-    opac_model_class = None             # definir no __init__ da sublcasse
+    opac_model_class = None
     opac_model_name = ''
-    opac_model_instance = None          # definir no __init__ da sublcasse
+    opac_model_instance = None
 
-    load_model_class = None             # definir no __init__ da sublcasse
+    load_model_class = None
     load_model_name = ''
-    load_model_instance = None          # definir no __init__ da sublcasse
+    load_model_instance = None
+
+    ids_model_class = None
+    ids_model_name = ''
+    ids_model_instance = None
 
     _uuid = None
     _uuid_str = None
@@ -87,6 +91,10 @@ class BaseLoader(object):
         self._uuid = transform_model_uuid
         self._uuid_str = str(transform_model_uuid).replace("-", "")
 
+        # buscamos a instância do modelo identifier:
+        self.get_identifier_model_instance(query_dict={'uuid': self._uuid})
+
+        # buscamos a instância do modelo transformado:
         self.get_transform_model_instance(query_dict={'uuid': self._uuid})
 
         # buscamos uma instância na base opac com o mesmo UUID
@@ -94,6 +102,15 @@ class BaseLoader(object):
 
         # Load model instance: to track process times by uuid
         self.get_load_model_instance(query_dict={'uuid': self._uuid})
+
+    def get_identifier_model_instance(self, query_dict):
+        # recuperamos uma instância do transform_model_class
+        # correspondente com a **query_dict dict.
+        # caso não exista, levantamos uma exeção por não ter o dado fonte
+        with switch_db(self.ids_model_class, OPAC_PROC_DB_NAME) as ids_model_class:
+            logger.debug(u'recuperando modelo: %s' % self.ids_model_name)
+            self.ids_model_instance = ids_model_class.objects(**query_dict).first()
+            logger.debug(u'modelo %s encontrado. query_dict: %s' % (self.ids_model_name, query_dict))
 
     def get_transform_model_instance(self, query_dict):
         # recuperamos uma instância do transform_model_class

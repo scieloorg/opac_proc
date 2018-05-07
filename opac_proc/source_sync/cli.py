@@ -107,14 +107,14 @@ def retriever():
 @retriever.command()
 @click.option('--model', default='all', help='DiffModel that you want to delete. Options: all, %s.' % MODEL_NAME_LIST_STR)
 def retriever_enqueue(model):
-    """ Enfilera as tasks necessárias para obter os IdModels do stage e model indicados"""
+    """ Enfilera as tasks necessárias para obter os IdModels do model indicado"""
     enqueue_ids_data_retriever(model)
 
 
 @retriever.command()
 @click.option('--model', default='all', help='DiffModel that you want to delete. Options: all, %s.' % MODEL_NAME_LIST_STR)
 def retriever_serial(model):
-    """ Roda o processo SERIAL necessário para obter os IdModels do stage e model indicados"""
+    """ Roda o processo SERIAL necessário para obter os IdModels do model indicado"""
     serial_run_ids_data_retriever(model)
 
 

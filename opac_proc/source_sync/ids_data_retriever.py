@@ -1,14 +1,12 @@
 # coding: utf-8
 import sys
 import os
-import json
 from datetime import datetime
 import logging
 import logging.config
 
 import feedparser
 from articlemeta.client import RestfulClient
-from xylose.scielodocument import Journal as xylose_journal
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)

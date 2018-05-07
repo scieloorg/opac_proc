@@ -3,6 +3,8 @@ from opac_proc.datastore.models import (
     TransformCollection,
     LoadCollection)
 from opac_proc.loaders.base import BaseLoader
+from opac_proc.datastore.identifiers_models import CollectionIdModel
+
 from opac_schema.v1.models import Collection as OpacCollection
 from opac_schema.v1.models import CollectionMetrics
 
@@ -24,6 +26,10 @@ class CollectionLoader(BaseLoader):
 
     load_model_class = LoadCollection
     load_model_instance = None
+
+    ids_model_class = CollectionIdModel
+    ids_model_name = 'CollectionIdModel'
+    ids_model_instance = None
 
     fields_to_load = [
         'acronym',

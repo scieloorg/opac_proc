@@ -5,6 +5,7 @@ from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.models import (
     LoadNews,
     TransformNews)
+from opac_proc.datastore.identifiers_models import NewsIdModel
 
 from opac_schema.v1.models import News as OpacNews
 
@@ -29,6 +30,10 @@ class NewsLoader(BaseLoader):
 
     load_model_class = LoadNews
     load_model_instance = None
+
+    ids_model_class = NewsIdModel
+    ids_model_name = 'NewsIdModel'
+    ids_model_instance = None
 
     fields_to_load = [
         'url',

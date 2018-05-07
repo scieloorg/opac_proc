@@ -6,6 +6,7 @@ from opac_proc.datastore.models import (
     TransformPressRelease)
 from opac_proc.transformers.base import BaseTransformer
 from opac_proc.extractors.decorators import update_metadata
+from opac_proc.datastore.identifiers_models import PressReleaseIdModel
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
@@ -22,6 +23,9 @@ class PressReleaseTransformer(BaseTransformer):
 
     transform_model_class = TransformPressRelease
     transform_model_instance = None
+
+    ids_model_class = PressReleaseIdModel
+    ids_model_instance = None
 
     def get_extract_model_instance(self, key):
         return self.extract_model_class.objects.get(uuid=key)

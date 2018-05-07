@@ -45,7 +45,7 @@ class LoadCollectionListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -65,7 +65,7 @@ class LoadCollectionListView(LoadBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'Acrônimo',
@@ -78,7 +78,7 @@ class LoadCollectionListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -122,7 +122,7 @@ class LoadJournalListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -160,7 +160,7 @@ class LoadJournalListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -214,7 +214,7 @@ class LoadIssueListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -252,7 +252,7 @@ class LoadIssueListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -286,7 +286,7 @@ class LoadArticleListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -306,7 +306,7 @@ class LoadArticleListView(LoadBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'PID',
@@ -314,7 +314,7 @@ class LoadArticleListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },

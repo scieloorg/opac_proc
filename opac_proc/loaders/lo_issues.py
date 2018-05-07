@@ -8,6 +8,8 @@ from opac_proc.datastore.models import (
     TransformArticle,
     TransformIssue,
     LoadIssue)
+from opac_proc.datastore.identifiers_models import IssueIdModel
+
 from opac_schema.v1.models import Issue as OpacIssue
 from opac_schema.v1.models import Journal as OpacJournal
 
@@ -31,6 +33,10 @@ class IssueLoader(BaseLoader):
 
     load_model_class = LoadIssue
     load_model_instance = None
+
+    ids_model_class = IssueIdModel
+    ids_model_name = 'IssueIdModel'
+    ids_model_instance = None
 
     fields_to_load = [
         'iid',

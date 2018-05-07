@@ -8,6 +8,7 @@ from opac_proc.datastore.models import (
     TransformArticle,
     TransformIssue,
     TransformJournal)
+from opac_proc.datastore.identifiers_models import ArticleIdModel
 from opac_proc.transformers.base import BaseTransformer
 from opac_proc.extractors.decorators import update_metadata
 
@@ -28,6 +29,9 @@ class ArticleTransformer(BaseTransformer):
 
     transform_model_class = TransformArticle
     transform_model_instance = None
+
+    ids_model_class = ArticleIdModel
+    ids_model_instance = None
 
     def get_extract_model_instance(self, key):
         # retornamos uma instancia de ExtractJounal
@@ -137,14 +141,14 @@ class ArticleTransformer(BaseTransformer):
         if hasattr(xylose_article, 'authors') and xylose_article.authors:
             self.transform_model_instance['authors'] = ['%s, %s' % (a['surname'], a['given_names']) for a in xylose_article.authors]
 
-        # PDFs
-        if hasattr(xylose_article, 'xml_languages') or hasattr(xylose_article, 'fulltexts'):
-            asset_pdf = AssetPDF(xylose_article)
+        # # PDFs
+        # if hasattr(xylose_article, 'xml_languages') or hasattr(xylose_article, 'fulltexts'):
+        #     asset_pdf = AssetPDF(xylose_article)
 
-            pdfs = asset_pdf.register()
+        #     pdfs = asset_pdf.register()
 
-            if pdfs:
-                self.transform_model_instance['pdfs'] = pdfs
+        #     if pdfs:
+        #         self.transform_model_instance['pdfs'] = pdfs
 
         # salvamos typo de artigo na fonte: xml ou html
         if hasattr(xylose_article, 'data_model_version'):
@@ -153,23 +157,23 @@ class ArticleTransformer(BaseTransformer):
             else:
                 self.transform_model_instance['data_model_version'] = 'html'
 
-        asset_html = AssetHTMLS(xylose_article)
+        # asset_html = AssetHTMLS(xylose_article)
 
-        # Versão XML do artigo
-        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
-            asset_xml = AssetXML(xylose_article)
+        # # Versão XML do artigo
+        # if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
+        #     asset_xml = AssetXML(xylose_article)
 
-            uuid, xml_url = asset_xml.register()
+        #     uuid, xml_url = asset_xml.register()
 
-            if xml_url and uuid:
-                self.transform_model_instance['xml'] = xml_url
-                self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
+        #     if xml_url and uuid:
+        #         self.transform_model_instance['xml'] = xml_url
+        #         self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
 
-        # Versão HTML do artigo
-        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':
-            htmls = asset_html.register()
-            if htmls:
-                self.transform_model_instance['htmls'] = htmls
+        # # Versão HTML do artigo
+        # if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':
+        #     htmls = asset_html.register()
+        #     if htmls:
+        #         self.transform_model_instance['htmls'] = htmls
 
         # publication_date
         if hasattr(xylose_article, 'publication_date'):

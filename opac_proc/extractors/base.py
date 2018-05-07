@@ -22,6 +22,7 @@ class BaseExtractor(object):
     _db = None
     articlemeta = None
     get_instance_query = None  # definir na subclasse
+    get_identifier_query = None  # definir na subclasse. dict com filtros (lookup) para recuperar o IdModel
     _raw_data = {}
     extract_model_class = None
     extract_model_name = ''
@@ -46,7 +47,7 @@ class BaseExtractor(object):
 
     def get_identifier_model_instance(self):
         if not self.get_identifier_query or not isinstance(self.get_identifier_query, dict):
-            raise ValueError("Deve definir self.query como dicionario no __init__ da subclasse")
+            raise ValueError("Deve definir self.get_identifier_query como dicionario no __init__ da subclasse")
 
         try:
             instance = self.ids_model_class.objects(**self.get_identifier_query)
@@ -63,7 +64,7 @@ class BaseExtractor(object):
 
     def get_extract_model_instance(self):
         if not self.get_instance_query or not isinstance(self.get_instance_query, dict):
-            raise ValueError("Deve definir self.query como dicionario no __init__ da subclasse")
+            raise ValueError("Deve definir self.get_instance_query como dicionario no __init__ da subclasse")
 
         try:
             instance = self.extract_model_class.objects(**self.get_instance_query)

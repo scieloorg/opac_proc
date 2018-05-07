@@ -7,6 +7,8 @@ from opac_proc.datastore.models import (
     TransformJournal,
     TransformIssue,
     LoadJournal)
+from opac_proc.datastore.identifiers_models import JournalIdModel
+
 from opac_schema.v1.models import Journal as OpacJournal
 from opac_schema.v1.models import (
     Collection,
@@ -36,6 +38,10 @@ class JournalLoader(BaseLoader):
 
     load_model_class = LoadJournal
     load_model_instance = None
+
+    ids_model_class = JournalIdModel
+    ids_model_name = 'JournalIdModel'
+    ids_model_instance = None
 
     fields_to_load = [
         'jid',

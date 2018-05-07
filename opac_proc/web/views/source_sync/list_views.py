@@ -26,32 +26,32 @@ class IdentifiersCollectionListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -61,7 +61,7 @@ class IdentifiersCollectionListView(IdentifiersBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'Acrônimo',
@@ -69,32 +69,32 @@ class IdentifiersCollectionListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -122,32 +122,32 @@ class IdentifiersJournalListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -157,7 +157,7 @@ class IdentifiersJournalListView(IdentifiersBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'Coleção',
@@ -165,32 +165,32 @@ class IdentifiersJournalListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -223,32 +223,32 @@ class IdentifiersIssueListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -258,7 +258,7 @@ class IdentifiersIssueListView(IdentifiersBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'Coleção',
@@ -266,32 +266,32 @@ class IdentifiersIssueListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -329,32 +329,32 @@ class IdentifiersArticleListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -364,7 +364,7 @@ class IdentifiersArticleListView(IdentifiersBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'Coleção',
@@ -372,32 +372,32 @@ class IdentifiersArticleListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -426,32 +426,32 @@ class IdentifiersPressReleaseListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -461,7 +461,7 @@ class IdentifiersPressReleaseListView(IdentifiersBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'Coleção',
@@ -474,32 +474,32 @@ class IdentifiersPressReleaseListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -528,32 +528,32 @@ class IdentifiersNewsListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },
@@ -563,7 +563,7 @@ class IdentifiersNewsListView(IdentifiersBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'Coleção',
@@ -576,32 +576,32 @@ class IdentifiersNewsListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Criação:',
+            'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Atualização:',
+            'field_label': u'Atualização',
             'field_name': 'updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Processing Date:',
+            'field_label': u'Processing Date',
             'field_name': 'processing_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Extração:',
+            'field_label': u'Data Extração',
             'field_name': 'extract_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Transformação:',
+            'field_label': u'Data Transformação',
             'field_name': 'transform_execution_date',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Data Carga:',
+            'field_label': u'Data Carga',
             'field_name': 'load_execution_date',
             'field_type': 'date_time'
         },

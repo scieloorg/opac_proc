@@ -62,7 +62,6 @@ def task_extract_all_collections():
     SLICE_SIZE = 1000
 
     list_of_all_uuids = source_ids_model_class.objects.all().values_list('uuid')
-    print "list_of_all_uuids: ", list_of_all_uuids
     if len(list_of_all_uuids) <= SLICE_SIZE:
         uuid_as_string_list = [str(uuid) for uuid in list_of_all_uuids]
         r_queues.enqueue(stage, model, task_extract_selected_collections, uuid_as_string_list)
@@ -94,14 +93,15 @@ def task_extract_selected_journals(selected_uuids):
     get_db_connection()
     r_queues = RQueues()
     source_ids_model_class = identifiers_models.JournalIdModel
-    print "task_extract_selected_journals: ", selected_uuids
     issns_iter = source_ids_model_class.objects.filter(uuid__in=selected_uuids).values_list('journal_issn')
-    print "issns_iter: ", issns_iter
     for issn in issns_iter:
         r_queues.enqueue('extract', 'journal', task_extract_one_journal, issn)
 
 
 def task_extract_all_journals():
+    """
+        Task para processar Extração de TODOS os registros do modelo: Journal
+    """
     get_db_connection()
     stage = 'extract'
     model = 'journal'
@@ -147,6 +147,9 @@ def task_extract_selected_issues(selected_uuids):
 
 
 def task_extract_all_issues():
+    """
+        Task para processar Extração de TODOS os registros do modelo: Issue
+    """
     get_db_connection()
     stage = 'extract'
     model = 'issue'
@@ -171,6 +174,9 @@ def task_extract_all_issues():
 
 
 def task_extract_one_article(article_pid):
+    """
+        Task para processar Extração de UM modelo: Article
+    """
     extractor = ArticleExtractor(article_pid)
     extractor.extract()
     extractor.save()
@@ -190,6 +196,9 @@ def task_extract_selected_articles(selected_uuids):
 
 
 def task_extract_all_articles(uuids=None):
+    """
+        Task para processar Extração de TODOS os registros do modelo: Article
+    """
     get_db_connection()
     stage = 'extract'
     model = 'article'
@@ -214,6 +223,9 @@ def task_extract_all_articles(uuids=None):
 
 
 def task_extract_one_press_release(journal_acronym, url, lang):
+    """
+        Task para processar Extração de UM modelo: Press Release
+    """
     extractor = PressReleaseExtractor(journal_acronym, url, lang)
     pr_entries = extractor.get_feed_entries()
     for pr_entry in pr_entries:
@@ -222,6 +234,9 @@ def task_extract_one_press_release(journal_acronym, url, lang):
 
 
 def task_extract_selected_press_releases(selected_uuids):
+    """
+        Task para processar Extração de um LISTA de UUIDs do modelo: Press Release
+    """
     get_db_connection()
     r_queues = RQueues()
 
@@ -234,6 +249,9 @@ def task_extract_selected_press_releases(selected_uuids):
 
 
 def task_extract_all_press_releases():
+    """
+        Task para processar Extração de TODOS os registros do modelo: Press Release
+    """
 
     def get_all_journals_acronyms():
         api_client = RestfulClient()
@@ -258,6 +276,9 @@ def task_extract_all_press_releases():
 
 
 def task_extract_one_news(url, lang):
+    """
+        Task para processar Extração de UM modelo: News
+    """
     extractor = NewsExtractor(url, lang)
     news_entries = extractor.get_feed_entries()
     for news_entry in news_entries:
@@ -266,6 +287,9 @@ def task_extract_one_news(url, lang):
 
 
 def task_extract_selected_news(selected_uuids):
+    """
+        Task para processar Extração de um LISTA de UUIDs do modelo: News
+    """
     get_db_connection()
     r_queues = RQueues()
 
@@ -277,6 +301,10 @@ def task_extract_selected_news(selected_uuids):
 
 
 def task_extract_all_news():
+    """
+        Task para processar Extração de TODOS os registros do modelo: News
+    """
+
     stage = 'extract'
     model = 'news'
     r_queues = RQueues()

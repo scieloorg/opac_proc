@@ -3,6 +3,8 @@ from mongoengine.context_managers import switch_db
 from mongoengine import DoesNotExist
 
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
+from opac_proc.datastore.identifiers_models import ArticleIdModel
+
 from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.models import (
     LoadArticle,
@@ -35,6 +37,10 @@ class ArticleLoader(BaseLoader):
 
     load_model_class = LoadArticle
     load_model_instance = None
+
+    ids_model_class = ArticleIdModel
+    ids_model_name = 'ArticleIdModel'
+    ids_model_instance = None
 
     fields_to_load = [
         'aid',

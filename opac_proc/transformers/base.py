@@ -29,6 +29,10 @@ class BaseTransformer(object):
     transform_model_name = ''
     transform_model_instance = None
 
+    ids_model_class = None
+    ids_model_name = ''
+    ids_model_instance = None
+
     metadata = {
         'process_start_at': None,
         'process_finish_at': None,
@@ -62,6 +66,7 @@ class BaseTransformer(object):
 
         self.extract_model_name = str(self.extract_model_class)
         self.transform_model_name = str(self.transform_model_class)
+        self.ids_model_name = str(self.ids_model_class)
 
         try:
             self.extract_model_instance = self.get_extract_model_instance(
@@ -107,6 +112,23 @@ class BaseTransformer(object):
     def get_extract_model_instance(self, key):
         raise NotImplementedError
 
+    def get_identifier_model_instance(self, id_model_lookup_dict):
+        if not id_model_lookup_dict or not isinstance(id_model_lookup_dict, dict):
+            raise ValueError("Deve definir id_model_lookup_dict como dicionario")
+
+        try:
+            instance = self.ids_model_class.objects(**id_model_lookup_dict)
+        except Exception, e:  # does not exist or multiple objects returned
+            # se existe deveria ser só uma instância do modelo
+            raise e
+        else:
+            if not instance:
+                return None
+            elif instance.count() > 1:
+                raise ValueError("self.get_instance_query retornou muitos resultados")
+            else:
+                return instance.first()
+
     # @update_metadata
     def transform(self):
         """
@@ -138,15 +160,23 @@ class BaseTransformer(object):
         """
         Salva os dados transformados no datastore (mongo)
         """
+        # obtemos a instância do modelo identifier:
+        id_model_lookup_dict = {
+            'uuid': self.extract_model_instance.uuid
+        }
+        self.ids_model_instance = self.get_identifier_model_instance(id_model_lookup_dict)
+        if not self.ids_model_instance:
+            raise ValueError(u'Não encontramos um modelo identifier (%s) relaciondo o esta modelo' % self.ids_model_name)
         logger.debug(u"iniciando save()")
         try:
+            # setamos o valor do campo UUID:
+            self.transform_model_instance.uuid = self.ids_model_instance.uuid
             self.metadata['must_reprocess'] = False
             self.transform_model_instance['metadata'] = ProcessMetada(**self.metadata)
             self.transform_model_instance.save()
             self.transform_model_instance.reload()
         except Exception, e:
-            msg = u"Não foi possível salvar %s. Exeção: %s" % (
-                self.transform_model_name, e)
+            msg = u"Não foi possível salvar %s. Exeção: %s" % (self.transform_model_name, e)
             logger.error(msg)
             raise Exception(msg)
         else:

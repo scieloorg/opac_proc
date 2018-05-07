@@ -46,7 +46,7 @@ class TransformCollectionListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -123,7 +123,7 @@ class TransformJournalListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -161,7 +161,7 @@ class TransformJournalListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -287,7 +287,7 @@ class TransformArticleListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -320,7 +320,7 @@ class TransformArticleListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -365,6 +365,11 @@ class TransformPressReleaseListView(TransformBaseListView):
     page_title = "Transform: Press Releases"
     list_columns = [
         {
+            'field_label': u'UUID',
+            'field_name': 'uuid',
+            'field_type': 'string'
+        },
+        {
             'field_label': u'Journal',
             'field_name': 'journal_acronym',
             'field_type': 'string'
@@ -385,7 +390,7 @@ class TransformPressReleaseListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -403,6 +408,11 @@ class TransformPressReleaseListView(TransformBaseListView):
 
     list_filters = [
         {
+            'field_label': u'UUID',
+            'field_name': 'uuid',
+            'field_type': 'uuid'
+        },
+        {
             'field_label': u'Journal',
             'field_name': 'journal_acronym',
             'field_type': 'string'
@@ -423,7 +433,7 @@ class TransformPressReleaseListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -462,7 +472,7 @@ class TransformNewsListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
@@ -495,7 +505,7 @@ class TransformNewsListView(TransformBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
+            'field_label': u'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
