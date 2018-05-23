@@ -43,7 +43,11 @@ class ArticleExtractor(BaseExtractor):
         logger.info(u'Inicia ArticleExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))
 
-        article = self.articlemeta.get_article(collection=self.acronym, code=self.article_id, body=config.OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY)
+        article = self.articlemeta.get_article(
+            collection=self.acronym,
+            code=self.article_id,
+            fmt=config.ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT,
+            body=config.OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY)
         self._raw_data = article
 
         if not self._raw_data:

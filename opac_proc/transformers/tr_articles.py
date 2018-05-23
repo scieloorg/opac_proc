@@ -155,13 +155,13 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['authors'] = ['%s, %s' % (a['surname'], a['given_names']) for a in xylose_article.authors]
 
         # # PDFs
-        # if hasattr(xylose_article, 'xml_languages') or hasattr(xylose_article, 'fulltexts'):
-        #     asset_pdf = AssetPDF(xylose_article)
+        if hasattr(xylose_article, 'xml_languages') or hasattr(xylose_article, 'fulltexts'):
+            asset_pdf = AssetPDF(xylose_article)
 
-        #     pdfs = asset_pdf.register()
+            pdfs = asset_pdf.register()
 
-        #     if pdfs:
-        #         self.transform_model_instance['pdfs'] = pdfs
+            if pdfs:
+                self.transform_model_instance['pdfs'] = pdfs
 
         # salvamos typo de artigo na fonte: xml ou html
         if hasattr(xylose_article, 'data_model_version'):
@@ -170,23 +170,23 @@ class ArticleTransformer(BaseTransformer):
             else:
                 self.transform_model_instance['data_model_version'] = 'html'
 
-        # asset_html = AssetHTMLS(xylose_article)
+        asset_html = AssetHTMLS(xylose_article)
 
-        # # Versão XML do artigo
-        # if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
-        #     asset_xml = AssetXML(xylose_article)
+        # Versão XML do artigo
+        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
+            asset_xml = AssetXML(xylose_article)
 
-        #     uuid, xml_url = asset_xml.register()
+            uuid, xml_url = asset_xml.register()
 
-        #     if xml_url and uuid:
-        #         self.transform_model_instance['xml'] = xml_url
-        #         self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
+            if xml_url and uuid:
+                self.transform_model_instance['xml'] = xml_url
+                self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
 
-        # # Versão HTML do artigo
-        # if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':
-        #     htmls = asset_html.register()
-        #     if htmls:
-        #         self.transform_model_instance['htmls'] = htmls
+        # Versão HTML do artigo
+        if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':
+            htmls = asset_html.register()
+            if htmls:
+                self.transform_model_instance['htmls'] = htmls
 
         # publication_date
         if hasattr(xylose_article, 'publication_date'):

@@ -186,63 +186,62 @@ class JournalTransformer(BaseTransformer):
             metrics = self.extract_model_instance.metrics
             self.transform_model_instance['metrics'] = metrics
 
-        # TODO: DESCOMENTAR!!!
-        # # logo_url
-        # def _open_logo(file_path, mode='rb'):
-        #     """
-        #     Open asset as file like object(bytes)
-        #     """
-        #     try:
-        #         return open(file_path, mode)
-        #     except IOError as e:
-        #         logger.error(u'Erro ao tentar abri o ativo: %s, erro: %s',
-        #                      file_path, e)
-        #         raise Exception(u'Erro ao tentar abri o ativo: %s', file_path)
+        # logo_url
+        def _open_logo(file_path, mode='rb'):
+            """
+            Open asset as file like object(bytes)
+            """
+            try:
+                return open(file_path, mode)
+            except IOError as e:
+                logger.error(u'Erro ao tentar abri o ativo: %s, erro: %s',
+                             file_path, e)
+                raise Exception(u'Erro ao tentar abri o ativo: %s', file_path)
 
-        # acron = xylose_journal.acronym.lower()
+        acron = xylose_journal.acronym.lower()
 
-        # logo_name = 'glogo.gif'
+        logo_name = 'glogo.gif'
 
-        # file_path = '%s/%s/%s' % (config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH,
-        #                           acron, logo_name)
+        file_path = '%s/%s/%s' % (config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH,
+                                  acron, logo_name)
 
-        # pfile = _open_logo(file_path)
+        pfile = _open_logo(file_path)
 
-        # ssm_asset = SSMHandler(pfile, logo_name, 'img',
-        #                        {'issn': self.extract_model_instance.code,
-        #                         'pid': self.extract_model_instance.code,
-        #                         'collection': transform_col.acronym,
-        #                         'file_name': logo_name,
-        #                         'type': 'img',
-        #                         'bucket_name': acron,
-        #                         'journal': acron
-        #                         }, acron)
+        ssm_asset = SSMHandler(pfile, logo_name, 'img',
+                               {'issn': self.extract_model_instance.code,
+                                'pid': self.extract_model_instance.code,
+                                'collection': transform_col.acronym,
+                                'file_name': logo_name,
+                                'type': 'img',
+                                'bucket_name': acron,
+                                'journal': acron
+                                }, acron)
 
-        # code, existing_asset = ssm_asset.exists()
+        code, existing_asset = ssm_asset.exists()
 
-        # if code == 2:
-        #     logger.info(u"Lista de imagens com mesmo filename para o journal: %s", existing_asset)
+        if code == 2:
+            logger.info(u"Lista de imagens com mesmo filename para o journal: %s", existing_asset)
 
-        #     logger.info(u"Removendo a lista de images: %s", existing_asset)
+            logger.info(u"Removendo a lista de images: %s", existing_asset)
 
-        #     for asset in existing_asset:
-        #         ssm_asset.remove(asset['uuid'])
+            for asset in existing_asset:
+                ssm_asset.remove(asset['uuid'])
 
-        # if code == 2 or code == 0:
+        if code == 2 or code == 0:
 
-        #     uuid = ssm_asset.register()
+            uuid = ssm_asset.register()
 
-        #     logger.info(u'Registrado logo do períodico: %s, com uuid: %s', acron,
-        #                 uuid)
+            logger.info(u'Registrado logo do períodico: %s, com uuid: %s', acron,
+                        uuid)
 
-        #     logo_url = ssm_asset.get_urls()['url_path']
+            logo_url = ssm_asset.get_urls()['url_path']
 
-        #     self.transform_model_instance['logo_url'] = logo_url
+            self.transform_model_instance['logo_url'] = logo_url
 
-        #     logger.info(u'URL para logo do períodico: %s, com acrônimo: %s' % (logo_url, acron))
+            logger.info(u'URL para logo do períodico: %s, com acrônimo: %s' % (logo_url, acron))
 
-        # if code == 1:
-        #     for asset in existing_asset:
-        #         self.transform_model_instance['logo_url'] = asset['absolute_url']
+        if code == 1:
+            for asset in existing_asset:
+                self.transform_model_instance['logo_url'] = asset['absolute_url']
 
         return self.transform_model_instance

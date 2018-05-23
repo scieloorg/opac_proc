@@ -23,6 +23,7 @@ ARTICLE_META_THRIFT_DOMAIN = os.environ.get(
 ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_THRIFT_PORT',
     11621))
+ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT = os.environ.get('OPAC_PROC_ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT', 'opac')
 
 # WEBAPP config: ----------------------------------------------------
 DEBUG = os.environ.get('OPAC_PROC_DEBUG', 'False') == 'True'
