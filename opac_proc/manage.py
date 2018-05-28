@@ -7,6 +7,8 @@ from flask_script import Manager, Shell
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(PROJECT_PATH)
 
+from articlemeta.client import ThriftClient
+
 from opac_proc.web.webapp import create_app
 from opac_proc.web.accounts.forms import EmailForm
 from opac_proc.web.accounts.mixins import User as UserMixin
@@ -84,37 +86,69 @@ def process_issue_article(collection, issns, stage, task_issue, task_article):
         print u"Enfilerados %s PIDs de artigos do periódico %s" % (len(r_queues.queues[stage]['article']), child['issn'])
 
 
+def get_issns_by_acrons(collection, acrons):
+    issn_list = []
+
+    cl = ThriftClient()
+
+    for journal in cl.journals(collection=collection):
+        if journal.acronym in acrons:
+            issn_list.append(journal.scielo_issn)
+
+    return issn_list
+
+
 @manager.command
+@manager.option('-a', '--acrons', dest='acrons')
 @manager.option('-i', '--issns', dest='issns')
-def process_extract(issns=None):
+def process_extract(issns=None, acrons=None):
     stage = 'extract'
 
-    if not issns:
-        print u'Obrigatório param ``issn``'
+    if not issns and not acrons:
+        print u'Obrigatório param ``issn`` ou param ``acrons``'
+        exit()
+
+    if issns and acrons:
+        print u'Utilizar issns ou acrônimos, param: -a ou -i'
         exit()
 
     collection = models.ExtractCollection.objects.all().first()
 
-    print u'Colecão que será extraída: %s' % collection.name
+    print u'Colecão que será carregada: %s' % collection.name
 
     ex_task_collection_create()
 
-    clean_issns = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
+    issn_list = []
 
-    print u'Processando o(s) ISSN(s): %s' % clean_issns
+    if acrons:
+        clean_acrons = [i.strip() for i in acrons.split(',')]  # Gerando a lista com Acrônimos
+
+        issn_list = get_issns_by_acrons(collection=collection.acronym,
+                                        acrons=clean_acrons)
+
+    if issns:
+
+        issn_list = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
+
+    print u'Processando o(s) ISSN(s): %s' % issn_list
 
     ex_task_journal_create()
 
-    process_issue_article(collection, clean_issns, stage, ex_task_extract_issue, ex_task_extract_article)
+    process_issue_article(collection, issn_list, stage, ex_task_extract_issue, ex_task_extract_article)
 
 
 @manager.command
+@manager.option('-a', '--acrons', dest='acrons')
 @manager.option('-i', '--issns', dest='issns')
-def process_transform(issns=None):
+def process_transform(issns=None, acrons=None):
     stage = 'transform'
 
-    if not issns:
-        print u'Obrigatório param ``issn``'
+    if not issns and not acrons:
+        print u'Obrigatório param ``issn`` ou param ``acrons``'
+        exit()
+
+    if issns and acrons:
+        print u'Utilizar issns ou acrônimos, param: -a ou -i'
         exit()
 
     collection = models.TransformCollection.objects.all().first()
@@ -123,22 +157,37 @@ def process_transform(issns=None):
 
     tr_task_collection_create()
 
-    clean_issns = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
+    issn_list = []
 
-    print u'Processando o(s) ISSN(s): %s' % clean_issns
+    if acrons:
+        clean_acrons = [i.strip() for i in acrons.split(',')]  # Gerando a lista com Acrônimos
+
+        issn_list = get_issns_by_acrons(collection=collection.acronym,
+                                        acrons=clean_acrons)
+
+    if issns:
+
+        issn_list = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
+
+    print u'Processando o(s) ISSN(s): %s' % issn_list
 
     tr_task_journal_create()
 
-    process_issue_article(collection, clean_issns, stage, tr_task_transform_issue, tr_task_transform_article)
+    process_issue_article(collection, issn_list, stage, tr_task_transform_issue, tr_task_transform_article)
 
 
 @manager.command
+@manager.option('-a', '--acrons', dest='acrons')
 @manager.option('-i', '--issns', dest='issns')
-def process_load(issns=None):
+def process_load(issns=None, acrons=None):
     stage = 'load'
 
-    if not issns:
-        print u'Obrigatório param ``issn``'
+    if not issns and not acrons:
+        print u'Obrigatório param ``issn`` ou param ``acrons``'
+        exit()
+
+    if issns and acrons:
+        print u'Utilizar issns ou acrônimos, param: -a ou -i'
         exit()
 
     collection = models.TransformCollection.objects.all().first()
@@ -147,13 +196,23 @@ def process_load(issns=None):
 
     lo_task_collection_create()
 
-    clean_issns = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
+    issn_list = []
 
-    print u'Processando o(s) ISSN(s): %s' % clean_issns
+    if acrons:
+        clean_acrons = [i.strip() for i in acrons.split(',')]  # Gerando a lista com Acrônimos
+
+        issn_list = get_issns_by_acrons(collection=collection.acronym,
+                                        acrons=clean_acrons)
+
+    if issns:
+
+        issn_list = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
+
+    print u'Processando o(s) ISSN(s): %s' % issn_list
 
     lo_task_journal_create()
 
-    process_issue_article(collection, clean_issns, stage, lo_task_load_issue, lo_task_load_article)
+    process_issue_article(collection, issn_list, stage, lo_task_load_issue, lo_task_load_article)
 
 
 @manager.command
