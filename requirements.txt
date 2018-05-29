@@ -29,4 +29,4 @@ feedparser==5.2.1
 Flask-Login==0.4.1
 Flask-Mail==0.9.1
 maya==0.3.3
-articlemetaapi==1.24.0
+articlemetaapi==1.25.0
