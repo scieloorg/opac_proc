@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 import sys
+import itertools
 import unittest
 from flask_script import Manager, Shell
 
@@ -44,53 +45,101 @@ def make_shell_context():
 manager.add_command("shell", Shell(make_context=make_shell_context))
 
 
-def enfilera_issue(collection, issue_ids, stage, task_issue, task_article, r_queues, child):
-    return _enfilera(collection, issue_ids, stage, task_issue, task_article, r_queues, child, 'issue')
-
-
-def enfilera_article(collection, article_ids, stage, task_issue, task_article, r_queues, child):
-    return _enfilera(collection, article_ids, stage, task_issue, task_article, r_queues, child, 'article')
-
-
-def _enfilera(collection, ids, stage, task_issue, task_article, r_queues, child, entity):
-    for _id in ids:
-        if stage == 'load':
-            r_queues.enqueue(stage, entity, task_issue, _id)
-        else:
-            r_queues.enqueue(stage, entity, task_issue, collection.acronym, _id)
-    print u"Enfilerados %s PIDs de %s do periódico %s" % (len(r_queues.queues[stage][entity]), entity, child['issn'])
-
-
-def process_issue_article(collection, issns, stage, task_issue, task_article):
+def _enqueue(collection, ids, stage, task, entity):
     r_queues = RQueues()
     r_queues.create_queues_for_stage(stage)
 
-    search_issn = [child['issn'] for child in collection['children_ids']]
-
-    print u"Lista de ISSNs: %s" % search_issn
-
-    children_found = [child for child in collection['children_ids'] if child['issn'] in issns]
-
-    print u"ISSNs encontrados: %s" % [child['issn'] for child in children_found]
-
-    for child in children_found:
-
-        # children_ids, pegamos os articles_ids e issues_ids
-        # Coleta os article_ids e issues_ids para processamento.
+    for _id in ids:
         if stage == 'load':
-            issue_ids = models.TransformIssue.objects.filter(pid__contains=child['issn']).values_list('uuid')
-            article_ids = models.TransformArticle.objects.filter(pid__contains=child['issn']).values_list('uuid')
+            r_queues.enqueue(stage, entity, task, _id)
         else:
-            article_ids = child['articles_ids']
-            issue_ids = child['issues_ids']
+            r_queues.enqueue(stage, entity, task, collection.acronym, _id)
 
-        print u"Processando %s pids de issues do periódico %s" % (len(issue_ids), child['issn'])
-        print u"Processando %s pids de artigos do periódico %s" % (len(article_ids), child['issn'])
+    return r_queues.queues[stage][entity]
 
-        # para cada pid de issues, enfileramos na queue certa:
-        enfilera_issue(collection, issue_ids, stage, task_issue, task_article, r_queues, child)
 
-        enfilera_article(collection, article_ids, stage, task_issue, task_article, r_queues, child)
+def process_issue(collection, stage, task, issns=None, issue_ids=None):
+
+    if bool(issns) == bool(issue_ids):
+        raise(u'Utilizar apenas ``issns`` ou apenas ``issue_ids``')
+
+    if issns:
+
+        children_found = [child for child in collection['children_ids'] if child['issn'] in issns]
+
+        for child in children_found:
+
+            if stage == 'load':
+                ids = models.TransformIssue.objects.filter(pid__contains=child['issn']).values_list('uuid')
+            else:
+                ids = child['issues_ids']
+
+            print u"Processando %s pids de issues do periódicoL %s" % (len(ids), child['issn'])
+
+            queued_issue = _enqueue(collection, ids, stage, task, 'issue')
+
+    if issue_ids:
+
+        queued_issue = _enqueue(collection, issue_ids, stage, task, 'issue')
+
+    print u"Enfilerados %s pids de issue" % (len(queued_issue))
+
+
+def process_article(collection, stage, task, issns=None, article_ids=None):
+
+    if bool(issns) == bool(article_ids):
+        raise(u'Utilizar apenas ``issns`` ou apenas ``article_ids``')
+
+    if issns:
+
+        children_found = [child for child in collection['children_ids'] if child['issn'] in issns]
+
+        for child in children_found:
+
+            if stage == 'load':
+                ids = models.TransformIssue.objects.filter(pid__contains=child['issn']).values_list('uuid')
+            else:
+                ids = child['articles_ids']
+
+            print u"Processando %s pids de artigos do periódico: %s" % (len(ids), child['issn'])
+
+            queued_issue = _enqueue(collection, ids, stage, task, 'article')
+
+    if article_ids:
+
+        queued_issue = _enqueue(collection, article_ids, stage, task, 'article')
+
+    print u"Enfilerados %s pids de artigo" % (len(queued_issue))
+
+
+def process_issn_issue(collection, issns, task_issue, stage):
+
+    children_ids = collection['children_ids']  # all ids in database
+
+    db_issns = [child['issn'] for child in children_ids]  # all issns in database
+
+    print u"Lista de ISSNs: %s" % db_issns
+
+    issn_found = [issn for issn in db_issns if issn in issns]  # issns to process
+
+    print u"ISSNs encontrados: %s" % issn_found
+
+    process_issue(collection, stage, task_issue, issns=issn_found)
+
+
+def process_issn_article(collection, issns, task_article, stage):
+
+    children_ids = collection['children_ids']  # all ids in database
+
+    db_issns = [child['issn'] for child in children_ids]  # all issns in database
+
+    print u"Lista de ISSNs: %s" % db_issns
+
+    issn_found = [issn for issn in db_issns if issn in issns]  # issns to process
+
+    print u"ISSNs encontrados: %s" % issn_found
+
+    process_article(collection, stage, task_article, issns=issn_found)
 
 
 def get_issn_by_acron(collection, acron):
@@ -122,7 +171,7 @@ def get_issns_by_acrons(collection, acrons):
     return issn_list
 
 
-def get_file_itens(collection, file):
+def get_file_items(collection, file):
     """
         Return a dictionary, like:
 
@@ -147,6 +196,54 @@ def get_file_itens(collection, file):
     return data_dict
 
 
+def issue_labels_to_ids(collection, items):
+    """
+        Return a dictionary, like:
+
+        {'issn':set([id, id]),
+         'issn':set([id, id]),
+         'issn':set([id, id])}
+    """
+
+    data_dict = {}
+
+    cl = ThriftClient()
+
+    for issn, labels in items.items():
+        d = data_dict.setdefault(issn, set())
+        for label in labels:
+            code = cl.get_issue_code_from_label(label, issn, collection)
+            if code:
+                d.add(code)
+
+    return data_dict
+
+
+def issue_ids_to_article_ids(collection, items):
+    """
+        Return a dictionary, like:
+
+        {'issn':[pid, pid, ...]),
+         'issn':[pid, pid, ...]),
+         'issn':[pid, pid, ...])}
+    """
+
+    data_dict = {}
+
+    cl = ThriftClient()
+
+    for issn, icodes in items.items():
+        d = data_dict.setdefault(issn, [])
+        for icode in icodes:
+            for code in cl.documents(collection=collection,
+                                     only_identifiers=True,
+                                     extra_filter='{"code_issue":"%s"}' % icode):
+                if code:
+                    d.append(code.code)
+
+    return data_dict
+
+
 @manager.command
 @manager.option('-a', '--acrons', dest='acrons')
 @manager.option('-i', '--issns', dest='issns')
@@ -163,6 +260,8 @@ def process_extract(issns=None, acrons=None, file=None):
 
     ex_task_collection_create()
 
+    ex_task_journal_create()
+
     issn_list = []
 
     if acrons:
@@ -172,28 +271,36 @@ def process_extract(issns=None, acrons=None, file=None):
                                         acrons=clean_acrons)
 
     if issns:
-
         issn_list = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
 
+    if issns or acrons:
+        print u'Processando o(s) ISSN(s): %s' % issn_list
+
+        process_issn_issue(collection, issn_list, stage, ex_task_extract_issue)
+
+        process_issn_article(collection, issn_list, stage, ex_task_extract_article)
+
     if file:
-        pass
-        # itens = get_file_itens(collection.acronym, file)
+        items = get_file_items(collection.acronym, file)
 
-    print u'Processando o(s) ISSN(s): %s' % issn_list
+        ids_issue_dict = issue_labels_to_ids(collection.acronym, items)
 
-    ex_task_journal_create()
+        process_issue(collection, stage, ex_task_extract_issue, issue_ids=list(itertools.chain(*ids_issue_dict.values())))
 
-    process_issue_article(collection, issn_list, stage, ex_task_extract_issue, ex_task_extract_article)
+        ids_article_dict = issue_ids_to_article_ids(collection.acronym, ids_issue_dict)
+
+        process_article(collection, stage, ex_task_extract_article, article_ids=list(itertools.chain(*ids_article_dict.values())))
 
 
 @manager.command
 @manager.option('-a', '--acrons', dest='acrons')
 @manager.option('-i', '--issns', dest='issns')
-def process_transform(issns=None, acrons=None):
+@manager.option('-f', '--file', dest='file')
+def process_transform(issns=None, acrons=None, file=None):
     stage = 'transform'
 
-    if bool(issns) == bool(acrons):
-        sys.exit(u'Utilizar apenas issns ou apenas acrônimos, param: -a ou -i')
+    if bool(issns) == bool(acrons) == bool(file):
+        sys.exit(u'Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
 
     collection = models.TransformCollection.objects.all().first()
 
@@ -201,6 +308,8 @@ def process_transform(issns=None, acrons=None):
 
     tr_task_collection_create()
 
+    tr_task_journal_create()
+
     issn_list = []
 
     if acrons:
@@ -210,24 +319,36 @@ def process_transform(issns=None, acrons=None):
                                         acrons=clean_acrons)
 
     if issns:
-
         issn_list = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
 
-    print u'Processando o(s) ISSN(s): %s' % issn_list
+    if issns or acrons:
+        print u'Processando o(s) ISSN(s): %s' % issn_list
 
-    tr_task_journal_create()
+        process_issn_issue(collection, issn_list, stage, tr_task_transform_issue)
 
-    process_issue_article(collection, issn_list, stage, tr_task_transform_issue, tr_task_transform_article)
+        process_issn_article(collection, issn_list, stage, tr_task_transform_article)
+
+    if file:
+        items = get_file_items(collection.acronym, file)
+
+        ids_issue_dict = issue_labels_to_ids(collection.acronym, items)
+
+        process_issue(collection, stage, tr_task_transform_issue, issue_ids=list(itertools.chain(*ids_issue_dict.values())))
+
+        ids_article_dict = issue_ids_to_article_ids(collection.acronym, ids_issue_dict)
+
+        process_article(collection, stage, tr_task_transform_article, article_ids=list(itertools.chain(*ids_article_dict.values())))
 
 
 @manager.command
 @manager.option('-a', '--acrons', dest='acrons')
 @manager.option('-i', '--issns', dest='issns')
-def process_load(issns=None, acrons=None):
+@manager.option('-f', '--file', dest='file')
+def process_load(issns=None, acrons=None, file=None):
     stage = 'load'
 
-    if bool(issns) == bool(acrons):
-        sys.exit(u'Utilizar apenas issns ou apenas acrônimos, param: -a ou -i')
+    if bool(issns) == bool(acrons) == bool(file):
+        sys.exit(u'Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
 
     collection = models.TransformCollection.objects.all().first()
 
@@ -235,6 +356,8 @@ def process_load(issns=None, acrons=None):
 
     lo_task_collection_create()
 
+    lo_task_journal_create()
+
     issn_list = []
 
     if acrons:
@@ -244,14 +367,25 @@ def process_load(issns=None, acrons=None):
                                         acrons=clean_acrons)
 
     if issns:
-
         issn_list = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
 
-    print u'Processando o(s) ISSN(s): %s' % issn_list
+    if issns or acrons:
+        print u'Processando o(s) ISSN(s): %s' % issn_list
 
-    lo_task_journal_create()
+        process_issn_issue(collection, issn_list, stage, lo_task_load_issue)
 
-    process_issue_article(collection, issn_list, stage, lo_task_load_issue, lo_task_load_article)
+        process_issn_article(collection, issn_list, stage, lo_task_load_article)
+
+    if file:
+        items = get_file_items(collection.acronym, file)
+
+        ids_issue_dict = issue_labels_to_ids(collection.acronym, items)
+
+        process_issue(collection, stage, lo_task_load_issue, issue_ids=list(itertools.chain(*ids_issue_dict.values())))
+
+        ids_article_dict = issue_ids_to_article_ids(collection.acronym, ids_issue_dict)
+
+        process_article(collection, stage, lo_task_load_article, article_ids=list(itertools.chain(*ids_article_dict.values())))
 
 
 @manager.command
