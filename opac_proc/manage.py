@@ -381,11 +381,19 @@ def process_load(issns=None, acrons=None, file=None):
 
         ids_issue_dict = issue_labels_to_ids(collection.acronym, items)
 
-        process_issue(collection, stage, lo_task_load_issue, issue_ids=list(itertools.chain(*ids_issue_dict.values())))
+        issue_list = list(itertools.chain(*ids_issue_dict.values()))
+
+        issues_ids = models.TransformIssue.objects.filter(pid__contains=issue_list).values_list('uuid')
+
+        process_issue(collection, stage, lo_task_load_issue, issue_ids=issues_ids)
 
         ids_article_dict = issue_ids_to_article_ids(collection.acronym, ids_issue_dict)
 
-        process_article(collection, stage, lo_task_load_article, article_ids=list(itertools.chain(*ids_article_dict.values())))
+        article_list = list(itertools.chain(*ids_article_dict.values()))
+
+        article_ids = models.TransformArticle.objects.filter(pid__contains=article_list).values_list('uuid')
+
+        process_article(collection, stage, lo_task_load_article, article_ids=article_ids)
 
 
 @manager.command
