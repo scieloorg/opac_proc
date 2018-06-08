@@ -383,7 +383,7 @@ def process_load(issns=None, acrons=None, file=None):
 
         issue_list = list(itertools.chain(*ids_issue_dict.values()))
 
-        issues_ids = models.TransformIssue.objects.filter(pid__contains=issue_list).values_list('uuid')
+        issues_ids = models.TransformIssue.objects.filter(pid__in=issue_list).values_list('uuid')
 
         process_issue(collection, stage, lo_task_load_issue, issue_ids=issues_ids)
 
@@ -391,7 +391,7 @@ def process_load(issns=None, acrons=None, file=None):
 
         article_list = list(itertools.chain(*ids_article_dict.values()))
 
-        article_ids = models.TransformArticle.objects.filter(pid__contains=article_list).values_list('uuid')
+        article_ids = models.TransformArticle.objects.filter(pid__in=article_list).values_list('uuid')
 
         process_article(collection, stage, lo_task_load_article, article_ids=article_ids)
 
