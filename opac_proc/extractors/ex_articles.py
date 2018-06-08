@@ -1,10 +1,12 @@
 # coding: utf-8
 from datetime import datetime
 
+from opac_proc.extractors.source_clients.amapi_wrapper import custom_amapi_client
 from opac_proc.datastore.models import ExtractArticle
 from opac_proc.datastore.identifiers_models import ArticleIdModel
 from opac_proc.extractors.base import BaseExtractor
 from opac_proc.extractors.decorators import update_metadata
+from prometheus_client import Summary
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
@@ -13,6 +15,12 @@ if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "extract")
 else:
     logger = getMongoLogger(__name__, "INFO", "extract")
+
+
+EX_ARTICLES_EXTRACT_METHOD_PROCESSING = Summary(
+    'ex_articles_extract_method_processing_seconds',
+    'Time spent processing during execution of extract method (ex_articles)'
+)
 
 
 class ArticleExtractor(BaseExtractor):
@@ -34,7 +42,12 @@ class ArticleExtractor(BaseExtractor):
         self.get_identifier_query = {
             'article_pid': self.article_id
         }
+        # redefinimos o cliente articlemeta para usar a api com: fmt='opac'
+        self.articlemeta = custom_amapi_client.ArticleMeta(
+            config.ARTICLE_META_THRIFT_DOMAIN,
+            config.ARTICLE_META_THRIFT_PORT)
 
+    @EX_ARTICLES_EXTRACT_METHOD_PROCESSING.time()
     @update_metadata
     def extract(self):
         """
@@ -47,7 +60,7 @@ class ArticleExtractor(BaseExtractor):
             collection=self.acronym,
             code=self.article_id,
             fmt=config.ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT,
-            body=config.OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY)
+            body=True)
         self._raw_data = article
 
         if not self._raw_data:
