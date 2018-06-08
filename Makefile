@@ -16,7 +16,7 @@ else
 endif
 
 ifndef OPAC_GRPC_HOST
-	export OPAC_GRPC_HOST=$(strip $(shell docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' opacssm_grpc_1))
+	export OPAC_GRPC_HOST=$(strip $(shell docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' opac_ssm_grpc_1))
 	export OPAC_GRPC_PORT=5000
 else
 	@echo "$$OPAC_MONGODB_HOST já foi definida previamente"
