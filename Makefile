@@ -16,7 +16,7 @@ else
 endif
 
 ifndef OPAC_GRPC_HOST
-	export OPAC_GRPC_HOST=$(strip $(shell docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' opacssm_grpc_1))
+	export OPAC_GRPC_HOST=$(strip $(shell docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' opac_ssm_grpc_1))
 	export OPAC_GRPC_PORT=5000
 else
 	@echo "$$OPAC_MONGODB_HOST já foi definida previamente"
@@ -134,19 +134,12 @@ travis_create_opac_mongodb_container:
 ###########################################################
 
 release_docker_build: get_opac_mongo_info get_build_info
-	@echo "[Building] Image full tag: $(TRAVIS_REPO_SLUG):$(COMMIT)"
+	@echo "[Building] Image full tag: $(TRAVIS_REPO_SLUG):$(TRAVIS_TAG)"
 	@docker build \
-	-t $(TRAVIS_REPO_SLUG):$(COMMIT) \
+	-t $(TRAVIS_REPO_SLUG):$(TRAVIS_TAG) \
 	--build-arg OPAC_PROC_BUILD_DATE=$(OPAC_PROC_BUILD_DATE) \
 	--build-arg OPAC_PROC_VCS_REF=$(OPAC_PROC_VCS_REF) \
 	--build-arg OPAC_PROC_WEBAPP_VERSION=$(OPAC_PROC_WEBAPP_VERSION) .
-
-release_docker_tag: get_opac_mongo_info get_build_info
-	@echo "[Tagging] Target image -> $(TRAVIS_REPO_SLUG):$(COMMIT)"
-	@echo "[Tagging] Image name:latest -> $(TRAVIS_REPO_SLUG):latest"
-	@docker tag $(TRAVIS_REPO_SLUG):$(COMMIT) $(TRAVIS_REPO_SLUG):latest
-	@echo "[Tagging] Image name:latest -> $(TRAVIS_REPO_SLUG):travis-$(TRAVIS_BUILD_NUMBER)"
-	@docker tag $(TRAVIS_REPO_SLUG):$(COMMIT) $(TRAVIS_REPO_SLUG):travis-$(TRAVIS_BUILD_NUMBER)
 
 release_docker_push: get_opac_mongo_info get_build_info
 	@echo "[Pushing] pushing image: $(TRAVIS_REPO_SLUG)"
