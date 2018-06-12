@@ -57,8 +57,8 @@ def task_retrive_all_articles_ids():
             task_retrive_articles_ids_by_chunks, list_of_ids)
 
 
-def task_call_data_retriver_by_model(model):
-    if model == 'article':
+def task_call_data_retriver_by_model(model, force_serial=False):
+    if model == 'article' and not force_serial:
         task_retrive_all_articles_ids()
     else:
         retirever_class = RETRIEVERS_BY_MODEL[model]
@@ -95,5 +95,5 @@ def serial_run_ids_data_retriever(model_name='all'):
 
     for model_ in models_list:
         logger.info(u'Iniciando execução SERIAL para obter dados do IdModel, para o model: %s.' % (model_))
-        task_call_data_retriver_by_model(model_)
+        task_call_data_retriver_by_model(model_, force_serial=True)
         logger.info(u'Fim da execução SERIAL para obter dados do IdModel, para o model: %s.' % (model_))
