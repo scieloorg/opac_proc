@@ -1,11 +1,5 @@
 from articlemeta.client import ThriftClient
-from prometheus_client import Summary
-
-
-AMAPI_THRIFT_GET_ARTICLE_REQUEST_TIME = Summary(
-    'amapi_thirft_get_article_request_processing_seconds',
-    'AM API THRIFT Time spent processing request'
-)
+from opac_proc.core.prometheus_metrics import push_metric
 
 
 class ArticleMeta(object):
@@ -38,7 +32,7 @@ class ArticleMeta(object):
     def get_issue(self, code, collection):
         raise NotImplementedError
 
-    @AMAPI_THRIFT_GET_ARTICLE_REQUEST_TIME.time()
+    @push_metric('amapi_thirft_get_article_request_processing_seconds')
     def get_article(self, code, collection, fmt='opac', body=True):
         article = self.client.document(code=code, collection=collection, fmt=fmt, body=body)
         return article.data

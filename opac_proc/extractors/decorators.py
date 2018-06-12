@@ -1,11 +1,13 @@
 # coding: utf-8
 from datetime import datetime
+from functools import wraps
 
 
 def update_metadata(extract_method):
     """
     decorator to be used with extract() method of FooExtractor subclass
     """
+    @wraps(extract_method)
     def wrapped(*args, **kwargs):
         _self = args[0]
 

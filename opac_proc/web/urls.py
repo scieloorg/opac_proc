@@ -98,7 +98,6 @@ from opac_proc.web.views.message.detail_views import (
     MessageDetailView)
 
 from opac_proc.web.views.home import home
-from opac_proc.web.views.metrics import prometheus_metrics
 from opac_proc.web.views.export_report import export_failed_jobs
 from opac_proc.web.views.source_sync.timeline import timeline_index
 
@@ -285,9 +284,6 @@ def add_url_rules(app):
     app.add_url_rule('/', 'home', login_required(home))
     app.add_url_rule('/timeline/', 'timeline', login_required(timeline_index))
     app.add_url_rule('/export/failed', 'export_failed_jobs', login_required(export_failed_jobs))
-
-    if app.config['PROMETHEUS_ENABLED']:
-        app.add_url_rule('/metrics', 'prometheus_metrics', prometheus_metrics)
 
     # then iterate over url_patterns to add each view:
     for url_definition in url_patterns:

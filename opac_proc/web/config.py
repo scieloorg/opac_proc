@@ -197,4 +197,9 @@ MAIL_ASCII_ATTACHMENTS = False
 DEFAULT_DIFF_SPAN = int(os.environ.get('OPAC_PROC_DEFAULT_DIFF_SPAN_DAYS', 7))
 
 # Prometheus settings:
-PROMETHEUS_ENABLED = os.environ.get('OPAC_PROMETHEUS_ENABLED', 'True') == 'True'
+PROMETHEUS_ENABLED = os.environ.get('OPAC_PROMETHEUS_ENABLED', 'False') == 'True'
+# PUSH GATEWAY CONNECTION ---------------------------------------------
+PROMPG_SCHEME = os.environ.get('OPAC_PROC_PROMPG_SCHEME', 'http')
+PROMPG_HOST = os.environ.get('OPAC_PROC_PROMPG_HOST', 'localhost')
+PROMPG_PORT = os.environ.get('OPAC_PROC_PROMPG_PORT', '9091')
+PROMPG_URL = '%s://%s:%s' % (PROMPG_SCHEME, PROMPG_HOST, PROMPG_PORT)
