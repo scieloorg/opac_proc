@@ -41,11 +41,7 @@ class ArticleMeta(object):
     @AMAPI_THRIFT_GET_ARTICLE_REQUEST_TIME.time()
     def get_article(self, code, collection, fmt='opac', body=True):
         article = self.client.document(code=code, collection=collection, fmt=fmt, body=body)
-        # gambe para o article.code
-        result = article.data
-        result['code'] = article.data['article']['code']
-        result['collection'] = article.data['article']['collection']
-        return result
+        return article.data
 
     def collections(self):
         raise NotImplementedError

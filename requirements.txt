@@ -1,3 +1,4 @@
+pendulum >=1.0,<=1.5.1 --install-option="--no-compile"
 Werkzeug==0.14.1
 Flask==0.12.2
 mongoengine==0.15.0
