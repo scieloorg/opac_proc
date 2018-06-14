@@ -10,30 +10,43 @@ sys.path.append(PROJECT_PATH)
 
 from articlemeta.client import ThriftClient
 
+from opac_proc.web.config import (
+    OPAC_PROC_COLLECTION,
+    ARTICLE_META_THRIFT_DOMAIN,
+    ARTICLE_META_THRIFT_PORT,
+    ARTICLE_META_REST_DOMAIN,
+    ARTICLE_META_REST_PORT)
+
 from opac_proc.web.webapp import create_app
 from opac_proc.web.accounts.forms import EmailForm
 from opac_proc.web.accounts.mixins import User as UserMixin
 from opac_proc.web.accounts.models import User as UserModel
 
-from opac_proc.datastore import models
-from opac_proc.datastore.mongodb_connector import get_db_connection
-from opac_proc.datastore.redis_queues import RQueues
-from opac_proc.extractors.jobs import (
-    task_collection_create as ex_task_collection_create,
-    task_journal_create as ex_task_journal_create,
-    task_extract_issue as ex_task_extract_issue,
-    task_extract_article as ex_task_extract_article)
-from opac_proc.transformers.jobs import (
-    task_collection_create as tr_task_collection_create,
-    task_journal_create as tr_task_journal_create,
-    task_transform_issue as tr_task_transform_issue,
-    task_transform_article as tr_task_transform_article)
-from opac_proc.loaders.jobs import (
-    task_collection_create as lo_task_collection_create,
-    task_journal_create as lo_task_journal_create,
-    task_load_issue as lo_task_load_issue,
-    task_load_article as lo_task_load_article)
+from opac_proc.source_sync.ids_data_retriever_jobs import task_call_data_retriver_by_model
 
+from opac_proc.extractors.jobs import (
+    task_extract_one_collection,
+    task_extract_selected_journals,
+    task_extract_selected_issues,
+    task_extract_selected_articles)
+
+from opac_proc.transformers.jobs import (
+    task_transform_one_collection,
+    task_transform_selected_journals,
+    task_transform_selected_issues,
+    task_transform_selected_articles)
+
+from opac_proc.loaders.jobs import (
+    task_load_one_collection,
+    task_load_selected_journals,
+    task_load_selected_issues,
+    task_load_selected_articles)
+
+from opac_proc.datastore.identifiers_models import (
+    CollectionIdModel,
+    JournalIdModel,
+    IssueIdModel,
+    ArticleIdModel)
 
 app = create_app()
 manager = Manager(app)
@@ -45,106 +58,12 @@ def make_shell_context():
 manager.add_command("shell", Shell(make_context=make_shell_context))
 
 
-def _enqueue(collection, ids, stage, task, entity):
-    r_queues = RQueues()
-    r_queues.create_queues_for_stage(stage)
-
-    for _id in ids:
-        if stage == 'load':
-            r_queues.enqueue(stage, entity, task, _id)
-        else:
-            r_queues.enqueue(stage, entity, task, collection.acronym, _id)
-
-    return r_queues.queues[stage][entity]
-
-
-def process_issue(collection, stage, task, issns=None, issue_ids=None):
-
-    if bool(issns) == bool(issue_ids):
-        raise(u'Utilizar apenas ``issns`` ou apenas ``issue_ids``')
-
-    if issns:
-
-        children_found = [child for child in collection['children_ids'] if child['issn'] in issns]
-
-        for child in children_found:
-
-            if stage == 'load':
-                ids = models.TransformIssue.objects.filter(pid__contains=child['issn']).values_list('uuid')
-            else:
-                ids = child['issues_ids']
-
-            print u"Processando %s pids de issues do periódicoL %s" % (len(ids), child['issn'])
-
-            queued_issue = _enqueue(collection, ids, stage, task, 'issue')
-
-    if issue_ids:
-
-        queued_issue = _enqueue(collection, issue_ids, stage, task, 'issue')
-
-    print u"Enfilerados %s pids de issue" % (len(queued_issue))
-
-
-def process_article(collection, stage, task, issns=None, article_ids=None):
-
-    if bool(issns) == bool(article_ids):
-        raise(u'Utilizar apenas ``issns`` ou apenas ``article_ids``')
-
-    if issns:
-
-        children_found = [child for child in collection['children_ids'] if child['issn'] in issns]
-
-        for child in children_found:
-
-            if stage == 'load':
-                ids = models.TransformIssue.objects.filter(pid__contains=child['issn']).values_list('uuid')
-            else:
-                ids = child['articles_ids']
-
-            print u"Processando %s pids de artigos do periódico: %s" % (len(ids), child['issn'])
-
-            queued_issue = _enqueue(collection, ids, stage, task, 'article')
-
-    if article_ids:
-
-        queued_issue = _enqueue(collection, article_ids, stage, task, 'article')
-
-    print u"Enfilerados %s pids de artigo" % (len(queued_issue))
-
-
-def process_issn_issue(collection, issns, task_issue, stage):
-
-    children_ids = collection['children_ids']  # all ids in database
-
-    db_issns = [child['issn'] for child in children_ids]  # all issns in database
-
-    print u"Lista de ISSNs: %s" % db_issns
-
-    issn_found = [issn for issn in db_issns if issn in issns]  # issns to process
-
-    print u"ISSNs encontrados: %s" % issn_found
-
-    process_issue(collection, stage, task_issue, issns=issn_found)
-
-
-def process_issn_article(collection, issns, task_article, stage):
-
-    children_ids = collection['children_ids']  # all ids in database
-
-    db_issns = [child['issn'] for child in children_ids]  # all issns in database
-
-    print u"Lista de ISSNs: %s" % db_issns
-
-    issn_found = [issn for issn in db_issns if issn in issns]  # issns to process
-
-    print u"ISSNs encontrados: %s" % issn_found
-
-    process_article(collection, stage, task_article, issns=issn_found)
-
-
 def get_issn_by_acron(collection, acron):
 
-    cl = ThriftClient()
+    domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
+                        ARTICLE_META_THRIFT_PORT)
+
+    cl = ThriftClient(domain)
 
     for journal in cl.journals(collection=collection):
 
@@ -155,7 +74,10 @@ def get_issn_by_acron(collection, acron):
 def get_issns_by_acrons(collection, acrons):
     issn_list = []
 
-    cl = ThriftClient()
+    domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
+                        ARTICLE_META_THRIFT_PORT)
+
+    cl = ThriftClient(domain)
 
     acrons = set(acrons)
 
@@ -207,7 +129,10 @@ def issue_labels_to_ids(collection, items):
 
     data_dict = {}
 
-    cl = ThriftClient()
+    domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
+                        ARTICLE_META_THRIFT_PORT)
+
+    cl = ThriftClient(domain)
 
     for issn, labels in items.items():
         d = data_dict.setdefault(issn, set())
@@ -230,7 +155,10 @@ def issue_ids_to_article_ids(collection, items):
 
     data_dict = {}
 
-    cl = ThriftClient()
+    domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
+                        ARTICLE_META_THRIFT_PORT)
+
+    cl = ThriftClient(domain)
 
     for issn, icodes in items.items():
         d = data_dict.setdefault(issn, [])
@@ -249,25 +177,28 @@ def issue_ids_to_article_ids(collection, items):
 @manager.option('-i', '--issns', dest='issns')
 @manager.option('-f', '--file', dest='file')
 def process_extract(issns=None, acrons=None, file=None):
-    stage = 'extract'
 
     if bool(issns) == bool(acrons) == bool(file):
         sys.exit(u'Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
 
-    collection = models.ExtractCollection.objects.all().first()
+    # Atualização de IDs (Serial)
+    task_call_data_retriver_by_model(model='collection', force_serial=True)
+    task_call_data_retriver_by_model(model='journal', force_serial=True)
+    task_call_data_retriver_by_model(model='issue', force_serial=True)
+    task_call_data_retriver_by_model(model='article', force_serial=True)
 
-    print u'Colecão que será carregada: %s' % collection.name
+    task_extract_one_collection()
 
-    ex_task_collection_create()
+    collection = OPAC_PROC_COLLECTION
 
-    ex_task_journal_create()
+    print u'Colecão que será carregada: %s' % collection
 
     issn_list = []
 
     if acrons:
         clean_acrons = [i.strip() for i in acrons.split(',')]  # Gerando a lista com Acrônimos
 
-        issn_list = get_issns_by_acrons(collection=collection.acronym,
+        issn_list = get_issns_by_acrons(collection=collection,
                                         acrons=clean_acrons)
 
     if issns:
@@ -276,20 +207,37 @@ def process_extract(issns=None, acrons=None, file=None):
     if issns or acrons:
         print u'Processando o(s) ISSN(s): %s' % issn_list
 
-        process_issn_issue(collection, issn_list, stage, ex_task_extract_issue)
+        journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        task_extract_selected_journals(journal_uuids)
 
-        process_issn_article(collection, issn_list, stage, ex_task_extract_article)
+        issue_uuids = IssueIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        print u'Processando %s issues' % len(issue_uuids)
+        task_extract_selected_issues(issue_uuids)
+
+        article_uuids = ArticleIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        print u'Processando %s artigos' % len(article_uuids)
+        task_extract_selected_articles(article_uuids)
 
     if file:
-        items = get_file_items(collection.acronym, file)
 
-        ids_issue_dict = issue_labels_to_ids(collection.acronym, items)
+        items = get_file_items(collection, file)
+        ids_issue_dict = issue_labels_to_ids(collection, items)
+        issn_list = ids_issue_dict.keys()
+        print u'Processando o(s) ISSN(s): %s' % issn_list
 
-        process_issue(collection, stage, ex_task_extract_issue, issue_ids=list(itertools.chain(*ids_issue_dict.values())))
+        journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        task_extract_selected_journals(journal_uuids)
 
-        ids_article_dict = issue_ids_to_article_ids(collection.acronym, ids_issue_dict)
+        issue_ids = list(itertools.chain(*ids_issue_dict.values()))
+        issue_uuids = IssueIdModel.objects.filter(issue_pid__in=issue_ids).values_list('uuid')
+        print u'Processando %s issues' % len(issue_uuids)
+        task_extract_selected_issues(issue_uuids)
 
-        process_article(collection, stage, ex_task_extract_article, article_ids=list(itertools.chain(*ids_article_dict.values())))
+        ids_article_dict = issue_ids_to_article_ids(collection, ids_issue_dict)
+        article_ids = list(itertools.chain(*ids_article_dict.values()))
+        article_uuids = ArticleIdModel.objects.filter(article_pid__in=article_ids).values_list('uuid')
+        print u'Processando %s artigos' % len(article_uuids)
+        task_extract_selected_articles(article_uuids)
 
 
 @manager.command
@@ -297,25 +245,22 @@ def process_extract(issns=None, acrons=None, file=None):
 @manager.option('-i', '--issns', dest='issns')
 @manager.option('-f', '--file', dest='file')
 def process_transform(issns=None, acrons=None, file=None):
-    stage = 'transform'
 
     if bool(issns) == bool(acrons) == bool(file):
         sys.exit(u'Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
 
-    collection = models.TransformCollection.objects.all().first()
+    task_transform_one_collection()
 
-    print u'Colecão que será tranformada: %s' % collection.name
+    collection = OPAC_PROC_COLLECTION
 
-    tr_task_collection_create()
-
-    tr_task_journal_create()
+    print u'Colecão que será carregada: %s' % collection
 
     issn_list = []
 
     if acrons:
         clean_acrons = [i.strip() for i in acrons.split(',')]  # Gerando a lista com Acrônimos
 
-        issn_list = get_issns_by_acrons(collection=collection.acronym,
+        issn_list = get_issns_by_acrons(collection=collection,
                                         acrons=clean_acrons)
 
     if issns:
@@ -324,20 +269,37 @@ def process_transform(issns=None, acrons=None, file=None):
     if issns or acrons:
         print u'Processando o(s) ISSN(s): %s' % issn_list
 
-        process_issn_issue(collection, issn_list, stage, tr_task_transform_issue)
+        journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        task_transform_selected_journals(journal_uuids)
 
-        process_issn_article(collection, issn_list, stage, tr_task_transform_article)
+        issue_uuids = IssueIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        print u'Processando %s issues' % len(issue_uuids)
+        task_transform_selected_issues(issue_uuids)
+
+        article_uuids = ArticleIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        print u'Processando %s artigos' % len(article_uuids)
+        task_transform_selected_articles(article_uuids)
 
     if file:
-        items = get_file_items(collection.acronym, file)
 
-        ids_issue_dict = issue_labels_to_ids(collection.acronym, items)
+        items = get_file_items(collection, file)
+        ids_issue_dict = issue_labels_to_ids(collection, items)
+        issn_list = ids_issue_dict.keys()
+        print u'Processando o(s) ISSN(s): %s' % issn_list
 
-        process_issue(collection, stage, tr_task_transform_issue, issue_ids=list(itertools.chain(*ids_issue_dict.values())))
+        journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        task_transform_selected_journals(journal_uuids)
 
-        ids_article_dict = issue_ids_to_article_ids(collection.acronym, ids_issue_dict)
+        issue_ids = list(itertools.chain(*ids_issue_dict.values()))
+        issue_uuids = IssueIdModel.objects.filter(issue_pid__in=issue_ids).values_list('uuid')
+        print u'Processando %s issues' % len(issue_uuids)
+        task_transform_selected_issues(issue_uuids)
 
-        process_article(collection, stage, tr_task_transform_article, article_ids=list(itertools.chain(*ids_article_dict.values())))
+        ids_article_dict = issue_ids_to_article_ids(collection, ids_issue_dict)
+        article_ids = list(itertools.chain(*ids_article_dict.values()))
+        article_uuids = ArticleIdModel.objects.filter(article_pid__in=article_ids).values_list('uuid')
+        print u'Processando %s artigos' % len(article_uuids)
+        task_transform_selected_articles(article_uuids)
 
 
 @manager.command
@@ -345,25 +307,24 @@ def process_transform(issns=None, acrons=None, file=None):
 @manager.option('-i', '--issns', dest='issns')
 @manager.option('-f', '--file', dest='file')
 def process_load(issns=None, acrons=None, file=None):
-    stage = 'load'
 
     if bool(issns) == bool(acrons) == bool(file):
         sys.exit(u'Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
 
-    collection = models.TransformCollection.objects.all().first()
+    collection = OPAC_PROC_COLLECTION
 
-    print u'Colecão que será carregada: %s' % collection.name
+    collection_uuid = CollectionIdModel.objects.get(collection_acronym=collection).uuid
 
-    lo_task_collection_create()
+    task_load_one_collection(collection_uuid)
 
-    lo_task_journal_create()
+    print u'Colecão que será carregada: %s' % collection
 
     issn_list = []
 
     if acrons:
         clean_acrons = [i.strip() for i in acrons.split(',')]  # Gerando a lista com Acrônimos
 
-        issn_list = get_issns_by_acrons(collection=collection.acronym,
+        issn_list = get_issns_by_acrons(collection=collection,
                                         acrons=clean_acrons)
 
     if issns:
@@ -372,28 +333,37 @@ def process_load(issns=None, acrons=None, file=None):
     if issns or acrons:
         print u'Processando o(s) ISSN(s): %s' % issn_list
 
-        process_issn_issue(collection, issn_list, stage, lo_task_load_issue)
+        journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        task_load_selected_journals(journal_uuids)
 
-        process_issn_article(collection, issn_list, stage, lo_task_load_article)
+        issue_uuids = IssueIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        print u'Processando %s issues' % len(issue_uuids)
+        task_load_selected_issues(issue_uuids)
+
+        article_uuids = ArticleIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        print u'Processando %s artigos' % len(article_uuids)
+        task_load_selected_articles(article_uuids)
 
     if file:
-        items = get_file_items(collection.acronym, file)
 
-        ids_issue_dict = issue_labels_to_ids(collection.acronym, items)
+        items = get_file_items(collection, file)
+        ids_issue_dict = issue_labels_to_ids(collection, items)
+        issn_list = ids_issue_dict.keys()
+        print u'Processando o(s) ISSN(s): %s' % issn_list
 
-        issue_list = list(itertools.chain(*ids_issue_dict.values()))
+        journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
+        task_load_selected_journals(journal_uuids)
 
-        issues_ids = models.TransformIssue.objects.filter(pid__in=issue_list).values_list('uuid')
+        issue_ids = list(itertools.chain(*ids_issue_dict.values()))
+        issue_uuids = IssueIdModel.objects.filter(issue_pid__in=issue_ids).values_list('uuid')
+        print u'Processando %s issues' % len(issue_uuids)
+        task_load_selected_issues(issue_uuids)
 
-        process_issue(collection, stage, lo_task_load_issue, issue_ids=issues_ids)
-
-        ids_article_dict = issue_ids_to_article_ids(collection.acronym, ids_issue_dict)
-
-        article_list = list(itertools.chain(*ids_article_dict.values()))
-
-        article_ids = models.TransformArticle.objects.filter(pid__in=article_list).values_list('uuid')
-
-        process_article(collection, stage, lo_task_load_article, article_ids=article_ids)
+        ids_article_dict = issue_ids_to_article_ids(collection, ids_issue_dict)
+        article_ids = list(itertools.chain(*ids_article_dict.values()))
+        article_uuids = ArticleIdModel.objects.filter(article_pid__in=article_ids).values_list('uuid')
+        print u'Processando %s artigos' % len(article_uuids)
+        task_load_selected_articles(article_uuids)
 
 
 @manager.command
