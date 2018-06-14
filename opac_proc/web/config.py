@@ -24,6 +24,15 @@ ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_THRIFT_PORT',
     11621))
 
+ARTICLE_META_REST_DOMAIN = os.environ.get(
+    'OPAC_PROC_ARTICLE_META_REST_DOMAIN',
+    'articlemeta.scielo.org')
+ARTICLE_META_REST_PORT = int(os.environ.get(
+    'OPAC_PROC_ARTICLE_META_REST_PORT',
+    80))
+
+ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT = os.environ.get('OPAC_PROC_ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT', 'opac')
+
 # WEBAPP config: ----------------------------------------------------
 DEBUG = os.environ.get('OPAC_PROC_DEBUG', 'False') == 'True'
 TESTING = os.environ.get('OPAC_PROC_TESTING', 'False') == 'True'
@@ -152,8 +161,6 @@ RSS_NEWS_FEEDS = {
     },
 }
 
-OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY = os.environ.get('OPAC_PROC_ARTICLE_EXTRACTION_WITH_BODY', 'True') == 'True'
-
 OPAC_SSM_GRPC_SERVER_HOST = os.environ.get('OPAC_SSM_GRPC_SERVER_HOST', 'homolog.grpc.ssm.scielo.org')
 OPAC_SSM_GRPC_SERVER_PORT = os.environ.get('OPAC_SSM_GRPC_SERVER_PORT', '8005')
 
@@ -193,3 +200,14 @@ MAIL_PASSWORD = os.environ.get('OPAC_PROC_MAIL_PASSWORD', None)
 MAIL_DEFAULT_SENDER = DEFAULT_EMAIL
 MAIL_MAX_EMAILS = None
 MAIL_ASCII_ATTACHMENTS = False
+
+# Processamento parcial:
+DEFAULT_DIFF_SPAN = int(os.environ.get('OPAC_PROC_DEFAULT_DIFF_SPAN_DAYS', 7))
+
+# Prometheus settings:
+PROMETHEUS_ENABLED = os.environ.get('OPAC_PROMETHEUS_ENABLED', 'False') == 'True'
+# PUSH GATEWAY CONNECTION ---------------------------------------------
+PROMPG_SCHEME = os.environ.get('OPAC_PROC_PROMPG_SCHEME', 'http')
+PROMPG_HOST = os.environ.get('OPAC_PROC_PROMPG_HOST', 'localhost')
+PROMPG_PORT = os.environ.get('OPAC_PROC_PROMPG_PORT', '9091')
+PROMPG_URL = '%s://%s:%s' % (PROMPG_SCHEME, PROMPG_HOST, PROMPG_PORT)

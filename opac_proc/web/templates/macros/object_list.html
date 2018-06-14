@@ -1,25 +1,17 @@
 {% macro render_row_cell(object, field_name, field_type='string') -%}
-
+    {% set obj_val = object|get_mongo_obj_value(field_name) %}
     {% if field_type == 'string' %}
-        {{ object[field_name] }}
+        {{ obj_val }}
     {% elif field_type == 'date' %}
-        {% if object[field_name] %}
-            {% if object[field_name]|string %} {# workarround resolvido no proc parcial #}
-                {{ object[field_name] }}
-            {% else %}
-                {{ object[field_name].strftime('%Y-%m-%d') }}
-            {% endif %}
+        {% if obj_val %}
+            {{ obj_val.strftime('%Y-%m-%d') }}
         {% endif %}
     {% elif field_type == 'date_time' %}
-        {% if object[field_name] %}
-            {% if object[field_name]|string %} {# workarround resolvido no proc parcial #}
-                {{ object[field_name] }}
-            {% else %}
-                {{ object[field_name].strftime('%Y-%m-%d %H:%M:%S') }}
-            {% endif %}
+        {% if obj_val %}
+            {{ obj_val.strftime('%Y-%m-%d %H:%M:%S') }}
         {% endif %}
     {% elif field_type == 'boolean' %}
-        {% if object[field_name] %}
+        {% if obj_val %}
             <i class="fa fa-check text-success" aria-hidden="true"></i>
         {% else %}
             <i class="fa fa-times text-danger" aria-hidden="true"></i>

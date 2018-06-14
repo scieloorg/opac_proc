@@ -3,12 +3,14 @@ import os
 import sys
 import json
 from datetime import datetime
+
 from mongoengine.context_managers import switch_db
 from opac_proc.datastore.mongodb_connector import (
     get_db_connection,
     register_connections,
     get_opac_proc_db_name,
     get_opac_webapp_db_name)
+from opac_proc.datastore.base_mixin import ProcessMetada, LoadedData
 
 from opac_schema.v1.models import Collection as OpacCollection
 from opac_schema.v1.models import Journal as OpacJournal
@@ -18,7 +20,6 @@ from opac_schema.v1.models import Sponsor as OpacSponsor
 from opac_schema.v1.models import News as OpacNews
 from opac_schema.v1.models import Pages as OpacPages
 from opac_schema.v1.models import PressRelease as OpacPressRelease
-
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
@@ -37,23 +38,27 @@ OPAC_WEBAPP_DB_NAME = get_opac_webapp_db_name()
 
 class BaseLoader(object):
     _db = None
-    transform_model_class = None        # definir no __init__ da sublcasse
+    transform_model_class = None
     transform_model_name = ''
-    transform_model_instance = None     # definir no __init__ da sublcasse
+    transform_model_instance = None
 
-    opac_model_class = None             # definir no __init__ da sublcasse
+    opac_model_class = None
     opac_model_name = ''
-    opac_model_instance = None          # definir no __init__ da sublcasse
+    opac_model_instance = None
 
-    load_model_class = None             # definir no __init__ da sublcasse
+    load_model_class = None
     load_model_name = ''
-    load_model_instance = None          # definir no __init__ da sublcasse
+    load_model_instance = None
+
+    ids_model_class = None
+    ids_model_name = ''
+    ids_model_instance = None
 
     _uuid = None
     _uuid_str = None
 
     metadata = {
-        'uuid': None,
+        # 'uuid': None,
         'process_start_at': None,
         'process_finish_at': None,
         'process_completed': False,
@@ -86,6 +91,10 @@ class BaseLoader(object):
         self._uuid = transform_model_uuid
         self._uuid_str = str(transform_model_uuid).replace("-", "")
 
+        # buscamos a instância do modelo identifier:
+        self.get_identifier_model_instance(query_dict={'uuid': self._uuid})
+
+        # buscamos a instância do modelo transformado:
         self.get_transform_model_instance(query_dict={'uuid': self._uuid})
 
         # buscamos uma instância na base opac com o mesmo UUID
@@ -94,7 +103,14 @@ class BaseLoader(object):
         # Load model instance: to track process times by uuid
         self.get_load_model_instance(query_dict={'uuid': self._uuid})
 
-        self.metadata['uuid'] = self._uuid
+    def get_identifier_model_instance(self, query_dict):
+        # recuperamos uma instância do transform_model_class
+        # correspondente com a **query_dict dict.
+        # caso não exista, levantamos uma exeção por não ter o dado fonte
+        with switch_db(self.ids_model_class, OPAC_PROC_DB_NAME) as ids_model_class:
+            logger.debug(u'recuperando modelo: %s' % self.ids_model_name)
+            self.ids_model_instance = ids_model_class.objects(**query_dict).first()
+            logger.debug(u'modelo %s encontrado. query_dict: %s' % (self.ids_model_name, query_dict))
 
     def get_transform_model_instance(self, query_dict):
         # recuperamos uma instância do transform_model_class
@@ -133,6 +149,7 @@ class BaseLoader(object):
                 logger.debug(u'load_model_instance não foi encontrado. criamos nova instância')
                 self.load_model_instance = self.load_model_class(**query_dict)
                 self.load_model_instance['uuid'] = self._uuid
+                self.load_model_instance['metadata'] = ProcessMetada(**self.metadata)
                 self.load_model_instance.save()
                 self.load_model_instance.reload()
                 logger.debug('nova instancia de load_model_instance. uuid: %s' % self.load_model_instance['uuid'])
@@ -146,7 +163,7 @@ class BaseLoader(object):
         removemos metadata e retornamos um dicionario (python) pronto
         para criar uma instância do opac_model_class
         """
-        logger.debug(u"iniciando metodo transform_model_instance_to_python (uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"iniciando metodo transform_model_instance_to_python (uuid: %s)" % self._uuid_str)
         self.metadata['process_start_at'] = datetime.now()
 
         t_model = self.transform_model_instance
@@ -161,11 +178,11 @@ class BaseLoader(object):
                 result_dict[field] = getattr(self, 'prepare_%s' % field)()
             elif hasattr(t_model, field):
                 result_dict[field] = getattr(t_model, field)
-        logger.debug(u"finalizando metodo transform_model_instance_to_python (uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"finalizando metodo transform_model_instance_to_python (uuid: %s)" % self._uuid_str)
         return result_dict
 
     def prepare(self):
-        logger.debug(u"iniciando metodo prepare (uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"iniciando metodo prepare (uuid: %s)" % self._uuid_str)
         obj_dict = self.transform_model_instance_to_python()
         obj_dict['_id'] = self._uuid_str
 
@@ -188,15 +205,14 @@ class BaseLoader(object):
                     for k, v in obj_dict.iteritems():
                         self.opac_model_instance[k] = v
                     self.opac_model_instance.save()
-
         logger.debug(u"modelo opac (_id: %s) encontrado. atualizando registro" % obj_dict['_id'])
 
-        logger.debug(u"finalizando metodo prepare(uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"finalizando metodo prepare(uuid: %s)" % self._uuid_str)
         logger.debug(u'opac_model_instance SALVO: %s' % self.opac_model_instance.to_json())
         return self.opac_model_instance
 
     def load(self):
-        logger.debug(u"iniciando metodo load() (uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"iniciando metodo load() (uuid: %s)" % self._uuid_str)
 
         logger.debug(u"salvando modelo %s no opac (_id: %s)" % (
             self.opac_model_name, self.opac_model_instance._id))
@@ -217,16 +233,21 @@ class BaseLoader(object):
 
         # atualizamos os dados do registro LOAD
         with switch_db(self.load_model_class, OPAC_PROC_DB_NAME):
+            # pegamos os dados que foram carregados no OPAC
+            json_opac_data = self.opac_model_instance.to_json()
+            cleaned_json_opac_data = json_opac_data.replace('$', '')  # retiramos o $
+            opac_data_dict = json.loads(cleaned_json_opac_data)
+            self.load_model_instance['loaded_data'] = LoadedData(**opac_data_dict)
+
+            # atualizamos os metadados:
             self.metadata['process_finish_at'] = datetime.now()
             self.metadata['process_completed'] = True
             self.metadata['must_reprocess'] = False
-            json_opac_data = self.opac_model_instance.to_json()
-            cleaned_json_opac_data = json_opac_data.replace('$', '')  # retiramos o $
-            self.metadata['loaded_data'] = json.loads(cleaned_json_opac_data)
-            self.load_model_instance.update(**self.metadata)
+            self.load_model_instance['metadata'] = ProcessMetada(**self.metadata)
+            # salvamos metadados e loaded_data
             self.load_model_instance.save()
             self.load_model_instance.reload()
             logger.debug(u"modelo %s no opac_proc (uuid: %s) foi atualizado" % (
-                self.load_model_name, self.metadata['uuid']))
+                self.load_model_name, self._uuid_str))
 
-        logger.debug(u"finalizando metodo load() (uuid: %s)" % self.metadata['uuid'])
+        logger.debug(u"finalizando metodo load() (uuid: %s)" % self._uuid_str)

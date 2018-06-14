@@ -74,6 +74,23 @@ from opac_proc.web.views.opac.detail_views import (
     OpacPressReleaseDetailView,
     OpacNewsDetailView)
 
+from opac_proc.web.views.source_sync.list_views import (
+    IdentifiersCollectionListView,
+    IdentifiersJournalListView,
+    IdentifiersIssueListView,
+    IdentifiersArticleListView,
+    IdentifiersPressReleaseListView,
+    IdentifiersNewsListView)
+
+from opac_proc.web.views.source_sync.detail_views import (
+    IdentifiersCollectionDetailView,
+    IdentifiersJournalDetailView,
+    IdentifiersIssueDetailView,
+    IdentifiersArticleDetailView,
+    IdentifiersPressReleaseDetailView,
+    IdentifiersNewsDetailView)
+
+
 from opac_proc.web.views.message.list_views import (
     MessageListView)
 
@@ -82,6 +99,7 @@ from opac_proc.web.views.message.detail_views import (
 
 from opac_proc.web.views.home import home
 from opac_proc.web.views.export_report import export_failed_jobs
+from opac_proc.web.views.source_sync.timeline import timeline_index
 
 url_patterns = (
     {
@@ -228,13 +246,43 @@ url_patterns = (
                 'detail_view_class': MessageDetailView,
             }
         }
-    }
+    },
+    {
+        'stage': 'sync_ids',
+        'models': {
+            'collection': {
+                'list_view_class': IdentifiersCollectionListView,
+                'detail_view_class': IdentifiersCollectionDetailView,
+            },
+            'journal': {
+                'list_view_class': IdentifiersJournalListView,
+                'detail_view_class': IdentifiersJournalDetailView,
+            },
+            'issue': {
+                'list_view_class': IdentifiersIssueListView,
+                'detail_view_class': IdentifiersIssueDetailView,
+            },
+            'article': {
+                'list_view_class': IdentifiersArticleListView,
+                'detail_view_class': IdentifiersArticleDetailView,
+            },
+            'press_release': {
+                'list_view_class': IdentifiersPressReleaseListView,
+                'detail_view_class': IdentifiersPressReleaseDetailView,
+            },
+            'news': {
+                'list_view_class': IdentifiersNewsListView,
+                'detail_view_class': IdentifiersNewsDetailView,
+            },
+        }
+    },
 )
 
 
 def add_url_rules(app):
     # first add home page:
     app.add_url_rule('/', 'home', login_required(home))
+    app.add_url_rule('/timeline/', 'timeline', login_required(timeline_index))
     app.add_url_rule('/export/failed', 'export_failed_jobs', login_required(export_failed_jobs))
 
     # then iterate over url_patterns to add each view:

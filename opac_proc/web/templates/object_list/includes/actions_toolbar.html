@@ -1,29 +1,19 @@
 <div class="btn-toolbar action-toolbar" role="toolbar">
   <div class="btn-group" role="group">
-    {# create action #}
-    {% if can_create %}
-      <button type="button" class="btn btn-primary btn-sm" data-action="create">
-        <i class="fa fa-download" aria-hidden="true"></i> Criar/Importar
-      </button>
-    {% else %}
-      <button type="button" class="btn btn-primary btn-sm disabled" data-action="create">
-        <i class="fa fa-download" aria-hidden="true"></i> Criar/Importar
-      </button>
-    {% endif %}
 
-    {# update action #}
+    {# process action #}
     <div class="btn-group" role="group">
-      {% if can_update and objects|length > 0 %}
+      {% if can_process %}
         <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fa fa-refresh"></i> Atualizar <span class="caret"></span>
+          <i class="fa fa-refresh"></i> Processar <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-          <li><a data-action="update" data-target="selected" href="#">Registros selecionados</a></li>
-          <li><a data-action="update" data-target="all" href="#">Todos os registros</a></li>
+          <li><a data-action="process" data-target="selected" href="#">Registros selecionados</a></li>
+          <li><a data-action="process" data-target="all" href="#">Todos os registros</a></li>
         </ul>
       {% else %}
         <button type="button" class="btn btn-info btn-sm disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fa fa-refresh"></i> Update <span class="caret"></span>
+          <i class="fa fa-refresh"></i> Processar <span class="caret"></span>
         </button>
       {% endif %}
     </div>
@@ -54,7 +44,7 @@
         <!-- custom_action: {{ custom_action.method_name }} -->
         <div class="btn-group" role="group">
           {% if custom_action.can_select_rows %}
-            {% if can_update and objects|length > 0 %} {# botão dropdown habilitado #}
+            {% if can_process and objects|length > 0 %} {# botão dropdown habilitado #}
               <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="{{ custom_action.icon_class }}"></i> {{ custom_action.label }} <span class="caret"></span>
               </button>
@@ -68,7 +58,7 @@
               </button>
             {% endif %}
           {% else %} {# botão simples habilitado #}
-            {% if can_update %}
+            {% if can_process %}
               <button type="button" class="btn btn-default btn-sm" data-action="{{ custom_action.method_name }}">
                 <i class="{{ custom_action.icon_class }}" aria-hidden="true"></i> {{ custom_action.label }}
               </button>

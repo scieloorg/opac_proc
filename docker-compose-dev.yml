@@ -2,6 +2,12 @@ version: '2'
 
 services:
 
+  pushgateway:
+    image: prom/pushgateway
+    hostname: proc-pushgateway
+    ports:
+        - "9091:9091"
+
   mailhog:
     image: mailhog/mailhog:latest
     hostname: mailhog
@@ -9,7 +15,7 @@ services:
         - "8026:8025"
         - "1025:1025"
     # volumes:
-        # - /etc/localtime:/etc/localtime:ro
+    #     - /etc/localtime:/etc/localtime:ro
 
   mongo-proc:
     image: mongo:latest
@@ -19,7 +25,7 @@ services:
     ports:
         - "27027:27017"
     # volumes:
-        # - /etc/localtime:/etc/localtime:ro
+    #     - /etc/localtime:/etc/localtime:ro
 
   mongo-logs:
     image: mongo:latest
@@ -29,7 +35,7 @@ services:
     ports:
         - "27037:27017"
     # volumes:
-        # - /etc/localtime:/etc/localtime:ro
+    #     - /etc/localtime:/etc/localtime:ro
 
   redis:
     image: scieloorg/redis
@@ -39,7 +45,7 @@ services:
     ports:
         - "6379:6379"
     volumes:
-      - .:/data
+      - ./redis-data:/data
       # - /etc/localtime:/etc/localtime:ro
 
   rq-worker:
@@ -59,6 +65,7 @@ services:
       - mongo-logs:mongo-logs
       - redis:redis
       - mailhog:mailhog
+      - pushgateway:proc-pushgateway
     volumes:
       # - /etc/localtime:/etc/localtime:ro
       - .:/app
@@ -111,6 +118,11 @@ services:
       - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
       # Assets
       - OPAC_PROC_ASSETS_RAISE_ERROR=True
+      # Prometheus
+      - OPAC_PROMETHEUS_ENABLED=True
+      - OPAC_PROC_PROMPG_HOST=pushgateway
+      - OPAC_PROC_PROMPG_PORT=9091
+
   webapp:
     build:
       context: .
@@ -127,6 +139,7 @@ services:
       - mongo-logs:mongo-logs
       - redis:redis
       - mailhog:mailhog
+      - pushgateway:proc-pushgateway
     volumes:
       # - /etc/localtime:/etc/localtime:ro
       - .:/app
@@ -181,5 +194,9 @@ services:
       - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
       # Assets
       - OPAC_PROC_ASSETS_RAISE_ERROR=True
+      # Prometheus
+      - OPAC_PROMETHEUS_ENABLED=True
+      - OPAC_PROC_PROMPG_HOST=pushgateway
+      - OPAC_PROC_PROMPG_PORT=9091
     stdin_open: True
     tty: true

@@ -1,3 +1,5 @@
+const string VERSION = "1.0.0"
+
 exception ValueError {
     1: string message,
 }
@@ -36,7 +38,8 @@ struct issue_identifiers {
 
 struct journal_identifiers {
     1: string code,
-    2: string collection
+    2: string collection,
+    3: string processing_date
 }
 
 struct event_document {
@@ -61,6 +64,7 @@ struct event_journal {
 }
 
 service ArticleMeta {
+    string getInterfaceVersion(),
     list<event_document> article_history_changes(1: string collection, 2: string event, 3: string code, 4: string from_date, 5: string until_date, 6: i32 limit, 7: i32 offset) throws (1: ValueError value_err, 2:ServerError server_err),
     list<event_issue> issue_history_changes(1: string collection, 2: string event, 3: string code, 4: string from_date, 5: string until_date, 6: i32 limit, 7: i32 offset) throws (1: ValueError value_err, 2:ServerError server_err),
     list<event_journal> journal_history_changes(1: string collection, 2: string event, 3: string code, 4: string from_date, 5: string until_date, 6:i32 limit, 7: i32 offset) throws (1: ValueError value_err, 2:ServerError server_err),
@@ -69,7 +73,9 @@ service ArticleMeta {
     string get_issue(1: string code, 2: string collection, 3: bool replace_journal_metadata) throws (1: ValueError value_err, 2:ServerError server_err),
     string get_journal(1: string code, 2: string collection) throws (1: ValueError value_err, 2:ServerError server_err),
     list<article_identifiers> get_article_identifiers(1: optional string collection, 2: optional string issn, 3: optional string from_date, 4: optional string until_date, 5: i32 limit, 6: i32 offset, 7: optional string extra_filter) throws (1:ValueError value_err, 2:ServerError server_err),
+    string get_articles(1: optional string collection, 2: optional string issn, 3: optional string from_date, 4: optional string until_date, 5: i32 limit, 6: i32 offset, 7: optional string extra_filter, 8: optional bool replace_journal_metadata, 9: optional bool body) throws (1:ValueError value_err, 2:ServerError server_err),
     list<issue_identifiers> get_issue_identifiers(1: optional string collection, 2: optional string issn, 3: optional string from_date, 4: optional string until_date, 5: i32 limit, 6: i32 offset, 7: optional string extra_filter) throws (1:ValueError value_err, 2:ServerError server_err),
+    string get_issues(1: optional string collection, 2: optional string issn, 3: optional string from_date, 4: optional string until_date, 5: i32 limit, 6: i32 offset, 7: optional string extra_filter) throws (1:ValueError value_err, 2:ServerError server_err),
     list<journal_identifiers> get_journal_identifiers(1: optional string collection, 2: optional string issn, 3: i32 limit, 4: i32 offset, 5: optional string extra_filter) throws (1: ValueError value_err, 2:ServerError server_err),
     list<collection> get_collection_identifiers() throws(1: ServerError server_err),
     bool set_doaj_id(1: string code, 2: string collection, 3: string doaj_id, 4: string admintoken) throws (1: ValueError value_err, 2:ServerError server_err, 3:Unauthorized unauthorized_access),

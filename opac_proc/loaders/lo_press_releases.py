@@ -7,6 +7,7 @@ from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.models import (
     LoadPressRelease,
     TransformPressRelease)
+from opac_proc.datastore.identifiers_models import PressReleaseIdModel
 
 from opac_schema.v1.models import Journal as OpacJournal
 from opac_schema.v1.models import PressRelease as OpacPressRelease
@@ -32,6 +33,10 @@ class PressReleaseLoader(BaseLoader):
 
     load_model_class = LoadPressRelease
     load_model_instance = None
+
+    ids_model_class = PressReleaseIdModel
+    ids_model_name = 'PressReleaseIdModel'
+    ids_model_instance = None
 
     fields_to_load = [
         'journal',

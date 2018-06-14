@@ -37,6 +37,14 @@ class RQueues(Singleton):
             'article': 'qlo_articles',
             'press_release': 'qlo_press_releases',
             'news': 'qlo_news',
+        },
+        'sync_ids': {
+            'collection': 'qss_collections',
+            'journal': 'qss_journals',
+            'issue': 'qss_issues',
+            'article': 'qss_articles',
+            'press_release': 'qss_press_releases',
+            'news': 'qss_news',
         }
     }
 
@@ -58,6 +66,14 @@ class RQueues(Singleton):
             'news': None,
         },
         'load': {
+            'collection': None,
+            'journal': None,
+            'issue': None,
+            'article': None,
+            'press_release': None,
+            'news': None,
+        },
+        'sync_ids': {
             'collection': None,
             'journal': None,
             'issue': None,
@@ -95,4 +111,4 @@ class RQueues(Singleton):
 
     def enqueue(self, stage, model, task, *args, **kwargs):
         queue = self.get_queue(stage, model)
-        return queue.enqueue(task, args=args, kwargs=kwargs, timeout=2000)
+        return queue.enqueue(task, args=args, kwargs=kwargs, timeout=2000, result_ttl=0)

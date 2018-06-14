@@ -7,6 +7,7 @@ from opac_proc.datastore.models import (
     ExtractIssue,
     TransformIssue,
     TransformJournal)
+from opac_proc.datastore.identifiers_models import IssueIdModel
 from opac_proc.transformers.base import BaseTransformer
 from opac_proc.extractors.decorators import update_metadata
 
@@ -25,6 +26,9 @@ class IssueTransformer(BaseTransformer):
 
     transform_model_class = TransformIssue
     transform_model_instance = None
+
+    ids_model_class = IssueIdModel
+    ids_model_instance = None
 
     def get_extract_model_instance(self, key):
         # retornamos uma instancia de ExtractJounal

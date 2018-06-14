@@ -79,7 +79,7 @@ dev_compose_make_test: dev_compose_up
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec webapp python opac_proc/manage.py test
 
 dev_compose_scale_workers: dev_compose_up
-	@docker-compose -f $(COMPOSE_FILE_DEV) scale rq-worker=8
+	@docker-compose -f $(COMPOSE_FILE_DEV) scale rq-worker=4
 
 test:
 	@python opac_proc/manage.py test

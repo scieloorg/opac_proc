@@ -19,8 +19,7 @@ OPAC_PROC_LOGS_DB_NAME = get_opac_logs_db_name()
 
 class LoadBaseListView(ListView):
     stage = 'load'
-    can_create = True
-    can_update = True
+    can_process = True
     can_delete = True
 
 
@@ -37,27 +36,27 @@ class LoadCollectionListView(LoadBaseListView):
         },
         {
             'field_label': u'Acrônimo',
-            'field_name': 'acronym',
+            'field_name': 'loaded_data.acronym',
             'field_type': 'string'
         },
         {
             'field_label': u'Nome',
-            'field_name': 'name',
+            'field_name': 'loaded_data.name',
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_label': u'Last update',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -66,31 +65,31 @@ class LoadCollectionListView(LoadBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'Acrônimo',
-            'field_name': 'acronym',
+            'field_name': 'loaded_data.acronym',
             'field_type': 'string'
         },
         {
             'field_label': u'Nome',
-            'field_name': 'name',
+            'field_name': 'loaded_data.name',
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_label': u'Last update',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -109,22 +108,32 @@ class LoadJournalListView(LoadBaseListView):
         },
         {
             'field_label': u'Aconym',
-            'field_name': 'acronym',
+            'field_name': 'loaded_data.acronym',
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_label': u'Print ISSN',
+            'field_name': 'loaded_data.print_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'SciELO ISSN',
+            'field_name': 'loaded_data.scielo_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -137,22 +146,32 @@ class LoadJournalListView(LoadBaseListView):
         },
         {
             'field_label': u'Aconym',
-            'field_name': 'acronym',
+            'field_name': 'loaded_data.acronym',
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_label': u'Print ISSN',
+            'field_name': 'loaded_data.print_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'SciELO ISSN',
+            'field_name': 'loaded_data.scielo_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Must reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -171,22 +190,80 @@ class LoadIssueListView(LoadBaseListView):
         },
         {
             'field_label': u'PID',
-            'field_name': 'pid',
+            'field_name': 'loaded_data.pid',
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_label': u'Year',
+            'field_name': 'loaded_data.year',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Volume',
+            'field_name': 'loaded_data.volume',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Number',
+            'field_name': 'loaded_data.number',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Type',
+            'field_name': 'loaded_data.type',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
+            'field_type': 'boolean'
+        },
+    ]
+
+    list_filters = [
+        {
+            'field_label': u'UUID',
+            'field_name': 'uuid',
+            'field_type': 'uuid'
+        },
+        {
+            'field_label': u'Aconym',
+            'field_name': 'loaded_data.acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Print ISSN',
+            'field_name': 'loaded_data.print_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'SciELO ISSN',
+            'field_name': 'loaded_data.scielo_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Last update',
+            'field_name': 'metadata.updated_at',
+            'field_type': 'date_time'
+        },
+        {
+            'field_label': u'Process completed?',
+            'field_name': 'metadata.process_completed',
+            'field_type': 'boolean'
+        },
+        {
+            'field_label': u'Must reprocess?',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -209,18 +286,18 @@ class LoadArticleListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_label': u'Last update',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -229,7 +306,7 @@ class LoadArticleListView(LoadBaseListView):
         {
             'field_label': u'UUID',
             'field_name': 'uuid',
-            'field_type': 'string'
+            'field_type': 'uuid'
         },
         {
             'field_label': u'PID',
@@ -237,18 +314,18 @@ class LoadArticleListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update:',
-            'field_name': 'updated_at',
+            'field_label': u'Last update',
+            'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'process_completed',
+            'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'must_reprocess',
+            'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
     ]
@@ -272,8 +349,7 @@ class LoadLogListView(LoadBaseListView):
     model_class = models.LoadLog
     model_name = 'loadlog'
     process_class = None  # logs somente tem o Delete
-    can_create = False
-    can_update = False
+    can_process = False
     can_delete = True
     page_title = "Load: Logs"
     page_subtitle = "most recent first"

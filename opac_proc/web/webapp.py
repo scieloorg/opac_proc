@@ -5,7 +5,7 @@ from raven.contrib.flask import Sentry
 import logging
 import rq_dashboard
 import rq_scheduler_dashboard
-
+import custom_jinja_filters
 from werkzeug.contrib.fixers import ProxyFix
 from flask import Flask, redirect, url_for
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
@@ -66,6 +66,10 @@ def regiter_bluprints(app):
     app.register_blueprint(rq_dashboard.blueprint, url_prefix='/dashboard')
 
 
+def register_jinja_filters(app):
+    app.jinja_env.filters['get_mongo_obj_value'] = custom_jinja_filters.get_mongo_obj_value
+
+
 def create_app(test_mode=False):
     app = Flask(
         __name__,
@@ -87,6 +91,8 @@ def create_app(test_mode=False):
     register_extensions(app)
     # blueprints
     regiter_bluprints(app)
+    # jinja custom filters
+    register_jinja_filters(app)
 
     app.wsgi_app = ProxyFix(app.wsgi_app)
     urls.add_url_rules(app)

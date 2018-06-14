@@ -1,5 +1,5 @@
 <nav class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
+  <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
         <span class="sr-only">Toggle navigation</span>
@@ -12,6 +12,34 @@
     <div id="navbar" class="collapse navbar-collapse">
       {% if current_user.is_authenticated %}
         <ul class="nav navbar-nav">
+
+          {# IDENTIFIERS #}
+          <li class="dropdown {% if request.path.startswith('/sync_ids/') %} active {% endif %}">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-info"></i> Ids <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li {% if request.path == url_for('sync_ids.collection_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('sync_ids.collection_list') }}">Collections</a>
+              </li>
+              <li {% if request.path == url_for('sync_ids.journal_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('sync_ids.journal_list') }}">Journals</a>
+              </li>
+              <li {% if request.path == url_for('sync_ids.issue_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('sync_ids.issue_list') }}">Issues</a>
+              </li>
+              <li {% if request.path == url_for('sync_ids.article_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('sync_ids.article_list') }}">Articles</a>
+              </li>
+              <li role="separator" class="divider"></li>
+              <li {% if request.path == url_for('sync_ids.news_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('sync_ids.news_list') }}">News</a>
+              </li>
+              <li {% if request.path == url_for('sync_ids.press_release_list') %} class="active" {% endif %}>
+                <a href="{{ url_for('sync_ids.press_release_list') }}">Press Releases</a>
+              </li>
+            </ul>
+          </li>
 
           {# EXTRACT #}
           <li class="dropdown {% if request.path.startswith('/extract/') %} active {% endif %}">
@@ -166,6 +194,13 @@
             <a href="{{ url_for('default.message_list') }}">
               <i class="fa fa-envelope"></i>
               Messages
+            </a>
+          </li>
+          {# MESSAGES #}
+          <li {% if request.path.startswith(url_for('timeline')) %} class="active" {% endif %}>
+            <a href="{{ url_for('timeline') }}">
+              <i class="fa fa-clock-o"></i>
+              Timeline
             </a>
           </li>
           <li class="dropdown {% if request.path.startswith('/accounts/') %} active {% endif %}">

@@ -8,6 +8,7 @@ from opac_proc.datastore.models import (
     TransformArticle,
     TransformIssue,
     TransformJournal)
+from opac_proc.datastore.identifiers_models import ArticleIdModel
 from opac_proc.transformers.base import BaseTransformer
 from opac_proc.extractors.decorators import update_metadata
 
@@ -28,6 +29,9 @@ class ArticleTransformer(BaseTransformer):
 
     transform_model_class = TransformArticle
     transform_model_instance = None
+
+    ids_model_class = ArticleIdModel
+    ids_model_instance = None
 
     def get_extract_model_instance(self, key):
         # retornamos uma instancia de ExtractJounal
@@ -150,7 +154,7 @@ class ArticleTransformer(BaseTransformer):
         if hasattr(xylose_article, 'authors') and xylose_article.authors:
             self.transform_model_instance['authors'] = ['%s, %s' % (a['surname'], a['given_names']) for a in xylose_article.authors]
 
-        # PDFs
+        # # PDFs
         if hasattr(xylose_article, 'xml_languages') or hasattr(xylose_article, 'fulltexts'):
             asset_pdf = AssetPDF(xylose_article)
 

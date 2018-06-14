@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask import json
+from articlemeta.client import RestfulClient
 
 from opac_proc.extractors.ex_collections import CollectionExtractor
 from opac_proc.extractors.ex_journals import JournalExtractor
@@ -7,14 +7,15 @@ from opac_proc.extractors.ex_issues import IssueExtractor
 from opac_proc.extractors.ex_articles import ArticleExtractor
 from opac_proc.extractors.ex_press_releases import PressReleaseExtractor
 from opac_proc.extractors.ex_news import NewsExtractor
-from xylose.scielodocument import Journal as xylose_journal
 
-from opac_proc.datastore import models
+from opac_proc.datastore import identifiers_models
+from opac_proc.datastore.models import ExtractPressRelease, ExtractNews
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
+from opac_proc.source_sync.utils import chunks
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "extract")
@@ -26,128 +27,145 @@ else:
 #                   COLLECTION                        #
 # --------------------------------------------------- #
 
-def task_extract_collection():
-    acronym = config.OPAC_PROC_COLLECTION
-    extractor = CollectionExtractor(acronym)
+
+def task_extract_one_collection():
+    """
+        Task para processar Extração de UM modelo: Collection
+    """
+    extractor = CollectionExtractor()
     extractor.extract()
     extractor.save()
 
 
-def task_collection_update(ids=None):
-    get_db_connection()
+def task_extract_selected_collections(selected_uuids):
+    """
+        Task para processar Extração de um LISTA de UUIDs do modelo: Collection
+    """
+
+    r_queues = RQueues()
+    for uuid in selected_uuids:
+        # para o caso da coleção, não precisamos nenhum parâmetro.
+        # somente garantimos que rodamos para todos os uuids no banco
+        # que deveria ser somente um.
+        r_queues.enqueue('extract', 'collection', task_extract_one_collection)
+
+
+def task_extract_all_collections():
+    """
+        Task para processar Extração de TODOS os registros do modelo: Collection
+    """
     stage = 'extract'
     model = 'collection'
+    source_ids_model_class = identifiers_models.CollectionIdModel
+    get_db_connection()
     r_queues = RQueues()
+    SLICE_SIZE = 1000
 
-    if ids is None:  # update all collections
-        models.ExtractCollection.objects.all().update(must_reprocess=True)
-        for collection in models.ExtractCollection.objects.all():
-            r_queues.enqueue(stage, model, task_extract_collection)
+    list_of_all_uuids = source_ids_model_class.objects.all().values_list('uuid')
+    if len(list_of_all_uuids) <= SLICE_SIZE:
+        uuid_as_string_list = [str(uuid) for uuid in list_of_all_uuids]
+        r_queues.enqueue(stage, model, task_extract_selected_collections, uuid_as_string_list)
     else:
-        for oid in ids:
-            try:
-                obj = models.ExtractCollection.objects.get(pk=oid)
-                obj.update(must_reprocess=True)
-                obj.reload()
-                r_queues.enqueue(stage, model, task_extract_collection)
-            except Exception as e:
-                logger.error('models.ExtractCollection %s. pk: %s' % (str(e), oid))
-
-
-def task_collection_create():
-    get_db_connection()
-    stage = 'extract'
-    model = 'collection'
-    r_queues = RQueues()
-    r_queues.enqueue(stage, model, task_extract_collection)
+        list_of_list_of_uuids = list(chunks(list_of_all_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_extract_selected_collections, uuid_as_string_list)
 
 
 # --------------------------------------------------- #
 #                   JOURNALS                          #
 # --------------------------------------------------- #
 
-def task_extract_journal(acronym, issn):
-    extractor = JournalExtractor(acronym, issn)
+
+def task_extract_one_journal(issn):
+    """
+        Task para processar Extração de UM modelo: Journal
+    """
+    extractor = JournalExtractor(issn)
     extractor.extract()
     extractor.save()
 
 
-def task_journal_update(ids=None):
+def task_extract_selected_journals(selected_uuids):
+    """
+        Task para processar Extração de um LISTA de UUIDs do modelo: Journal
+    """
+    get_db_connection()
+    r_queues = RQueues()
+    source_ids_model_class = identifiers_models.JournalIdModel
+    issns_iter = source_ids_model_class.objects.filter(uuid__in=selected_uuids).values_list('journal_issn')
+    for issn in issns_iter:
+        r_queues.enqueue('extract', 'journal', task_extract_one_journal, issn)
+
+
+def task_extract_all_journals():
+    """
+        Task para processar Extração de TODOS os registros do modelo: Journal
+    """
     get_db_connection()
     stage = 'extract'
     model = 'journal'
     r_queues = RQueues()
-    collection = models.ExtractCollection.objects.all().first()
-    if ids is None:  # update all collections
-        models.ExtractJournal.objects.all().update(must_reprocess=True)
-        for journal in models.ExtractJournal.objects.all():
-            r_queues.enqueue(stage, model, task_extract_journal, collection.acronym, journal.code)
+    source_ids_model_class = identifiers_models.JournalIdModel
+    SLICE_SIZE = 1000
+
+    list_of_all_uuids = source_ids_model_class.objects.all().values_list('uuid')
+    if len(list_of_all_uuids) <= SLICE_SIZE:
+        uuid_as_string_list = [str(uuid) for uuid in list_of_all_uuids]
+        r_queues.enqueue(stage, model, task_extract_selected_journals, uuid_as_string_list)
     else:
-        for oid in ids:
-            try:
-                obj = models.ExtractJournal.objects.get(pk=oid)
-                obj.update(must_reprocess=True)
-                obj.reload()
-                r_queues.enqueue(stage, model, task_extract_journal, collection.acronym, obj.code)
-            except Exception as e:
-                logger.error('models.ExtractJournal %s. pk: %s' % (str(e), oid))
-
-
-def task_journal_create():
-    get_db_connection()
-    stage = 'extract'
-    model = 'journal'
-    r_queues = RQueues()
-
-    collection = models.ExtractCollection.objects.all().first()
-
-    for child in collection.children_ids:
-        r_queues.enqueue(stage, model, task_extract_journal, collection.acronym, child['issn'])
+        list_of_list_of_uuids = list(chunks(list_of_all_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_extract_selected_journals, uuid_as_string_list)
 
 
 # --------------------------------------------------- #
 #                   ISSUES                            #
 # --------------------------------------------------- #
 
-def task_extract_issue(acronym, issue_id):
-    extractor = IssueExtractor(acronym, issue_id)
+def task_extract_one_issue(issue_pid):
+    """
+        Task para processar Extração de UM modelo: Issue
+    """
+    extractor = IssueExtractor(issue_pid)
     extractor.extract()
     extractor.save()
 
 
-def task_issue_update(ids=None):
+def task_extract_selected_issues(selected_uuids):
+    """
+        Task para processar Extração de um LISTA de UUIDs do modelo: Issue
+    """
+    get_db_connection()
+    r_queues = RQueues()
+    source_ids_model_class = identifiers_models.IssueIdModel
+
+    pids_iter = source_ids_model_class.objects.filter(uuid__in=selected_uuids).values_list('issue_pid')
+    for issue_pid in pids_iter:
+        r_queues.enqueue('extract', 'issue', task_extract_one_issue, issue_pid)
+
+
+def task_extract_all_issues():
+    """
+        Task para processar Extração de TODOS os registros do modelo: Issue
+    """
     get_db_connection()
     stage = 'extract'
     model = 'issue'
     r_queues = RQueues()
+    source_ids_model_class = identifiers_models.IssueIdModel
+    SLICE_SIZE = 1000
 
-    if ids is None:  # update all collections
-        models.ExtractIssue.objects.all().update(must_reprocess=True)
-        for issue in models.ExtractIssue.objects.all():
-            r_queues.enqueue(stage, model, task_extract_issue, issue.code)
+    list_of_all_uuids = source_ids_model_class.objects.all().values_list('uuid')
+    if len(list_of_all_uuids) <= SLICE_SIZE:
+        uuid_as_string_list = [str(uuid) for uuid in list_of_all_uuids]
+        r_queues.enqueue(stage, model, task_extract_selected_issues, uuid_as_string_list)
     else:
-        for oid in ids:
-            try:
-                obj = models.ExtractIssue.objects.get(pk=oid)
-                obj.update(must_reprocess=True)
-                obj.reload()
-                r_queues.enqueue(stage, model, task_extract_issue, obj.code)
-            except Exception as e:
-                logger.error('models.ExtractIssue %s. pk: %s' % (str(e), oid))
-
-
-def task_issue_create():
-    get_db_connection()
-    stage = 'extract'
-    model = 'issue'
-    r_queues = RQueues()
-
-    collection = models.ExtractCollection.objects.all().first()
-
-    for child in collection.children_ids:
-        issues_ids = child['issues_ids']
-        for issue_pid in issues_ids:
-            r_queues.enqueue(stage, model, task_extract_issue, collection.acronym, issue_pid)
+        list_of_list_of_uuids = list(chunks(list_of_all_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_extract_selected_issues, uuid_as_string_list)
 
 
 # --------------------------------------------------- #
@@ -155,47 +173,48 @@ def task_issue_create():
 # --------------------------------------------------- #
 
 
-def task_extract_article(acronym, article_id):
-    extractor = ArticleExtractor(acronym, article_id)
+def task_extract_one_article(article_pid):
+    """
+        Task para processar Extração de UM modelo: Article
+    """
+    extractor = ArticleExtractor(article_pid)
     extractor.extract()
     extractor.save()
 
 
-def task_article_update(ids=None):
+def task_extract_selected_articles(selected_uuids):
+    """
+        Task para processar Extração de um LISTA de UUIDs do modelo: Issue
+    """
+    get_db_connection()
+    r_queues = RQueues()
+    source_ids_model_class = identifiers_models.ArticleIdModel
+
+    pids_iter = source_ids_model_class.objects.filter(uuid__in=selected_uuids).values_list('article_pid')
+    for article_pid in pids_iter:
+        r_queues.enqueue('extract', 'article', task_extract_one_article, article_pid)
+
+
+def task_extract_all_articles(uuids=None):
+    """
+        Task para processar Extração de TODOS os registros do modelo: Article
+    """
     get_db_connection()
     stage = 'extract'
     model = 'article'
     r_queues = RQueues()
+    source_ids_model_class = identifiers_models.ArticleIdModel
+    SLICE_SIZE = 1000
 
-    collection = models.ExtractCollection.objects.all().first()
-
-    if ids is None:  # update all collections
-        models.ExtractArticle.objects.all().update(must_reprocess=True)
-        for article in models.ExtractArticle.objects.all():
-            r_queues.enqueue(stage, model, task_extract_article, collection.acronym, article.code)
+    list_of_all_uuids = source_ids_model_class.objects.all().values_list('uuid')
+    if len(list_of_all_uuids) <= SLICE_SIZE:
+        uuid_as_string_list = [str(uuid) for uuid in list_of_all_uuids]
+        r_queues.enqueue(stage, model, task_extract_selected_articles, uuid_as_string_list)
     else:
-        for oid in ids:
-            try:
-                obj = models.ExtractArticle.objects.get(pk=oid)
-                obj.update(must_reprocess=True)
-                obj.reload()
-                r_queues.enqueue(stage, model, task_extract_article, collection.acronym, obj.code)
-            except Exception as e:
-                logger.error('models.ExtractArticle %s. pk: %s' % (str(e), oid))
-
-
-def task_article_create():
-    get_db_connection()
-    stage = 'extract'
-    model = 'article'
-    r_queues = RQueues()
-
-    collection = models.ExtractCollection.objects.all().first()
-
-    for child in collection.children_ids:
-        articles_ids = child['articles_ids']
-        for article_pid in articles_ids:
-            r_queues.enqueue(stage, model, task_extract_article, collection.acronym, article_pid)
+        list_of_list_of_uuids = list(chunks(list_of_all_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_extract_selected_articles, uuid_as_string_list)
 
 
 # --------------------------------------------------- #
@@ -203,70 +222,67 @@ def task_article_create():
 # --------------------------------------------------- #
 
 
-def task_extract_press_release(acronym, url, lang):
-    extractor = PressReleaseExtractor(acronym, url, lang)
+def task_extract_one_press_release(journal_acronym, url, lang):
+    """
+        Task para processar Extração de UM modelo: Press Release
+    """
+    extractor = PressReleaseExtractor(journal_acronym, url, lang)
     pr_entries = extractor.get_feed_entries()
     for pr_entry in pr_entries:
         extractor.extract(pr_entry)
         extractor.save()
 
 
-def task_press_release_update(ids=None):
+def task_extract_selected_press_releases(selected_uuids):
+    """
+        Task para processar Extração de um LISTA de UUIDs do modelo: Press Release
+    """
     get_db_connection()
-    stage = 'extract'
-    model = 'press_release'
     r_queues = RQueues()
 
-    if ids is None:  # update all collections
-        models.ExtractPressRelease.objects.all().update(must_reprocess=True)
-        for pr in models.ExtractPressRelease.objects.all():
-            r_queues.enqueue(
-                stage, model,
-                task_extract_press_release,
-                acronym=pr.journal_acronym,
-                url=pr.feed_url_used,
-                lang=pr.feed_lang)
-    else:
-        for oid in ids:
-            try:
-                obj = models.ExtractPressRelease.objects.get(pk=oid)
-                obj.update(must_reprocess=True)
-                obj.reload()
-                r_queues.enqueue(
-                    stage, model,
-                    task_extract_press_release,
-                    acronym=obj.journal_acronym,
-                    url=obj.feed_url_used,
-                    lang=obj.feed_lang)
-            except models.ExtractPressRelease.DoesNotExist as e:
-                logger.error('models.ExtractPressRelease %s. pk: %s' % (str(e), oid))
+    extracted_press_releases_selected = ExtractPressRelease.objects.filter(uuid__in=selected_uuids)
+    for ex_pr in extracted_press_releases_selected:
+        r_queues.enqueue('extract', 'press_release',
+                         task_extract_one_press_release,
+                         ex_pr.journal_acronym,
+                         ex_pr.feed_url_used, ex_pr.feed_lang)
 
 
-def task_press_release_create():
-    get_db_connection()
-    stage = 'extract'
-    model = 'press_release'
+def task_extract_all_press_releases():
+    """
+        Task para processar Extração de TODOS os registros do modelo: Press Release
+    """
+
+    def get_all_journals_acronyms():
+
+        domain = "%s:%s" % (config.ARTICLE_META_REST_DOMAIN,
+                            config.ARTICLE_META_REST_PORT)
+
+        api_client = RestfulClient(domain)
+        acronyms = []
+        for journal in api_client.journals(collection=config.OPAC_PROC_COLLECTION):
+            acronyms.append(journal.acronym)
+        return acronyms
+
     r_queues = RQueues()
-
-    for journal in models.ExtractJournal.objects.all():
-        journal_dict = json.loads(journal.to_json())
-        acronym = xylose_journal(journal_dict).acronym
-
+    journal_acronyms = get_all_journals_acronyms()
+    for j_acronym in journal_acronyms:
         for lang, feed in config.RSS_PRESS_RELEASES_FEEDS_BY_CATEGORY.items():
-            url = feed['url'].format(lang, acronym)
-            r_queues.enqueue(
-                stage, model,
-                task_extract_press_release,
-                acronym=acronym,
-                url=url,
-                lang=lang)
+            feed_url_by_lang = feed['url'].format(lang, j_acronym)
+            r_queues.enqueue('extract', 'press_release',
+                             task_extract_one_press_release,
+                             j_acronym, feed_url_by_lang, lang)
+
 
 # --------------------------------------------------- #
 #                    NEWS                             #
 # --------------------------------------------------- #
 
 
-def task_extract_news(url, lang):
+def task_extract_one_news(url, lang):
+    """
+        Task para processar Extração de UM modelo: News
+    """
     extractor = NewsExtractor(url, lang)
     news_entries = extractor.get_feed_entries()
     for news_entry in news_entries:
@@ -274,37 +290,25 @@ def task_extract_news(url, lang):
         extractor.save()
 
 
-def task_news_update(ids=None):
+def task_extract_selected_news(selected_uuids):
+    """
+        Task para processar Extração de um LISTA de UUIDs do modelo: News
+    """
     get_db_connection()
-    stage = 'extract'
-    model = 'news'
     r_queues = RQueues()
 
-    if ids is None:  # update all collections
-        models.ExtractNews.objects.all().update(must_reprocess=True)
-        for news in models.ExtractNews.objects.all():
-            r_queues.enqueue(
-                stage, model,
-                task_extract_news,
-                url=news.feed_url_used,
-                lang=news.feed_lang)
-    else:
-        for oid in ids:
-            try:
-                obj = models.ExtractNews.objects.get(pk=oid)
-                obj.update(must_reprocess=True)
-                obj.reload()
-                r_queues.enqueue(
-                    stage, model,
-                    task_extract_news,
-                    url=obj.feed_url_used,
-                    lang=obj.feed_lang)
-            except models.ExtractNews.DoesNotExist as e:
-                logger.error('models.ExtractNews %s. pk: %s' % (str(e), oid))
+    extracted_news_selected = ExtractNews.objects.filter(uuid__in=selected_uuids)
+    for ex_news in extracted_news_selected:
+        r_queues.enqueue('extract', 'news',
+                         task_extract_one_news,
+                         ex_news.feed_url_used, ex_news.feed_lang)
 
 
-def task_news_create():
-    get_db_connection()
+def task_extract_all_news():
+    """
+        Task para processar Extração de TODOS os registros do modelo: News
+    """
+
     stage = 'extract'
     model = 'news'
     r_queues = RQueues()
@@ -313,6 +317,5 @@ def task_news_create():
         url = feed['url'].format(lang)
         r_queues.enqueue(
             stage, model,
-            task_extract_news,
-            url=url,
-            lang=lang)
+            task_extract_one_news,
+            url, lang)

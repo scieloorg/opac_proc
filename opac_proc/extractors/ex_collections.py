@@ -2,6 +2,7 @@
 import requests
 from datetime import datetime
 from opac_proc.datastore.models import ExtractCollection
+from opac_proc.datastore.identifiers_models import CollectionIdModel
 from opac_proc.extractors.base import BaseExtractor
 from opac_proc.extractors.decorators import update_metadata
 
@@ -18,15 +19,19 @@ PUBLICATION_SIZE_ENDPOINT = 'ajx/publication/size'
 
 class CollectionExtractor(BaseExtractor):
     acronym = None
-    children_ids = []
 
     extract_model_class = ExtractCollection
+    ids_model_class = CollectionIdModel
+    ids_model_name = 'CollectionIdModel'
 
-    def __init__(self, acronym):
+    def __init__(self):
         super(CollectionExtractor, self).__init__()
-        self.acronym = acronym
+        self.acronym = config.OPAC_PROC_COLLECTION
         self.get_instance_query = {
             'acronym': self.acronym
+        }
+        self.get_identifier_query = {
+            'collection_acronym': self.acronym
         }
 
     def _get_json_metrics(self, metric_name, url, params):
@@ -94,30 +99,9 @@ class CollectionExtractor(BaseExtractor):
             raise Exception(msg)
 
         logger.info(u'Extração de ISSNs da coleção: %s - %s' % (self.acronym, datetime.now()))
-        # recuperamos os identificadores ISSNs
-        journals_ids = self.articlemeta.get_journal_identifiers(collection=self.acronym)
-        for issn in journals_ids:
-            issues_ids = self.articlemeta.get_issues_identifiers(collection=self.acronym, issn=issn)
-            articles_ids = self.articlemeta.get_article_identifiers(collection=self.acronym, issn=issn)
-
-            self.children_ids.append({
-                'issn': issn,
-                'issues_ids': [id for id in issues_ids],
-                'articles_ids': [id for id in articles_ids],
-            })
-
-        logger.info(u'Extraidos %s ISSNs da coleção: %s - %s' % (len(self.children_ids), self.acronym, datetime.now()))
-
-        if not self.children_ids:
-            msg = u"Não foi possível recuperar os ISSNs da Coleção (acronym: %s). A informação é vazía" % self.acronym
-            logger.error(msg)
-            raise Exception(msg)
-        else:
-            # atualizo self.metadata para que self.children_ids seja salvo junto com self.raw_data no save()
-            self.metadata['children_ids'] = self.children_ids
-
         # extração de metricas
-        self._raw_data['metrics'] = self._extract_metrics()
+        if self._raw_data['has_analytics']:
+            self._raw_data['metrics'] = self._extract_metrics()
 
         logger.info(u'Fim CollectionExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))

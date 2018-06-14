@@ -5,6 +5,7 @@ from opac_proc.datastore.models import (
     ExtractJournal,
     TransformJournal,
     TransformCollection)
+from opac_proc.datastore.identifiers_models import JournalIdModel
 from opac_proc.transformers.base import BaseTransformer
 from opac_proc.transformers.utils import trydate, validate_email
 from opac_proc.extractors.decorators import update_metadata
@@ -27,6 +28,9 @@ class JournalTransformer(BaseTransformer):
 
     transform_model_class = TransformJournal
     transform_model_instance = None
+
+    ids_model_class = JournalIdModel
+    ids_model_instance = None
 
     def get_extract_model_instance(self, key):
         # retornamos uma instancia de ExtractJounal

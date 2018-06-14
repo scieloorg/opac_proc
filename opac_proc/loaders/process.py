@@ -11,35 +11,35 @@ else:
 
 class ProcessLoadCollection(ProcessLoadBase):
     model_name = 'collection'
-    create_task = 'opac_proc.loaders.jobs.task_collection_create'
-    update_task = 'opac_proc.loaders.jobs.task_collection_update'
+    task_for_selected = 'opac_proc.loaders.jobs.task_load_selected_collections'
+    task_for_all = 'opac_proc.loaders.jobs.task_load_all_collections'
 
 
 class ProcessLoadJournal(ProcessLoadBase):
     model_name = 'journal'
-    create_task = 'opac_proc.loaders.jobs.task_journal_create'
-    update_task = 'opac_proc.loaders.jobs.task_journal_update'
+    task_for_selected = 'opac_proc.loaders.jobs.task_load_selected_journals'
+    task_for_all = 'opac_proc.loaders.jobs.task_load_all_journals'
 
 
 class ProcessLoadIssue(ProcessLoadBase):
     model_name = 'issue'
-    create_task = 'opac_proc.loaders.jobs.task_issue_create'
-    update_task = 'opac_proc.loaders.jobs.task_issue_update'
+    task_for_selected = 'opac_proc.loaders.jobs.task_load_selected_issues'
+    task_for_all = 'opac_proc.loaders.jobs.task_load_all_issues'
 
 
 class ProcessLoadArticle(ProcessLoadBase):
     model_name = 'article'
-    create_task = 'opac_proc.loaders.jobs.task_article_create'
-    update_task = 'opac_proc.loaders.jobs.task_article_update'
+    task_for_selected = 'opac_proc.loaders.jobs.task_load_selected_articles'
+    task_for_all = 'opac_proc.loaders.jobs.task_load_all_articles'
 
 
 class ProcessLoadPressRelease(ProcessLoadBase):
     model_name = 'press_release'
-    create_task = 'opac_proc.loaders.jobs.task_press_release_create'
-    update_task = 'opac_proc.loaders.jobs.task_press_release_update'
+    task_for_selected = 'opac_proc.loaders.jobs.task_load_selected_press_releases'
+    task_for_all = 'opac_proc.loaders.jobs.task_load_all_press_releases'
 
 
 class ProcessLoadNews(ProcessLoadBase):
     model_name = 'news'
-    create_task = 'opac_proc.loaders.jobs.task_news_create'
-    update_task = 'opac_proc.loaders.jobs.task_news_update'
+    task_for_selected = 'opac_proc.loaders.jobs.task_load_selected_news'
+    task_for_all = 'opac_proc.loaders.jobs.task_load_all_news'

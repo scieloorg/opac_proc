@@ -2,6 +2,7 @@
 from opac_proc.datastore.models import (
     ExtractCollection,
     TransformCollection)
+from opac_proc.datastore.identifiers_models import CollectionIdModel
 from opac_proc.transformers.base import BaseTransformer
 from opac_proc.extractors.decorators import update_metadata
 
@@ -21,6 +22,9 @@ class CollectionTransformer(BaseTransformer):
     transform_model_class = TransformCollection
     transform_model_instance = None
 
+    ids_model_class = CollectionIdModel
+    ids_model_instance = None
+
     def get_extract_model_instance(self, key):
         # retornamos uma instancia de ExtractCollection
         # buscando pela key (=acronym)
@@ -33,7 +37,6 @@ class CollectionTransformer(BaseTransformer):
         self.transform_model_instance['uuid'] = self.extract_model_instance.uuid
         self.transform_model_instance['acronym'] = self.extract_model_instance.acronym
         self.transform_model_instance['name'] = self.extract_model_instance.name
-        self.transform_model_instance['children_ids'] = self.extract_model_instance.children_ids
         self.transform_model_instance['metrics'] = self.extract_model_instance.metrics
         logger.info(u'Fim CollectionTransformer.transform')
         return self.transform_model_instance

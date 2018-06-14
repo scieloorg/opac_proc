@@ -99,7 +99,7 @@ class ArticleMeta(object):
             jjournal = None
             try:
                 jjournal = json.loads(journal)
-                logger.info('Journal loaded: %s_%s' % (collection, code))
+                logger.info(u'Journal loaded: %s_%s' % (collection, code))
             except Exception, e:
                 msg = 'Fail to load JSON when retrienving Journal: %s_%s. Exception: %s' % (
                     collection, code, str(e))
@@ -123,7 +123,7 @@ class ArticleMeta(object):
             jissue = None
             try:
                 jissue = json.loads(issue)
-                logger.info('Issue loaded: %s_%s' % (collection, code))
+                logger.info(u'Issue loaded: %s_%s' % (collection, code))
             except Exception, e:
                 msg = 'Fail to load JSON when retrienving Issue: %s_%s. Exception: %s' % (
                     collection, code, str(e))
@@ -132,13 +132,13 @@ class ArticleMeta(object):
             else:
                 return jissue
 
-    def get_article(self, code, collection, body=True):
+    def get_article(self, code, collection, fmt='xylose', body=True):
         try:
             article = self.client.get_article(
                 code=code,
                 collection=collection,
                 replace_journal_metadata=True,
-                fmt='xylose',
+                fmt=fmt,
                 body=body)
         except Exception, e:
             msg = 'Error retrieving Article: %s_%s. Exception: %s' % (
@@ -163,8 +163,12 @@ class ArticleMeta(object):
             for collection in self.client.get_collection_identifiers():
                 collections_list.append({
                     'code': collection.code,
-                    'name': collection.name,
                     'acronym': collection.acronym,
+                    'acronym2letters': collection.acronym2letters,
+                    'status': collection.status,
+                    'domain': collection.domain,
+                    'name': collection.name,
+                    'has_analytics': collection.has_analytics,
                 })
             return collections_list
         except Exception, e:

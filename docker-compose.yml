@@ -2,6 +2,12 @@ version: '2'
 
 services:
 
+  pushgateway:
+    image: prom/pushgateway
+    hostname: proc-pushgateway
+    ports:
+        - "9091:9091"
+
   mongo-proc:
     image: mongo:latest
     restart: always
@@ -98,6 +104,11 @@ services:
       - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
       # Assets
       - OPAC_PROC_ASSETS_RAISE_ERROR=False
+      # Prometheus
+      - OPAC_PROMETHEUS_ENABLED=True
+      - OPAC_PROC_PROMPG_HOST=pushgateway
+      - OPAC_PROC_PROMPG_PORT=9091
+
   webapp:
     images: scieloorg/opac_proc
     user: nobody
@@ -163,3 +174,8 @@ services:
       - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
       # Assets
       - OPAC_PROC_ASSETS_RAISE_ERROR=False
+      # Prometheus
+      - OPAC_PROMETHEUS_ENABLED=True
+      - OPAC_PROC_PROMPG_HOST=pushgateway
+      - OPAC_PROC_PROMPG_PORT=9091
+

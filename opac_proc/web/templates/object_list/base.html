@@ -82,7 +82,7 @@
             </th>
             {% for column in list_columns %}
               {% if loop.first %}
-                <td {% if column.field_name|lower == 'uuid' %} style="width: 300px" {% endif %}>
+                <td {% if column.field_name|lower == 'uuid' %} style="min-width: 320px" {% endif %}>
                   <a class="row-detail" href="{{ object.pk }}"> {# hack! URL de detail é relativo a URL de listagem #}
                     {{ mhelper.render_row_cell(object, column.field_name, column.field_type) }}
                   </a>

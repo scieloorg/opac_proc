@@ -6,8 +6,7 @@ from opac_proc.web.views.generics.list_views import ListView
 
 class MessageListView(ListView):
     stage = 'default'
-    can_create = False
-    can_update = False
+    can_process = False
     can_delete = True
     model_class = models.Message
     model_name = 'message'

@@ -3,18 +3,22 @@ from datetime import datetime
 from mongoengine import (
     Document,
     DynamicDocument,
-    EmbeddedDocument,
     EmbeddedDocumentField,
-    ReferenceField,
     signals,
     StringField,
     DateTimeField,
     BooleanField,
-    MapField,
 )
-from base_mixin import BaseMixin
+from base_mixin import BaseMixin, LoadedData
 
 from opac_proc.web import config
+from opac_proc.datastore import identifiers_models
+from opac_proc.source_sync.utils import (
+    parse_journal_issn_from_issue_code,
+    parse_journal_issn_from_article_code,
+    parse_issue_pid_from_article_code,
+)
+
 
 # #### EXTRACT MODELS
 
@@ -25,12 +29,31 @@ class ExtractCollection(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = TransformCollection.objects.get(uuid=uuid).first()
+            doc = TransformCollection.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.CollectionIdModel.objects.get(uuid=uuid)
+        except identifiers_models.CollectionIdModel.DoesNotExist:
+            pass
+        else:
+            doc.extract_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um CollectionDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': self.acronym,
+        }
 
     meta = {
         'collection': 'e_collection'
@@ -47,12 +70,32 @@ class ExtractJournal(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = TransformJournal.objects.get(uuid=uuid).first()
+            doc = TransformJournal.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.JournalIdModel.objects.get(uuid=uuid)
+        except identifiers_models.JournalIdModel.DoesNotExist as e:
+            raise e
+        else:
+            doc.extract_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um JournalDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': self.collection,
+            'journal_issn': self.code
+        }
 
     meta = {
         'collection': 'e_journal'
@@ -69,12 +112,33 @@ class ExtractIssue(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = TransformIssue.objects.get(uuid=uuid).first()
+            doc = TransformIssue.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.IssueIdModel.objects.get(uuid=uuid)
+        except identifiers_models.IssueIdModel.DoesNotExist:
+            pass
+        else:
+            doc.extract_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um IssueDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': self.collection,
+            'journal_issn': parse_journal_issn_from_issue_code(self.code),
+            'issue_pid': self.code
+        }
 
     meta = {
         'collection': 'e_issue'
@@ -91,12 +155,34 @@ class ExtractArticle(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = TransformArticle.objects.get(uuid=uuid).first()
+            doc = TransformArticle.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.ArticleIdModel.objects.get(uuid=uuid)
+        except identifiers_models.ArticleIdModel.DoesNotExist:
+            pass
+        else:
+            doc.extract_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um ArticleDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': self.collection,
+            'journal_issn': parse_journal_issn_from_article_code(self.code),
+            'issue_pid': parse_issue_pid_from_article_code(self.code),
+            'article_pid': self.code
+        }
 
     meta = {
         'collection': 'e_article'
@@ -113,12 +199,32 @@ class ExtractPressRelease(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = TransformPressRelease.objects.get(uuid=uuid).first()
+            doc = TransformPressRelease.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.PressReleaseIdModel.objects.get(uuid=uuid)
+        except identifiers_models.PressReleaseIdModel.DoesNotExist:
+            pass
+        else:
+            doc.extract_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'url_id': self.url_id
+        }
 
     meta = {
         'collection': 'e_press_release'
@@ -135,12 +241,32 @@ class ExtractNews(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = TransformNews.objects.get(uuid=uuid).first()
+            doc = TransformNews.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.NewsIdModel.objects.get(uuid=uuid)
+        except identifiers_models.NewsIdModel.DoesNotExist:
+            pass
+        else:
+            doc.extract_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'url_id': self.url_id
+        }
 
     meta = {
         'collection': 'e_news'
@@ -160,12 +286,31 @@ class TransformCollection(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = LoadCollection.objects.get(uuid=uuid).first()
+            doc = LoadCollection.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.CollectionIdModel.objects.get(uuid=uuid)
+        except identifiers_models.CollectionIdModel.DoesNotExist:
+            pass
+        else:
+            doc.transform_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um CollectionDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': self.acronym,
+        }
 
     meta = {
         'collection': 't_collection'
@@ -177,17 +322,50 @@ signals.post_save.connect(TransformCollection.post_save, sender=TransformCollect
 
 
 class TransformJournal(BaseMixin, DynamicDocument):
+
+    @property
+    def get_issn(self):
+        if hasattr(self, 'scielo_issn', False):
+            issn = self.scielo_issn
+        elif hasattr(self, 'eletronic_issn', False):
+            issn = self.eletronic_issn
+        elif hasattr(self, 'print_issn', False):
+            issn = self.print_issn
+        else:
+            raise ValueError('O modelo de Journal com uuid: %s não tem ISSN' % self.uuid)
+        return issn
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = LoadJournal.objects.get(uuid=uuid).first()
+            doc = LoadJournal.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.JournalIdModel.objects.get(uuid=uuid)
+        except identifiers_models.JournalIdModel.DoesNotExist as e:
+            raise e
+        else:
+            doc.transform_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um JournalDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': self.collection,
+            'journal_issn': self.get_issn
+        }
 
     meta = {
         'collection': 't_journal'
@@ -204,12 +382,33 @@ class TransformIssue(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = LoadIssue.objects.get(uuid=uuid).first()
+            doc = LoadIssue.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.IssueIdModel.objects.get(uuid=uuid)
+        except identifiers_models.IssueIdModel.DoesNotExist:
+            pass
+        else:
+            doc.transform_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um IssueDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'journal_issn': parse_journal_issn_from_issue_code(self.pid),
+            'issue_pid': self.pid
+        }
 
     meta = {
         'collection': 't_issue'
@@ -226,12 +425,34 @@ class TransformArticle(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = LoadArticle.objects.get(uuid=uuid).first()
+            doc = LoadArticle.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.ArticleIdModel.objects.get(uuid=uuid)
+        except identifiers_models.ArticleIdModel.DoesNotExist:
+            pass
+        else:
+            doc.transform_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um ArticleDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'journal_issn': parse_journal_issn_from_article_code(self.pid),
+            'issue_pid': parse_issue_pid_from_article_code(self.pid),
+            'article_pid': self.pid
+        }
 
     meta = {
         'collection': 't_article'
@@ -248,12 +469,32 @@ class TransformPressRelease(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = LoadPressRelease.objects.get(uuid=uuid).first()
+            doc = LoadPressRelease.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.PressReleaseIdModel.objects.get(uuid=uuid)
+        except identifiers_models.PressReleaseIdModel.DoesNotExist:
+            pass
+        else:
+            doc.transform_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'url_id': self.url
+        }
 
     meta = {
         'collection': 't_press_release'
@@ -270,12 +511,32 @@ class TransformNews(BaseMixin, DynamicDocument):
         Notificamos o modelos com este uuid que tem que ser reprocessado
         """
         try:
-            doc = LoadNews.objects.get(uuid=uuid).first()
+            doc = LoadNews.objects.get(uuid=uuid)
         except Exception:
             pass
         else:
-            doc['must_reprocess'] = True
+            doc['metadata']['must_reprocess'] = True
             doc.save()
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.NewsIdModel.objects.get(uuid=uuid)
+        except identifiers_models.NewsIdModel.DoesNotExist:
+            pass
+        else:
+            doc.transform_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'url_id': self.url
+        }
 
     meta = {
         'collection': 't_news'
@@ -290,8 +551,29 @@ signals.post_save.connect(TransformNews.post_save, sender=TransformNews)
 
 
 class LoadCollection(BaseMixin, DynamicDocument):
+    loaded_data = EmbeddedDocumentField(LoadedData)
+
     def update_reprocess_field(self, uuid):
         pass  # não precisa propagar mais
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.CollectionIdModel.objects.get(uuid=uuid)
+        except identifiers_models.CollectionIdModel.DoesNotExist:
+            pass
+        else:
+            doc.load_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um CollectionDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': self.loaded_data.acronym,
+        }
 
     meta = {
         'collection': 'l_collection'
@@ -303,8 +585,47 @@ signals.post_save.connect(LoadCollection.post_save, sender=LoadCollection)
 
 
 class LoadJournal(BaseMixin, DynamicDocument):
+    loaded_data = EmbeddedDocumentField(LoadedData)
+
+    @property
+    def get_issn(self):
+        if hasattr(self, 'loaded_data'):
+            loaded_data = self.loaded_data
+        else:
+            raise ValueError('O modelo de Journal com uuid: %s não tem loaded_data' % self.uuid)
+
+        if hasattr(loaded_data, 'scielo_issn', False):
+            issn = loaded_data.scielo_issn
+        elif hasattr(loaded_data, 'eletronic_issn', False):
+            issn = loaded_data.eletronic_issn
+        elif hasattr(loaded_data, 'print_issn', False):
+            issn = loaded_data.print_issn
+        else:
+            raise ValueError('O modelo de Journal com uuid: %s não tem ISSN' % self.uuid)
+        return issn
+
     def update_reprocess_field(self, uuid):
         pass  # não precisa propagar mais
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.JournalIdModel.objects.get(uuid=uuid)
+        except identifiers_models.JournalIdModel.DoesNotExist as e:
+            raise e
+        else:
+            doc.load_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um JournalDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': self.loaded_data.collection,
+            'journal_issn': self.get_issn
+        }
 
     meta = {
         'collection': 'l_journal'
@@ -316,8 +637,31 @@ signals.post_save.connect(LoadJournal.post_save, sender=LoadJournal)
 
 
 class LoadIssue(BaseMixin, DynamicDocument):
+    loaded_data = EmbeddedDocumentField(LoadedData)
+
     def update_reprocess_field(self, uuid):
         pass  # não precisa propagar mais
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.IssueIdModel.objects.get(uuid=uuid)
+        except identifiers_models.IssueIdModel.DoesNotExist:
+            pass
+        else:
+            doc.load_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um IssueDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'journal_issn': parse_journal_issn_from_issue_code(self.loaded_data.pid),
+            'issue_pid': self.loaded_data.pid
+        }
 
     meta = {
         'collection': 'l_issue'
@@ -329,8 +673,32 @@ signals.post_save.connect(LoadIssue.post_save, sender=LoadIssue)
 
 
 class LoadArticle(BaseMixin, DynamicDocument):
+    loaded_data = EmbeddedDocumentField(LoadedData)
+
     def update_reprocess_field(self, uuid):
         pass  # não precisa propagar mais
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.ArticleIdModel.objects.get(uuid=uuid)
+        except identifiers_models.ArticleIdModel.DoesNotExist:
+            pass
+        else:
+            doc.load_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um ArticleDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'journal_issn': parse_journal_issn_from_article_code(self.loaded_data.pid),
+            'issue_pid': parse_issue_pid_from_article_code(self.loaded_data.pid),
+            'article_pid': self.loaded_data.pid
+        }
 
     meta = {
         'collection': 'l_article'
@@ -342,8 +710,30 @@ signals.post_save.connect(LoadArticle.post_save, sender=LoadArticle)
 
 
 class LoadPressRelease(BaseMixin, DynamicDocument):
+    loaded_data = EmbeddedDocumentField(LoadedData)
+
     def update_reprocess_field(self, uuid):
         pass  # não precisa propagar mais
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.PressReleaseIdModel.objects.get(uuid=uuid)
+        except identifiers_models.PressReleaseIdModel.DoesNotExist:
+            pass
+        else:
+            doc.load_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'url_id': self.url
+        }
 
     meta = {
         'collection': 'l_press_release'
@@ -355,8 +745,30 @@ signals.post_save.connect(LoadPressRelease.post_save, sender=LoadPressRelease)
 
 
 class LoadNews(BaseMixin, DynamicDocument):
+    loaded_data = EmbeddedDocumentField(LoadedData)
+
     def update_reprocess_field(self, uuid):
         pass  # não precisa propagar mais
+
+    def update_identifier_model(self, uuid, execution_datetime):
+        try:
+            doc = identifiers_models.NewsIdModel.objects.get(uuid=uuid)
+        except identifiers_models.NewsIdModel.DoesNotExist:
+            pass
+        else:
+            doc.load_execution_date = execution_datetime
+            doc.save()
+
+    @property
+    def get_diff_model_data(self):
+        """
+        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        """
+        return {
+            'uuid': self.uuid,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
+            'url_id': self.url
+        }
 
     meta = {
         'collection': 'l_news'
@@ -394,6 +806,7 @@ class Message(Document):
     meta = {
         'collection': 'messages',
     }
+
 
 signals.pre_save.connect(Message.pre_save, sender=Message)
 
@@ -433,45 +846,4 @@ class DefaultLog(DynamicDocument):
         'max_documents': 100000,
         'collection': 'default_log',
         'db_alias': config.OPAC_PROC_LOG_MONGODB_NAME,
-    }
-
-
-# ## FINITE STATE MACHINES & STATES
-
-
-class MachineState(Document):
-    name = StringField(max_length=50, required=True, unique=True)
-    description = StringField(defult='')
-    is_initial_state = BooleanField(default=False)
-    is_final_state = BooleanField(default=False)
-    execution_started_at = DateTimeField(blank=True, null=True)
-    execution_finished_at = DateTimeField(blank=True, null=True)
-
-    def __unicode__(self):
-        return self.name
-
-    meta = {
-        'collection': 'fsm_state',
-    }
-
-
-class StateTransition(EmbeddedDocument):
-    on_success = ReferenceField(MachineState, required=True)
-    on_failure = ReferenceField(MachineState, required=True)
-
-
-class FiniteStateMachine(Document):
-    name = StringField(max_length=50, required=True, unique=True)
-    description = StringField(defult='')
-    current_state = ReferenceField(MachineState, null=True, blank=True)
-    execution_started_at = DateTimeField(blank=True, null=True)
-    execution_finished_at = DateTimeField(blank=True, null=True)
-    is_ready_to_run = BooleanField(default=False)
-    transition_map = MapField(EmbeddedDocumentField(StateTransition))
-
-    def __unicode__(self):
-        return self.name
-
-    meta = {
-        'collection': 'fsm',
     }
