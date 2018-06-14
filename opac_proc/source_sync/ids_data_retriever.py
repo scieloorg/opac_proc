@@ -46,7 +46,10 @@ class BaseIdDataRetriever(object):
             self._db = get_db_connection()
 
         if self.api_client is None:
-            self.api_client = RestfulClient()
+            domain = "%s:%s" % (config.ARTICLE_META_REST_DOMAIN,
+                                config.ARTICLE_META_REST_PORT)
+            self.api_client = RestfulClient(domain)
+
         super(BaseIdDataRetriever, self).__init__()
 
     def get_data_source_identifiers(self):

@@ -10,7 +10,12 @@ sys.path.append(PROJECT_PATH)
 
 from articlemeta.client import ThriftClient
 
-from opac_proc.web.config import OPAC_PROC_COLLECTION
+from opac_proc.web.config import (
+    OPAC_PROC_COLLECTION,
+    ARTICLE_META_THRIFT_DOMAIN,
+    ARTICLE_META_THRIFT_PORT,
+    ARTICLE_META_REST_DOMAIN,
+    ARTICLE_META_REST_PORT)
 
 from opac_proc.web.webapp import create_app
 from opac_proc.web.accounts.forms import EmailForm
@@ -55,7 +60,10 @@ manager.add_command("shell", Shell(make_context=make_shell_context))
 
 def get_issn_by_acron(collection, acron):
 
-    cl = ThriftClient()
+    domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
+                        ARTICLE_META_THRIFT_PORT)
+
+    cl = ThriftClient(domain)
 
     for journal in cl.journals(collection=collection):
 
@@ -66,7 +74,10 @@ def get_issn_by_acron(collection, acron):
 def get_issns_by_acrons(collection, acrons):
     issn_list = []
 
-    cl = ThriftClient()
+    domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
+                        ARTICLE_META_THRIFT_PORT)
+
+    cl = ThriftClient(domain)
 
     acrons = set(acrons)
 
@@ -118,7 +129,10 @@ def issue_labels_to_ids(collection, items):
 
     data_dict = {}
 
-    cl = ThriftClient()
+    domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
+                        ARTICLE_META_THRIFT_PORT)
+
+    cl = ThriftClient(domain)
 
     for issn, labels in items.items():
         d = data_dict.setdefault(issn, set())
@@ -141,7 +155,10 @@ def issue_ids_to_article_ids(collection, items):
 
     data_dict = {}
 
-    cl = ThriftClient()
+    domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
+                        ARTICLE_META_THRIFT_PORT)
+
+    cl = ThriftClient(domain)
 
     for issn, icodes in items.items():
         d = data_dict.setdefault(issn, [])

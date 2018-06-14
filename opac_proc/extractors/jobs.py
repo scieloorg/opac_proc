@@ -254,7 +254,11 @@ def task_extract_all_press_releases():
     """
 
     def get_all_journals_acronyms():
-        api_client = RestfulClient()
+
+        domain = "%s:%s" % (config.ARTICLE_META_REST_DOMAIN,
+                            config.ARTICLE_META_REST_PORT)
+
+        api_client = RestfulClient(domain)
         acronyms = []
         for journal in api_client.journals(collection=config.OPAC_PROC_COLLECTION):
             acronyms.append(journal.acronym)
