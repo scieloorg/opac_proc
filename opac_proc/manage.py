@@ -372,9 +372,9 @@ def process_load(issns=None, acrons=None, file=None):
     if issns or acrons:
         print u'Processando o(s) ISSN(s): %s' % issn_list
 
-        process_issn_issue(collection, issn_list, stage, lo_task_load_issue)
+        process_issn_issue(collection, issn_list, lo_task_load_issue, stage)
 
-        process_issn_article(collection, issn_list, stage, lo_task_load_article)
+        process_issn_article(collection, issn_list, lo_task_load_article, stage)
 
     if file:
         items = get_file_items(collection.acronym, file)
