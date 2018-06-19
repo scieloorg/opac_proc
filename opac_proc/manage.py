@@ -276,9 +276,9 @@ def process_extract(issns=None, acrons=None, file=None):
     if issns or acrons:
         print u'Processando o(s) ISSN(s): %s' % issn_list
 
-        process_issn_issue(collection, issn_list, stage, ex_task_extract_issue)
+        process_issn_issue(collection, issn_list, ex_task_extract_issue, stage)
 
-        process_issn_article(collection, issn_list, stage, ex_task_extract_article)
+        process_issn_article(collection, issn_list, ex_task_extract_article, stage)
 
     if file:
         items = get_file_items(collection.acronym, file)
@@ -324,9 +324,9 @@ def process_transform(issns=None, acrons=None, file=None):
     if issns or acrons:
         print u'Processando o(s) ISSN(s): %s' % issn_list
 
-        process_issn_issue(collection, issn_list, stage, tr_task_transform_issue)
+        process_issn_issue(collection, issn_list, tr_task_transform_issue, stage)
 
-        process_issn_article(collection, issn_list, stage, tr_task_transform_article)
+        process_issn_article(collection, issn_list, tr_task_transform_article, stage)
 
     if file:
         items = get_file_items(collection.acronym, file)
