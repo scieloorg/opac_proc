@@ -165,6 +165,11 @@ class IdentifiersJournalListView(IdentifiersBaseListView):
             'field_type': 'string'
         },
         {
+            'field_label': u'ISSN',
+            'field_name': 'journal_issn',
+            'field_type': 'string'
+        },
+        {
             'field_label': u'Criação',
             'field_name': 'created_at',
             'field_type': 'date_time'
@@ -263,6 +268,16 @@ class IdentifiersIssueListView(IdentifiersBaseListView):
         {
             'field_label': u'Coleção',
             'field_name': 'collection_acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'ISSN',
+            'field_name': 'journal_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Issue PID',
+            'field_name': 'issue_pid',
             'field_type': 'string'
         },
         {
@@ -369,6 +384,21 @@ class IdentifiersArticleListView(IdentifiersBaseListView):
         {
             'field_label': u'Coleção',
             'field_name': 'collection_acronym',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'ISSN',
+            'field_name': 'journal_issn',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Issue PID',
+            'field_name': 'issue_pid',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Article PID',
+            'field_name': 'article_pid',
             'field_type': 'string'
         },
         {

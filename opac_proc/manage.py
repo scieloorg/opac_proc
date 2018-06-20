@@ -173,6 +173,17 @@ def issue_ids_to_article_ids(collection, items):
 
 
 @manager.command
+def process_ids():
+    """
+    Coleta todos os identifiers de: collection, journal, issue e artigo de forma sincrona
+    """
+    task_call_data_retriver_by_model(model='collection', force_serial=True)
+    task_call_data_retriver_by_model(model='journal', force_serial=True)
+    task_call_data_retriver_by_model(model='issue', force_serial=True)
+    task_call_data_retriver_by_model(model='article', force_serial=True)
+
+
+@manager.command
 @manager.option('-a', '--acrons', dest='acrons')
 @manager.option('-i', '--issns', dest='issns')
 @manager.option('-f', '--file', dest='file')
@@ -180,12 +191,6 @@ def process_extract(issns=None, acrons=None, file=None):
 
     if bool(issns) == bool(acrons) == bool(file):
         sys.exit(u'Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
-
-    # Atualização de IDs (Serial)
-    task_call_data_retriver_by_model(model='collection', force_serial=True)
-    task_call_data_retriver_by_model(model='journal', force_serial=True)
-    task_call_data_retriver_by_model(model='issue', force_serial=True)
-    task_call_data_retriver_by_model(model='article', force_serial=True)
 
     task_extract_one_collection()
 

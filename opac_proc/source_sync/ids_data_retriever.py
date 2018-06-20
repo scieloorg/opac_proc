@@ -6,11 +6,11 @@ import logging
 import logging.config
 
 import feedparser
-from articlemeta.client import RestfulClient
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
+from opac_proc.extractors.source_clients.amapi_wrapper import custom_amapi_client
 from opac_proc.datastore.models import ExtractCollection, ExtractJournal
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.datastore import identifiers_models as idmodels
@@ -46,9 +46,8 @@ class BaseIdDataRetriever(object):
             self._db = get_db_connection()
 
         if self.api_client is None:
-            domain = "%s:%s" % (config.ARTICLE_META_REST_DOMAIN,
-                                config.ARTICLE_META_REST_PORT)
-            self.api_client = RestfulClient(domain)
+            self.api_client = custom_amapi_client.ArticleMeta(
+                config.ARTICLE_META_THRIFT_DOMAIN, config.ARTICLE_META_THRIFT_PORT)
 
         super(BaseIdDataRetriever, self).__init__()
 
@@ -139,7 +138,7 @@ class CollectionIdDataRetriever(BaseIdDataRetriever):
         Obtemos os dados do modelo fornecidos pela API da fonte
         """
 
-        for col in self.api_client.collections():
+        for col in self.api_client.get_collections_identifiers():
             if col['code'] == self.collection_acronym:
                 _raw_data = col
                 break
@@ -209,7 +208,7 @@ class CollectionIdDataRetriever(BaseIdDataRetriever):
 
     def run_serial_for_all(self):
         _raw_data = None
-        for col in self.api_client.collections():
+        for col in self.api_client.get_collections():
             if col['code'] == self.collection_acronym:
                 _raw_data = col
                 break
@@ -237,10 +236,7 @@ class JournalIdDataRetriever(BaseIdDataRetriever):
         """
         Obtemos os dados do modelo fornecidos pela API da fonte
         """
-
-        return self.api_client.journals(
-            collection=self.collection_acronym,
-            only_identifiers=True)
+        return self.api_client.get_journals_identifiers(collection=self.collection_acronym)
 
     def get_identifier_data(self, identifier):
         return {
@@ -274,17 +270,11 @@ class IssueIdDataRetriever(BaseIdDataRetriever):
         """
         Obtemos os dados do modelo fornecidos pela API da fonte
         """
-        return self.api_client.issues_by_identifiers(
-            collection=self.collection_acronym,
-            only_identifiers=True)
+        return self.api_client.get_issues_identifiers(collection=self.collection_acronym)
 
     def get_identifier_data(self, identifier):
         code = identifier['code']
         issn = parse_journal_issn_from_issue_code(code)
-        # if code[0] == 'S':
-        #     issn = code[0:10]
-        # else:
-        #     issn = code[0:9]
         proc_date = identifier['processing_date']
 
         return {
@@ -320,9 +310,7 @@ class ArticleIdDataRetriever(BaseIdDataRetriever):
         """
         Obtemos os dados do modelo fornecidos pela API da fonte
         """
-        return self.api_client.documents_by_identifiers(
-            collection=self.collection_acronym,
-            only_identifiers=True)
+        return self.api_client.get_articles_identifiers(collection=self.collection_acronym)
 
     def get_identifier_data(self, identifier):
         code = identifier['code']
