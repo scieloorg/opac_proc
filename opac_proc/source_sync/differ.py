@@ -456,10 +456,8 @@ class DifferBase(object):
         logger.info('Processor: %s' % processor_class)
 
         if action in ACTION_LIST:
-            if action == 'add':
-                processor_instance.create([target_uuid])
-            elif action == 'update':
-                processor_instance.update([target_uuid])
+            if action == 'add' or action == 'update':
+                processor_instance.task_for_selected([target_uuid])
             elif action == 'delete':
                 raise NotImplementedError('Precisa implementar ainda!')
 
