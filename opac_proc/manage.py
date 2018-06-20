@@ -97,7 +97,7 @@ def process_article(collection, stage, task, issns=None, article_ids=None):
         for child in children_found:
 
             if stage == 'load':
-                ids = models.TransformIssue.objects.filter(pid__contains=child['issn']).values_list('uuid')
+                ids = models.TransformArticle.objects.filter(pid__contains=child['issn']).values_list('uuid')
             else:
                 ids = child['articles_ids']
 
