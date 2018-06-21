@@ -457,7 +457,7 @@ class DifferBase(object):
 
         if action in ACTION_LIST:
             if action == 'add' or action == 'update':
-                processor_instance.task_for_selected([target_uuid])
+                processor_instance.selected([target_uuid])
             elif action == 'delete':
                 raise NotImplementedError('Precisa implementar ainda!')
 

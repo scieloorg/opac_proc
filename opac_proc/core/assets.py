@@ -623,7 +623,7 @@ class AssetHTMLS(Assets):
 
         if errors:
             for error in errors:
-                logger.error("Erro gerando o HTML: ", error)
+                logger.error("Erro gerando o HTML: %s", error)
 
         return htmls
 
