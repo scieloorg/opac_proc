@@ -15,7 +15,8 @@ from opac_proc.web.config import (
     ARTICLE_META_THRIFT_DOMAIN,
     ARTICLE_META_THRIFT_PORT,
     ARTICLE_META_REST_DOMAIN,
-    ARTICLE_META_REST_PORT)
+    ARTICLE_META_REST_PORT,
+    ARTICLE_META_THRIFT_TIMEOUT)
 
 from opac_proc.web.webapp import create_app
 from opac_proc.web.accounts.forms import EmailForm
@@ -63,7 +64,7 @@ def get_issn_by_acron(collection, acron):
     domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
                         ARTICLE_META_THRIFT_PORT)
 
-    cl = ThriftClient(domain)
+    cl = ThriftClient(domain, timeout=ARTICLE_META_THRIFT_TIMEOUT)
 
     for journal in cl.journals(collection=collection):
 
@@ -77,7 +78,7 @@ def get_issns_by_acrons(collection, acrons):
     domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
                         ARTICLE_META_THRIFT_PORT)
 
-    cl = ThriftClient(domain)
+    cl = ThriftClient(domain, timeout=ARTICLE_META_THRIFT_TIMEOUT)
 
     acrons = set(acrons)
 
@@ -132,7 +133,7 @@ def issue_labels_to_ids(collection, items):
     domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
                         ARTICLE_META_THRIFT_PORT)
 
-    cl = ThriftClient(domain)
+    cl = ThriftClient(domain, timeout=ARTICLE_META_THRIFT_TIMEOUT)
 
     for issn, labels in items.items():
         d = data_dict.setdefault(issn, set())
@@ -158,7 +159,7 @@ def issue_ids_to_article_ids(collection, items):
     domain = "%s:%s" % (ARTICLE_META_THRIFT_DOMAIN,
                         ARTICLE_META_THRIFT_PORT)
 
-    cl = ThriftClient(domain)
+    cl = ThriftClient(domain, timeout=ARTICLE_META_THRIFT_TIMEOUT)
 
     for issn, icodes in items.items():
         d = data_dict.setdefault(issn, [])

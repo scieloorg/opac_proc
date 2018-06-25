@@ -32,7 +32,8 @@ class ArticleExtractor(BaseExtractor):
         # redefinimos o cliente articlemeta para usar a api com: fmt='opac'
         self.articlemeta = custom_amapi_client.ArticleMeta(
             config.ARTICLE_META_THRIFT_DOMAIN,
-            config.ARTICLE_META_THRIFT_PORT)
+            config.ARTICLE_META_THRIFT_PORT,
+            config.ARTICLE_META_THRIFT_TIMEOUT)
 
     @push_metric('ex_articles_extract_method_processing_seconds')
     @update_metadata

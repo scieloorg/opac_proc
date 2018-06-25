@@ -325,11 +325,11 @@ class TransformJournal(BaseMixin, DynamicDocument):
 
     @property
     def get_issn(self):
-        if hasattr(self, 'scielo_issn', False):
+        if hasattr(self, 'scielo_issn'):
             issn = self.scielo_issn
-        elif hasattr(self, 'eletronic_issn', False):
+        elif hasattr(self, 'eletronic_issn'):
             issn = self.eletronic_issn
-        elif hasattr(self, 'print_issn', False):
+        elif hasattr(self, 'print_issn'):
             issn = self.print_issn
         else:
             raise ValueError('O modelo de Journal com uuid: %s não tem ISSN' % self.uuid)
@@ -594,11 +594,11 @@ class LoadJournal(BaseMixin, DynamicDocument):
         else:
             raise ValueError('O modelo de Journal com uuid: %s não tem loaded_data' % self.uuid)
 
-        if hasattr(loaded_data, 'scielo_issn', False):
+        if hasattr(loaded_data, 'scielo_issn'):
             issn = loaded_data.scielo_issn
-        elif hasattr(loaded_data, 'eletronic_issn', False):
+        elif hasattr(loaded_data, 'eletronic_issn'):
             issn = loaded_data.eletronic_issn
-        elif hasattr(loaded_data, 'print_issn', False):
+        elif hasattr(loaded_data, 'print_issn'):
             issn = loaded_data.print_issn
         else:
             raise ValueError('O modelo de Journal com uuid: %s não tem ISSN' % self.uuid)

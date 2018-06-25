@@ -462,7 +462,8 @@ class DifferBase(object):
                 raise NotImplementedError('Precisa implementar ainda!')
 
             # atualizo registro diff como feito
-            diff_model_instance = self.diff_model_class.objects.get(uuid=target_uuid)
+            diff_model_instance = self.diff_model_class.objects.filter(
+                uuid=target_uuid, action=action, stage=stage, done_at=None).first()
             diff_model_instance.done_at = datetime.now()
             diff_model_instance.save()
         else:

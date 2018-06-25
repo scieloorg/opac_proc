@@ -47,7 +47,9 @@ class BaseIdDataRetriever(object):
 
         if self.api_client is None:
             self.api_client = custom_amapi_client.ArticleMeta(
-                config.ARTICLE_META_THRIFT_DOMAIN, config.ARTICLE_META_THRIFT_PORT)
+                config.ARTICLE_META_THRIFT_DOMAIN,
+                config.ARTICLE_META_THRIFT_PORT,
+                config.ARTICLE_META_THRIFT_TIMEOUT)
 
         super(BaseIdDataRetriever, self).__init__()
 

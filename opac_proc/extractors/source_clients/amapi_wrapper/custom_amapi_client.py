@@ -1,20 +1,22 @@
 from articlemeta.client import ThriftClient
 from opac_proc.core.prometheus_metrics import push_metric
+from opac_proc.web.config import ARTICLE_META_THRIFT_TIMEOUT
 
 
 class ArticleMeta(object):
 
-    def __init__(self, address, port):
+    def __init__(self, address, port, timeout=ARTICLE_META_THRIFT_TIMEOUT):
         """
         Cliente thrift para o Articlemeta.
         """
         self._address = address
         self._port = port
         self._domain = "%s:%s" % (self._address, self._port)
+        self.timeout = timeout
 
     @property
     def client(self):
-        client = ThriftClient(domain=self._domain)
+        client = ThriftClient(domain=self._domain, timeout=self.timeout)
         return client
 
     def get_collections_identifiers(self):
