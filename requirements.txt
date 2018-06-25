@@ -29,5 +29,5 @@ feedparser==5.2.1
 Flask-Login==0.4.1
 Flask-Mail==0.9.1
 maya==0.5.0
-articlemetaapi==1.26.1
+articlemetaapi==1.26.2
 prometheus-client==0.2.0
