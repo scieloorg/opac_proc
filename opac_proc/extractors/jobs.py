@@ -1,5 +1,4 @@
 # coding: utf-8
-from uuid import UUID
 from articlemeta.client import RestfulClient
 
 from opac_proc.extractors.ex_collections import CollectionExtractor
