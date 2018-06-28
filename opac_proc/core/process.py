@@ -28,6 +28,18 @@ class Process(object):
             self.model_name,
             self.task_for_all)
 
+    def delete_selected(self, selected_uuids):
+        self.r_queues.enqueue(
+            self.stage,
+            self.model_name,
+            self.task_delete_selected, selected_uuids)
+
+    def delete_all(self):
+        self.r_queues.enqueue(
+            self.stage,
+            self.model_name,
+            self.task_delete_all)
+
 
 class ProcessExtractBase(Process):
     stage = 'extract'

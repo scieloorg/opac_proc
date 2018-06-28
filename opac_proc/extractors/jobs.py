@@ -1,4 +1,5 @@
 # coding: utf-8
+from uuid import UUID
 from articlemeta.client import RestfulClient
 
 from opac_proc.extractors.ex_collections import CollectionExtractor
@@ -9,7 +10,14 @@ from opac_proc.extractors.ex_press_releases import PressReleaseExtractor
 from opac_proc.extractors.ex_news import NewsExtractor
 
 from opac_proc.datastore import identifiers_models
-from opac_proc.datastore.models import ExtractPressRelease, ExtractNews
+from opac_proc.datastore.models import (
+    ExtractCollection,
+    ExtractJournal,
+    ExtractIssue,
+    ExtractArticle,
+    ExtractNews,
+    ExtractPressRelease
+)
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
 
@@ -72,6 +80,41 @@ def task_extract_all_collections():
             r_queues.enqueue(stage, model, task_extract_selected_collections, uuid_as_string_list)
 
 
+def task_delete_selected_collections(selected_ids):
+    """
+        Task para apagar Coleções Extaidas.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'extract'
+    model = 'collection'
+    model_class = ExtractCollection
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_collections, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_collections():
+    get_db_connection()
+    all_records = ExtractCollection.objects.all()
+    all_records.delete()
+
+
 # --------------------------------------------------- #
 #                   JOURNALS                          #
 # --------------------------------------------------- #
@@ -118,6 +161,41 @@ def task_extract_all_journals():
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_extract_selected_journals, uuid_as_string_list)
+
+
+def task_delete_selected_journals(selected_ids):
+    """
+        Task para apagar Journals Extaidaos.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'extract'
+    model = 'journal'
+    model_class = ExtractJournal
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_journals, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_journals():
+    get_db_connection()
+    all_records = ExtractJournal.objects.all()
+    all_records.delete()
 
 
 # --------------------------------------------------- #
@@ -168,6 +246,41 @@ def task_extract_all_issues():
             r_queues.enqueue(stage, model, task_extract_selected_issues, uuid_as_string_list)
 
 
+def task_delete_selected_issues(selected_ids):
+    """
+        Task para apagar Issues Extaidaos.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'extract'
+    model = 'issue'
+    model_class = ExtractIssue
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_issues, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_issues():
+    get_db_connection()
+    all_records = ExtractIssue.objects.all()
+    all_records.delete()
+
+
 # --------------------------------------------------- #
 #                   ARTICLE                           #
 # --------------------------------------------------- #
@@ -215,6 +328,41 @@ def task_extract_all_articles(uuids=None):
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_extract_selected_articles, uuid_as_string_list)
+
+
+def task_delete_selected_articles(selected_ids):
+    """
+        Task para apagar Articles Extaidaos.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'extract'
+    model = 'article'
+    model_class = ExtractArticle
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_articles, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_articles():
+    get_db_connection()
+    all_records = ExtractArticle.objects.all()
+    all_records.delete()
 
 
 # --------------------------------------------------- #
@@ -274,6 +422,41 @@ def task_extract_all_press_releases():
                              j_acronym, feed_url_by_lang, lang)
 
 
+def task_delete_selected_press_releases(selected_ids):
+    """
+        Task para apagar Press Releases Extaidaos.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'extract'
+    model = 'press_release'
+    model_class = ExtractPressRelease
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_press_releases, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_press_releases():
+    get_db_connection()
+    all_records = ExtractPressRelease.objects.all()
+    all_records.delete()
+
+
 # --------------------------------------------------- #
 #                    NEWS                             #
 # --------------------------------------------------- #
@@ -319,3 +502,39 @@ def task_extract_all_news():
             stage, model,
             task_extract_one_news,
             url, lang)
+
+
+def task_delete_selected_news(selected_ids):
+    """
+        Task para apagar News Extaidaos.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'extract'
+    model = 'press_release'
+    model_class = ExtractPressRelease
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_news, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_news():
+    get_db_connection()
+    all_records = ExtractPressRelease.objects.all()
+    all_records.delete()
+

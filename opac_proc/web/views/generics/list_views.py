@@ -215,7 +215,8 @@ class ListView(View):
         user = current_user.email
         if is_error:
             exception_msg = u"{exception_str} {traceback_str}".format(
-                            exception_str=unicode(exception_obj), traceback_str=traceback_str)
+                            exception_str=unicode(exception_obj),
+                            traceback_str=traceback_str)
 
             msg_subject = u"ERRO: Após o usuário: {user} iniciar o processo de: {stage} para o modelo: {model} via web".format(
                 user=user, stage=self.stage, model=self.model_name)
@@ -228,13 +229,14 @@ class ListView(View):
                         {exception_msg}
                         """.format(user=user, stage=self.stage, model=self.model_name, exception_msg=exception_msg, qty=qty)
             app_msg = create_error_msg(msg_subject, msg_body, self.stage, self.model_name)
-            msg_link = url_for('default.message_detail', app_msg.pk, _external=True)
+            msg_link = url_for('default.message_detail', object_id=app_msg.pk, _external=True)
             flask_msg = u'{msg}. Descrição completa do erro <a href="{url}">aqui</a>'.format(msg=msg_subject, url=msg_link)
             flash(flask_msg, 'error')
             app_msg.send_email()
         else:
             msg_subject = u"Usuário: {user} iniciou o processo de: {stage} para o modelo: {model} via web".format(
-                          user=user, stage=self.stage, model=self.model_name)
+                          user=user, stage=self.stage,
+                          model=self.model_name)
             qty = items_count or 'todos os'
             msg_body = u"""
                         Usuário: <strong>{user}</strong> iniciar o processo de: <strong>{stage}</strong>
@@ -258,7 +260,6 @@ class ListView(View):
 
     def do_process_selected(self, selected_uuids):
         try:
-            print "selected_uuids: ", selected_uuids
             processor = self.process_class()
             processor.selected(selected_uuids)
         except Exception as e:
@@ -268,34 +269,27 @@ class ListView(View):
             self._trigger_messages(items_count=len(selected_uuids))
 
     def do_delete_all(self):
-        if self.model_class is None:
-            raise ValueError("model class not defined")
+        try:
+            processor = self.process_class()
+            processor.delete_all()
+        except Exception as e:
+            traceback_str = traceback.format_exc()
+            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str)
         else:
-            self.model_class.objects.all().delete()
-            flash("All records deleted successfully!", "success")
+            self._trigger_messages()
 
-    def do_delete_selected(self, ids):
-        if self.model_class is None:
-            raise ValueError("atributo 'model_class' não definido!")
-
-        delete_errors_count = 0
-        for oid in ids:
-            try:
-                model = self.model_class.objects.get(pk=oid)
-                model.delete()
-            except Exception:
-                delete_errors_count += 1
-        if delete_errors_count:
-            flash("%s registros não podem ser removidos" % delete_errors_count, "error")
-        successfully_deleted = len(ids) - delete_errors_count
-        if successfully_deleted > 0:
-            flash("%s registros removidos com sucesso!" % successfully_deleted, "success")
+    def do_delete_selected(self, selected_uuids):
+        try:
+            processor = self.process_class()
+            processor.delete_selected(selected_uuids)
+        except Exception as e:
+            traceback_str = traceback.format_exc()
+            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=len(selected_uuids))
         else:
-            flash("%s registros removidos com sucesso!" % successfully_deleted, "warning")
+            self._trigger_messages(items_count=len(selected_uuids))
 
     def get_selected_ids(self):
         uuids = request.form.getlist('rowid')
-        print 'uuids: ', uuids
         if not uuids:
             raise ValueError(u"Não selecionou registros!")
         elif isinstance(uuids, list):
