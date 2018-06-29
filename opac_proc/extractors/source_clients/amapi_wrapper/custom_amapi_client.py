@@ -16,20 +16,37 @@ class ArticleMeta(object):
 
     @property
     def client(self):
+        """
+        Returns a new instance of ThriftClient client
+        """
         client = ThriftClient(domain=self._domain, timeout=self.timeout)
         return client
 
     def get_collections_identifiers(self):
+        """
+        methods to get retrieve a generator of COLLECTIONS IDENTIFIERS, each one is a dict()
+        """
         objs = self.client.collections(only_identifiers=True)
         for obj in objs:
             yield obj.__dict__
 
     def get_journals_identifiers(self, collection=None, issn=None):
+        """
+        methods to get retrieve a generator of JOURNALS IDENTIFIERS, each one is a dict()
+        - collection: collection acronym
+        - issn: issn of the related journal
+        """
         objs = self.client.journals(collection=collection, issn=issn, only_identifiers=True)
         for obj in objs:
             yield obj.__dict__
 
     def get_issues_identifiers(self, collection=None, issn=None, from_date=None, until_date=None):
+        """
+        methods to get retrieve a generator of ISSUES IDENTIFIERS, each one is a dict()
+        - collection: collection acronym
+        - issn: issn of the related journal
+        - from_date, until_date: interval of dates for filtering
+        """
         objs = self.client.issues(
             collection=collection, issn=issn,
             from_date=from_date, until_date=until_date,
@@ -38,6 +55,13 @@ class ArticleMeta(object):
             yield obj.__dict__
 
     def get_articles_identifiers(self, collection=None, issn=None, from_date=None, until_date=None):
+        """
+        methods to get retrieve a generator of ARTICLES IDENTIFIERS, each one is a dict()
+        @params:
+        - collection: collection acronym
+        - issn: issn of the related journal
+        - from_date, until_date: interval of dates for filtering
+        """
         objs = self.client.documents(
             collection=collection, issn=issn,
             from_date=from_date, until_date=until_date,
@@ -45,19 +69,31 @@ class ArticleMeta(object):
         for obj in objs:
             yield obj.__dict__
 
-    # methods to retrieve list of full docuements (not identifiers):
-
     def get_collections(self):
+        """
+        methods to get retrieve a generator of COLLECTIONS, each one is a dict()
+        """
         objs = self.client.collections()
         for obj in objs:
             yield obj.__dict__
 
     def get_journals(self, collection=None, issn=None):
+        """
+        methods to get retrieve a generator of JOURNALS, each one is a dict()
+        - collection: collection acronym
+        - issn: issn of the related journal
+        """
         objs = self.client.journals(collection=collection, issn=issn)
         for obj in objs:
             yield obj.__dict__
 
     def get_issues(self, collection=None, issn=None, from_date=None, until_date=None):
+        """
+        methods to get retrieve a generator of ISSUES, each one is a dict()
+        - collection: collection acronym
+        - issn: issn of the related journal
+        - from_date, until_date: interval of dates for filtering
+        """
         objs = self.client.issues(
             collection=collection, issn=issn,
             from_date=from_date, until_date=until_date)
@@ -65,37 +101,57 @@ class ArticleMeta(object):
             yield obj.__dict__
 
     def get_articles(self, collection=None, issn=None, from_date=None, until_date=None):
+        """
+        methods to get retrieve a generator of ARTICLES, each one is a dict()
+        @params:
+        - collection: collection acronym
+        - issn: issn of the related journal
+        - from_date, until_date: interval of dates for filtering
+        """
         objs = self.client.documents(
             collection=collection, issn=issn,
             from_date=from_date, until_date=until_date)
         for obj in objs:
             yield obj.__dict__
 
-    # methods to retrieve list of full XYLOSE docuements (not identifiers):
-
     def get_xylose_collections(self):
-        objs = self.client.collections()
-        for obj in objs:
-            yield obj
+        """
+        methods to get retrieve a generator of COLLECTIONS as xylose objects
+        """
+        return self.client.collections()
 
     def get_xylose_journals(self, collection=None, issn=None):
-        objs = self.client.journals(collection=collection, issn=issn)
-        for obj in objs:
-            yield obj
+        """
+        methods to get retrieve a generator of JOURNALS, each one is a xylose object
+        @params:
+        - collection: journal's collection ('spa', 'scl', etc)
+        - issn: journal ISSN
+        """
+        return self.client.journals(collection=collection, issn=issn)
 
     def get_xylose_issues(self, collection=None, issn=None, from_date=None, until_date=None):
-        objs = self.client.issues(
+        """
+        methods to get retrieve a generator of ISSUES, each one is a xylose object
+        @params:
+        - collection: journal's collection ('spa', 'scl', etc)
+        - issn: journal ISSN
+        - from_date, until_date: interval of dates for filtering
+        """
+        return self.client.issues(
             collection=collection, issn=issn,
             from_date=from_date, until_date=until_date)
-        for obj in objs:
-            yield obj
 
     def get_xylose_articles(self, collection=None, issn=None, from_date=None, until_date=None):
-        objs = self.client.documents(
+        """
+        methods to get retrieve a generator of ARTICLES, each one is a xylose object
+        @params:
+        - collection: journal's collection ('spa', 'scl', etc)
+        - issn: journal ISSN
+        - from_date, until_date: interval of dates for filtering
+        """
+        return self.client.documents(
             collection=collection, issn=issn,
             from_date=from_date, until_date=until_date)
-        for obj in objs:
-            yield obj
 
     def get_journal(self, code, collection):
         """
