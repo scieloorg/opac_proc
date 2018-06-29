@@ -1,5 +1,5 @@
 # coding: utf-8
-from articlemeta.client import RestfulClient
+from opac_proc.extractors.source_clients.amapi_wrapper import custom_amapi_client
 
 from opac_proc.extractors.ex_collections import CollectionExtractor
 from opac_proc.extractors.ex_journals import JournalExtractor
@@ -402,13 +402,11 @@ def task_extract_all_press_releases():
 
     def get_all_journals_acronyms():
 
-        domain = "%s:%s" % (config.ARTICLE_META_REST_DOMAIN,
-                            config.ARTICLE_META_REST_PORT)
-
-        api_client = RestfulClient(domain)
-        acronyms = []
-        for journal in api_client.journals(collection=config.OPAC_PROC_COLLECTION):
-            acronyms.append(journal.acronym)
+        client = custom_amapi_client.ArticleMeta(
+            config.ARTICLE_META_THRIFT_DOMAIN,
+            config.ARTICLE_META_THRIFT_PORT,
+            config.ARTICLE_META_THRIFT_TIMEOUT)
+        acronyms = [j.acronym for j in client.get_xylose_journals(collection=config.OPAC_PROC_COLLECTION)]
         return acronyms
 
     r_queues = RQueues()
@@ -536,4 +534,3 @@ def task_delete_all_news():
     get_db_connection()
     all_records = ExtractPressRelease.objects.all()
     all_records.delete()
-
