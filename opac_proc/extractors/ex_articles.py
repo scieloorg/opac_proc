@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from opac_proc.extractors.source_clients.amapi_wrapper import custom_amapi_client
+
 from opac_proc.datastore.models import ExtractArticle
 from opac_proc.datastore.identifiers_models import ArticleIdModel
 from opac_proc.extractors.base import BaseExtractor
@@ -29,11 +29,6 @@ class ArticleExtractor(BaseExtractor):
         self.get_identifier_query = {
             'article_pid': self.article_id
         }
-        # redefinimos o cliente articlemeta para usar a api com: fmt='opac'
-        self.articlemeta = custom_amapi_client.ArticleMeta(
-            config.ARTICLE_META_THRIFT_DOMAIN,
-            config.ARTICLE_META_THRIFT_PORT,
-            config.ARTICLE_META_THRIFT_TIMEOUT)
 
     @push_metric('ex_articles_extract_method_processing_seconds')
     @update_metadata

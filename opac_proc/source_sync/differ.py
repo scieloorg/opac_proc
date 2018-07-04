@@ -107,6 +107,30 @@ DIFF_APPLY_PROCESSORS = {
         }
     },
     'delete': {
+        'extract': {
+            'collection': ProcessExtractCollection,
+            'journal': ProcessExtractJournal,
+            'issue': ProcessExtractIssue,
+            'article': ProcessExtractArticle,
+            'news': ProcessExtractNews,
+            'press_release': ProcessExtractPressRelease,
+        },
+        'transform': {
+            'collection': ProcessTransformCollection,
+            'journal': ProcessTransformJournal,
+            'issue': ProcessTransformIssue,
+            'article': ProcessTransformArticle,
+            'news': ProcessTransformNews,
+            'press_release': ProcessTransformPressRelease,
+        },
+        'load': {
+            'collection': ProcessLoadCollection,
+            'journal': ProcessLoadJournal,
+            'issue': ProcessLoadIssue,
+            'article': ProcessLoadArticle,
+            'news': ProcessLoadNews,
+            'press_release': ProcessLoadPressRelease,
+        }
 
     }
 }

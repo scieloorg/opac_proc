@@ -160,7 +160,7 @@ class ArticleMeta(object):
         - code: journal ISSN
         - collection: journal's collection ('spa', 'scl', etc)
         """
-        journal = self.client.document(code=code, collection=collection)
+        journal = self.client.journal(code=code, collection=collection)
         return journal.data
 
     def get_issue(self, code, collection):

@@ -87,7 +87,7 @@ class CollectionExtractor(BaseExtractor):
         logger.info(u'Inicia CollectionExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))
 
-        for col in self.articlemeta.collections():
+        for col in self.articlemeta.get_collections():
             if col['acronym'] == self.acronym:
                 logger.info(u"Adicionado a coleção: %s" % self.acronym)
                 self._raw_data = col

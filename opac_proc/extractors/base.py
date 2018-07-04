@@ -2,7 +2,7 @@
 import os
 import sys
 
-from opac_proc.extractors.source_clients.thrift import am_clients
+from opac_proc.extractors.source_clients.amapi_wrapper import custom_amapi_client
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.datastore.base_mixin import ProcessMetada
 
@@ -41,9 +41,10 @@ class BaseExtractor(object):
 
     def __init__(self):
         self._db = get_db_connection()
-        self.articlemeta = am_clients.ArticleMeta(
+        self.articlemeta = custom_amapi_client.ArticleMeta(
             config.ARTICLE_META_THRIFT_DOMAIN,
-            config.ARTICLE_META_THRIFT_PORT)
+            config.ARTICLE_META_THRIFT_PORT,
+            config.ARTICLE_META_THRIFT_TIMEOUT)
 
     def get_identifier_model_instance(self):
         if not self.get_identifier_query or not isinstance(self.get_identifier_query, dict):

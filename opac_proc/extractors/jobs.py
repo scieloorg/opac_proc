@@ -217,7 +217,6 @@ def task_extract_selected_issues(selected_uuids):
     get_db_connection()
     r_queues = RQueues()
     source_ids_model_class = identifiers_models.IssueIdModel
-
     pids_iter = source_ids_model_class.objects.filter(uuid__in=selected_uuids).values_list('issue_pid')
     for issue_pid in pids_iter:
         r_queues.enqueue('extract', 'issue', task_extract_one_issue, issue_pid)
