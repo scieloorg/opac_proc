@@ -41,6 +41,10 @@ class Process(object):
             self.task_delete_all)
 
 
+class ProcessIdentifiersBase(Process):
+    stage = 'sync_ids'
+
+
 class ProcessExtractBase(Process):
     stage = 'extract'
 

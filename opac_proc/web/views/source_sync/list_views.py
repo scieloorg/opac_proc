@@ -2,16 +2,25 @@
 
 from opac_proc.datastore import identifiers_models
 from opac_proc.web.views.generics.list_views import ListView
+from opac_proc.source_sync.process import (
+    ProcessIdentifiersCollection,
+    ProcessIdentifiersJournal,
+    ProcessIdentifiersIssue,
+    ProcessIdentifiersArticle,
+    ProcessIdentifiersPressRelease,
+    ProcessIdentifiersNews,
+)
 
 
 class IdentifiersBaseListView(ListView):
     stage = 'sync_ids'
-    can_process = False
-    can_delete = False
+    can_process = True
+    can_delete = True
 
 
 class IdentifiersCollectionListView(IdentifiersBaseListView):
     model_class = identifiers_models.CollectionIdModel
+    process_class = ProcessIdentifiersCollection
     model_name = 'collection'
     page_title = "Identifiers: Collection"
     list_columns = [
@@ -103,6 +112,7 @@ class IdentifiersCollectionListView(IdentifiersBaseListView):
 
 class IdentifiersJournalListView(IdentifiersBaseListView):
     model_class = identifiers_models.JournalIdModel
+    process_class = ProcessIdentifiersJournal
     model_name = 'journal'
     page_title = "Identifiers: Journals"
     list_columns = [
@@ -204,6 +214,7 @@ class IdentifiersJournalListView(IdentifiersBaseListView):
 
 class IdentifiersIssueListView(IdentifiersBaseListView):
     model_class = identifiers_models.IssueIdModel
+    process_class = ProcessIdentifiersIssue
     model_name = 'issue'
     page_title = "Identifiers: Issues"
     list_columns = [
@@ -315,6 +326,7 @@ class IdentifiersIssueListView(IdentifiersBaseListView):
 
 class IdentifiersArticleListView(IdentifiersBaseListView):
     model_class = identifiers_models.ArticleIdModel
+    process_class = ProcessIdentifiersArticle
     model_name = 'article'
     page_title = "Identifiers: Articles"
     list_columns = [
@@ -436,6 +448,7 @@ class IdentifiersArticleListView(IdentifiersBaseListView):
 
 class IdentifiersPressReleaseListView(IdentifiersBaseListView):
     model_class = identifiers_models.PressReleaseIdModel
+    process_class = ProcessIdentifiersPressRelease
     model_name = 'press_release'
     page_title = "Identifiers: Press Releases"
 
@@ -538,6 +551,7 @@ class IdentifiersPressReleaseListView(IdentifiersBaseListView):
 
 class IdentifiersNewsListView(IdentifiersBaseListView):
     model_class = identifiers_models.NewsIdModel
+    process_class = ProcessIdentifiersNews
     model_name = 'news'
     page_title = "Identifiers: News"
 

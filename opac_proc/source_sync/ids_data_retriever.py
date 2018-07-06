@@ -199,6 +199,12 @@ class CollectionIdDataRetriever(BaseIdDataRetriever):
                     break
             return must_update_record
 
+    def get_identifier_data(self, identifier):
+        return {
+            'collection_acronym': identifier['code'],
+            'processing_date': datetime.now()
+        }
+
     def process_one_identifier(self, identifier_data):
         coll_selector = {
             'collection_acronym': self.collection_acronym
