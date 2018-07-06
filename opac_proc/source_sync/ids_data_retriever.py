@@ -412,7 +412,7 @@ class PressReleaseDataRetriever(BaseIdDataRetriever):
         No output capturado de /journals/identifiers não forence o acronym, só o ISSN
         """
         acronyms = []
-        for journal in self.api_client.journals(collection=self.collection_acronym):
+        for journal in self.api_client.get_xylose_journals(collection=self.collection_acronym):
             acronyms.append(journal.acronym)
         return acronyms
 

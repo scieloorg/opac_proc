@@ -34,6 +34,7 @@ def send_email(recipient, subject, html):
     if isinstance(recipient, list):
         recipients = recipient
     try:
+        subject = "[%s] %s" % (current_app.config['OPAC_PROC_COLLECTION'], subject)
         msg = Message(
             subject=subject,
             sender=current_app.config['MAIL_DEFAULT_SENDER'],

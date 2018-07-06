@@ -7,7 +7,9 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/">Opac Proc</a>
+      <a class="navbar-brand" href="/">
+        Opac Proc <strong>[{{ config.OPAC_PROC_COLLECTION }}]</strong>
+      </a>
     </div>
     <div id="navbar" class="collapse navbar-collapse">
       {% if current_user.is_authenticated %}
