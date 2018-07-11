@@ -7,17 +7,20 @@ from opac_proc.transformers.tr_press_releases import PressReleaseTransformer
 from opac_proc.transformers.tr_news import NewsTransformer
 
 from opac_proc.datastore import identifiers_models
+from opac_proc.datastore.models import (
+    TransformCollection,
+    TransformJournal,
+    TransformIssue,
+    TransformArticle,
+    TransformNews,
+    TransformPressRelease
+)
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
 
 from opac_proc.web import config
-from opac_proc.logger_setup import getMongoLogger
 from opac_proc.source_sync.utils import chunks
 
-if config.DEBUG:
-    logger = getMongoLogger(__name__, "DEBUG", "transform")
-else:
-    logger = getMongoLogger(__name__, "INFO", "transform")
 
 # --------------------------------------------------- #
 #                   COLLECTION                        #
@@ -69,6 +72,41 @@ def task_transform_all_collections():
             r_queues.enqueue(stage, model, task_transform_selected_collections, uuid_as_string_list)
 
 
+def task_delete_selected_collections(selected_ids):
+    """
+        Task para apagar Coleções Transformadas.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'transform'
+    model = 'collection'
+    model_class = TransformCollection
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_collections, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_collections():
+    get_db_connection()
+    all_records = TransformCollection.objects.all()
+    all_records.delete()
+
+
 # --------------------------------------------------- #
 #                   JOURNALS                          #
 # --------------------------------------------------- #
@@ -115,6 +153,41 @@ def task_transform_all_journals():
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_transform_selected_journals, uuid_as_string_list)
+
+
+def task_delete_selected_journals(selected_ids):
+    """
+        Task para apagar Journals Transormados.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'transform'
+    model = 'journal'
+    model_class = TransformJournal
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_journals, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_journals():
+    get_db_connection()
+    all_records = TransformJournal.objects.all()
+    all_records.delete()
 
 
 # --------------------------------------------------- #
@@ -166,6 +239,40 @@ def task_transform_all_issues():
             r_queues.enqueue(stage, model, task_transform_selected_issues, uuid_as_string_list)
 
 
+def task_delete_selected_issues(selected_ids):
+    """
+        Task para apagar Issues Tranformados.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'transform'
+    model = 'issue'
+    model_class = TransformIssue
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_issues, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_issues():
+    get_db_connection()
+    all_records = TransformIssue.objects.all()
+    all_records.delete()
+
 # --------------------------------------------------- #
 #                   ARTICLE                           #
 # --------------------------------------------------- #
@@ -215,6 +322,40 @@ def task_transform_all_articles():
             r_queues.enqueue(stage, model, task_transform_selected_articles, uuid_as_string_list)
 
 
+def task_delete_selected_articles(selected_ids):
+    """
+        Task para apagar Articles Transformados.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'transform'
+    model = 'article'
+    model_class = TransformArticle
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_articles, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_articles():
+    get_db_connection()
+    all_records = TransformArticle.objects.all()
+    all_records.delete()
+
 # --------------------------------------------------- #
 #               PRESS RELEASES                        #
 # --------------------------------------------------- #
@@ -263,6 +404,41 @@ def task_transform_all_press_releases():
             r_queues.enqueue(stage, model, task_transform_selected_press_releases, uuid_as_string_list)
 
 
+def task_delete_selected_press_releases(selected_ids):
+    """
+        Task para apagar Press Releases Transformados.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'transform'
+    model = 'press_release'
+    model_class = TransformPressRelease
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_press_releases, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_press_releases():
+    get_db_connection()
+    all_records = TransformPressRelease.objects.all()
+    all_records.delete()
+
+
 # --------------------------------------------------- #
 #                    NEWS                             #
 # --------------------------------------------------- #
@@ -309,3 +485,38 @@ def task_transform_all_news():
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_transform_selected_news, uuid_as_string_list)
+
+
+def task_delete_selected_news(selected_ids):
+    """
+        Task para apagar News Transformados.
+        @param:
+        - selected_ids: lista de pk dos documentos a serem removidos
+
+        Se a lista `selected_ids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_ids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'transform'
+    model = 'news'
+    model_class = TransformNews
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_ids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_news, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_news():
+    get_db_connection()
+    all_records = TransformNews.objects.all()
+    all_records.delete()

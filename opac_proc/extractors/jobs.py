@@ -507,8 +507,8 @@ def task_delete_selected_news(selected_ids):
     """
 
     stage = 'extract'
-    model = 'press_release'
-    model_class = ExtractPressRelease
+    model = 'news'
+    model_class = ExtractNews
     get_db_connection()
     r_queues = RQueues()
     SLICE_SIZE = 1000
@@ -525,5 +525,5 @@ def task_delete_selected_news(selected_ids):
 
 def task_delete_all_news():
     get_db_connection()
-    all_records = ExtractPressRelease.objects.all()
+    all_records = ExtractNews.objects.all()
     all_records.delete()

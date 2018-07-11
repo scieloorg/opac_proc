@@ -34,8 +34,8 @@ class ArticleTransformer(BaseTransformer):
     ids_model_instance = None
 
     def get_extract_model_instance(self, key):
-        # retornamos uma instancia de ExtractJounal
-        # buscando pela key (=issn)
+        # retornamos uma instancia de ExtractArticle
+        # buscando pela key (=PID)
         return self.extract_model_class.objects.get(code=key)
 
     @update_metadata
