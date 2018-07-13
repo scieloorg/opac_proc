@@ -68,7 +68,84 @@ services:
       - pushgateway:proc-pushgateway
     volumes:
       # - /etc/localtime:/etc/localtime:ro
+      - ./data/xml:/app/data/xml:ro
+      - ./data/pdf:/app/data/pdf:ro
       - .:/app
+    environment:
+      - OPAC_PROC_LOG_LEVEL=DEBUG
+      - OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN=articlemeta.scielo.org
+      - OPAC_PROC_ARTICLE_META_THRIFT_PORT=11621
+      - OPAC_PROC_COLLECTION=spa
+      - OPAC_PROC_DEBUG=True
+      - OPAC_PROC_TESTING=False
+      - OPAC_PROC_SECRET_KEY="s3cr3t-k3y"
+      # - OPAC_PROC_SENTRY_DSN=
+      # mongo processamento
+      - OPAC_PROC_MONGODB_NAME=opac_proc
+      - OPAC_PROC_MONGODB_HOST=mongo-proc
+      - OPAC_PROC_MONGODB_PORT=27017
+      # - OPAC_PROC_MONGODB_USER=
+      # - OPAC_PROC_MONGODB_PASS=
+      # mongo db do opac
+      - OPAC_MONGODB_NAME=${OPAC_MONGODB_NAME}  # nome do banco mongo do OPAC
+      - OPAC_MONGODB_HOST=${OPAC_MONGODB_HOST}  # host do banco mongo do OPAC
+      - OPAC_MONGODB_PORT=${OPAC_MONGODB_PORT}  # porta do banco mongo do OPAC
+      # - OPAC_MONGODB_USER=
+      # - OPAC_MONGODB_PASS=
+      # mongo logs do opac
+      - OPAC_PROC_LOG_MONGODB_NAME=opac_proc_logs
+      - OPAC_PROC_LOG_MONGODB_HOST=mongo-logs
+      - OPAC_PROC_LOG_MONGODB_PORT=27017
+      # - OPAC_PROC_LOG_MONGODB_USER=
+      # - OPAC_PROC_LOG_MONGODB_PASS=
+      # Redis:
+      - OPAC_PROC_REDIS_HOST=redis
+      - OPAC_PROC_REDIS_PORT=6379
+      # Accounts:
+      - OPAC_PROC_WEB_REGISTRATION_ENABLED=True
+      - OPAC_PROC_ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION=True
+      # Email:
+      - OPAC_PROC_MAIL_SERVER=mailhog
+      - OPAC_PROC_MAIL_PORT=1026
+      # Opac_ssm_server
+      - OPAC_SSM_GRPC_SERVER_HOST=${OPAC_GRPC_HOST}
+      - OPAC_SSM_GRPC_SERVER_PORT=${OPAC_GRPC_PORT}
+      # Opac_ssm_api
+      - OPAC_SSM_PROTO_FILE_HOST=raw.githubusercontent.com
+      - OPAC_SSM_PROTO_FILE_PORT=80
+      - OPAC_SSM_PROTO_FILE_PATH=/scieloorg/opac_ssm/master/grpc_ssm/opac.proto
+      # Static HTML Generator
+      - OPAC_PROC_ARTICLE_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-article.css
+      - OPAC_PROC_ARTICLE_PRINT_CSS_URL=http://ssm.scielo.org/media/assets/css/scielo-print.css
+      - OPAC_PROC_ARTICLE_JS_URL=http://ssm.scielo.org/media/assets/js/scielo-article.js
+      # Assets
+      - OPAC_PROC_ASSETS_RAISE_ERROR=True
+      # Prometheus
+      - OPAC_PROMETHEUS_ENABLED=True
+      - OPAC_PROC_PROMPG_HOST=pushgateway
+      - OPAC_PROC_PROMPG_PORT=9091
+
+  rq-scheduler:
+    build:
+      context: .
+      dockerfile: ./Dockerfile-dev
+      args:
+        - OPAC_PROC_BUILD_DATE=${OPAC_PROC_BUILD_DATE}            # export OPAC_PROC_BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+        - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
+        - OPAC_PROC_WEBAPP_VERSION=${OPAC_PROC_WEBAPP_VERSION}    # export OPAC_PROC_WEBAPP_VERSION="v0.1.0-dev"
+    command: /start_scheduler.sh
+    user: nobody
+    restart: always
+    volumes:
+      - ./data/xml:/app/data/xml:ro
+      - ./data/pdf:/app/data/pdf:ro
+      - .:/app
+    links:
+      - mongo-proc:mongo-proc
+      - mongo-logs:mongo-logs
+      - redis:redis
+      - mailhog:mailhog
+      - pushgateway:proc-pushgateway
     environment:
       - OPAC_PROC_LOG_LEVEL=DEBUG
       - OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN=articlemeta.scielo.org
@@ -142,6 +219,8 @@ services:
       - pushgateway:proc-pushgateway
     volumes:
       # - /etc/localtime:/etc/localtime:ro
+      - ./data/xml:/app/data/xml:ro
+      - ./data/pdf:/app/data/pdf:ro
       - .:/app
     ports:
       - "9000:8000"
