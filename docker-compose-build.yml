@@ -85,7 +85,12 @@ services:
       - OPAC_PROC_ASSETS_RAISE_ERROR=False
 
   rq-scheduler:
-    images: scieloorg/opac_proc
+    build:
+      context: .
+      args:
+        - OPAC_PROC_BUILD_DATE=${OPAC_PROC_BUILD_DATE}            # export OPAC_PROC_BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+        - OPAC_PROC_VCS_REF=${OPAC_PROC_VCS_REF}                  # export OPAC_PROC_VCS_REF=`git rev-parse --short HEAD`
+        - OPAC_PROC_WEBAPP_VERSION=${OPAC_PROC_WEBAPP_VERSION}    # export OPAC_PROC_WEBAPP_VERSION="v0.1.0-dev"
     command: /start_scheduler.sh
     user: nobody
     restart: always
