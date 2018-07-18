@@ -228,11 +228,11 @@ class Assets(object):
 
             prefix = '' if lang == original_lang else '%s_' % lang
 
-            pdf_lang.append({lang: '{}{}.pdf'.format(prefix, file_code)})
+            pdf_lang.append({lang: u'{}{}.pdf'.format(prefix, file_code)})
             assets['pdf'] = pdf_lang
 
         if self.xylose.data_model_version == 'xml':
-            assets['xml'] = '{0}.xml'.format(file_code)
+            assets['xml'] = u'{0}.xml'.format(file_code)
         else:
             # importante verificar se é o xylose devolve uma URL
             pass
@@ -606,7 +606,7 @@ class AssetHTMLS(Assets):
 
         prefix = '' if lang == original_lang else '%s_' % lang
 
-        return '{}{}.html'.format(prefix, file_code)
+        return u'{}{}.html'.format(prefix, file_code)
 
     def generate_htmls(self, content, css=None, print_css=None, js=None):
         """
