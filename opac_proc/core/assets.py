@@ -56,9 +56,15 @@ class Assets(object):
 
         if medias:
             for media_name, url in medias.items():
-                self.content = self.content.replace(
-                                            media_name.encode('utf-8'),
-                                            url.encode('utf-8'))
+                # test media_name is unicode?
+                if not isinstance(media_name, unicode):
+                    media_name = media_name.encode('utf-8')
+
+                # test url is unicode?
+                if not isinstance(url, unicode):
+                    url = url.encode('utf-8')
+
+                self.content = self.content.replace(media_name, url)
 
     def _extract_media(self):
         """

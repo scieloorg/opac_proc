@@ -1,5 +1,4 @@
 # coding: utf-8
-import os
 
 from flask import abort, current_app, render_template, request, send_from_directory
 from mongoengine.context_managers import switch_db
