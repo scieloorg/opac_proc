@@ -11,12 +11,16 @@ sys.path.append(PROJECT_PATH)
 from articlemeta.client import ThriftClient
 
 from opac_proc.web.config import (
+    OPAC_PROC_ASSETS_SOURCE_PDF_PATH,
+    OPAC_PROC_ASSETS_SOURCE_XML_PATH,
     OPAC_PROC_COLLECTION,
     ARTICLE_META_THRIFT_DOMAIN,
     ARTICLE_META_THRIFT_PORT,
     ARTICLE_META_REST_DOMAIN,
     ARTICLE_META_REST_PORT,
-    ARTICLE_META_THRIFT_TIMEOUT)
+    ARTICLE_META_THRIFT_TIMEOUT,
+    PDF_CATALOG_CRON_STRING,
+    XML_CATALOG_CRON_STRING)
 
 from opac_proc.web.webapp import create_app
 from opac_proc.web.accounts.forms import EmailForm
@@ -24,6 +28,11 @@ from opac_proc.web.accounts.mixins import User as UserMixin
 from opac_proc.web.accounts.models import User as UserModel
 
 from opac_proc.source_sync.ids_data_retriever_jobs import task_call_data_retriver_by_model
+
+from opac_proc.core.jobs import task_create_collection_static_catalog
+from opac_proc.core.tasks import (
+    clear_setup_scheduler_jobs,
+    setup_scheduler_jobs)
 
 from opac_proc.extractors.jobs import (
     task_extract_one_collection,
@@ -430,6 +439,63 @@ def create_superuser():
         print u'\n\n!!! Ocorreu um erro na criação do usuário. Erro: %s ***\n' % str(e)
     else:
         print u'\n\n*** Novo usuário criado com sucesso! ***\n'
+
+
+@manager.command
+@manager.option('-a', '--all', dest='all_formats')
+@manager.option('-f', '--format', dest='format')
+@manager.option('-c', '--cronstr', dest='cron_string')
+def setup_static_catalog_scheduler(all_formats=False,
+                                   format=None,
+                                   cron_string=None):
+    def setup_scheduler_format_task(queue_name, format, source_path,
+                                    cron_string):
+        clear_setup_scheduler_jobs(queue_name)
+        print u'Format %s from %s queue %s cron %s' % (format, source_path,
+                                                       queue_name, cron_string)
+        setup_scheduler_jobs(
+            task_create_collection_static_catalog,
+            [format, source_path],
+            queue_name=queue_name,
+            cron_string=cron_string
+        )
+
+    catalog_formats = {
+        'pdf': (OPAC_PROC_ASSETS_SOURCE_PDF_PATH, PDF_CATALOG_CRON_STRING),
+        'xml': (OPAC_PROC_ASSETS_SOURCE_XML_PATH, XML_CATALOG_CRON_STRING)
+    }
+    print u'Config. Static Catalog Scheduler'
+
+    all_formats = True if all_formats else False
+    if format and format not in catalog_formats.keys():
+        sys.exit(u'Format "%s" não suportado. Informe "pdf" ou "xml".' % format)
+    elif format:
+        source_path, catalog_cron_string = catalog_formats[format]
+        setup_scheduler_format_task(
+            queue_name='q%s_catalog' % format,
+            format=format,
+            source_path=source_path,
+            cron_string=cron_string if cron_string else catalog_cron_string
+        )
+    elif all_formats:
+        for format, catalog_format in catalog_formats.items():
+            source_path, catalog_cron_string = catalog_format
+            setup_scheduler_format_task(
+                queue_name='q%s_catalog' % format,
+                format=format,
+                source_path=source_path,
+                cron_string=cron_string if cron_string else catalog_cron_string
+            )
+    else:
+        sys.exit(u'Informe --format ou --all.')
+
+
+@manager.command
+@manager.option('-q', '--queue', dest='queue')
+def clear_setup_scheduler_queue(queue):
+    print u'\n Limpando fila %s' % queue
+    clear_setup_scheduler_jobs(queue)
+    print u'\n Sem jobs em fila %s!' % queue
 
 
 if __name__ == "__main__":

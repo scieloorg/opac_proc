@@ -29,11 +29,15 @@ COPY . /app
 RUN pip --no-cache-dir install -r /app/requirements.txt
 
 COPY ./start_worker.sh /start_worker.sh
+COPY ./start_scheduler.sh /start_scheduler.sh
 
 RUN sed -i 's/\r//' /start_worker.sh \
+    && sed -i 's/\r//' /start_scheduler.sh \
     && chmod +x /start_worker.sh \
+    && chmod +x /start_scheduler.sh \
     && chmod -R +x /src/ \
     && chown nobody /start_worker.sh \
+    && chown nobody /start_scheduler.sh \
     && chown -R nobody /src/
 
 RUN chown -R nobody:nogroup /app
