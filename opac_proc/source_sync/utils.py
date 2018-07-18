@@ -1,5 +1,5 @@
 # coding: utf-8
-import maya
+from dateutil.parser import parse as dateutil_parse
 
 MODEL_NAME_LIST = [
     'collection',
@@ -54,4 +54,4 @@ def parse_issue_pid_from_article_code(code):
 
 
 def parse_date_str_to_datetime_obj(date_str):
-    return maya.MayaDT.from_iso8601(date_str).datetime()
+    return dateutil_parse(date_str)
