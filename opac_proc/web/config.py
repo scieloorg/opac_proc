@@ -193,3 +193,10 @@ MAIL_PASSWORD = os.environ.get('OPAC_PROC_MAIL_PASSWORD', None)
 MAIL_DEFAULT_SENDER = DEFAULT_EMAIL
 MAIL_MAX_EMAILS = None
 MAIL_ASCII_ATTACHMENTS = False
+
+# Static files
+OPAC_PROC_STATIC_CATALOG = os.path.join(HERE, 'static', 'catalog')
+PDF_CATALOG_CRON_STRING = os.environ.get('OPAC_PROC_PDF_CATALOG_CRON_STRING',
+                                         '0 0 * * 0')
+XML_CATALOG_CRON_STRING = os.environ.get('OPAC_PROC_XML_CATALOG_CRON_STRING',
+                                         '0 0 * * 0')

@@ -1,5 +1,7 @@
 # coding: utf-8
-from flask import render_template
+import os
+
+from flask import abort, current_app, render_template, request, send_from_directory
 from mongoengine.context_managers import switch_db
 from opac_schema.v1.models import Collection as OpacCollection
 from opac_schema.v1.models import Journal as OpacJournal
@@ -109,3 +111,20 @@ def home():
         'latest_msg': latest_msg
     }
     return render_template("home.html", **context)
+
+
+# ##################################Others#######################################
+
+
+def download_file_by_filename():
+    catalog_types = ('pdf', 'html', 'xml')
+    catalog_file = request.path.replace('/', '')
+    valid_catalog_file = [
+        catalog_type for catalog_type in catalog_types
+        if catalog_file == 'static_{}_files.txt'.format(catalog_type)
+    ]
+    if not valid_catalog_file:
+        abort(404, 'Not found')
+
+    return send_from_directory(current_app.config['OPAC_PROC_STATIC_CATALOG'],
+                               catalog_file)

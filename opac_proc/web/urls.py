@@ -80,7 +80,7 @@ from opac_proc.web.views.message.list_views import (
 from opac_proc.web.views.message.detail_views import (
     MessageDetailView)
 
-from opac_proc.web.views.home import home
+from opac_proc.web.views.home import home, download_file_by_filename
 from opac_proc.web.views.export_report import export_failed_jobs
 
 url_patterns = (
@@ -236,6 +236,12 @@ def add_url_rules(app):
     # first add home page:
     app.add_url_rule('/', 'home', login_required(home))
     app.add_url_rule('/export/failed', 'export_failed_jobs', login_required(export_failed_jobs))
+    app.add_url_rule('/static_pdf_files.txt',
+                     view_func=download_file_by_filename)
+    app.add_url_rule('/static_html_files.txt',
+                     view_func=download_file_by_filename)
+    app.add_url_rule('/static_xml_files.txt',
+                     view_func=download_file_by_filename)
 
     # then iterate over url_patterns to add each view:
     for url_definition in url_patterns:
