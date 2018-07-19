@@ -39,6 +39,10 @@ services:
     user: nobody
     restart: always
     hostname: opac-proc-rqworker
+    links:
+      - mongo-proc:mongo-proc
+      - mongo-logs:mongo-logs
+      - redis:redis
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/scielosp_org/htdocs/img/revistas:/app/data/img:ro
@@ -105,6 +109,10 @@ services:
     user: nobody
     restart: always
     hostname: opac-proc-rqscheduler
+    links:
+      - mongo-proc:mongo-proc
+      - mongo-logs:mongo-logs
+      - redis:redis
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /mnt/scielosp_org/htdocs/img/revistas:/app/data/img:ro

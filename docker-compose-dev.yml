@@ -134,7 +134,6 @@ services:
       - mongo-logs:mongo-logs
       - redis:redis
       - mailhog:mailhog
-      - pushgateway:proc-pushgateway
     environment:
       - OPAC_PROC_LOG_LEVEL=DEBUG
       - OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN=articlemeta.scielo.org

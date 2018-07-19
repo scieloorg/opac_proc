@@ -19,7 +19,8 @@ def setup_scheduler_jobs(task_function, function_args, queue_name,
         cron_string,
         func=task_function,
         args=function_args,
-        queue_name=queue_name)
+        queue_name=queue_name,
+        timeout=2000)
 
 
 def clear_setup_scheduler_jobs(queue_name):
