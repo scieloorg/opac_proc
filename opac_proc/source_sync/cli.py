@@ -13,7 +13,8 @@ from opac_proc.source_sync.utils import MODEL_NAME_LIST, STAGE_LIST, ACTION_LIST
 from opac_proc.source_sync.populate_jobs import enqueue_full_populate_task_by_model
 from opac_proc.source_sync.ids_data_retriever_jobs import (
     enqueue_ids_data_retriever,
-    serial_run_ids_data_retriever
+    serial_run_ids_data_retriever,
+    serial_retriever_article_ids
 )
 
 from opac_proc.source_sync.differ_producer_jobs import enqueue_differ_producer_tasks
@@ -117,6 +118,11 @@ def retriever_serial(model):
     """ Roda o processo SERIAL necessário para obter os IdModels do model indicado"""
     serial_run_ids_data_retriever(model)
 
+
+@retriever.command()
+@click.option('--file', default='/app/article_ids.json', help='file path of articles identifiers to read')
+def retriever_article_ids(file):
+    serial_retriever_article_ids(file)
 
 # ------------------------------------------------------ #
 #                    POPULATE                            #

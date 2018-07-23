@@ -1,4 +1,5 @@
 # coding: utf-8
+import json
 import os
 import sys
 import logging
@@ -6,8 +7,17 @@ import logging.config
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
-
-from opac_proc.source_sync.utils import chunks, MODEL_NAME_LIST, STAGE_LIST, ACTION_LIST
+from opac_proc.source_sync.utils import (
+    chunks,
+    MODEL_NAME_LIST,
+    STAGE_LIST,
+    ACTION_LIST,
+    parse_date_str_to_datetime_obj,
+    parse_journal_issn_from_issue_code,
+    parse_journal_issn_from_article_code,
+    parse_issue_pid_from_article_code,
+    parse_date_str_to_datetime_obj,
+)
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.source_sync.event_logger import create_sync_event_record
 from opac_proc.source_sync.ids_data_retriever import (
@@ -19,6 +29,8 @@ from opac_proc.source_sync.ids_data_retriever import (
     PressReleaseDataRetriever,
 )
 
+from opac_proc.datastore.mongodb_connector import get_db_connection
+from opac_proc.datastore.identifiers_models import ArticleIdModel
 
 logger = logging.getLogger(__name__)
 logger_ini = os.path.join(os.path.dirname(__file__), 'logging.ini')
@@ -97,3 +109,34 @@ def serial_run_ids_data_retriever(model_name='all'):
         logger.info(u'Iniciando execução SERIAL para obter dados do IdModel, para o model: %s.' % (model_))
         task_call_data_retriver_by_model(model_, force_serial=True)
         logger.info(u'Fim da execução SERIAL para obter dados do IdModel, para o model: %s.' % (model_))
+
+
+def serial_retriever_article_ids(filepath):
+    get_db_connection()
+    with open(filepath) as fp:
+        logger.info('lendo arquivo: %s', filepath)
+        for line in fp:
+            aid_data = json.loads(line)
+            try:
+                code = aid_data['code']
+                new_processing_date = parse_date_str_to_datetime_obj(aid_data['processing_date'])
+                art = ArticleIdModel.objects.get(article_pid=code)
+            except ArticleIdModel.DoesNotExist:
+                issn = parse_journal_issn_from_article_code(code)
+                issue_pid = parse_issue_pid_from_article_code(code)
+                new_article_data = {
+                    'journal_issn': issn,
+                    'issue_pid': issue_pid,
+                    'article_pid': code,
+                    'processing_date': aid_data['processing_date']
+                }
+                new_art = ArticleIdModel(**new_article_data)
+                logger.info('cadastrando novo artigo: %s', aid_data)
+                new_art.save()
+            else:
+                old_processing_date = art.processing_date
+                if old_processing_date != new_processing_date:
+                    # update
+                    logger.info('atualizando aid: %', code)
+                    art.processing_date = new_processing_date
+                    art.save()
