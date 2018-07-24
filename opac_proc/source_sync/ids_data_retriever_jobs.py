@@ -137,6 +137,8 @@ def serial_retriever_article_ids(filepath):
                 old_processing_date = art.processing_date
                 if old_processing_date != new_processing_date:
                     # update
-                    logger.info('atualizando aid: %', code)
+                    logger.info('atualizando aid: %s', code)
                     art.processing_date = new_processing_date
                     art.save()
+                else:
+                    logger.info(u'artigo aid: %s sem mudança de data', code)
