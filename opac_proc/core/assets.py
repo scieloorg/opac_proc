@@ -574,7 +574,9 @@ class AssetXML(Assets):
 
             self._change_img_path(registered_media)  # change self.content
 
-            ssm_asset = SSMHandler(BytesIO(self.content), file_name,
+            # passamos de content em unicode depois do replace. para bytes
+            content_as_bytes = BytesIO(self.content.encode('utf-8'))
+            ssm_asset = SSMHandler(content_as_bytes, file_name,
                                    'xml', self.get_metadata(), self.bucket_name)
 
             code, assets = ssm_asset.exists()
