@@ -2,7 +2,7 @@
 import os
 import re
 import json
-from io import BytesIO
+from io import BytesIO, open as io_open
 
 from opac_proc.web import config
 from opac_proc.logger_setup import getMongoLogger
@@ -35,19 +35,24 @@ class Assets(object):
         self.xylose = xylose
         self.content = None
 
-    def _open_asset(self, file_path, mode='rb'):
+    def _open_asset(self, file_path, mode='rb', encoding=None):
         """
         Open asset as file like object(bytes)
         """
         try:
-            return open(file_path, mode)
+            if encoding is None:
+                return open(file_path, mode)
+            else:
+                return io_open(file_path, mode, encoding=encoding)
+
         except IOError as e:
             msg_error = u'Erro ao tentar abri o ativo: %s, erro: %s' % (file_path, e)
             logger.error(msg_error)
-            return None
 
             if config.OPAC_PROC_RAISE_ERROR:
                 raise Exception(msg_error)
+            else:
+                return None
 
     def _change_img_path(self, medias):
         """
@@ -555,10 +560,7 @@ class AssetXML(Assets):
             file_name = self.get_assets().get('xml')
             file_path = self._get_path(self.get_assets().get('xml'))
 
-            raw_content = self._open_asset(file_path, mode='r').read()
-            if not isinstance(raw_content, unicode):
-                raw_content = raw_content.encode('utf-8')
-            self.content = raw_content
+            self.content = self._open_asset(file_path, mode='r', encoding='utf-8').read()
 
             registered_media = self.register_media_xml()
 
