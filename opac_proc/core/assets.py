@@ -555,7 +555,10 @@ class AssetXML(Assets):
             file_name = self.get_assets().get('xml')
             file_path = self._get_path(self.get_assets().get('xml'))
 
-            self.content = self._open_asset(file_path, mode='r').read()
+            raw_content = self._open_asset(file_path, mode='r').read()
+            if not isinstance(raw_content, unicode):
+                raw_content = raw_content.encode('utf-8')
+            self.content = raw_content
 
             registered_media = self.register_media_xml()
 

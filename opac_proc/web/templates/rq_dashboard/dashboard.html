@@ -29,8 +29,13 @@
                 </table>
 
                 <script name="queue-row" type="text/template">
-                    <tr data-role="queue" <% if (d.name === 'failed' && d.count > 0) { %> class="failed"<% } %>>
-                        <td><i class="glyphicon glyphicon-inbox" style="opacity: .5;"></i> <a href="<%= d.url %>"><%= d.name %></a></td>
+                    <tr data-role="queue"
+                        <% if (d.name === 'failed' && d.count > 0) { %> class="failed"<% } %>
+                        <% if (d.name !== 'failed' && d.count > 0) { %> style="background-color: #D9EDF7;"<% } %>>
+                        <td>
+                            <i class="glyphicon glyphicon-inbox" style="opacity: .5;"></i>
+                            <a href="<%= d.url %>"><%= d.name %></a>
+                        </td>
                         <td class="narrow"><%= d.count %></td>
                     </tr>
                 </script>
