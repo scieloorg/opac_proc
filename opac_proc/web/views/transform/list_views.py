@@ -22,6 +22,7 @@ class TransformBaseListView(ListView):
     stage = 'transform'
     can_process = True
     can_delete = True
+    convert_pk_to_uuid = True
 
 
 class TransformCollectionListView(TransformBaseListView):

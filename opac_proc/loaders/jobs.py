@@ -7,6 +7,14 @@ from opac_proc.loaders.lo_articles import ArticleLoader
 from opac_proc.loaders.lo_press_releases import PressReleaseLoader
 from opac_proc.loaders.lo_news import NewsLoader
 from opac_proc.datastore import identifiers_models
+from opac_proc.datastore.models import (
+    LoadCollection,
+    LoadJournal,
+    LoadIssue,
+    LoadArticle,
+    LoadNews,
+    LoadPressRelease
+)
 
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
@@ -66,6 +74,41 @@ def task_load_all_collections():
             r_queues.enqueue(stage, model, task_load_selected_collections, uuid_as_string_list)
 
 
+def task_delete_selected_collections(selected_uuids):
+    """
+        Task para apagar Coleções Carregadas.
+        @param:
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
+
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'load'
+    model = 'collection'
+    model_class = LoadCollection
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_collections, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_collections():
+    get_db_connection()
+    all_records = LoadCollection.objects.all()
+    all_records.delete()
+
+
 # --------------------------------------------------- #
 #                   JOURNALS                          #
 # --------------------------------------------------- #
@@ -109,6 +152,41 @@ def task_load_all_journals():
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_load_selected_journals, uuid_as_string_list)
+
+
+def task_delete_selected_journals(selected_uuids):
+    """
+        Task para apagar Journals Carregados.
+        @param:
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
+
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'load'
+    model = 'journal'
+    model_class = LoadJournal
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_journals, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_journals():
+    get_db_connection()
+    all_records = LoadJournal.objects.all()
+    all_records.delete()
 
 
 # --------------------------------------------------- #
@@ -156,6 +234,40 @@ def task_load_all_issues():
             r_queues.enqueue(stage, model, task_load_selected_issues, uuid_as_string_list)
 
 
+def task_delete_selected_issues(selected_uuids):
+    """
+        Task para apagar Issues Carregados.
+        @param:
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
+
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'load'
+    model = 'issue'
+    model_class = LoadIssue
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_issues, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_issues():
+    get_db_connection()
+    all_records = LoadIssue.objects.all()
+    all_records.delete()
+
 # --------------------------------------------------- #
 #                   ARTICLE                           #
 # --------------------------------------------------- #
@@ -200,6 +312,40 @@ def task_load_all_articles():
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_load_selected_articles, uuid_as_string_list)
 
+
+def task_delete_selected_articles(selected_uuids):
+    """
+        Task para apagar Articles Carregados.
+        @param:
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
+
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'load'
+    model = 'article'
+    model_class = LoadArticle
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_articles, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_articles():
+    get_db_connection()
+    all_records = LoadArticle.objects.all()
+    all_records.delete()
 
 # --------------------------------------------------- #
 #               PRESS RELEASES                        #
@@ -246,6 +392,41 @@ def task_load_all_press_releases():
             r_queues.enqueue(stage, model, task_load_selected_press_releases, uuid_as_string_list)
 
 
+def task_delete_selected_press_releases(selected_uuids):
+    """
+        Task para apagar Press Releases Carregados.
+        @param:
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
+
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'load'
+    model = 'press_release'
+    model_class = LoadressRelease
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_press_releases, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_press_releases():
+    get_db_connection()
+    all_records = LoadPressRelease.objects.all()
+    all_records.delete()
+
+
 # --------------------------------------------------- #
 #                    NEWS                             #
 # --------------------------------------------------- #
@@ -289,3 +470,38 @@ def task_load_all_news():
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_load_selected_news, uuid_as_string_list)
+
+
+def task_delete_selected_news(selected_uuids):
+    """
+        Task para apagar News Carregados.
+        @param:
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
+
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
+            A lista será fatiada em listas de tamanho: SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
+            Será feito uma delete direto no queryset
+    """
+
+    stage = 'load'
+    model = 'news'
+    model_class = LoadNews
+    get_db_connection()
+    r_queues = RQueues()
+    SLICE_SIZE = 1000
+
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
+        for list_of_uuids in list_of_list_of_uuids:
+            uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+            r_queues.enqueue(stage, model, task_delete_selected_news, uuid_as_string_list)
+    else:
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
+        documents_to_delete.delete()
+
+
+def task_delete_all_news():
+    get_db_connection()
+    all_records = LoadNews.objects.all()
+    all_records.delete()

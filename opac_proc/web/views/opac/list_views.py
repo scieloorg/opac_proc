@@ -1,4 +1,5 @@
 # coding: utf-8
+import traceback
 from mongoengine.context_managers import switch_db
 from opac_schema.v1 import models
 from opac_proc.web.views.generics.list_views import ListView
@@ -11,6 +12,7 @@ class OpacBaseListView(ListView):
     stage = 'opac'
     can_process = False
     can_delete = True
+    convert_pk_to_uuid = False
 
     def get_objects(self):
         if self.model_class is None:
@@ -28,12 +30,25 @@ class OpacBaseListView(ListView):
     def do_delete_all(self):
         register_connections()
         with switch_db(self.model_class, OPAC_WEBAPP_DB_NAME):
-            super(OpacBaseListView, self).do_delete_all()
+            try:
+                self.model_class.objects.delete()
+            except Exception as e:
+                traceback_str = traceback.format_exc()
+                self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str)
+            else:
+                self._trigger_messages()
 
     def do_delete_selected(self, ids):
         register_connections()
         with switch_db(self.model_class, OPAC_WEBAPP_DB_NAME):
-            super(OpacBaseListView, self).do_delete_selected(ids)
+            # super(OpacBaseListView, self).do_delete_selected(ids)
+            try:
+                self.model_class.objects.filter(pk__in=ids).delete()
+            except Exception as e:
+                traceback_str = traceback.format_exc()
+                self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=len(ids))
+            else:
+                self._trigger_messages(items_count=len(ids))
 
 
 class OpacCollectionListView(OpacBaseListView):

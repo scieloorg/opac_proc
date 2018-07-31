@@ -21,6 +21,7 @@ class ExtractBaseListView(ListView):
     stage = 'extract'
     can_process = True
     can_delete = True
+    convert_pk_to_uuid = True
 
 
 class ExtractCollectionListView(ExtractBaseListView):

@@ -98,6 +98,7 @@ class ListView(View):
         #     'can_select_rows': True,        # boolean, se permite ou não a opção "All/Selected" ou não
         # },
     ]
+    convert_pk_to_uuid = False
 
     def _valid_uuid(self, uuid):
         regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
@@ -288,15 +289,18 @@ class ListView(View):
         else:
             self._trigger_messages(items_count=len(selected_uuids))
 
-    def get_selected_ids(self):
-        uuids = request.form.getlist('rowid')
-        if not uuids:
+    def get_selected_ids(self, return_as_uuid_str=False):
+        pks = request.form.getlist('rowid')
+        if not pks:
             raise ValueError(u"Não selecionou registros!")
-        elif isinstance(uuids, list):
-            uuids = [_id.strip() for _id in uuids]
+        elif isinstance(pks, list):
+            pks = [_id.strip() for _id in pks]
+            if return_as_uuid_str:
+                selected_uuids = self.model_class.objects.filter(pk__in=pks).values_list('uuid')
+                return [str(uuid) for uuid in selected_uuids]
         else:
-            raise ValueError("Seleção inválida: %s" % uuids)
-        return uuids
+            raise ValueError("Seleção inválida: %s" % pks)
+        return pks
 
     def dispatch_request(self):
         if request.method == 'POST':  # create action
@@ -338,7 +342,7 @@ class ListView(View):
                 elif action_name == 'process_selected':
                     if self.can_process:
                         try:
-                            ids = self.get_selected_ids()
+                            ids = self.get_selected_ids(self.convert_pk_to_uuid)
                             if ids:
                                 self.do_process_selected(ids)
                             else:
@@ -358,7 +362,7 @@ class ListView(View):
                 elif action_name == 'delete_selected':
                     if self.can_delete:
                         try:
-                            ids = self.get_selected_ids()
+                            ids = self.get_selected_ids(self.convert_pk_to_uuid)
                             if ids:
                                 self.do_delete_selected(ids)
                             else:

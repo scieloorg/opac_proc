@@ -77,6 +77,6 @@ class MessageListView(ListView):
         },
     ]
 
-    def get_selected_ids(self):
+    def get_selected_ids(self, *args, **kwargs):
         ids = super(MessageListView, self).get_selected_ids()
         return [ObjectId(_id.strip()) for _id in ids]

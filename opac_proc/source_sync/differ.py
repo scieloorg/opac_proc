@@ -287,9 +287,15 @@ class DifferBase(object):
         elif stage == 'load':
             is_transformed = self.is_transformed(target_uuid)
             is_loaded = self.is_loaded(target_uuid)
-            if is_transformed and not is_loaded:
+            logger.info('check_update_operation: stage -> %s, stage -> %s', stage, target_uuid)
+            logger.info('check_update_operation: is_transformed -> %s', is_transformed)
+            logger.info('check_update_operation: is_loaded -> %s', is_loaded)
+            if is_transformed and is_loaded:
+                logger.info('entrou no IF -> transformado e carregado')
                 tr_model_instance = self.tr_model_class.objects.get(uuid=target_uuid)
                 lo_model_instance = self.lo_model_class.objects.get(uuid=target_uuid)
+                logger.info('\ttr_model_instance.metadata.updated_at: %s', tr_model_instance.metadata.updated_at)
+                logger.info('\tlo_model_instance.metadata.updated_at: %s', lo_model_instance.metadata.updated_at)
                 return tr_model_instance.metadata.updated_at > lo_model_instance.metadata.updated_at
             else:
                 return False
@@ -370,6 +376,7 @@ class DifferBase(object):
         Resultado:
             retorna a lista de UUIDs que precisam ser addicionados na fase `stage`
         """
+        logger.info('[collect_update_records] %s %s', stage, since_date)
         if since_date is None:
             since_date = datetime.now() - timedelta(days=7)  # hoje - 7 dias
         elif not isinstance(since_date, datetime):
@@ -483,7 +490,7 @@ class DifferBase(object):
             if action == 'add' or action == 'update':
                 processor_instance.selected([target_uuid])
             elif action == 'delete':
-                raise NotImplementedError('Precisa implementar ainda!')
+                processor_instance.delete_selected([target_uuid])
 
             # atualizo registro diff como feito
             diff_model_instance = self.diff_model_class.objects.filter(

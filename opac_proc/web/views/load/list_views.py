@@ -21,6 +21,7 @@ class LoadBaseListView(ListView):
     stage = 'load'
     can_process = True
     can_delete = True
+    convert_pk_to_uuid = True
 
 
 class LoadCollectionListView(LoadBaseListView):

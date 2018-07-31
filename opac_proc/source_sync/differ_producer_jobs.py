@@ -78,7 +78,7 @@ def task_differ_update(stage, model_name, since_date=None):
         uuids_to_update = diff_class_instance.collect_update_records(stage, since_date)
         logger.info("[%s][%s] Coletados: %s documentos para UPDATE: " % (stage, model_name, len(uuids_to_update)))
         for uuid in uuids_to_update:
-            diff_class_instance.create_diff_model(stage, 'add', uuid)
+            diff_class_instance.create_diff_model(stage, 'update', uuid)
 
 
 # ------------------------------------------------------ #
