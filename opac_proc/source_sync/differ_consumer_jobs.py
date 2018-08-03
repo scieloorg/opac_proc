@@ -31,8 +31,8 @@ DIFFERS = {  # mover para utils.py
     'journal': JournalDiffer,
     'issue': IssueDiffer,
     'article': ArticleDiffer,
-    'news': PressReleaseDiffer,
-    'press_release': NewsDiffer,
+    'news': NewsDiffer,
+    'press_release': PressReleaseDiffer,
 }
 
 
@@ -51,8 +51,8 @@ def task_differ_apply_for_selected_uuids(stage, model_name, action, uuids):
 
     diff_class = DIFFERS[model_name]
     diff_class_instance = diff_class()
-    for target_uuid in uuids:
-        diff_class_instance.apply_diff_record(stage, action, target_uuid)
+    # passamos a lista de uuids a aplicar
+    diff_class_instance.apply_diff_record(stage, action, uuids)
 
 
 def enqueue_differ_consumer_tasks(stage='all', model_name='all', action='all'):

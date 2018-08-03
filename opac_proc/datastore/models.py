@@ -52,7 +52,7 @@ class ExtractCollection(BaseMixin, DynamicDocument):
         """
         return {
             'uuid': self.uuid,
-            'collection_acronym': self.acronym,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
         }
 
     meta = {
@@ -363,7 +363,7 @@ class TransformJournal(BaseMixin, DynamicDocument):
         """
         return {
             'uuid': self.uuid,
-            'collection_acronym': self.collection,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
             'journal_issn': self.get_issn
         }
 
@@ -623,7 +623,7 @@ class LoadJournal(BaseMixin, DynamicDocument):
         """
         return {
             'uuid': self.uuid,
-            'collection_acronym': self.loaded_data.collection,
+            'collection_acronym': config.OPAC_PROC_COLLECTION,
             'journal_issn': self.get_issn
         }
 
