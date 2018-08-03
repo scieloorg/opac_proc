@@ -76,8 +76,8 @@ DIFF_APPLY_PROCESSORS = {
             'journal': ProcessLoadJournal,
             'issue': ProcessLoadIssue,
             'article': ProcessLoadArticle,
-            'news': ProcessLoadPressRelease,
-            'press_release': ProcessLoadNews,
+            'news': ProcessLoadNews,
+            'press_release': ProcessLoadPressRelease,
         }
     },
     'update': {
@@ -477,26 +477,32 @@ class DifferBase(object):
     def get_uuids_unapplied(self, stage, action):
         return self.diff_model_class.objects.filter(stage=stage, action=action, done_at=None).values_list('uuid')
 
-    def apply_diff_record(self, stage, action, target_uuid):
-        logger.info(
-            "Aplicando o diff model para: stage: %s, action: %s, modelo: %s, UUID: %s" % (
-                stage, action, self.model_name, target_uuid))
+    def apply_diff_record(self, stage, action, target_uuids):
+        # logger.info(
+        #     "Aplicando o diff model para: stage: %s, action: %s, modelo: %s, UUID: %s" % (
+        #         stage, action, self.model_name, target_uuid))
         # get processor
         processor_class = DIFF_APPLY_PROCESSORS[action][stage][self.model_name]
         processor_instance = processor_class()
-        logger.info('Processor: %s' % processor_class)
+        # logger.info('Processor: %s' % processor_class)
 
         if action in ACTION_LIST:
             if action == 'add' or action == 'update':
-                processor_instance.selected([target_uuid])
+                if stage == 'extract' and action == 'add' and self.model_name in ['news', 'press_release']:
+                    processor_instance.all()
+                else:
+                    processor_instance.selected(target_uuids)
             elif action == 'delete':
-                processor_instance.delete_selected([target_uuid])
+                processor_instance.delete_selected(target_uuids)
 
             # atualizo registro diff como feito
-            diff_model_instance = self.diff_model_class.objects.filter(
-                uuid=target_uuid, action=action, stage=stage, done_at=None).first()
-            diff_model_instance.done_at = datetime.now()
-            diff_model_instance.save()
+            updated_count = self.diff_model_class.objects.filter(
+                uuid__in=target_uuids,
+                action=action,
+                stage=stage,
+                done_at=None).update(
+                    set__done_at=datetime.now())
+            logger.info('Atualizando %s registros de diff como feitos!' % updated_count)
         else:
             raise ValueError(u'Param action com valor inesperado: %s' % action)
 

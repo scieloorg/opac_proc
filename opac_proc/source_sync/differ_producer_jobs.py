@@ -31,8 +31,8 @@ DIFFERS = {
     'journal': JournalDiffer,
     'issue': IssueDiffer,
     'article': ArticleDiffer,
-    'news': PressReleaseDiffer,
-    'press_release': NewsDiffer,
+    'news': NewsDiffer,
+    'press_release': PressReleaseDiffer,
 }
 
 
