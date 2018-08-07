@@ -48,7 +48,8 @@ class ExtractCollection(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um CollectionDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        CollectionDiffModel
         """
         return {
             'uuid': self.uuid,
@@ -218,7 +219,8 @@ class ExtractPressRelease(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        PressReleaseDiffModel
         """
         return {
             'uuid': self.uuid,
@@ -260,7 +262,8 @@ class ExtractNews(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        NewsDiffModel
         """
         return {
             'uuid': self.uuid,
@@ -305,7 +308,8 @@ class TransformCollection(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um CollectionDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        CollectionDiffModel
         """
         return {
             'uuid': self.uuid,
@@ -444,7 +448,8 @@ class TransformArticle(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um ArticleDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        ArticleDiffModel
         """
         return {
             'uuid': self.uuid,
@@ -530,7 +535,8 @@ class TransformNews(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        NewsDiffModel
         """
         return {
             'uuid': self.uuid,
@@ -592,7 +598,8 @@ class LoadJournal(BaseMixin, DynamicDocument):
         if hasattr(self, 'loaded_data'):
             loaded_data = self.loaded_data
         else:
-            raise ValueError('O modelo de Journal com uuid: %s não tem loaded_data' % self.uuid)
+            raise ValueError(
+                'O modelo de Journal com uuid: %s não tem loaded_data' % self.uuid)
 
         if hasattr(loaded_data, 'scielo_issn'):
             issn = loaded_data.scielo_issn
@@ -601,7 +608,8 @@ class LoadJournal(BaseMixin, DynamicDocument):
         elif hasattr(loaded_data, 'print_issn'):
             issn = loaded_data.print_issn
         else:
-            raise ValueError('O modelo de Journal com uuid: %s não tem ISSN' % self.uuid)
+            raise ValueError(
+                'O modelo de Journal com uuid: %s não tem ISSN' % self.uuid)
         return issn
 
     def update_reprocess_field(self, uuid):
@@ -619,7 +627,8 @@ class LoadJournal(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um JournalDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        JournalDiffModel
         """
         return {
             'uuid': self.uuid,
@@ -654,12 +663,14 @@ class LoadIssue(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um IssueDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        IssueDiffModel
         """
+        issn = parse_journal_issn_from_issue_code(self.loaded_data.pid)
         return {
             'uuid': self.uuid,
             'collection_acronym': config.OPAC_PROC_COLLECTION,
-            'journal_issn': parse_journal_issn_from_issue_code(self.loaded_data.pid),
+            'journal_issn': issn,
             'issue_pid': self.loaded_data.pid
         }
 
@@ -690,13 +701,16 @@ class LoadArticle(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um ArticleDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        ArticleDiffModel
         """
+        issn = parse_journal_issn_from_article_code(self.loaded_data.pid)
+        issue_pid = parse_issue_pid_from_article_code(self.loaded_data.pid)
         return {
             'uuid': self.uuid,
             'collection_acronym': config.OPAC_PROC_COLLECTION,
-            'journal_issn': parse_journal_issn_from_article_code(self.loaded_data.pid),
-            'issue_pid': parse_issue_pid_from_article_code(self.loaded_data.pid),
+            'journal_issn': issn,
+            'issue_pid': issue_pid,
             'article_pid': self.loaded_data.pid
         }
 
@@ -727,12 +741,13 @@ class LoadPressRelease(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        PressReleaseDiffModel
         """
         return {
             'uuid': self.uuid,
             'collection_acronym': config.OPAC_PROC_COLLECTION,
-            'url_id': self.url
+            'url_id': self.loaded_data.url
         }
 
     meta = {
@@ -762,12 +777,13 @@ class LoadNews(BaseMixin, DynamicDocument):
     @property
     def get_diff_model_data(self):
         """
-        Retona um dicionariom com a informação dos campos para criarar um NewsDiffModel
+        Retona um dicionariom com a informação dos campos para criarar um
+        NewsDiffModel
         """
         return {
             'uuid': self.uuid,
             'collection_acronym': config.OPAC_PROC_COLLECTION,
-            'url_id': self.url
+            'url_id': self.loaded_data.url
         }
 
     meta = {

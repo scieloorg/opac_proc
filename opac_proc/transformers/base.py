@@ -80,7 +80,7 @@ class BaseTransformer(object):
             try:
                 self.transform_model_instance = self.transform_model_class.objects.get(
                     uuid=transform_model_uuid)
-            except Exception, e:
+            except self.transform_model_class.DoesNotExist, e:
                 raise ValueError('transform_model_uuid inválido!!')
         else:
             try:
@@ -88,7 +88,7 @@ class BaseTransformer(object):
                 extract_uuid = self.extract_model_instance.uuid
                 self.transform_model_instance = self.transform_model_class.objects.get(
                     uuid=extract_uuid)
-            except Exception, e:
+            except self.transform_model_class.DoesNotExist, e:
                 # não achamos, teremos que retornar uma instância nova do modelo
                 self.transform_model_instance = self.transform_model_class()
 

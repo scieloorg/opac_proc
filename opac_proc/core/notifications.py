@@ -110,7 +110,7 @@ def send_email_unread_single_message(msg_id):
             msg.send_email()
         else:
             raise ValueError(u'A mensagem com id: %s já esta marcada como enviada e não sera enviada novamente!' % msg_id)
-    except Message.DoesNotExists:
+    except Message.DoesNotExist:
         raise ValueError(u'A mensagem com id: %s não existe!' % msg_id)
     except Exception, e:  # melhorar esta Exception com IOError ou socket.error
         raise Exception(u'A mensagem com id: %s não pode ser enviada! Erro: %s' % (msg_id, str(e)))
