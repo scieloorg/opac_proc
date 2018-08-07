@@ -247,7 +247,6 @@
     $('#workers-list-toggle').click(function(event){
         event.preventDefault();
         var current_status = $(this).data('status');
-        console.log('current_status: ', current_status);
         if (current_status === "expandend") {
             // novo status: "collapsed"
             $('#workers-list-collapse').show();
@@ -266,7 +265,6 @@
     $('#queues-list-toggle').click(function(event){
         event.preventDefault();
         var current_status = $(this).data('status');
-        console.log('current_status: ', current_status);
         if (current_status === "expandend") {
             // novo status: "collapsed"
             $('#queues-list-collapse').show();

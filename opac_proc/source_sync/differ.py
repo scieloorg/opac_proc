@@ -287,15 +287,9 @@ class DifferBase(object):
         elif stage == 'load':
             is_transformed = self.is_transformed(target_uuid)
             is_loaded = self.is_loaded(target_uuid)
-            logger.info('check_update_operation: stage -> %s, stage -> %s', stage, target_uuid)
-            logger.info('check_update_operation: is_transformed -> %s', is_transformed)
-            logger.info('check_update_operation: is_loaded -> %s', is_loaded)
             if is_transformed and is_loaded:
-                logger.info('entrou no IF -> transformado e carregado')
                 tr_model_instance = self.tr_model_class.objects.get(uuid=target_uuid)
                 lo_model_instance = self.lo_model_class.objects.get(uuid=target_uuid)
-                logger.info('\ttr_model_instance.metadata.updated_at: %s', tr_model_instance.metadata.updated_at)
-                logger.info('\tlo_model_instance.metadata.updated_at: %s', lo_model_instance.metadata.updated_at)
                 return tr_model_instance.metadata.updated_at > lo_model_instance.metadata.updated_at
             else:
                 return False
@@ -478,13 +472,9 @@ class DifferBase(object):
         return self.diff_model_class.objects.filter(stage=stage, action=action, done_at=None).values_list('uuid')
 
     def apply_diff_record(self, stage, action, target_uuids):
-        # logger.info(
-        #     "Aplicando o diff model para: stage: %s, action: %s, modelo: %s, UUID: %s" % (
-        #         stage, action, self.model_name, target_uuid))
         # get processor
         processor_class = DIFF_APPLY_PROCESSORS[action][stage][self.model_name]
         processor_instance = processor_class()
-        # logger.info('Processor: %s' % processor_class)
 
         if action in ACTION_LIST:
             if action == 'add' or action == 'update':
