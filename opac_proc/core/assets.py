@@ -87,7 +87,7 @@ class Assets(object):
                 './/supplementary-material[@xlink:href]',
                 './/inline-supplementary-material[@xlink:href]',
             ]
-            xml_et = etree.XML(self.content)
+            xml_et = etree.XML(self.content.encode('utf-8'))
             namespaces = {'xlink': 'http://www.w3.org/1999/xlink'}
             attrib_iters = [
                 xml_et.iterfind(attrib, namespaces=namespaces)
