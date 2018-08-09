@@ -44,7 +44,7 @@ class TestAssets(BaseTestCase):
         )
         document = Article(article_json)
         asset = Assets(document)
-        asset.content = """<?xml version="1.0" encoding="utf-8"?>
+        xml_content = """<?xml version="1.0" encoding="utf-8"?>
         <article xmlns:xlink="http://www.w3.org/1999/xlink">
             <graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf01.tif"/>
 			<graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf02.tif"/>
@@ -54,6 +54,7 @@ class TestAssets(BaseTestCase):
 			<graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf06.tif"/>
 			<graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf07.tif"/>
         </article>"""
+        asset.content = unicode(xml_content)
         expected = [
             "1414-431X-bjmbr-1414-431X20176177-gf01.tif",
             "1414-431X-bjmbr-1414-431X20176177-gf02.tif",
