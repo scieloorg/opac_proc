@@ -17,10 +17,7 @@ from opac_proc.source_sync.ids_data_retriever_jobs import (
     serial_retriever_article_ids
 )
 
-from opac_proc.source_sync.differ_producer_jobs import enqueue_differ_producer_tasks
-from opac_proc.source_sync.differ_consumer_jobs import enqueue_differ_consumer_tasks
 from opac_proc.source_sync.cleaner import (
-    task_clean_diff_models,
     task_clean_id_models,
     task_clean_etl_models_by_stage,
 )
@@ -33,33 +30,6 @@ STAGE_LIST_STR = ', '.join(STAGE_LIST)
 MODEL_NAME_LIST_STR = ', '.join(MODEL_NAME_LIST)
 ACTION_LIST_STR = ', '.join(ACTION_LIST)
 
-# ------------------------------------------------------ #
-#                    DIFFER                              #
-# ------------------------------------------------------ #
-
-
-@click.group()
-def differ():
-    pass
-
-
-@differ.command()
-@click.option('--stage', default='all', help='Stage to produce. Options: all, %s.' % STAGE_LIST_STR)
-@click.option('--model', default='all', help='Model to produce. Options: all, %s.' % MODEL_NAME_LIST_STR)
-@click.option('--action', default='all', help='Action to produce. Options: all, %s' % ACTION_LIST_STR)
-def differ_produce_records(stage, model, action):
-    """Enfilera as tasks para gerar registros Differ do stage, modelo e action indicados"""
-    enqueue_differ_producer_tasks(stage, model, action)
-
-
-@differ.command()
-@click.option('--stage', default='all', help='Stage to consume. Options: all, %s.' % STAGE_LIST_STR)
-@click.option('--model', default='all', help='Model to consume. Options: all, %s.' % MODEL_NAME_LIST_STR)
-@click.option('--action', default='all', help='Action to consume. Options: all, %s' % ACTION_LIST_STR)
-def differ_consumer_tasks(stage, model, action):
-    """Enfilera as tasks para processar registros Differ do stage, modelo e action indicados"""
-    enqueue_differ_consumer_tasks(stage, model, action)
-
 
 # ------------------------------------------------------ #
 #                    CLEANER                             #
@@ -69,15 +39,6 @@ def differ_consumer_tasks(stage, model, action):
 @click.group()
 def cleaner():
     pass
-
-
-@cleaner.command()
-@click.option('--stage', default='all', help='Stage used to filter the Diff Model to delete. Options: all, %s.' % STAGE_LIST_STR)
-@click.option('--model', default='all', help='DiffModel that you want to delete. Options: all, %s.' % MODEL_NAME_LIST_STR)
-@click.option('--action', default='all', help='Action used to filter the Diff Model to delete. Options: all, %s' % ACTION_LIST_STR)
-def clean_diff_models(stage, model, action):
-    """Enfilera as tasks para remover registros Differ do stage, modelo e action indicados"""
-    task_clean_diff_models(stage, model, action)
 
 
 @cleaner.command()
@@ -141,7 +102,7 @@ def populate_id_model(model):
     enqueue_full_populate_task_by_model(model)
 
 
-cli = click.CommandCollection(sources=[differ, cleaner, retriever, populate])
+cli = click.CommandCollection(sources=[cleaner, retriever, populate])
 
 
 if __name__ == '__main__':

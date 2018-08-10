@@ -34,6 +34,24 @@ ARTICLE_META_REST_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_REST_PORT',
     80))
 
+# CONEXÃO MONGO ARTICLEMETA  --------------------------------------------
+AM_MONGODB_NAME = os.environ.get('OPAC_PROC_AM_MONGODB_NAME', 'articlemeta')
+AM_MONGODB_HOST = os.environ.get('OPAC_PROC_AM_MONGODB_HOST', None)
+AM_MONGODB_PORT = os.environ.get('OPAC_PROC_AM_MONGODB_PORT', 27017)
+AM_MONGODB_USER = os.environ.get('OPAC_PROC_AM_MONGODB_USER', None)
+AM_MONGODB_PASS = os.environ.get('OPAC_PROC_AM_MONGODB_PASS', None)
+
+AM_MONGODB_SETTINGS = {
+    'db': AM_MONGODB_NAME,
+    'host': AM_MONGODB_HOST,
+    'port': int(AM_MONGODB_PORT),
+}
+
+if AM_MONGODB_USER and AM_MONGODB_PASS:
+    AM_MONGODB_SETTINGS['username'] = AM_MONGODB_USER
+    AM_MONGODB_SETTINGS['password'] = AM_MONGODB_PASS
+
+
 ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT = os.environ.get('OPAC_PROC_ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT', 'opac')
 
 # WEBAPP config: ----------------------------------------------------

@@ -10,7 +10,6 @@ sys.path.append(PROJECT_PATH)
 from opac_proc.datastore.redis_queues import RQueues
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.datastore import identifiers_models
-from opac_proc.datastore import diff_models
 from opac_proc.datastore import models
 from opac_proc.source_sync.utils import MODEL_NAME_LIST, STAGE_LIST, ACTION_LIST
 from opac_proc.source_sync.event_logger import create_sync_event_record
@@ -18,16 +17,6 @@ from opac_proc.source_sync.event_logger import create_sync_event_record
 logger = logging.getLogger(__name__)
 logger_ini = os.path.join(os.path.dirname(__file__), 'logging.ini')
 logging.config.fileConfig(logger_ini, disable_existing_loggers=False)
-
-
-DIFF_MODEL_CLASS = {
-    'collection': diff_models.CollectionDiffModel,
-    'journal': diff_models.JournalDiffModel,
-    'issue': diff_models.IssueDiffModel,
-    'article': diff_models.ArticleDiffModel,
-    'news': diff_models.NewsDiffModel,
-    'press_release': diff_models.PressReleaseDiffModel
-}
 
 
 ID_MODEL_CLASS = {
@@ -79,28 +68,8 @@ def delete_identifiers(model_name):
     logger.info(u"Objetos removidos com sucesso!")
 
 
-def delete_diff_models(stage, model_name, action):
-    """função que remove documentos (modelos Diff*) para o modelo: `model_name`"""
-
-    if stage not in STAGE_LIST:
-        raise ValueError(u'parametro: stage: %s não é válido!' % stage)
-
-    if model_name not in DIFF_MODEL_CLASS.keys():
-        raise ValueError(u'parametro: model_name: %s não é válido!' % model_name)
-
-    if action not in ACTION_LIST:
-        raise ValueError(u'parametro: action: %s não é válido!' % action)
-
-    get_db_connection()
-    model_class = DIFF_MODEL_CLASS[model_name]
-    objects = model_class.objects.filter(stage=stage, action=action)
-    logger.info(u"Removendo: %s objetos do modelo: %s" % (objects.count(), model_name))
-    objects.delete()
-    logger.info(u"Objetos removidos com sucesso!")
-
-
 def delete_etl_models(stage, model_name):
-    """função que remove documentos (modelos Diff*) para o modelo: `model_name`"""
+    """função que remove documentos (modelos ETL) para o modelo: `model_name`"""
 
     if stage not in STAGE_LIST:
         raise ValueError(u'parametro: stage: %s não é válido!' % stage)
@@ -114,43 +83,6 @@ def delete_etl_models(stage, model_name):
     logger.info(u"Removendo: %s objetos do modelo: %s" % (objects.count(), model_name))
     objects.delete()
     logger.info(u"Objetos removidos com sucesso!")
-
-
-def task_clean_diff_models(stage='all', model_name='all', action='all'):
-    """
-    task que enfilera funções para remover modelos Diffs.
-    Param:
-    - `stage`: filtro do campo stage: "extract", "transform" ou "load"
-    - `model_name`: modelo a ser removido: "collection", "journal", etc.
-    - `action` filtro do campo: "add" | "update" | "delete"
-    """
-    r_queues = RQueues()
-
-    if model_name == 'all':
-        model_name_list = DIFF_MODEL_CLASS.keys()
-    else:
-        model_name_list = [model_name]
-
-    if stage == 'all':
-        stages_list = STAGE_LIST
-    else:
-        stages_list = [stage, ]
-
-    if action == 'all':
-        actions_list = ACTION_LIST
-    else:
-        actions_list = [action, ]
-
-    for model_ in model_name_list:
-        for stage_ in stages_list:
-            for action_ in actions_list:
-                msg = u'Enfilerando task para remover o diff model, modelo: %s, stage: %s, action: %s' % (model_, stage_, action_)
-                logger.info(msg)
-                create_sync_event_record('sync_ids', model_, 'delete_diff_models', msg)
-                r_queues.enqueue('sync_ids', model_, delete_diff_models, stage_, model_, action_)
-                msg = u'Fim: Enfilerando task para remover o diff model, modelo: %s, stage: %s, action: %s' % (model_, stage_, action_)
-                logger.info(msg)
-                create_sync_event_record('sync_ids', model_, 'delete_diff_models', msg)
 
 
 def task_clean_id_models(model_name='all'):
