@@ -223,7 +223,7 @@ MAIL_MAX_EMAILS = None
 MAIL_ASCII_ATTACHMENTS = False
 
 # Processamento parcial:
-DEFAULT_DIFF_SPAN = int(os.environ.get('OPAC_PROC_DEFAULT_DIFF_SPAN_DAYS', 7))
+DEFAULT_DIFF_SPAN = int(os.environ.get('OPAC_PROC_DEFAULT_DIFF_SPAN_DAYS', 30))
 
 # Prometheus settings:
 PROMETHEUS_ENABLED = os.environ.get('OPAC_PROMETHEUS_ENABLED', 'False') == 'True'
