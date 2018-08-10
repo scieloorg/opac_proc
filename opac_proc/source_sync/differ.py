@@ -1,8 +1,6 @@
 # coding: utf-8
 import sys
 import os
-import logging
-import logging.config
 
 from datetime import datetime, timedelta
 
@@ -47,10 +45,6 @@ from opac_proc.loaders.process import (
     ProcessLoadPressRelease,
     ProcessLoadNews
 )
-
-logger = logging.getLogger(__name__)
-logger_ini = os.path.join(os.path.dirname(__file__), 'logging.ini')
-logging.config.fileConfig(logger_ini, disable_existing_loggers=False)
 
 
 DIFF_APPLY_PROCESSORS = {
@@ -370,7 +364,6 @@ class DifferBase(object):
         Resultado:
             retorna a lista de UUIDs que precisam ser addicionados na fase `stage`
         """
-        logger.info('[collect_update_records] %s %s', stage, since_date)
         if since_date is None:
             since_date = datetime.now() - timedelta(days=7)  # hoje - 7 dias
         elif not isinstance(since_date, datetime):
@@ -486,13 +479,12 @@ class DifferBase(object):
                 processor_instance.delete_selected(target_uuids)
 
             # atualizo registro diff como feito
-            updated_count = self.diff_model_class.objects.filter(
+            self.diff_model_class.objects.filter(
                 uuid__in=target_uuids,
                 action=action,
                 stage=stage,
                 done_at=None).update(
                     set__done_at=datetime.now())
-            logger.info('Atualizando %s registros de diff como feitos!' % updated_count)
         else:
             raise ValueError(u'Param action com valor inesperado: %s' % action)
 
