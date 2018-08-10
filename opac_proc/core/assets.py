@@ -1,16 +1,18 @@
 # coding: utf-8
+import itertools
+import json
 import os
 import re
-import json
 from io import BytesIO, open as io_open
 
-from opac_proc.web import config
-from opac_proc.logger_setup import getMongoLogger
-
-from html_generator import generate_htmls
-from ssm_handler import SSMHandler
+from bs4 import BeautifulSoup
+from lxml import etree
 
 from opac_proc.core import utils
+from opac_proc.logger_setup import getMongoLogger
+from opac_proc.web import config
+from html_generator import generate_htmls
+from ssm_handler import SSMHandler
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
@@ -77,14 +79,34 @@ class Assets(object):
 
         Try get imgs by href e src tags.
         """
-
         if self.xylose.data_model_version == 'xml':
-            regex = config.OPAC_PROC_MEDIA_XML_MATCH_REGEX
+            attribs = [
+                './/graphic[@xlink:href]',
+                './/media[@xlink:href]',
+                './/inline-graphic[@xlink:href]',
+                './/supplementary-material[@xlink:href]',
+                './/inline-supplementary-material[@xlink:href]',
+            ]
+            xml_et = etree.XML(self.content.encode('utf-8'))
+            namespaces = {'xlink': 'http://www.w3.org/1999/xlink'}
+            attrib_iters = [
+                xml_et.iterfind(attrib, namespaces=namespaces)
+                for attrib in attribs
+            ]
+            elements = itertools.chain(*attrib_iters)
+            medias = [
+                element.attrib['{http://www.w3.org/1999/xlink}href']
+                for element in elements
+            ]
+        else:
+            parser = "html.parser"
+            soup = BeautifulSoup(self.content, parser)
+            medias = [
+                tag.get('src').strip().encode('utf-8')
+                for tag in soup.find_all(src=True)
+            ]
 
-        if self.xylose.data_model_version != 'xml':
-            regex = config.OPAC_PROC_MEDIA_HTML_MATCH_REGEX
-
-        return re.findall(regex, self.content)
+        return medias
 
     def _get_media_path(self, name):
         """
