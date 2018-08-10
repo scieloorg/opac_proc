@@ -129,7 +129,7 @@ def consume(stage, model, action):
         for model_ in models_list:
             for action_ in actions_list:
                 task_fn = task_fn_by_action[action_]
-                logger.info("[%s][%s][%s] enfilerando para producir registros diff", stage_, model_, action_)
+                logger.info("[%s][%s][%s] enfilerando para consumir registros diff", stage_, model_, action_)
                 r_queues.enqueue('sync_ids', model_, task_fn, stage_, model_)
 
 
