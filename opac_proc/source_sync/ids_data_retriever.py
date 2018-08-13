@@ -11,6 +11,7 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
 from opac_proc.extractors.source_clients.amapi_wrapper import custom_amapi_client
+from opac_proc.extractors.source_clients.am_db.api_db_adapter import AMDBAPI
 from opac_proc.datastore.models import ExtractCollection, ExtractJournal
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.datastore import identifiers_models as idmodels
@@ -34,6 +35,7 @@ class BaseIdDataRetriever(object):
     api_client = None
     model_name = None
     idmodel_class = None
+    am_db_api = None
 
     def __init__(self):
         if self.model_name is None:
@@ -50,6 +52,8 @@ class BaseIdDataRetriever(object):
                 config.ARTICLE_META_THRIFT_DOMAIN,
                 config.ARTICLE_META_THRIFT_PORT,
                 config.ARTICLE_META_THRIFT_TIMEOUT)
+        if self.am_db_api is None:
+            self.am_db_api = AMDBAPI()
 
         super(BaseIdDataRetriever, self).__init__()
 
@@ -139,8 +143,8 @@ class CollectionIdDataRetriever(BaseIdDataRetriever):
         """
         Obtemos os dados do modelo fornecidos pela API da fonte
         """
-
-        for col in self.api_client.get_collections_identifiers():
+        collection_ids = self.am_db_api.get_collections_identifiers()
+        for col in collection_ids:
             if col['code'] == self.collection_acronym:
                 _raw_data = col
                 break
@@ -182,6 +186,10 @@ class CollectionIdDataRetriever(BaseIdDataRetriever):
         if ex_collection is None:
             # A Collection nunca foi extraída. Temos que atualizar sim.
             return True
+        elif hasattr(raw_data, 'processing_date'):  # api_db_adapter inject processing_date
+            source_processing_date = raw_data['processing_date']
+            extracted_processing_date = ex_collection['metadata']['updated_at']
+            return source_processing_date > extracted_processing_date
         else:
             # A Collection foi extraída, e vamos comparar os campos salvos como os da fonte
             target_fields = [
@@ -200,10 +208,16 @@ class CollectionIdDataRetriever(BaseIdDataRetriever):
             return must_update_record
 
     def get_identifier_data(self, identifier):
-        return {
-            'collection_acronym': identifier['code'],
-            'processing_date': datetime.now()
+        data = {
+            'collection_acronym': identifier['code']
         }
+
+        if hasattr(identifier, 'processing_date'):
+            data['processing_date'] = identifier['processing_date']
+        else:
+            data['processing_date'] = datetime.now()
+
+        return data
 
     def process_one_identifier(self, identifier_data):
         coll_selector = {
@@ -244,7 +258,8 @@ class JournalIdDataRetriever(BaseIdDataRetriever):
         """
         Obtemos os dados do modelo fornecidos pela API da fonte
         """
-        return self.api_client.get_journals_identifiers(collection=self.collection_acronym)
+        journals_ids = self.am_db_api.get_journals_identifiers()
+        return journals_ids
 
     def get_identifier_data(self, identifier):
         return {
@@ -258,9 +273,15 @@ class JournalIdDataRetriever(BaseIdDataRetriever):
             'journal_issn': identifier_data['issn'],
         }
         # atualizo o registro no banco
-        new_data = {
-            'processing_date': parse_date_str_to_datetime_obj(identifier_data['processing_date'])
-        }
+        p_date = identifier_data['processing_date']
+        if isinstance(p_date, datetime):
+            new_data = {
+                'processing_date': p_date
+            }
+        else:
+            new_data = {
+                'processing_date': parse_date_str_to_datetime_obj(p_date)
+            }
         self._update_model_instance(document_selector, new_data)
 
 
@@ -278,7 +299,8 @@ class IssueIdDataRetriever(BaseIdDataRetriever):
         """
         Obtemos os dados do modelo fornecidos pela API da fonte
         """
-        return self.api_client.get_issues_identifiers(collection=self.collection_acronym)
+        issues_ids = self.am_db_api.get_issues_identifiers()
+        return issues_ids
 
     def get_identifier_data(self, identifier):
         code = identifier['code']
@@ -298,9 +320,15 @@ class IssueIdDataRetriever(BaseIdDataRetriever):
             'issue_pid': identifier_data['issue_pid'],
         }
         # atualizo o registro no banco
-        new_data = {
-            'processing_date': parse_date_str_to_datetime_obj(identifier_data['processing_date'])
-        }
+        p_date = identifier_data['processing_date']
+        if isinstance(p_date, datetime):
+            new_data = {
+                'processing_date': p_date
+            }
+        else:
+            new_data = {
+                'processing_date': parse_date_str_to_datetime_obj(p_date)
+            }
         self._update_model_instance(document_selector, new_data)
 
 
@@ -318,7 +346,8 @@ class ArticleIdDataRetriever(BaseIdDataRetriever):
         """
         Obtemos os dados do modelo fornecidos pela API da fonte
         """
-        return self.api_client.get_articles_identifiers(collection=self.collection_acronym)
+        articles_ids = self.am_db_api.get_articles_identifiers()
+        return articles_ids
 
     def get_identifier_data(self, identifier):
         code = identifier['code']
@@ -340,10 +369,16 @@ class ArticleIdDataRetriever(BaseIdDataRetriever):
             'issue_pid': identifier_data['issue_pid'],
             'article_pid': identifier_data['article_pid'],
         }
-        new_date = {
-            'processing_date': parse_date_str_to_datetime_obj(identifier_data['processing_date'])
-        }
-        self._update_model_instance(document_selector, new_date)
+        p_date = identifier_data['processing_date']
+        if isinstance(p_date, datetime):
+            new_data = {
+                'processing_date': p_date
+            }
+        else:
+            new_data = {
+                'processing_date': parse_date_str_to_datetime_obj(p_date)
+            }
+        self._update_model_instance(document_selector, new_data)
 
 
 # --------------------------------------------------- #
