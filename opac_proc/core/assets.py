@@ -97,11 +97,14 @@ class Assets(object):
                 element.attrib['{http://www.w3.org/1999/xlink}href']
                 for element in itertools.chain(*attrib_iters)
             ]
-            extension_files_list = config.PROC_MEDIA_EXTENSION_FILES.split(',')
+            extension_files_list = [
+                '.' + extension
+                for extension in config.MEDIA_EXTENSION_FILES.split(',')
+            ]
             medias = [
                 href
                 for href in hrefs
-                if href.split('.')[-1] in extension_files_list
+                if os.path.splitext(href)[-1] in extension_files_list
             ]
         else:
             parser = "html.parser"
@@ -112,7 +115,7 @@ class Assets(object):
             ]
 
             def _is_external_link(src_tag):
-                ext_link_indicators = config.PROC_MEDIA_EXT_LINKS_IND.split(',')
+                ext_link_indicators = config.MEDIA_EXT_LINKS_IND.split(',')
                 return any(
                     map(lambda ext_link_ind: src_tag.startswith(ext_link_ind),
                         ext_link_indicators)
@@ -131,7 +134,7 @@ class Assets(object):
         Returns the folder path of media.
         """
         asset_path = config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
-        if name.split('.')[-1].lower() == 'pdf':
+        if os.path.splitext(name)[-1].lower() == '.pdf':
             asset_path = config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH
 
         return '%s/%s/%s/%s' % (
