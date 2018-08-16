@@ -58,6 +58,10 @@ from opac_proc.datastore.identifiers_models import (
     IssueIdModel,
     ArticleIdModel)
 
+from opac_proc.source_sync.sched import SCHED_ID_BY_MODEL_NAME
+from opac_proc.source_sync.utils import MODEL_NAME_LIST
+
+
 app = create_app()
 manager = Manager(app)
 
@@ -496,6 +500,40 @@ def clear_setup_scheduler_queue(queue):
     print u'\n Limpando fila %s' % queue
     clear_setup_scheduler_jobs(queue)
     print u'\n Sem jobs em fila %s!' % queue
+
+
+@manager.command
+@manager.option('-m', '--model', dest='model_name')
+def setup_idsync_scheduler(model_name='all'):
+    models_selected = []
+    if model_name == 'all':
+        models_selected = MODEL_NAME_LIST
+    elif model_name not in MODEL_NAME_LIST:
+        model_options = str(['all'] + MODEL_NAME_LIST)
+        sys.exit(u'Modelo "%s" inválido. Opções: "all",%s ' % model_name, model_options)
+
+    for model_name_ in models_selected:
+        sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
+        sched_instance = sched_class()
+        print "configurando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_)
+        sched_instance.setup()
+
+
+@manager.command
+@manager.option('-m', '--model', dest='model_name')
+def clear_idsync_scheduler(model_name='all'):
+    models_selected = []
+    if model_name == 'all':
+        models_selected = MODEL_NAME_LIST
+    elif model_name not in MODEL_NAME_LIST:
+        model_options = str(['all'] + MODEL_NAME_LIST)
+        sys.exit(u'Modelo "%s" inválido. Opções: "all",%s ' % model_name, model_options)
+
+    for model_name_ in models_selected:
+        sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
+        sched_instance = sched_class()
+        print "limpando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_)
+        sched_instance.clear_jobs()
 
 
 if __name__ == "__main__":
