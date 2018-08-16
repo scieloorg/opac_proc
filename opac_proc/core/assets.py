@@ -77,7 +77,7 @@ class Assets(object):
         """
         Return a list of media to be collect from content
 
-        Try get imgs by href e src tags.
+        Try get imgs by xlink:href and src tags with internal links.
         """
         if self.xylose.data_model_version == 'xml':
             attribs = [
@@ -93,17 +93,35 @@ class Assets(object):
                 xml_et.iterfind(attrib, namespaces=namespaces)
                 for attrib in attribs
             ]
-            elements = itertools.chain(*attrib_iters)
-            medias = [
+            hrefs = [
                 element.attrib['{http://www.w3.org/1999/xlink}href']
-                for element in elements
+                for element in itertools.chain(*attrib_iters)
+            ]
+            extension_files_list = config.PROC_MEDIA_EXTENSION_FILES.split(',')
+            medias = [
+                href
+                for href in hrefs
+                if href.split('.')[-1] in extension_files_list
             ]
         else:
             parser = "html.parser"
             soup = BeautifulSoup(self.content, parser)
-            medias = [
+            src_tags = [
                 tag.get('src').strip().encode('utf-8')
                 for tag in soup.find_all(src=True)
+            ]
+
+            def _is_external_link(src_tag):
+                ext_link_indicators = config.PROC_MEDIA_EXT_LINKS_IND.split(',')
+                return any(
+                    map(lambda ext_link_ind: src_tag.startswith(ext_link_ind),
+                        ext_link_indicators)
+                )
+
+            medias = [
+                src_tag
+                for src_tag in src_tags
+                if not _is_external_link(src_tag)
             ]
 
         return medias
@@ -112,8 +130,12 @@ class Assets(object):
         """
         Returns the folder path of media.
         """
+        asset_path = config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
+        if name.split('.')[-1].lower() == 'pdf':
+            asset_path = config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH
+
         return '%s/%s/%s/%s' % (
-                            config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH,
+                            asset_path,
                             self.xylose.journal.acronym.lower(),
                             self.xylose.assets_code,
                             name)
@@ -163,13 +185,14 @@ class Assets(object):
                     /img/revistas/gs/v29n4/original_breve1_t1.jpg (must common example)
                     /img/fbpe/gs/v29n4/original_breve1_t1.jpg
                     ../img/revistas/gs/v29n4/original_breve1_t1.jpg
-                    http:/img/revistas/gs/v29n4/original_breve1_t1.jpg
                     img/revistas/resp/v80n6/seta.gif
                     /img/revistas/resp/v80n6/seta.gif (this media is no registered)
         """
 
         origin_path = media_path
 
+        # TODO: Colocar um cadastro de mídias fixas para não alterar? Consulta
+        # que não seja feita a cada interação para não comprometer performance
         exclude_medias = ['seta.jpg', 'seta.gif']
 
         if os.path.basename(media_path) in exclude_medias:
@@ -177,8 +200,9 @@ class Assets(object):
 
         source_media_path = config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
 
-        change_media_path = [('tif', 'jpg'), ('../', '/'), ('http:', ''),
+        change_media_path = [('tif', 'jpg'), ('../', '/'), ('./', '/'),
                              ('/img/fbpe', source_media_path),
+                             ('img/fbpe', source_media_path),
                              ('/img/revistas', source_media_path),
                              ('img/revistas', source_media_path)]
 
@@ -202,11 +226,8 @@ class Assets(object):
         """
 
         origin_path = media_path
-
         change_media_path = [('tif', 'jpg')]
-
-        for replace in change_media_path:
-            _from, _to = replace
+        for _from, _to in change_media_path:
             media_path = media_path.replace(_from, _to)
 
         return (origin_path, media_path)
