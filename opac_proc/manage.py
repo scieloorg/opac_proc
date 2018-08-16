@@ -511,6 +511,8 @@ def setup_idsync_scheduler(model_name='all'):
     elif model_name not in MODEL_NAME_LIST:
         model_options = str(['all'] + MODEL_NAME_LIST)
         sys.exit(u'Modelo "%s" inválido. Opções: "all",%s ' % model_name, model_options)
+    else:
+        models_selected = [model_name, ]
 
     for model_name_ in models_selected:
         sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
@@ -528,6 +530,8 @@ def clear_idsync_scheduler(model_name='all'):
     elif model_name not in MODEL_NAME_LIST:
         model_options = str(['all'] + MODEL_NAME_LIST)
         sys.exit(u'Modelo "%s" inválido. Opções: "all",%s ' % model_name, model_options)
+    else:
+        models_selected = [model_name, ]
 
     for model_name_ in models_selected:
         sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]

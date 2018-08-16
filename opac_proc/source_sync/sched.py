@@ -72,7 +72,7 @@ class SyncScheduler:
             connection=self._redis_conn)
 
     def setup(self):
-        rq_sched = self.get_scheduler_instance()
+        rq_sched = self._rq_scheduler_instance
 
         if self.task_func:
             rq_sched.cron(
@@ -87,7 +87,7 @@ class SyncScheduler:
         return self._rq_scheduler_instance
 
     def clear_jobs(self):
-        rq_sched = self.get_scheduler_instance()
+        rq_sched = self._rq_scheduler_instance
 
         for job in rq_sched.get_jobs():
             if job.origin == self.queue_name:
