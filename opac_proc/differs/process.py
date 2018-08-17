@@ -14,9 +14,9 @@ class ProcessDiffersBase:
     task_produce_delete = 'opac_proc.differs.produce_jobs.task_produce_diff_delete'
     task_delete_selected = 'opac_proc.differs.produce_jobs.task_delete_selected_diff_etl_model'
     task_delete_all = 'opac_proc.differs.produce_jobs.task_delete_all_diff_etl_model'
-    task_consume_add = 'opac_proc.differs.produce_jobs.task_consume_diff_add'
-    task_consume_update = 'opac_proc.differs.produce_jobs.task_consume_diff_update'
-    task_consume_delete = 'opac_proc.differs.produce_jobs.task_consume_diff_delete'
+    task_consume_add = 'opac_proc.differs.consumer_jobs.task_consume_diff_add'
+    task_consume_update = 'opac_proc.differs.consumer_jobs.task_consume_diff_update'
+    task_consume_delete = 'opac_proc.differs.consumer_jobs.task_consume_diff_delete'
 
     def produce(self, stage, action):
         task_fn = None

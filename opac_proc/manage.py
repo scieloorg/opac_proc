@@ -60,7 +60,13 @@ from opac_proc.datastore.identifiers_models import (
 
 from opac_proc.source_sync.sched import SCHED_ID_BY_MODEL_NAME
 from opac_proc.source_sync.utils import MODEL_NAME_LIST
-
+from opac_proc.differs.producer_sched import PRODUCER_SCHEDS
+from opac_proc.differs.consumer_sched import CONSUMER_SCHEDS
+from opac_proc.differs.utils import (
+    ETL_STAGE_LIST,
+    ETL_MODEL_NAME_LIST,
+    ACTION_LIST
+)
 
 app = create_app()
 manager = Manager(app)
@@ -517,7 +523,7 @@ def setup_idsync_scheduler(model_name='all'):
     for model_name_ in models_selected:
         sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
         sched_instance = sched_class()
-        print "configurando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_)
+        print "instalando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_)
         sched_instance.setup()
 
 
@@ -538,6 +544,154 @@ def clear_idsync_scheduler(model_name='all'):
         sched_instance = sched_class()
         print "limpando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_)
         sched_instance.clear_jobs()
+
+
+@manager.command
+@manager.option('-s', '--stage', dest='stage')
+@manager.option('-m', '--model', dest='model_name')
+@manager.option('-a', '--action', dest='action')
+def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
+
+    if stage == 'all':
+        stages_list = ETL_STAGE_LIST
+    elif stage not in ETL_STAGE_LIST:
+        sys.exit('Param: stage: %s com valor inesperado!' % stage)
+    else:
+        stages_list = [stage, ]
+
+    if model_name == 'all':
+        models_list = ETL_MODEL_NAME_LIST
+    elif model_name not in ETL_MODEL_NAME_LIST:
+        sys.exit('Param: model: %s com valor inesperado!' % model_name)
+    else:
+        models_list = [model_name]
+
+    if action == 'all':
+        actions_list = ACTION_LIST
+    elif action not in ACTION_LIST:
+        sys.exit('Param: action: %s com valor inesperado!' % action)
+    else:
+        actions_list = [action, ]
+
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
+                sched_instance = sched_class()
+                print "[%s][%s][%s] instalando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name)
+                sched_instance.setup()
+
+
+@manager.command
+@manager.option('-s', '--stage', dest='stage')
+@manager.option('-m', '--model', dest='model_name')
+@manager.option('-a', '--action', dest='action')
+def clear_produce_differ_scheduler(stage='all', model_name='all', action='all'):
+
+    if stage == 'all':
+        stages_list = ETL_STAGE_LIST
+    elif stage not in ETL_STAGE_LIST:
+        sys.exit('Param: stage: %s com valor inesperado!' % stage)
+    else:
+        stages_list = [stage, ]
+
+    if model_name == 'all':
+        models_list = ETL_MODEL_NAME_LIST
+    elif model_name not in ETL_MODEL_NAME_LIST:
+        sys.exit('Param: model: %s com valor inesperado!' % model_name)
+    else:
+        models_list = [model_name]
+
+    if action == 'all':
+        actions_list = ACTION_LIST
+    elif action not in ACTION_LIST:
+        sys.exit('Param: action: %s com valor inesperado!' % action)
+    else:
+        actions_list = [action, ]
+
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
+                sched_instance = sched_class()
+                print "[%s][%s][%s] limpando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name)
+                sched_instance.clear_jobs()
+
+
+@manager.command
+@manager.option('-s', '--stage', dest='stage')
+@manager.option('-m', '--model', dest='model_name')
+@manager.option('-a', '--action', dest='action')
+def setup_consume_differ_scheduler(stage='all', model_name='all', action='all'):
+
+    if stage == 'all':
+        stages_list = ETL_STAGE_LIST
+    elif stage not in ETL_STAGE_LIST:
+        sys.exit('Param: stage: %s com valor inesperado!' % stage)
+    else:
+        stages_list = [stage, ]
+
+    if model_name == 'all':
+        models_list = ETL_MODEL_NAME_LIST
+    elif model_name not in ETL_MODEL_NAME_LIST:
+        sys.exit('Param: model: %s com valor inesperado!' % model_name)
+    else:
+        models_list = [model_name]
+
+    if action == 'all':
+        actions_list = ACTION_LIST
+    elif action not in ACTION_LIST:
+        sys.exit('Param: action: %s com valor inesperado!' % action)
+    else:
+        actions_list = [action, ]
+
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                sched_class = CONSUMER_SCHEDS[stage_][model_][action_]
+                sched_instance = sched_class()
+                print "[%s][%s][%s] instalando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name)
+                sched_instance.setup()
+
+
+@manager.command
+@manager.option('-s', '--stage', dest='stage')
+@manager.option('-m', '--model', dest='model_name')
+@manager.option('-a', '--action', dest='action')
+def clear_consume_differ_scheduler(stage='all', model_name='all', action='all'):
+
+    if stage == 'all':
+        stages_list = ETL_STAGE_LIST
+    elif stage not in ETL_STAGE_LIST:
+        sys.exit('Param: stage: %s com valor inesperado!' % stage)
+    else:
+        stages_list = [stage, ]
+
+    if model_name == 'all':
+        models_list = ETL_MODEL_NAME_LIST
+    elif model_name not in ETL_MODEL_NAME_LIST:
+        sys.exit('Param: model: %s com valor inesperado!' % model_name)
+    else:
+        models_list = [model_name]
+
+    if action == 'all':
+        actions_list = ACTION_LIST
+    elif action not in ACTION_LIST:
+        sys.exit('Param: action: %s com valor inesperado!' % action)
+    else:
+        actions_list = [action, ]
+
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                sched_class = CONSUMER_SCHEDS[stage_][model_][action_]
+                sched_instance = sched_class()
+                print "[%s][%s][%s] limpando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name)
+                sched_instance.clear_jobs()
 
 
 if __name__ == "__main__":
