@@ -68,6 +68,11 @@ from opac_proc.differs.utils import (
     ACTION_LIST
 )
 
+from opac_proc.utils import (
+    clean_idsync_scheduler_params,
+    clean_differ_scheduler_params
+)
+
 app = create_app()
 manager = Manager(app)
 
@@ -511,15 +516,13 @@ def clear_setup_scheduler_queue(queue):
 @manager.command
 @manager.option('-m', '--model', dest='model_name')
 def setup_idsync_scheduler(model_name='all'):
-    models_selected = []
-    if model_name == 'all':
-        models_selected = MODEL_NAME_LIST
-    elif model_name not in MODEL_NAME_LIST:
-        model_options = str(['all'] + MODEL_NAME_LIST)
-        sys.exit(u'Modelo "%s" inválido. Opções: "all",%s ' % model_name, model_options)
-    else:
-        models_selected = [model_name, ]
+    """
+    Instala os schedulers para recuperar os identificadores do modelo indicado
+    pelo param model_name.
+    Por padrão será executado para todos os modelos
+    """
 
+    models_selected = clean_idsync_scheduler_params(model_name)
     for model_name_ in models_selected:
         sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
         sched_instance = sched_class()
@@ -530,15 +533,13 @@ def setup_idsync_scheduler(model_name='all'):
 @manager.command
 @manager.option('-m', '--model', dest='model_name')
 def clear_idsync_scheduler(model_name='all'):
-    models_selected = []
-    if model_name == 'all':
-        models_selected = MODEL_NAME_LIST
-    elif model_name not in MODEL_NAME_LIST:
-        model_options = str(['all'] + MODEL_NAME_LIST)
-        sys.exit(u'Modelo "%s" inválido. Opções: "all",%s ' % model_name, model_options)
-    else:
-        models_selected = [model_name, ]
+    """
+    Removo todos os jobs enfilerados na fila dos schedulers
+    indicados pelos param model_name.
+    Por padrão será executado para todos os modelos
+    """
 
+    models_selected = clean_idsync_scheduler_params(model_name)
     for model_name_ in models_selected:
         sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
         sched_instance = sched_class()
@@ -551,28 +552,12 @@ def clear_idsync_scheduler(model_name='all'):
 @manager.option('-m', '--model', dest='model_name')
 @manager.option('-a', '--action', dest='action')
 def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
-
-    if stage == 'all':
-        stages_list = ETL_STAGE_LIST
-    elif stage not in ETL_STAGE_LIST:
-        sys.exit('Param: stage: %s com valor inesperado!' % stage)
-    else:
-        stages_list = [stage, ]
-
-    if model_name == 'all':
-        models_list = ETL_MODEL_NAME_LIST
-    elif model_name not in ETL_MODEL_NAME_LIST:
-        sys.exit('Param: model: %s com valor inesperado!' % model_name)
-    else:
-        models_list = [model_name]
-
-    if action == 'all':
-        actions_list = ACTION_LIST
-    elif action not in ACTION_LIST:
-        sys.exit('Param: action: %s com valor inesperado!' % action)
-    else:
-        actions_list = [action, ]
-
+    """
+    instala os schedulers para producir a diferencia nos modelos de ETL.
+    Por padrão aplica para todas as fases, todos os modelos e todas as açoes
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        stage, model_name, action)
     for stage_ in stages_list:
         for model_ in models_list:
             for action_ in actions_list:
@@ -588,28 +573,12 @@ def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
 @manager.option('-m', '--model', dest='model_name')
 @manager.option('-a', '--action', dest='action')
 def clear_produce_differ_scheduler(stage='all', model_name='all', action='all'):
-
-    if stage == 'all':
-        stages_list = ETL_STAGE_LIST
-    elif stage not in ETL_STAGE_LIST:
-        sys.exit('Param: stage: %s com valor inesperado!' % stage)
-    else:
-        stages_list = [stage, ]
-
-    if model_name == 'all':
-        models_list = ETL_MODEL_NAME_LIST
-    elif model_name not in ETL_MODEL_NAME_LIST:
-        sys.exit('Param: model: %s com valor inesperado!' % model_name)
-    else:
-        models_list = [model_name]
-
-    if action == 'all':
-        actions_list = ACTION_LIST
-    elif action not in ACTION_LIST:
-        sys.exit('Param: action: %s com valor inesperado!' % action)
-    else:
-        actions_list = [action, ]
-
+    """
+    remove os jobs enfilerados nas filas usadas pelos schedulers de
+    producir as diferencias
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        stage, model_name, action)
     for stage_ in stages_list:
         for model_ in models_list:
             for action_ in actions_list:
@@ -625,28 +594,12 @@ def clear_produce_differ_scheduler(stage='all', model_name='all', action='all'):
 @manager.option('-m', '--model', dest='model_name')
 @manager.option('-a', '--action', dest='action')
 def setup_consume_differ_scheduler(stage='all', model_name='all', action='all'):
-
-    if stage == 'all':
-        stages_list = ETL_STAGE_LIST
-    elif stage not in ETL_STAGE_LIST:
-        sys.exit('Param: stage: %s com valor inesperado!' % stage)
-    else:
-        stages_list = [stage, ]
-
-    if model_name == 'all':
-        models_list = ETL_MODEL_NAME_LIST
-    elif model_name not in ETL_MODEL_NAME_LIST:
-        sys.exit('Param: model: %s com valor inesperado!' % model_name)
-    else:
-        models_list = [model_name]
-
-    if action == 'all':
-        actions_list = ACTION_LIST
-    elif action not in ACTION_LIST:
-        sys.exit('Param: action: %s com valor inesperado!' % action)
-    else:
-        actions_list = [action, ]
-
+    """
+    instala os schedulers para consumir a diferencia nos modelos de ETL.
+    Por padrão aplica para todas as fases, todos os modelos e todas as açoes
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        stage, model_name, action)
     for stage_ in stages_list:
         for model_ in models_list:
             for action_ in actions_list:
@@ -662,28 +615,12 @@ def setup_consume_differ_scheduler(stage='all', model_name='all', action='all'):
 @manager.option('-m', '--model', dest='model_name')
 @manager.option('-a', '--action', dest='action')
 def clear_consume_differ_scheduler(stage='all', model_name='all', action='all'):
-
-    if stage == 'all':
-        stages_list = ETL_STAGE_LIST
-    elif stage not in ETL_STAGE_LIST:
-        sys.exit('Param: stage: %s com valor inesperado!' % stage)
-    else:
-        stages_list = [stage, ]
-
-    if model_name == 'all':
-        models_list = ETL_MODEL_NAME_LIST
-    elif model_name not in ETL_MODEL_NAME_LIST:
-        sys.exit('Param: model: %s com valor inesperado!' % model_name)
-    else:
-        models_list = [model_name]
-
-    if action == 'all':
-        actions_list = ACTION_LIST
-    elif action not in ACTION_LIST:
-        sys.exit('Param: action: %s com valor inesperado!' % action)
-    else:
-        actions_list = [action, ]
-
+    """
+    remove os jobs enfilerados nas filas usadas pelos schedulers de
+    consumir as diferencias
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        stage, model_name, action)
     for stage_ in stages_list:
         for model_ in models_list:
             for action_ in actions_list:
