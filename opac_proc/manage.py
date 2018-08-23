@@ -631,5 +631,42 @@ def clear_consume_differ_scheduler(stage='all', model_name='all', action='all'):
                 sched_instance.clear_jobs()
 
 
+@manager.command
+def clear_and_setup_all_schedulers():
+    """
+    Comando utilitario para limpar todas filas usadas pelos schedulers e
+    instalar todos os schedulers.
+    """
+    # qxml_catalog e qpdf_catalog
+    print('[limpando] filas de schedulers do catalog')
+    catalog_queues = ['qxml_catalog', 'qpdf_catalog']
+    for queue_name in catalog_queues:
+        clear_setup_scheduler_queue(queue_name)
+
+    # qss_* para identificadores
+    print('[limpando] filas de schedulers do identificadores')
+    clear_idsync_scheduler()
+
+    # qss_* para produzir diff
+    print('[limpando] filas de schedulers do produce diff')
+    clear_produce_differ_scheduler()
+
+    # qss_* para consumir diff
+    print('[limpando] filas de schedulers do consume diff')
+    clear_consume_differ_scheduler()
+
+    print('[instalando] schedulers do catalog')
+    setup_static_catalog_scheduler(all_formats=True)
+
+    print('[instalando] schedulers do identificadores')
+    setup_idsync_scheduler()
+
+    print('[instalando] schedulers do produzir a diff')
+    setup_produce_differ_scheduler()
+
+    print('[instalando] schedulers do consumir a diff')
+    setup_consume_differ_scheduler()
+
+
 if __name__ == "__main__":
     manager.run()
