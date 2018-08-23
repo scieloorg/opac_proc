@@ -1,6 +1,5 @@
 # coding: utf-8
 import os
-import sys
 import logging
 import logging.config
 
@@ -9,9 +8,7 @@ from redis import Redis
 from rq import Queue
 from rq_scheduler import Scheduler
 
-
-PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-sys.path.append(PROJECT_PATH)
+from opac_proc.web.config import DEFAULT_SCHEDULER_TIMEOUT
 
 
 logger = logging.getLogger(__name__)
@@ -61,7 +58,7 @@ class SyncScheduler:
     cron_string = None  # definir na subclasse
     task_func = None  # definir na subclasse
     task_args = None  # definir na subclasse
-
+    timeout = DEFAULT_SCHEDULER_TIMEOUT
     queue_name = None
     _queue = None
     _redis_conn = None
@@ -84,7 +81,8 @@ class SyncScheduler:
                 self.cron_string,
                 func=self.task_func,
                 args=self.task_args,
-                queue_name=self.queue_name)
+                queue_name=self.queue_name,
+                timeout=self.timeout)
         else:
             raise AttributeError(u'Falta definir a função da task e/ou args')
 

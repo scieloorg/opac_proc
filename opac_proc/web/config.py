@@ -239,3 +239,4 @@ PDF_CATALOG_CRON_STRING = os.environ.get('OPAC_PROC_PDF_CATALOG_CRON_STRING',
                                          '0 0 * * 0')
 XML_CATALOG_CRON_STRING = os.environ.get('OPAC_PROC_XML_CATALOG_CRON_STRING',
                                          '0 0 * * 0')
+DEFAULT_SCHEDULER_TIMEOUT = int(os.environ.get('OPAC_PROC_DEFAULT_SCHEDULER_TIMEOUT', 2000))

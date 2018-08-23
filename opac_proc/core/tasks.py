@@ -4,6 +4,7 @@ from flask import current_app
 from redis import Redis
 from rq import Queue
 from rq_scheduler import Scheduler
+from opac_proc.web.config import DEFAULT_SCHEDULER_TIMEOUT
 
 
 def get_scheduler(queue_name):
@@ -19,7 +20,8 @@ def setup_scheduler_jobs(task_function, function_args, queue_name,
         cron_string,
         func=task_function,
         args=function_args,
-        queue_name=queue_name)
+        queue_name=queue_name,
+        timeout=DEFAULT_SCHEDULER_TIMEOUT)
 
 
 def clear_setup_scheduler_jobs(queue_name):
