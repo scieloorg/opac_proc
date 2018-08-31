@@ -65,6 +65,7 @@ class ArticleLoader(BaseLoader):
         'htmls',
         'pdfs',
         'pid',
+        'aop_pid',
         'fpage',
         'lpage',
         'elocation',
