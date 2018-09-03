@@ -81,52 +81,29 @@ class Assets(object):
         Try get imgs by xlink:href and src tags with internal links.
         """
         if self.xylose.data_model_version == 'xml':
-            attribs = [
-                './/graphic[@xlink:href]',
-                './/media[@xlink:href]',
-                './/inline-graphic[@xlink:href]',
-                './/supplementary-material[@xlink:href]',
-                './/inline-supplementary-material[@xlink:href]',
-            ]
-            xml_et = etree.XML(self._content.encode('utf-8'))
-            namespaces = {'xlink': 'http://www.w3.org/1999/xlink'}
-            attrib_iters = [
-                xml_et.iterfind(attrib, namespaces=namespaces)
-                for attrib in attribs
-            ]
-            hrefs = [
-                element.attrib['{http://www.w3.org/1999/xlink}href']
-                for element in itertools.chain(*attrib_iters)
-            ]
-            extension_files_list = [
-                '.' + extension
-                for extension in config.MEDIA_EXTENSION_FILES.split(',')
-            ]
-            medias = [
-                href
-                for href in hrefs
-                if os.path.splitext(href)[-1] in extension_files_list
-            ]
-        else:
-            parser = "html.parser"
-            soup = BeautifulSoup(self._content, parser)
-            src_tags = [
-                tag.get('src').strip().encode('utf-8')
-                for tag in soup.find_all(src=True)
-            ]
+            msg_error = "Método não deve ser usado para XMLs."
+            logger.error(msg_error)
+            raise TypeError(msg_error)
 
-            def _is_external_link(src_tag):
-                ext_link_indicators = config.MEDIA_EXT_LINKS_IND.split(',')
-                return any(
-                    map(lambda ext_link_ind: src_tag.startswith(ext_link_ind),
-                        ext_link_indicators)
-                )
+        parser = "html.parser"
+        soup = BeautifulSoup(self._content, parser)
+        src_tags = [
+            tag.get('src').strip().encode('utf-8')
+            for tag in soup.find_all(src=True)
+        ]
 
-            medias = [
-                src_tag
-                for src_tag in src_tags
-                if not _is_external_link(src_tag)
-            ]
+        def _is_external_link(src_tag):
+            ext_link_indicators = config.MEDIA_EXT_LINKS_IND.split(',')
+            return any(
+                map(lambda ext_link_ind: src_tag.startswith(ext_link_ind),
+                    ext_link_indicators)
+            )
+
+        medias = [
+            src_tag
+            for src_tag in src_tags
+            if not _is_external_link(src_tag)
+        ]
 
         return medias
 
@@ -498,12 +475,11 @@ class AssetXML(Assets):
 
     def _get_content(self):
         """
-        Get file content, calling a function to get the content according to it
-        type (PDF, XMl or HTML), path and file_name.
+        Get XML file content, using etree.parse, reading _file_name path.
         If there is no file_name, it raises an Exception according to config.
         """
         if not self._file_name:
-            msg_error = "Nao existe {} para o artigo, PID: {}".format(
+            msg_error = "Não existe {} para o artigo, PID: {}".format(
                 self._file_type.upper(), self.xylose.publisher_id)
             logger.error(msg_error)
             if config.OPAC_PROC_RAISE_ERROR:
@@ -511,7 +487,7 @@ class AssetXML(Assets):
             else:
                 return None
 
-        logger.info(u"{} existente para o artigo, PID: {}".format(
+        logger.info("{} existente para o artigo, PID: {}".format(
             self._file_type.upper(), self._file_name))
 
         parser = etree.XMLParser(remove_blank_text=True)
@@ -538,8 +514,8 @@ class AssetXML(Assets):
 
     def _get_media(self):
         """
-        Find all media elements in self._content (a etree._Element) and return a
-        generator with tuples (element, attrib_key), where element is a media
+        Find all media elements in self._content (an etree._Element) and return
+        a generator with tuples (element, attrib_key), where element is a media
         tree element and attrib_key is the xlink:href attrib.
         Only media elements with href attrib that contains path with file
         extension in MEDIA_EXTENSION_FILES are returned.
