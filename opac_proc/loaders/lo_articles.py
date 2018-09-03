@@ -61,6 +61,7 @@ class ArticleLoader(BaseLoader):
         'pid',
         'aop_pid',
         'fpage',
+        'fpage_sequence',
         'lpage',
         'elocation',
         'keywords',

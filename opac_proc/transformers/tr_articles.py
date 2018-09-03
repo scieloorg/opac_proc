@@ -216,6 +216,11 @@ class ArticleTransformer(BaseTransformer):
         if hasattr(xylose_article, 'start_page'):
             self.transform_model_instance['fpage'] = xylose_article.start_page
 
+        # fpage_sequence
+        if hasattr(xylose_article, 'start_page_sequence'):
+            self.transform_model_instance['fpage_sequence'] = \
+                                            xylose_article.start_page_sequence
+
         # lpage
         if hasattr(xylose_article, 'end_page'):
             self.transform_model_instance['lpage'] = xylose_article.end_page
