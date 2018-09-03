@@ -61,7 +61,7 @@ dev_compose_up: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) up -d
 
 dev_compose_logs: get_opac_mongo_info get_opac_grpc_info
-	@docker-compose -f $(COMPOSE_FILE_DEV) logs -f $1
+	@docker-compose -f $(COMPOSE_FILE_DEV) logs -f $(SERVICE)
 
 dev_compose_stop: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) stop
