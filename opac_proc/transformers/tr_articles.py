@@ -176,7 +176,7 @@ class ArticleTransformer(BaseTransformer):
 
             if xml_url and uuid:
                 self.transform_model_instance['xml'] = xml_url
-                self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
+                self.transform_model_instance['htmls'] = asset_xml.register_htmls()
 
         # Versão HTML do artigo
         if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':

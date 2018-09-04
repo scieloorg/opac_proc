@@ -1,0 +1,1623 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE article
+  PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Publishing DTD v1.1 20151215//EN" "JATS-journalpublishing1.dtd">
+<article article-type="research-article" dtd-version="1.1" specific-use="sps-1.8" xml:lang="es" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<front>
+		<journal-meta>
+			<journal-id journal-id-type="nlm-ta">Salud Colect</journal-id>
+			<journal-id journal-id-type="publisher-id">scol</journal-id>
+			<journal-title-group>
+				<journal-title>Salud Colectiva</journal-title>
+				<abbrev-journal-title abbrev-type="publisher">Salud Colect</abbrev-journal-title>
+			</journal-title-group>
+			<issn pub-type="ppub">1669-2381</issn>
+			<issn pub-type="epub">1851-8265</issn>
+			<publisher>
+				<publisher-name>Universidad Nacional de Lanús</publisher-name>
+			</publisher>
+		</journal-meta>
+		<article-meta>
+			<article-id pub-id-type="doi">10.18294/sc.2018.1200</article-id>
+			<article-categories>
+				<subj-group subj-group-type="heading">
+					<subject>ARTÍCULOS</subject>
+				</subj-group>
+			</article-categories>
+			<title-group>
+				<article-title>Cáncer infantil: incidencia y patrones espaciales en la ciudad de Campinas, Brasil, 1996-2005</article-title>
+			</title-group>
+			<contrib-group>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">0000-0002-5432-9560</contrib-id>
+					<name>
+						<surname>Oliveira Friestino</surname>
+						<given-names>Jane Kelly</given-names>
+					</name>
+					<xref ref-type="aff" rid="aff1"><sup>1</sup></xref>
+				</contrib>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">0000-0003-4835-8944</contrib-id>
+					<name>
+						<surname>Mendonça</surname>
+						<given-names>Denisa</given-names>
+					</name>
+					<xref ref-type="aff" rid="aff2"><sup>2</sup></xref>
+				</contrib>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">0000-0002-2470-0795</contrib-id>
+					<name>
+						<surname>Oliveira</surname>
+						<given-names>Pedro</given-names>
+					</name>
+					<xref ref-type="aff" rid="aff3"><sup>3</sup></xref>
+				</contrib>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">0000-0002-4594-1723</contrib-id>
+					<name>
+						<surname>Oliveira</surname>
+						<given-names>Carla M</given-names>
+					</name>
+					<xref ref-type="aff" rid="aff4"><sup>4</sup></xref>
+				</contrib>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">0000-0002-7943-0868</contrib-id>
+					<name>
+						<surname>de Carvalho Moreira</surname>
+						<given-names>Djalma</given-names>
+						<suffix>Filho</suffix>
+					</name>
+					<xref ref-type="aff" rid="aff5"><sup>5</sup></xref>
+				</contrib>
+			</contrib-group>
+			<aff id="aff1">
+				<label>1</label>
+				<institution content-type="original">Doctora en Salud Colectiva. Profesora, Universidade Federal da Fronteira Sul, Chapecó, Brasil. jane.friestino@uffs.edu.br</institution>
+				<institution content-type="normalized">Universidade Federal da Fronteira Sul</institution>
+				<institution content-type="orgname">Universidade Federal da Fronteira Sul</institution>
+				<addr-line>
+					<city>Chapecó</city>
+				</addr-line>
+				<country country="BR">Brazil</country>
+				<email>jane.friestino@uffs.edu.br</email>
+			</aff>
+			<aff id="aff2">
+				<label>2</label>
+				<institution content-type="original">Doctora en Bioestadística. Profesora, Epidemiology Research Unit, Instituto de Saúde Pública, Instituto de Ciências Biomédicas Abel Salazar, Universidade do Porto, Portugal. dvmendon@icbas.up.pt</institution>
+				<institution content-type="normalized">Universidade do Porto</institution>
+				<institution content-type="orgdiv1">Instituto de Ciências Biomédicas Abel Salazar</institution>
+				<institution content-type="orgname">Universidade do Porto</institution>
+				<country country="PT">Portugal</country>
+				<email>dvmendon@icbas.up.pt</email>
+			</aff>
+			<aff id="aff3">
+				<label>3</label>
+				<institution content-type="original">Doctor en Bioestadística. Profesor, Epidemiology Research Unit, Instituto de Saúde Pública, Instituto de Ciências Biomédicas Abel Salazar, Universidade do Porto, Portugal. pnoliveira@icbas.up.pt</institution>
+				<institution content-type="normalized">Universidade do Porto</institution>
+				<institution content-type="orgdiv1">Instituto de Ciências Biomédicas Abel Salazar</institution>
+				<institution content-type="orgname">Universidade do Porto</institution>
+				<country country="PT">Portugal</country>
+				<email>pnoliveira@icbas.up.pt</email>
+			</aff>
+			<aff id="aff4">
+				<label>4</label>
+				<institution content-type="original">Doctora en Salud Pública. Profesora Asistente Invitada, Escola Superior de Saúde, Instituto Politécnico do Porto. Investigadora, Instituto de Investigação e Inovação em Saúde (i3s), Instituto de Engenharia Biomédica, Universidade do Porto, Portugal. carlaoliver@gmail.com</institution>
+				<institution content-type="normalized">Universidade do Porto</institution>
+				<institution content-type="orgdiv1">Instituto de Investigação e Inovação em Saúde (i3s)</institution>
+				<institution content-type="orgdiv2">Instituto de Engenharia Biomédica</institution>
+				<institution content-type="orgname">Universidade do Porto</institution>
+				<country country="PT">Portugal</country>
+				<email>carlaoliver@gmail.com</email>
+			</aff>
+			<aff id="aff5">
+				<label>5</label>
+				<institution content-type="original">Doctor en Medicina Preventiva. Profesor, Universidade Estadual de Campinas, Brasil. djalmore@unicamp.br</institution>
+				<institution content-type="normalized">Universidade Estadual de Campinas</institution>
+				<institution content-type="orgname">Universidade Estadual de Campinas</institution>
+				<country country="BR">Brazil</country>
+				<email>djalmore@unicamp.br</email>
+			</aff>
+			<pub-date pub-type="epub-ppub">
+				<season>Jan-Mar</season>
+				<year>2018</year>
+			</pub-date>
+			<volume>14</volume>
+			<issue>1</issue>
+			<fpage>51</fpage>
+			<lpage>63</lpage>
+			<history>
+				<date date-type="received">
+					<day>31</day>
+					<month>10</month>
+					<year>2016</year>
+				</date>
+				<date date-type="rev-recd">
+					<day>26</day>
+					<month>05</month>
+					<year>2017</year>
+				</date>
+				<date date-type="accepted">
+					<day>28</day>
+					<month>08</month>
+					<year>2017</year>
+				</date>
+			</history>
+			<permissions>
+				<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by-nc/4.0/" xml:lang="es">
+					<license-p>Este es un artículo publicado en acceso abierto bajo una licencia Creative Commons</license-p>
+				</license>
+			</permissions>
+			<abstract>
+				<title>RESUMEN </title>
+				<p>Analizamos los patrones espaciales y las incidencias de cáncer en niños, niñas y adolescentes de 0 a 19 años de edad residentes en la ciudad de Campinas, al sureste de Brasil, diagnosticados entre 1996 y 2005. Se clasificaron los cánceres según los grupos de la tercera revisión de la <italic>International Classification of Childhood Cancer</italic> (ICCC-3). Se incluyeron los cuatro grupos más comunes: leucemias, linfomas, y las neoplasias del sistema nervioso central y de tejidos blandos. Se calcularon tasas de incidencia estandarizadas por edad utilizando la población mundial estándar. Se ajustó un modelo espacial de regresión jerárquica de Bayes (controlando por la heterogeneidad de los datos y la autocorrelación espacial), que asume que el número de casos sigue una distribución de Poisson. Se diagnosticó un total de 180 casos durante el periodo de estudio. La tasa de incidencia bruta para las edades 0-19 años fue de 54,2 por millón y la tasa de incidencia estandarizada por edad fue de 56,5 por millón. Si bien algunas regiones presentan tasas de incidencia más altas al considerar la heterogeneidad y la autocorrelación, no se observaron diferencias estadísticamente significativas en los riesgos relativos. </p>
+			</abstract>
+			<kwd-group xml:lang="es">
+				<title>PALABRAS CLAVES: </title>
+				<kwd>Análisis Espacial</kwd>
+				<kwd>Neoplasias</kwd>
+				<kwd>Salud Infantil</kwd>
+				<kwd>Salud del Adolescente</kwd>
+				<kwd>Geografía Médica</kwd>
+				<kwd>Brasil</kwd>
+			</kwd-group>
+			<counts>
+				<fig-count count="6"/>
+				<table-count count="2"/>
+				<equation-count count="20"/>
+				<ref-count count="33"/>
+				<page-count count="13"/>
+			</counts>
+		</article-meta>
+	</front>
+	<body>
+		<sec sec-type="intro">
+			<title>INTRODUCCIÓN</title>
+			<p>El Sistema Único de Salud (SUS), como parte integral del sistema de protección social brasileño, tiene entre sus objetivos la identificación de factores y determinantes de salud y el uso de indicadores para describir las situaciones de salud y bienestar de la población<xref ref-type="bibr" rid="B1"><sup>1</sup></xref>.</p>
+			<p>En este escenario, la salud colectiva en Brasil ha pasado por reestructuraciones desde la reforma de salud de mediados de la década de 1970. Con base en concepciones de la medicina social, la salud colectiva se constituye actualmente como un campo científico que contribuye al estudio el proceso de salud-enfermedad-atención-cuidado en diversos grupos poblaciones insertos en contextos geográficos, históricos y sociales específicos<xref ref-type="bibr" rid="B2"><sup>2</sup></xref>.</p>
+			<p>La epidemiología actual, especialmente la epidemiología social, ha superado los modelos explicativos del proceso salud-enfermedad de la década de 1970. Hoy en día la epidemiología incluye en sus métodos de investigación la experticia de otras áreas de conocimiento y, por lo tanto, no deja de tener en cuenta elementos importantes como la complejidad existente en los diversos ciclos de la vida humana, reuniendo tanto el espacio y el tiempo en los que se inscriben los individuos<xref ref-type="bibr" rid="B3"><sup>3</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B4"><sup>4</sup></xref>.</p>
+			<p>Desde la perspectiva de la epidemiología social, la salud se considera un componente relevante del bienestar, no solo del individuo, sino de la sociedad, además de una condición esencial para el disfrute de la vida y un derecho inalienable de las personas sin importar el lugar en donde viven. Los cambios en la estructura general de la sociedad, los cambios climáticos, el envejecimiento poblacional, el crecimiento de la desigualdad y el acceso a los cuidados en salud son algunas de las problemáticas que han despertado el reconocimiento de la importancia del territorio y de la geografía en el análisis de las condiciones de salud, haciendo que esta área de conocimiento cobre relevancia en el campo de la salud colectiva.</p>
+			<p>Según Barcellos<xref ref-type="bibr" rid="B5"><sup>5</sup></xref>, la geografía de la salud:</p>
+			<disp-quote>
+				<p>…es un campo de conocimiento que debería involucrar los varios técnicos y profesionales que se interesan por los procesos de salud, enfermedad y cuidado en el espacio geográfico, para poder intervenir.</p>
+			</disp-quote>
+			<p>Actualmente, en la bibliografía es posible encontrar un gran número de estudios que analizan enfermedades crónicas y no transmisibles, en particular, la ocurrencia de neoplasias<xref ref-type="bibr" rid="B4"><sup>4</sup></xref>. Como se consideran enfermedades multifactoriales, varios factores influyen en la distribución geográfica de las neoplasias, especialmente, los determinantes sociales, el ambiente y el acceso a los servicios de salud. Una herramienta esencial para la vigilancia epidemiológica de la incidencia de cáncer son los Registros de Cáncer de Base Poblacional. Estos registros son fuentes fundamentales para el desarrollo de la investigación epidemiológica y clínicas y, además, para la planificación y la evaluación de las acciones de control de cáncer.</p>
+			<p>Dada la importancia de conocer la incidencia del cáncer en la población, desde la década de 1980, el Instituto Nacional del Cáncer de Brasil ha promovido el establecimiento de registros, motivo por el cual en la actualidad hay 20 Registros de Cáncer de Base Poblacional distribuidos por las grandes ciudades de todas las regiones de país<xref ref-type="bibr" rid="B6"><sup>6</sup></xref>. La mayor parte de las investigaciones se orientan hacia los tipos de neoplasias con mayor incidencia, quizá debido a la facilidad para obtener los datos o a la gran cantidad de información necesaria para la elaboración de los planes de contingencia; por lo tanto, los estudios sobre casos poco frecuentes escasean en la bibliografía<xref ref-type="bibr" rid="B7"><sup>7</sup></xref>.</p>
+			<p>Campinas es una ciudad grande ubicada en el suroeste de Brasil. Cuenta con un Registro de Cáncer de Base Poblacional desde 1990. Aunque los estudios poblacionales sobre la incidencia del cáncer infantil y la supervivencia son importantes para evaluar los servicios locales de salud, pocos estudios se encuentran disponibles para la región.</p>
+			<p>El cáncer infantil (diagnosticado entre las edades de 0 y 19 años) incluye varias malignidades y la incidencia varía mundialmente según edad, género, etnicidad y geografía. Dicha variación podría iluminar aspectos de la etiología del cáncer<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B9"><sup>9</sup></xref>. Este tipo de cáncer se considera raro cuando se compara con el cáncer en adultos, dado que representa aproximadamente del 2,5% al 3% de todos los tipos de cáncer en América Latina y el Caribe<xref ref-type="bibr" rid="B6"><sup>6</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B10"><sup>10</sup></xref>.</p>
+			<p>A pesar de la baja incidencia, el número de casos nuevos en este grupo de edad representa un gran impacto para la salud pública debido a que las tasas de mortalidad frecuentemente son altas, y las consecuencias severas producto del tratamiento y de las neoplasias en sí se ven agravados por el sufrimiento experimentado por la familia<xref ref-type="bibr" rid="B11"><sup>11</sup></xref>. </p>
+			<p>En Brasil, el 32,9% de la población tiene menos de 19 años de edad<xref ref-type="bibr" rid="B12"><sup>12</sup></xref> y aunque el cáncer en este grupo de edad es poco frecuente, se estima que hubo 11.530 casos en niños en 2012 en Brasil. Según un estudio publicado en 2009, que utilizó datos de 14 Registros de Cáncer de Base Poblacional de Brasil, la incidencia promedio era de 154,3 por millón de niños<xref ref-type="bibr" rid="B6"><sup>6</sup></xref>. </p>
+			<p>El cáncer tiene comportamientos específicos en este grupo de edad, por lo tanto, la implementación de monitoreo es una medida que sirve tanto para la prevención como para la producción de conocimiento, lo que concede mayor visibilidad al problema.</p>
+			<p> Es sabido que en Brasil existen desigualdades en el acceso a los servicios de salud para el tratamiento del cáncer infantil. En este sentido, Brasil tiene características similares a las de otros países en desarrollo, en los que se conoce poco sobre la magnitud del cáncer. Esta situación impide la planificación de acciones de salud y la implementación de estrategias para la prevención y el cuidado en la población en su totalidad<xref ref-type="bibr" rid="B13"><sup>13</sup></xref>.</p>
+			<p>Dadas las características especiales del cáncer infantil, los estudios epidemiológicos son de suma importancia. Analizan la distribución de casos en la comunidad y construyen indicadores y ponderaciones para generar mayor conocimiento sobre los eventos, lo cual es esencial para conocer la población afectada y las exigencias sobre el sistema de salud<xref ref-type="bibr" rid="B14"><sup>14</sup></xref>.</p>
+			<p>En Scott<xref ref-type="bibr" rid="B15"><sup>15</sup></xref> se evaluó positivamente el uso de sistemas de información geográfica (SIG) en la creación de un sistema de información en salud sobre cáncer. Aunque los datos registrados en Sudáfrica estaban incompletos, la técnica mostró la potencialidad de agregar valor al sistema de información, y de aportar datos respecto de la demanda que hasta el momento no se habían tenido en cuenta.</p>
+			<p>En muchos países de bajos y medianos ingresos, aunque existan registros de cáncer de base poblacional, se desconoce la información sobre cáncer infantil dado que no se recopila información sobre la incidencia del cáncer, por lo que puede ser necesario acudir a otras fuentes de datos y someter las estadísticas resultantes a un control de calidad meticuloso. Respecto de la incidencia del cáncer infantil a nivel mundial, solo hay tres publicaciones disponibles: una de 1988, otra de 1998 y una más reciente de 2017. Las distancias entre estas fechas resaltan la complejidad que existe en los registros de cáncer infantil, dado que son más sensibles a imprecisiones o información faltante<xref ref-type="bibr" rid="B7"><sup>7</sup></xref>.</p>
+			<p>Un mejor conocimiento de la incidencia y de los patrones espaciales del cáncer infantil en el área local puede ayudar a direccionar los servicios de salud y ofrecer claves para la planificación en el sistema de salud<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B16"><sup>16</sup></xref>. Aunque el análisis geográfico puede ser innovador con respecto a la información sobre incidencia del cáncer, se sabe que existe una laguna en la bibliografía científica respecto de este tema. Por lo tanto, este estudio analiza los patrones espaciales de la incidencia del cáncer en niños y niñas de 0-14 años y adolescentes de 15-19 años, residentes de Campinas que fueron diagnosticados en el periodo 1996-2005. El estudio forma parte de una tesis doctoral defendida en 2015 bajo el título “<italic>Panorama do câncer em crianças e adolescentes sob a perspectiva da saúde coletiva</italic>”<xref ref-type="bibr" rid="B17"><sup>17</sup></xref>.</p>
+		</sec>
+		<sec sec-type="materials|methods">
+			<title>MATERIAL Y MÉTODOS</title>
+			<p>Se realizó un estudio observacional retrospectivo sobre el cáncer en niños, niñas y adolescentes de 0 a 19 años de edad, en Campinas, San Pablo, Brasil, diagnosticados en el periodo 1996-2005.</p>
+			<p>Campinas es una ciudad industrial ubicada en el estado de San Pablo, Brasil, con aproximadamente 1,1 millones de habitantes. Alrededor del 30% de la población que vive en Campinas tiene menos de 19 años de edad. Durante el periodo de estudio hubo un incremento del 8,34% en la población menor a 19 años<xref ref-type="bibr" rid="B12"><sup>12</sup></xref>.</p>
+			<p>En 2000, el Departamento Municipal de Salud de Campinas dividió la ciudad en 47 áreas de cubertura de las unidades de salud, las cuales conforman las unidades geográficas utilizadas en el análisis espacial. La población menor de 19 años en estas áreas fue de entre 1.099 y 7.036, con una mediana de 3.429.</p>
+			<p>La mayor atención para el cáncer infantil ocurre en la Unidad de Alta Complejidad de Oncología Pediátrica, y según un análisis del Registro de Cáncer con Base Poblacional de Campinas, la unidad tiene una cobertura del 85% de todos los casos incidentes en la ciudad para este grupo de edad<xref ref-type="bibr" rid="B18"><sup>18</sup></xref>.</p>
+			<p>Aunque Campinas cuenta con un Registro de Cáncer con Base Poblacional, no disponía de datos para el periodo de tiempo contemplado en esta investigación. Por lo tanto, el estudio se realizó en la mencionada Unidad de Alta Complejidad de Oncología Pediátrica, utilizando todos los pasos de recolección de datos ya validados en los Registros de Cáncer con Base Poblacional y la notificación activa de casos como el principal procedimiento para la recopilación de datos.</p>
+			<p>El presente estudio se realizó de acuerdo con la Resolución 196/96 del Consejo Nacional de Salud de Brasil. La investigación mayor en la que se basa este artículo fue aprobada por el Comité de Ética en Investigación Humana del Centro Infantil Boldrini (CEP-Boldrini) (CAAE 0566.0.000.144-11) Nº 06/2011, el 13 de mayo de 2011.</p>
+			<sec>
+				<title>Definición de caso</title>
+				<p>Se recopilaron datos de niños, niñas y adolescentes residentes en Campinas, de 0 a 19 años de edad que habían sido diagnosticados entre el 1 de enero de 1996 y el 31 de diciembre de 2005. Se obtuvieron los diagnósticos confirmados de cáncer a través de las historias clínicas, y se utilizó la fecha de diagnóstico del primer tumor primario. Para evitar la inclusión de casos no provenientes de la población en riesgo, se llevó a cabo un chequeo manual de los datos y se comparó la dirección del domicilio de los casos con el área geográfica incluida en el estudio.</p>
+				<p>Los cánceres se clasificaron según la <italic>International Classification of Childhood Cancer</italic>, tercera revisión (ICCC-3)<xref ref-type="bibr" rid="B19"><sup>19</sup></xref>. Se excluyeron los tumores benignos y solo se incluyeron los cuatro grupos más comunes: Grupo I, Leucemias; Grupo II, Linfomas y neoplasias reticuloendoteliales; Grupo III, Sistema nervioso central y miscelánea de neoplasias intracraneales e intraespinales, y Grupo IX, Sarcomas de tejidos blandos y otros extraóseos.</p>
+			</sec>
+			<sec>
+				<title>Incidencia de cáncer</title>
+				<p>Las persona-año del periodo incluido en el estudio se obtuvieron a través de estimaciones de población del Instituto Brasilero de Geografía y Estadística (IBGE)<xref ref-type="bibr" rid="B12"><sup>12</sup></xref>. Las tasas de incidencia promedio anuales brutas y estandarizadas, calculadas por 1.000.000 de habitantes, expresan el riesgo de nuevos casos. Los denominadores poblacionales utilizados para el cálculo de las tasas de incidencia se basaron en el censo demográfico de 2000 y proyecciones estimadas para los años restantes<xref ref-type="bibr" rid="B12"><sup>12</sup></xref>. Se calcularon tasas de incidencia específicas por edad, por millón de habitantes, para niños, niñas y adolescentes residentes en la ciudad de Campinas<xref ref-type="bibr" rid="B12"><sup>12</sup></xref>. Las tasas de incidencia estandarizadas por edad se calcularon por método directo y se utilizó la población mundial estándar<xref ref-type="bibr" rid="B20"><sup>20</sup></xref> para controlar las diferencias que pudieran existir en la estructura de edad y sexo entre regiones y poder comparar las tasas de incidencia entre regiones. En otras palabras, considerando que <italic>yijk</italic> representa el número de casos de cáncer (entre 1996 y 2005) en las áreas de cobertura <italic>i</italic> (<italic>i=</italic>1,...,47), en el sexo <italic>j</italic> (<italic>j</italic>=1,2) y grupo de edad <italic>k</italic> (<italic>k=</italic>1,...,4 respectivamente para los grupos de edad 0-4, 5-9, 10-14 and 15-19 años) y <italic>Nijk</italic> el número de individuos en riesgo en área <italic>i</italic>, sexo <italic>j</italic>, grupo de edad <italic>k</italic>, las tasas de incidencia estandarizadas por edad (TIEE) se estimaron mediante:</p>
+				<p>
+					<disp-formula id="e1">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e1.jpg"/>
+					</disp-formula>
+				</p>
+				<p>Donde</p>
+				<p>
+					<disp-formula id="e2">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e2.jpg"/>
+					</disp-formula>
+				</p>
+				<p>representa el número de casos esperados para cada región <italic>i</italic>, donde <italic>NPjk</italic> representa el número de individuos en la población mundial de sexo <italic>j</italic> y grupo de edad <italic>k</italic>, y <italic>CIRijk=yijk/ Nijk</italic> representa la tasa cruda de incidencia de región <italic>i</italic>, en sexo <italic>j</italic> y grupo de edad <italic>k</italic>. El intervalo de confianza se calculó con el método exacto con base en la distribución de Poisson (apropiada para números pequeños). </p>
+			</sec>
+			<sec>
+				<title>Análisis espacial</title>
+				<p>Los mapas digitales de los límites administrativos fueron realizados por el IBGE. Utilizamos las áreas de las unidades sanitarias que corresponden al área de cobertura de los centros de salud de la ciudad y su respectiva población.</p>
+				<p> La medida convencional utilizada en el mapeo de las enfermedades es la razón de morbilidad estandarizada (RME), que refiere a la incidencia en este periodo. Para cada área <italic>i,</italic> la RME se define como la razón entre casos observados <italic>yi</italic> y casos esperados <italic>ei</italic>. </p>
+				<p>Los <italic>ei</italic> fueron calculados con base en la estandarización indirecta, para controlar el efecto de sexo y edad<xref ref-type="bibr" rid="B21"><sup>21</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B22"><sup>22</sup></xref>.</p>
+				<p>Los casos esperados se calcularon de la siguiente manera: considerando <italic>i</italic> el índice del área de cobertura de la unidad sanitaria, <italic>j</italic> el índice de sexo y <italic>k</italic> el índice del grupo de edad, entonces <italic>yijk</italic> representa el número de eventos de sexo <italic>j</italic> y grupo de edad <italic>k</italic> en el área <italic>i</italic>, y <italic>Nijk</italic> el número de personas en riesgo por sexo <italic>j,</italic> grupo de edad <italic>k</italic>, en el área <italic>i</italic>. </p>
+				<p>La tasa global para la ciudad por grupo de edad y sexo se dio por la siguiente expresión:</p>
+				<p>
+					<disp-formula id="e3">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e3.jpg"/>
+					</disp-formula>
+				</p>
+				<p>Luego la expresión:</p>
+				<p>
+					<disp-formula id="e4">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e4.jpg"/>
+					</disp-formula>
+				</p>
+				<p>representa el número de eventos esperados en el área <italic>i</italic>, sexo <italic>j</italic> y grupo de edad <italic>k</italic>. De esta manera el número de eventos esperados en el área <italic>i</italic>, asumiendo un riesgo constante en cada clase de edad y sexo, se expresa a través de: </p>
+				<p>
+					<disp-formula id="e5">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e5.jpg"/>
+					</disp-formula>
+				</p>
+				<p>es decir, la suma de valores esperados en el área sobre las clases de edad y sexo. La RME ajustada por grupo de edad y sexo para cada área de unidad sanitaria <italic>i</italic> (<italic>i</italic>=1,...,47), asumiendo que el riesgo es constante en cada área, se expresa a través de:</p>
+				<p>
+					<disp-formula id="e6">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e6.jpg"/>
+					</disp-formula>
+				</p>
+				<p>Para controlar por la heterogeneidad de los datos y la autocorrelación espacial entre áreas, se ajustó un modelo espacial de regresión jerárquico bayesiano. Los parámetros de interés se estimaron a través del siguiente modelo:</p>
+				<p>
+					<disp-formula id="e7">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e7.jpg"/>
+					</disp-formula>
+				</p>
+				<p>donde </p>
+				<p>
+					<disp-formula id="e8">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e8.jpg"/>
+					</disp-formula>
+				</p>
+				<p>
+					<disp-formula id="e9">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e9.jpg"/>
+					</disp-formula>
+				</p>
+				<p>La inclusión de los efectos aleatorios <italic>Øi</italic> introduce un efecto latente en el modelo para capturar el impacto de factores confusores desconocidos o no observados a nivel del área. Estos efectos aleatorios no estructurados espacialmente pueden explicar la sobredispersión (presencia de mayor variabilidad en los datos) en la distribución del conteo de la incidencia de cáncer infantil <italic>yi</italic>. Sin embargo, no permite dependencia espacial explícita entre <italic>yi</italic>. Esta dependencia se incluyó al agregar el efecto aleatorio estructurado espacialmente <italic>vi</italic>. Para permitir la dependencia espacial, se asume un modelo condicionalmente autoregresivo (CAR)<xref ref-type="bibr" rid="B21"><sup>21</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B22"><sup>22</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B23"><sup>23</sup></xref><sup>)</sup> para <italic>vi</italic>, definido por: </p>
+				<p>
+					<disp-formula id="e10">
+						<graphic xlink:href="1851-8265-scol-14-01-51-e10.jpg"/>
+					</disp-formula>
+				</p>
+				<p>donde <italic>wij</italic> son los pesos de adyacencia para las áreas. En el estudio los valores de <italic>wij</italic> se tomaron como binarios simples: <italic>wij</italic>=1 si el área <italic>i</italic> tiene un límite común con el área <italic>j</italic> y <italic>wij</italic>=0 de lo contario; <italic>σv</italic> sirvió como hiperparámetro que controla la fuerza de la dependencia local espacial.</p>
+				<p>Se asumieron distribuciones <italic>a priori</italic> no informativas para los parámetros del modelo. Se le dio al parámetro α una distribución <italic>a priori</italic> gaussiana con un promedio de 0 y una gran varianza (1.000), mientras para la inversa de <inline-graphic xlink:href="1851-8265-scol-14-01-51-i011.jpg"/> y <inline-graphic xlink:href="1851-8265-scol-14-01-51-i012.jpg"/> se asumió una distribución <italic>a priori</italic> Gamma (0,5; 0,0005)<xref ref-type="bibr" rid="B24"><sup>24</sup></xref>.</p>
+				<p>Se estimaron el riesgo relativo (RR) y los intervalos de credibilidad del 95%, utilizando el promedio y los cuantiles empíricos del 2,5% y 97,5% respectivamente, de las muestras <italic>a posteriori</italic> de cada parámetro de interés. Estas muestras se basan en dos cadenas de Markov con método Monte Carlo [<italic>Markov chain Monte Carlo</italic>] (MCMC) con 100.000 iteraciones cada una y un periodo de calentamiento (<italic>burn-in</italic>) de 10.000. Todos los puntos de corte utilizados en los mapas corresponden a los cuartiles de las mediciones que presentamos.</p>
+				<p>Los análisis se realizaron con los siguientes softwares: SPSS, Geoda, Winbugs (WinBUGS14, Cambridge, UK)<xref ref-type="bibr" rid="B25"><sup>25</sup></xref> y R versión 2.14.1 (Project for Statistical Computing)<xref ref-type="bibr" rid="B26"><sup>26</sup></xref>, utilizando el paquete R2WinBUGS para conectar las últimas dos herramientas. WinBUGS utiliza el muestreo de Gibbs, un método específico de MCMC, para producir muestras de la posterior distribución de cada parámetro.</p>
+			</sec>
+		</sec>
+		<sec sec-type="results">
+			<title>RESULTADOS</title>
+			<p>Se diagnosticaron 180 casos en total, 154 niños y niñas y 26 adolescentes. La <xref ref-type="table" rid="t1">Tabla 1</xref> representa la frecuencia de distribución absoluta de casos de tumores por grupo diagnóstico además de las tasas de incidencia por millón según edad -estratificadas en dos grupos, 0-14 y 15-19 años- y grupo diagnóstico. Las neoplasias más frecuentes fueron: leucemia linfoblástica aguda (niños y niñas: 37,7%; adolescentes: 15,4%), leucemia aguda no linfoblástica (niños y niñas: 13%; adolescentes: 23,1%), astrocitomas (niños y niñas: 11%) y linfoma de Hodgkin (adolescentes: 19,2%) (<xref ref-type="table" rid="t1">Tabla 1</xref>).</p>
+			<p>
+				<table-wrap id="t1">
+					<label>Tabla 1</label>
+					<caption>
+						<title>Frecuencia, razón hombre-mujer y tasas de incidencia (por millón) según grupo diagnóstico de cáncer y grupo de edad en niños, niñas y adolescentes de 0 a 19 años. Campinas, San Pablo, Brasil, 1996-2005.</title>
+					</caption>
+					<graphic xlink:href="1851-8265-scol-14-01-51-gt1.jpg"/>
+					<table-wrap-foot>
+						<fn id="TFN1">
+							<p>Fuente: Elaboración propia con datos. TIEE = Tasas de incidencia estandarizadas por edad.</p>
+						</fn>
+					</table-wrap-foot>
+				</table-wrap>
+			</p>
+			<p>Entre niñas y niños, los tumores más frecuentes se encontraron en el Grupo I, que representó el 52% de todas las neoplasias incidentes, seguido por el Grupo III (22,7%) y Grupo II (18,1%). Entre adolescentes, el Grupo II representó el 42,2% de los diagnósticos, seguido por el Grupo I (38,5%) y el Grupo III (11,5%). Se observan diferencias pronunciadas en la razón hombre/mujer para el Grupo II.</p>
+			<p>La tasa de incidencia bruta para las edades en estudio fue de 54,2 casos por millón [IC95% (46,2-62,1)]; para niñas y niños fue del 64,2 [IC95% (54,0-74,3)] y para adolescentes 28,2 [IC95% (17,3-39,0)]. La tasa estandarizada por edad para todas estas edades fue del 56,5 [IC95% (48,1-64,9)]. Para el Grupo I, fue del 28,8 [IC95% (22,7-34,8)]; Grupo II, 11,6 [IC95% (7,85-15,2)]; Grupo III, 11,9 [IC95% (8,08-15,7)] y Grupo IX, 4,3 [IC95% (1,94- 6,74)] (<xref ref-type="table" rid="t1">Tabla 1</xref>).</p>
+			<p>Al analizar el patrón geográfico de las tasas de incidencia, se observó que las tasas brutas más altas correspondían a las áreas de cobertura al sur y al oeste de la ciudad. También se calcularon las tasas de incidencia estandarizadas por edad en niñas, niños y adolescentes para el periodo, según área de cobertura de la unidad sanitaria. Se encontró un patrón geográfico acentuado, con la incidencia más baja en el norte y este de Campinas. La <xref ref-type="fig" rid="f1">Figura 1</xref> muestra que la razón de morbilidad estandarizada más alta está concentrada en las regiones suroeste y sureste de la municipalidad.</p>
+			<p>
+				<fig id="f1">
+					<label>Figura 1</label>
+					<caption>
+						<title>Razón de morbilidad estandarizada (RME) para cáncer en niñas, niños y adolescentes de 0 a 19 años de edad, según área de unidad sanitaria. Campinas, San Pablo, Brasil, 1996-2005</title>
+					</caption>
+					<graphic xlink:href="1851-8265-scol-14-01-51-gf1.jpg"/>
+					<attrib>Fuente: Elaboración propia con base en datos de la Unidad de Alta Complejidad de Oncología Pediátrica de Campinas</attrib>
+				</fig>
+			</p>
+			<p>Según el modelo que se describe arriba, hay un patrón geográfico acentuado, con menor distribución en el norte de la ciudad. Los riesgos relativos (RR) no fueron estadísticamente significativos entre las áreas de unidad sanitaria. Las <xref ref-type="fig" rid="f2">Figuras 2</xref> y <xref ref-type="fig" rid="f3">3</xref> muestran los RR para cáncer infantil y los intervalos de credibilidad del 95%. Aunque algunas de las áreas de cobertura al sur y al oeste presentaron tasas brutas de incidencia más altas, no se observaron diferencias estadísticamente significativas en los RR.</p>
+			<p>
+				<fig id="f2">
+					<label>Figura 2</label>
+					<caption>
+						<title>Riesgo relativo de cáncer estimado entre personas de 0 a 19 años según área de unidad sanitaria. Campinas, San Pablo, Brasil, 1996-2005</title>
+					</caption>
+					<graphic xlink:href="1851-8265-scol-14-01-51-gf2.jpg"/>
+					<attrib>Fuente: Elaboración propia con base en datos de la Unidad de Alta Complejidad de Oncología Pediátrica de Campinas</attrib>
+				</fig>
+			</p>
+			<p>
+				<fig id="f3">
+					<label>Figura 3</label>
+					<caption>
+						<title>Riesgo relativo estimado e intervalos de credibilidad del 95% en niñas, niños y adolescentes de 0 a 19 años según área de unidad sanitaria. Campinas, San Pablo, Brasil, 1996-2005</title>
+					</caption>
+					<graphic xlink:href="1851-8265-scol-14-01-51-gf3.jpg"/>
+					<attrib>Fuente: Elaboración propia con base en datos de la Unidad de Alta Complejidad de Oncología Pediátrica de Campinas</attrib>
+				</fig>
+			</p>
+		</sec>
+		<sec sec-type="discussion">
+			<title>DISCUSIÓN</title>
+			<p>Este estudio analiza el cáncer infantil en Campinas y utiliza el análisis espacial para examinar el patrón y la distribución de incidencia en la ciudad. El cáncer con mayor frecuencia ajustada por edad fue el Grupo I (Leucemia, 28,8 por millón), seguido por el Grupo III (Sistema nervioso central y miscelánea de neoplasias intracraneales e intraespinales, 11,9 por millón).</p>
+			<p>Dado que las características, la frecuencia y la distribución del tipo de cáncer en niñas, niños y adolescentes son diferentes a las observadas en cualquier otro grupo de edad, se ha recomendado que los estudios epidemiológicos de cáncer infantil se realizan de forma separada a los otros grupos de edad<xref ref-type="bibr" rid="B8"><sup>8</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B27"><sup>27</sup></xref>.</p>
+			<p>En Campinas -de modo similar a los resultados de informes previos que utilizaron registros europeos- el cáncer infantil más frecuente es el del Grupo I, que presentó tasas de incidencia más bajas que las observadas en la mayoría de los países europeos pero similares a las de Portugal (28 por millón), Polonia (29,9 por millón) y Rumanía (28,3 por millón)<xref ref-type="bibr" rid="B28"><sup>28</sup></xref>. Se ha sugerido que las tasas de cáncer infantil pueden reflejar el nivel de desarrollo socioeconómico de la sociedad, con tasas más altas en las sociedades más pudientes<xref ref-type="bibr" rid="B29"><sup>29</sup></xref>.</p>
+			<p>Sin embargo, encontramos que, en Campinas, los valores más altos de RME se concentran en las regiones del suroeste y sureste, las cuales corresponden a áreas de mayor desigualdad social en la ciudad. Este hallazgo puede estar relacionado con variables no observadas y merece mayor investigación. El tema del cáncer infantil no se puede evaluar de manera independiente al nivel de desarrollo y las condiciones de salud en cada región. El crecimiento poblacional, la pobreza, la falta de higiene, la falta de educación y una multitud de problemas de salud impiden el desarrollo de la oncología pediátrica y el éxito del manejo de cáncer infantil en los países en desarrollo<xref ref-type="bibr" rid="B29"><sup>29</sup></xref>.</p>
+			<p>Además, la distribución de los casos por sexo, edad y los cuatro grupos diagnósticos más frecuentes es similar a las encontradas en otros estudios brasile<bold>ñ</bold>os basados en 14 registros de cáncer con base poblacional<xref ref-type="bibr" rid="B6"><sup>6</sup></xref>. Al contrastar nuestro análisis con publicaciones brasile<bold>ñ</bold>as previas sobre cáncer infantil, vemos que los cánceres del sistema nervioso central también fueron el segundo tumor infantil más frecuente observado<xref ref-type="bibr" rid="B6"><sup>6</sup></xref>. </p>
+			<p>Las leucemias son el cáncer más frecuente en niños <bold>y</bold> niñas a nivel mundial y tienen el impacto más grande en la incidencia global de cáncer. Comparativamente, la incidencia más parecida a la encontrada en nuestro estudio fue el de África del Norte (28,2 por millón)<xref ref-type="bibr" rid="B7"><sup>7</sup></xref>. Los diagnósticos más frecuentes en Campinas fueron las leucemias linfoblásticas agudas, las leucemias agudas no linfoblásticas, los astrocitomas y los linfomas de Hodgkin, tanto en niños <bold>y</bold> niñas como en adolescentes, hechos ya informados en la bibliografía<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B30"><sup>30</sup></xref>.</p>
+			<p>Según los registros encontrados para Sudamérica, solo la incidencia para el Grupo II fue similar a los hallazgos del presente estudio (11,6 por millón); para los otros tres grupos estudiados, la incidencia fue más alta en otros países de la región<xref ref-type="bibr" rid="B7"><sup>7</sup></xref>.</p>
+			<p>En comparación con los países europeos, las diferencias más grandes en la incidencia se observaron para el Grupo III y el Grupo IX. En países europeos, las tasas de incidencia estandarizadas para el Grupo III (29,5 por millón) y el Grupo IX (9,4 por millón) son casi el doble de lo encontrado en Campinas (incidencia del Grupo II, 11,9 por millón y del Grupo IX, 4,3 por millón). Sin embargo, con relación al Grupo IX, la incidencia es semejante a la incidencia encontrada en Sudáfrica y en personas pertenecientes a los pueblos originarios en EE.UU.<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B28"><sup>28</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B31"><sup>31</sup></xref>.</p>
+			<p>En nuestro estudio, estas diferencias se pueden explicar por el tipo de tumor (macizo) que afecta mayormente a adolescentes, quienes podrían haber recibido tratamiento en otra institución o haber sido considerados como adultos jóvenes y por ende no derivados a la Unidad de Alta Complejidad en Oncología Pediátrica.</p>
+			<p>Aunque las tasas de incidencia en los cuatro grupos diagnósticos difieren de las incidencias observadas a partir de los registros de cáncer con base poblacional de los países desarrollados, se asemejan a las encontradas en la bibliografía para los países en desarrollo, incluso Brasil<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B32"><sup>32</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B33"><sup>33</sup></xref>.</p>
+			<p>Una limitación de este estudio resulta de la fuente de datos, ya que los registros se obtuvieron de solo un servicio de oncología infantil. Aunque el Registro de Cáncer con Base Poblacional afirma que hay una cobertura del 85% en el caso de residentes de la ciudad, es posible que el perfil de pacientes no incluidos en el análisis difiera de lo observado en nuestros resultados.</p>
+			<p>Es necesario crear sistemas de monitoreo eficientes para cáncer, en particular, para los pocos casos de cáncer infantil. Su creación potenciaría el valor del análisis espacial al permitir resultados más precisos. A futuro se debería investigar la relación entre geografía y las tasas de incidencia por cáncer infantil para un espectro más amplio de medidas y resultados en salud<xref ref-type="bibr" rid="B16"><sup>16</sup></xref>.</p>
+			<p>Para concluir, nuestros resultados se condicen con informes previos de otros registros de cáncer. Esta aplicación de la incidencia de cáncer en una región de Brasil produjo evidencias de una distribución similar de cáncer entre niñas, niños y adolescentes. Este estudio de las tasas de incidencia de cáncer y el análisis de los patrones espaciales de las RME pueden ser centrales para definir programas de intervención en la región. Por lo tanto, puede aportar al desarrollo de programas de salud para la reducción de la morbilidad y la mortalidad en cáncer infantil y, de manera concomitante, a la planificación de intervenciones y la estructuración de la red sanitaria.</p>
+		</sec>
+	</body>
+	<back>
+		<ack>
+			<title>AGRADECIMIENTOS</title>
+			<p>A la Coordenação de Aperfeiçoamento de Pessoal de Nivel Superior de Brasil por el apoyo económico otorgado a la investigación (N° 99999.007495/2014-05), además de la importante contribución de investigadores de la Universidade do Porto y al Registro de Cáncer con Base Poblacional de Campinas.</p>
+		</ack>
+		<ref-list>
+			<title>REFERENCIAS BIBLIOGRÁFICAS</title>
+			<ref id="B1">
+				<label>1</label>
+				<mixed-citation>1. Brasil. Lei 8080, de 19 de setembro de 1990. Dispõe sobre as condições para a promoção, proteção e recuperação da saúde, a organização e o funcionamento dos serviços correspondentes e dá outras providências [Internet]. Diário Oficial da República Federativa do Brasil; 1990 [citado 2 May 2017]. Disponible en: <comment>Disponible en: <ext-link ext-link-type="uri" xlink:href="https://tinyurl.com/d73vyv">https://tinyurl.com/d73vyv</ext-link>
+					</comment>.</mixed-citation>
+				<element-citation publication-type="legal-doc">
+					<person-group person-group-type="author">
+						<collab>Brasil</collab>
+					</person-group>
+					<article-title>Lei 8080, de 19 de setembro de 1990. Dispõe sobre as condições para a promoção, proteção e recuperação da saúde, a organização e o funcionamento dos serviços correspondentes e dá outras providências</article-title>
+					<source>Diário Oficial da República Federativa do Brasil</source>
+					<year>1990</year>
+					<date-in-citation content-type="access-date" iso-8601-date="2017-05-02">2 May 2017</date-in-citation>
+					<comment>Disponible en: <ext-link ext-link-type="uri" xlink:href="https://tinyurl.com/d73vyv">https://tinyurl.com/d73vyv</ext-link>
+					</comment>
+				</element-citation>
+			</ref>
+			<ref id="B2">
+				<label>2</label>
+				<mixed-citation>2. Nunes ED. Collective health paradigms: a brief reflection. Salud Colectiva. 2014;10(1):57-65.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Nunes</surname>
+							<given-names>ED</given-names>
+						</name>
+					</person-group>
+					<article-title>Collective health paradigms: a brief reflection</article-title>
+					<source>Salud Colectiva</source>
+					<year>2014</year>
+					<volume>10</volume>
+					<issue>1</issue>
+					<fpage>57</fpage>
+					<lpage>65</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B3">
+				<label>3</label>
+				<mixed-citation>3. Breilh J. Epidemiologia: economia, política e saúde. São Paulo: Unesp-Hucitec; 1991.</mixed-citation>
+				<element-citation publication-type="book">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Breilh</surname>
+							<given-names>J</given-names>
+						</name>
+					</person-group>
+					<source>Epidemiologia: economia, política e saúde</source>
+					<publisher-loc>São Paulo</publisher-loc>
+					<publisher-name>Unesp-Hucitec</publisher-name>
+					<year>1991</year>
+				</element-citation>
+			</ref>
+			<ref id="B4">
+				<label>4</label>
+				<mixed-citation>4. Guimarães RB. Geografia e saúde coletiva no Brasil. Saúde e Sociedade. 2016;25(4):869-879.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Guimarães</surname>
+							<given-names>RB</given-names>
+						</name>
+					</person-group>
+					<article-title>Geografia e saúde coletiva no Brasil</article-title>
+					<source>Saúde e Sociedade</source>
+					<year>2016</year>
+					<volume>25</volume>
+					<issue>4</issue>
+					<fpage>869</fpage>
+					<lpage>879</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B5">
+				<label>5</label>
+				<mixed-citation>5. Barcellos C. A Geografia e o Contexto dos Problemas de Saúde. Rio de Janeiro: Abrasco; 2008.</mixed-citation>
+				<element-citation publication-type="book">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Barcellos</surname>
+							<given-names>C</given-names>
+						</name>
+					</person-group>
+					<source>A Geografia e o Contexto dos Problemas de Saúde</source>
+					<publisher-loc>Rio de Janeiro</publisher-loc>
+					<publisher-name>Abrasco</publisher-name>
+					<year>2008</year>
+				</element-citation>
+			</ref>
+			<ref id="B6">
+				<label>6</label>
+				<mixed-citation>6. De Camargo B, De Oliveira Santos M, Rebelo MS, De Souza Reis R, Ferman S, Noronha CP, Pombo-de-Oliveira MS. Cancer incidence among children and adolescents in Brazil: first report of 14 population-based cancer registries. International Journal of Cancer. 2010;126(3):715-720.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>De Camargo</surname>
+							<given-names>B</given-names>
+						</name>
+						<name>
+							<surname>De Oliveira Santos</surname>
+							<given-names>M</given-names>
+						</name>
+						<name>
+							<surname>Rebelo</surname>
+							<given-names>MS</given-names>
+						</name>
+						<name>
+							<surname>De Souza Reis</surname>
+							<given-names>R</given-names>
+						</name>
+						<name>
+							<surname>Ferman</surname>
+							<given-names>S</given-names>
+						</name>
+						<name>
+							<surname>Noronha</surname>
+							<given-names>CP</given-names>
+						</name>
+						<name>
+							<surname>Pombo-de-Oliveira</surname>
+							<given-names>MS</given-names>
+						</name>
+					</person-group>
+					<article-title>Cancer incidence among children and adolescents in Brazil: first report of 14 population-based cancer registries</article-title>
+					<source>International Journal of Cancer</source>
+					<year>2010</year>
+					<volume>126</volume>
+					<issue>3</issue>
+					<fpage>715</fpage>
+					<lpage>720</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B7">
+				<label>7</label>
+				<mixed-citation>7. Steliarova-Foucher E, Colombet M, Ries LAG, Moreno F, Dolya A, Bray F, Hesseling P, Shin HY, Stiller CA, IICC-3 contributors. International incidence of childhood cancer, 2001-10: a population-based registry study. The Lancet Oncology. 2017;18(6):719-731.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Steliarova-Foucher</surname>
+							<given-names>E</given-names>
+						</name>
+						<name>
+							<surname>Colombet</surname>
+							<given-names>M</given-names>
+						</name>
+						<name>
+							<surname>Ries</surname>
+							<given-names>LAG</given-names>
+						</name>
+						<name>
+							<surname>Moreno</surname>
+							<given-names>F</given-names>
+						</name>
+						<name>
+							<surname>Dolya</surname>
+							<given-names>A</given-names>
+						</name>
+						<name>
+							<surname>Bray</surname>
+							<given-names>F</given-names>
+						</name>
+						<name>
+							<surname>Hesseling</surname>
+							<given-names>P</given-names>
+						</name>
+						<name>
+							<surname>Shin</surname>
+							<given-names>HY</given-names>
+						</name>
+						<name>
+							<surname>Stiller</surname>
+							<given-names>CA</given-names>
+						</name>
+						<collab>IICC-3 contributors</collab>
+					</person-group>
+					<article-title>International incidence of childhood cancer, 2001-10: a population-based registry study</article-title>
+					<source>The Lancet Oncology</source>
+					<year>2017</year>
+					<volume>18</volume>
+					<issue>6</issue>
+					<fpage>719</fpage>
+					<lpage>731</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B8">
+				<label>8</label>
+				<mixed-citation>8. Magrath I, Steliarova-Foucher E , Epelman S, Ribeiro RC, Harif M, Li CK, Kebudi R, Macfarlane SD, Howard SC. Paediatric cancer in low-income and middle-income countries. The Lancet Oncology. 2013;14(3):e104-e116.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Magrath</surname>
+							<given-names>I</given-names>
+						</name>
+						<name>
+							<surname>Steliarova-Foucher</surname>
+							<given-names>E</given-names>
+						</name>
+						<name>
+							<surname>Epelman</surname>
+							<given-names>S</given-names>
+						</name>
+						<name>
+							<surname>Ribeiro</surname>
+							<given-names>RC</given-names>
+						</name>
+						<name>
+							<surname>Harif</surname>
+							<given-names>M</given-names>
+						</name>
+						<name>
+							<surname>Li</surname>
+							<given-names>CK</given-names>
+						</name>
+						<name>
+							<surname>Kebudi</surname>
+							<given-names>R</given-names>
+						</name>
+						<name>
+							<surname>Macfarlane</surname>
+							<given-names>SD</given-names>
+						</name>
+						<name>
+							<surname>Howard</surname>
+							<given-names>SC</given-names>
+						</name>
+					</person-group>
+					<article-title>Paediatric cancer in low-income and middle-income countries</article-title>
+					<source>The Lancet Oncology</source>
+					<year>2013</year>
+					<volume>14</volume>
+					<issue>3</issue>
+					<fpage>e104</fpage>
+					<lpage>e116</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B9">
+				<label>9</label>
+				<mixed-citation>9. Forman D, Bray F , Brewster DH, Gombe Mbalawa C, Kohler B, Piñeros M, Steliarova-Foucher E , Swaminathan R, Ferlay J, editors. Cancer incidence in five continents Vol-X [Internet]. Lyon: International Agency for Research on Cancer; 2014 [citado 12 oct 2016]. Disponible en: <comment>Disponible en: <ext-link ext-link-type="uri" xlink:href="https://tinyurl.com/y8z9w5rk">https://tinyurl.com/y8z9w5rk</ext-link>
+					</comment>.</mixed-citation>
+				<element-citation publication-type="book">
+					<person-group person-group-type="editor">
+						<name>
+							<surname>Forman</surname>
+							<given-names>D</given-names>
+						</name>
+						<name>
+							<surname>Bray</surname>
+							<given-names>F</given-names>
+						</name>
+						<name>
+							<surname>Brewster</surname>
+							<given-names>DH</given-names>
+						</name>
+						<name>
+							<surname>Gombe Mbalawa</surname>
+							<given-names>C</given-names>
+						</name>
+						<name>
+							<surname>Kohler</surname>
+							<given-names>B</given-names>
+						</name>
+						<name>
+							<surname>Piñeros</surname>
+							<given-names>M</given-names>
+						</name>
+						<name>
+							<surname>Steliarova-Foucher</surname>
+							<given-names>E</given-names>
+						</name>
+						<name>
+							<surname>Swaminathan</surname>
+							<given-names>R</given-names>
+						</name>
+						<name>
+							<surname>Ferlay</surname>
+							<given-names>J</given-names>
+						</name>
+					</person-group>
+					<source>Cancer incidence in five continents Vol-X</source>
+					<publisher-loc>Lyon</publisher-loc>
+					<publisher-name>International Agency for Research on Cancer</publisher-name>
+					<year>2014</year>
+					<date-in-citation content-type="access-date" iso-8601-date="2016-10-12">12 oct 2016</date-in-citation>
+					<comment>Disponible en: <ext-link ext-link-type="uri" xlink:href="https://tinyurl.com/y8z9w5rk">https://tinyurl.com/y8z9w5rk</ext-link>
+					</comment>
+				</element-citation>
+			</ref>
+			<ref id="B10">
+				<label>10</label>
+				<mixed-citation>10. Parkin DM, Kramárová E, Draper GJ, Masuyer E, editors. International Incidence of Childhood Cancer. No.114. Lyon: IARC Scientific Publication; 1998.</mixed-citation>
+				<element-citation publication-type="book">
+					<person-group person-group-type="editor">
+						<name>
+							<surname>Parkin</surname>
+							<given-names>DM</given-names>
+						</name>
+						<name>
+							<surname>Kramárová</surname>
+							<given-names>E</given-names>
+						</name>
+						<name>
+							<surname>Draper</surname>
+							<given-names>GJ</given-names>
+						</name>
+						<name>
+							<surname>Masuyer</surname>
+							<given-names>E</given-names>
+						</name>
+					</person-group>
+					<source>International Incidence of Childhood Cancer</source>
+					<issue>114</issue>
+					<publisher-loc>Lyon</publisher-loc>
+					<publisher-name>IARC Scientific Publication</publisher-name>
+					<year>1998</year>
+				</element-citation>
+			</ref>
+			<ref id="B11">
+				<label>11</label>
+				<mixed-citation>11. Teixeira RP, Ramalho WS, Fernandes ICF, Salge AKM, Barbosa MA, Siqueira KM. A Família da criança com câncer: percepções de profissionais de enfermagem atuantes em oncologia pediátrica. Ciência, Cuidado e Saúde. 2012;11(4):784-791.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Teixeira</surname>
+							<given-names>RP</given-names>
+						</name>
+						<name>
+							<surname>Ramalho</surname>
+							<given-names>WS</given-names>
+						</name>
+						<name>
+							<surname>Fernandes</surname>
+							<given-names>ICF</given-names>
+						</name>
+						<name>
+							<surname>Salge</surname>
+							<given-names>AKM</given-names>
+						</name>
+						<name>
+							<surname>Barbosa</surname>
+							<given-names>MA</given-names>
+						</name>
+						<name>
+							<surname>Siqueira</surname>
+							<given-names>KM</given-names>
+						</name>
+					</person-group>
+					<article-title>A Família da criança com câncer: percepções de profissionais de enfermagem atuantes em oncologia pediátrica</article-title>
+					<source>Ciência, Cuidado e Saúde</source>
+					<year>2012</year>
+					<volume>11</volume>
+					<issue>4</issue>
+					<fpage>784</fpage>
+					<lpage>791</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B12">
+				<label>12</label>
+				<mixed-citation>12. Instituto Brasileiro de Geografia e Estatística. Infográficos [Internet]. Brasil: IBGE; 2010 [citado 02 May 2017]. Disponible en: <comment>Disponible en: <ext-link ext-link-type="uri" xlink:href="https://tinyurl.com/ybqtotu2">https://tinyurl.com/ybqtotu2</ext-link>
+					</comment>.</mixed-citation>
+				<element-citation publication-type="book">
+					<person-group person-group-type="author">
+						<collab>Instituto Brasileiro de Geografia e Estatística</collab>
+					</person-group>
+					<source>Infográficos</source>
+					<publisher-loc>Brasil</publisher-loc>
+					<publisher-name>IBGE</publisher-name>
+					<year>2010</year>
+					<date-in-citation content-type="access-date" iso-8601-date="2017-05-02">02 May 2017</date-in-citation>
+					<comment>Disponible en: <ext-link ext-link-type="uri" xlink:href="https://tinyurl.com/ybqtotu2">https://tinyurl.com/ybqtotu2</ext-link>
+					</comment>
+				</element-citation>
+			</ref>
+			<ref id="B13">
+				<label>13</label>
+				<mixed-citation>13. Grabois MF, Oliveira EXG, Carvalho MS. Childhood cancer and pediatric oncologic care in Brazil: access and equity. Cadernos de Saúde Pública. 2011;27:1711-1720.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Grabois</surname>
+							<given-names>MF</given-names>
+						</name>
+						<name>
+							<surname>Oliveira</surname>
+							<given-names>EXG</given-names>
+						</name>
+						<name>
+							<surname>Carvalho</surname>
+							<given-names>MS</given-names>
+						</name>
+					</person-group>
+					<article-title>Childhood cancer and pediatric oncologic care in Brazil: access and equity</article-title>
+					<source>Cadernos de Saúde Pública</source>
+					<year>2011</year>
+					<volume>27</volume>
+					<fpage>1711</fpage>
+					<lpage>1720</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B14">
+				<label>14</label>
+				<mixed-citation>14. Mutti CF, Paula CC, Souto MD. Assistência à Saúde da Criança com Câncer na Produção Científica Brasileira. Revista Brasileira de Cancerologia. 2010;1(56):71-83.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Mutti</surname>
+							<given-names>CF</given-names>
+						</name>
+						<name>
+							<surname>Paula</surname>
+							<given-names>CC</given-names>
+						</name>
+						<name>
+							<surname>Souto</surname>
+							<given-names>MD</given-names>
+						</name>
+					</person-group>
+					<article-title>Assistência à Saúde da Criança com Câncer na Produção Científica Brasileira</article-title>
+					<source>Revista Brasileira de Cancerologia</source>
+					<year>2010</year>
+					<volume>1</volume>
+					<issue>56</issue>
+					<fpage>71</fpage>
+					<lpage>83</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B15">
+				<label>15</label>
+				<mixed-citation>15. Scott D, Curtis B, Twumasi FO. Towards the creation of a health information system for cancer in KwaZulu-Natal, South Africa. Health &amp; Place. 2002;8(4):237-249.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Scott</surname>
+							<given-names>D</given-names>
+						</name>
+						<name>
+							<surname>Curtis</surname>
+							<given-names>B</given-names>
+						</name>
+						<name>
+							<surname>Twumasi</surname>
+							<given-names>FO</given-names>
+						</name>
+					</person-group>
+					<article-title>Towards the creation of a health information system for cancer in KwaZulu-Natal, South Africa</article-title>
+					<source>Health &amp; Place</source>
+					<year>2002</year>
+					<volume>8</volume>
+					<issue>4</issue>
+					<fpage>237</fpage>
+					<lpage>249</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B16">
+				<label>16</label>
+				<mixed-citation>16. Bailony MR, Hararah MK, Salhab AR, Ghannam I, Abdeen Z, Ghannam J. Cancer registration and healthcare access in West Bank, Palestine: a GIS analysis of childhood cancer, 1998-2007. International Journal of Cancer. 2011;129(5):1180-1189.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Bailony</surname>
+							<given-names>MR</given-names>
+						</name>
+						<name>
+							<surname>Hararah</surname>
+							<given-names>MK</given-names>
+						</name>
+						<name>
+							<surname>Salhab</surname>
+							<given-names>AR</given-names>
+						</name>
+						<name>
+							<surname>Ghannam</surname>
+							<given-names>I</given-names>
+						</name>
+						<name>
+							<surname>Abdeen</surname>
+							<given-names>Z</given-names>
+						</name>
+						<name>
+							<surname>Ghannam</surname>
+							<given-names>J</given-names>
+						</name>
+					</person-group>
+					<article-title>Cancer registration and healthcare access in West Bank, Palestine: a GIS analysis of childhood cancer, 1998-2007</article-title>
+					<source>International Journal of Cancer</source>
+					<year>2011</year>
+					<volume>129</volume>
+					<issue>5</issue>
+					<fpage>1180</fpage>
+					<lpage>1189</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B17">
+				<label>17</label>
+				<mixed-citation>17. Friestino JKO. Panorama do câncer em crianças e adolescentes sob a perspectiva da saúde coletiva. [Teses de Doutorado]. Campinas: Universidade Estadual de Campinas; 2015.</mixed-citation>
+				<element-citation publication-type="thesis">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Friestino</surname>
+							<given-names>JKO</given-names>
+						</name>
+					</person-group>
+					<source>Panorama do câncer em crianças e adolescentes sob a perspectiva da saúde coletiva</source>
+					<comment content-type="degree">Teses de Doutorado</comment>
+					<publisher-loc>Campinas</publisher-loc>
+					<publisher-name>Universidade Estadual de Campinas</publisher-name>
+					<year>2015</year>
+				</element-citation>
+			</ref>
+			<ref id="B18">
+				<label>18</label>
+				<mixed-citation>18. Oliveira-Friestino JK, Francisco PMB, Moreira Filho DC. Incidence profile of leukemias, lymphomas, central nervous system tumors and soft-tissue sarcomas in children and adolescents in a brazilian city. International Archives of Medicine. 2016;9(152):1-8.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Oliveira-Friestino</surname>
+							<given-names>JK</given-names>
+						</name>
+						<name>
+							<surname>Francisco</surname>
+							<given-names>PMB</given-names>
+						</name>
+						<name>
+							<surname>Moreira</surname>
+							<given-names>DC</given-names>
+							<suffix>Filho</suffix>
+						</name>
+					</person-group>
+					<article-title>Incidence profile of leukemias, lymphomas, central nervous system tumors and soft-tissue sarcomas in children and adolescents in a brazilian city</article-title>
+					<source>International Archives of Medicine</source>
+					<year>2016</year>
+					<volume>9</volume>
+					<issue>152</issue>
+					<fpage>1</fpage>
+					<lpage>8</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B19">
+				<label>19</label>
+				<mixed-citation>19. Steliarova-Foucher E , Stiller C, Lacour B, Kaatsch P. International Classification of Childhood Cancer, Third Edition. Cancer. 2005;103(7):1457-1467.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Steliarova-Foucher</surname>
+							<given-names>E</given-names>
+						</name>
+						<name>
+							<surname>Stiller</surname>
+							<given-names>C</given-names>
+						</name>
+						<name>
+							<surname>Lacour</surname>
+							<given-names>B</given-names>
+						</name>
+						<name>
+							<surname>Kaatsch</surname>
+							<given-names>P</given-names>
+						</name>
+					</person-group>
+					<article-title>Classification of Childhood Cancer, Third Edition</article-title>
+					<source>Cancer</source>
+					<year>2005</year>
+					<volume>103</volume>
+					<issue>7</issue>
+					<fpage>1457</fpage>
+					<lpage>1467</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B20">
+				<label>20</label>
+				<mixed-citation>20. Doll R, Payne P, Waterhouse JAH, editors. Cancer incidence in five continents. Geneva: Union Internationale Contre le Cancer; 1966.</mixed-citation>
+				<element-citation publication-type="book">
+					<person-group person-group-type="editor">
+						<name>
+							<surname>Doll</surname>
+							<given-names>R</given-names>
+						</name>
+						<name>
+							<surname>Payne</surname>
+							<given-names>P</given-names>
+						</name>
+						<name>
+							<surname>Waterhouse</surname>
+							<given-names>JAH</given-names>
+						</name>
+					</person-group>
+					<source>Cancer incidence in five continents</source>
+					<publisher-loc>Geneva</publisher-loc>
+					<publisher-name>Union Internationale Contre le Cancer</publisher-name>
+					<year>1966</year>
+				</element-citation>
+			</ref>
+			<ref id="B21">
+				<label>21</label>
+				<mixed-citation>21. Clayton D, Kaldor J. Empirical Bayes estimates of age-standardized relative risks for use in disease mapping. Biometrics. 1987;43(3):671-681.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Clayton</surname>
+							<given-names>D</given-names>
+						</name>
+						<name>
+							<surname>Kaldor</surname>
+							<given-names>J</given-names>
+						</name>
+					</person-group>
+					<article-title>Empirical Bayes estimates of age-standardized relative risks for use in disease mapping</article-title>
+					<source>Biometrics</source>
+					<year>1987</year>
+					<volume>43</volume>
+					<issue>3</issue>
+					<fpage>671</fpage>
+					<lpage>681</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B22">
+				<label>22</label>
+				<mixed-citation>22. Bailey TC. Spatial statistical methods in health. Cadernos de Saúde Pública. 2001;17:1083-1098.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Bailey</surname>
+							<given-names>TC</given-names>
+						</name>
+					</person-group>
+					<article-title>Spatial statistical methods in health</article-title>
+					<source>Cadernos de Saúde Pública</source>
+					<year>2001</year>
+					<volume>17</volume>
+					<fpage>1083</fpage>
+					<lpage>1098</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B23">
+				<label>23</label>
+				<mixed-citation>23. Gelfand AE, Vounatsou P. Proper multivariate conditional autoregressive models for spatial data analysis. Biostatistics. 2003;4(1):11-25.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Gelfand</surname>
+							<given-names>AE</given-names>
+						</name>
+						<name>
+							<surname>Vounatsou</surname>
+							<given-names>P</given-names>
+						</name>
+					</person-group>
+					<article-title>Proper multivariate conditional autoregressive models for spatial data analysis</article-title>
+					<source>Biostatistics</source>
+					<year>2003</year>
+					<volume>4</volume>
+					<issue>1</issue>
+					<fpage>11</fpage>
+					<lpage>25</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B24">
+				<label>24</label>
+				<mixed-citation>24. Oliveira CM, Economou T, Bailey T, Mendonca D, Pina MF. The interactions between municipal socioeconomic status and age on hip fracture risk. Osteoporosis International. 2015;26(2):489-498.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Oliveira</surname>
+							<given-names>CM</given-names>
+						</name>
+						<name>
+							<surname>Economou</surname>
+							<given-names>T</given-names>
+						</name>
+						<name>
+							<surname>Bailey</surname>
+							<given-names>T</given-names>
+						</name>
+						<name>
+							<surname>Mendonca</surname>
+							<given-names>D</given-names>
+						</name>
+						<name>
+							<surname>Pina</surname>
+							<given-names>MF</given-names>
+						</name>
+					</person-group>
+					<article-title>The interactions between municipal socioeconomic status and age on hip fracture risk</article-title>
+					<source>Osteoporosis International</source>
+					<year>2015</year>
+					<volume>26</volume>
+					<issue>2</issue>
+					<fpage>489</fpage>
+					<lpage>498</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B25">
+				<label>25</label>
+				<mixed-citation>25. Lunn DJ, Thomas A, Best N, Spiegelhalter D. WinBUGS-a Bayesian modelling framework: concepts, structure, and extensibility. Statistics and Computing. 2000;10(4):325-337.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Lunn</surname>
+							<given-names>DJ</given-names>
+						</name>
+						<name>
+							<surname>Thomas</surname>
+							<given-names>A</given-names>
+						</name>
+						<name>
+							<surname>Best</surname>
+							<given-names>N</given-names>
+						</name>
+						<name>
+							<surname>Spiegelhalter</surname>
+							<given-names>D</given-names>
+						</name>
+					</person-group>
+					<article-title>WinBUGS-a Bayesian modelling framework: concepts, structure, and extensibility</article-title>
+					<source>Statistics and Computing</source>
+					<year>2000</year>
+					<volume>10</volume>
+					<issue>4</issue>
+					<fpage>325</fpage>
+					<lpage>337</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B26">
+				<label>26</label>
+				<mixed-citation>26. RC Team. R: a language and environment for statistical computing [Internet]. Austria: R Foundation for Statistical Computing; 2012 [citado 16 oct 2016]. Disponible en: <comment>Disponible en: <ext-link ext-link-type="uri" xlink:href="https://www.r-project.org/">https://www.r-project.org/</ext-link>
+					</comment>.</mixed-citation>
+				<element-citation publication-type="software">
+					<person-group person-group-type="author">
+						<collab>RC Team</collab>
+					</person-group>
+					<source>R: a language and environment for statistical computing</source>
+					<publisher-loc>Austria</publisher-loc>
+					<publisher-name>R Foundation for Statistical Computing</publisher-name>
+					<year>2012</year>
+					<date-in-citation content-type="access-date" iso-8601-date="2016-10-16">16 oct 2016</date-in-citation>
+					<comment>Disponible en: <ext-link ext-link-type="uri" xlink:href="https://www.r-project.org/">https://www.r-project.org/</ext-link>
+					</comment>
+				</element-citation>
+			</ref>
+			<ref id="B27">
+				<label>27</label>
+				<mixed-citation>27. Carreira H, Antunes L, Castro C, Lunet N, Bento MJ. Cancer incidence and survival (1997-2006) among adolescents and young adults in the north of Portugal. Pediatric Hematology and Oncology. 2012;29(7):663-676.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Carreira</surname>
+							<given-names>H</given-names>
+						</name>
+						<name>
+							<surname>Antunes</surname>
+							<given-names>L</given-names>
+						</name>
+						<name>
+							<surname>Castro</surname>
+							<given-names>C</given-names>
+						</name>
+						<name>
+							<surname>Lunet</surname>
+							<given-names>N</given-names>
+						</name>
+						<name>
+							<surname>Bento</surname>
+							<given-names>MJ</given-names>
+						</name>
+					</person-group>
+					<article-title>Cancer incidence and survival (1997-2006) among adolescents and young adults in the north of Portugal</article-title>
+					<source>Pediatric Hematology and Oncology</source>
+					<year>2012</year>
+					<volume>29</volume>
+					<issue>7</issue>
+					<fpage>663</fpage>
+					<lpage>676</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B28">
+				<label>28</label>
+				<mixed-citation>28. International Agency for Research on Cancer. World Cancer Report 2014. Lyon: WHO; 2014.</mixed-citation>
+				<element-citation publication-type="book">
+					<person-group person-group-type="author">
+						<collab>International Agency for Research on Cancer</collab>
+					</person-group>
+					<source>World Cancer Report 2014</source>
+					<publisher-loc>Lyon</publisher-loc>
+					<publisher-name>WHO</publisher-name>
+					<year>2014</year>
+				</element-citation>
+			</ref>
+			<ref id="B29">
+				<label>29</label>
+				<mixed-citation>29. Yaris N, Mandiracioglu A, Büyükpamukcuc M. Childhood cancer in developing countries. Pediatric Hematology and Oncology. 2004;21(3):237-253.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Yaris</surname>
+							<given-names>N</given-names>
+						</name>
+						<name>
+							<surname>Mandiracioglu</surname>
+							<given-names>A</given-names>
+						</name>
+						<name>
+							<surname>Büyükpamukcuc</surname>
+							<given-names>M</given-names>
+						</name>
+					</person-group>
+					<article-title>Childhood cancer in developing countries</article-title>
+					<source>Pediatric Hematology and Oncology</source>
+					<year>2004</year>
+					<volume>21</volume>
+					<issue>3</issue>
+					<fpage>237</fpage>
+					<lpage>253</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B30">
+				<label>30</label>
+				<mixed-citation>30. Steliarova-Foucher E, Stiller C, Kaatsch P, Berrino F, Coebergh JW, Lacour B, Parkin M. Geographical patterns and time trends of cancer incidence and survival among children and adolescents in Europe since the 1970s (the ACCIS project): an epidemiological study. Lancet. 2004;364(9451):2097-2105.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Steliarova-Foucher</surname>
+							<given-names>E</given-names>
+						</name>
+						<name>
+							<surname>Stiller</surname>
+							<given-names>C</given-names>
+						</name>
+						<name>
+							<surname>Kaatsch</surname>
+							<given-names>P</given-names>
+						</name>
+						<name>
+							<surname>Berrino</surname>
+							<given-names>F</given-names>
+						</name>
+						<name>
+							<surname>Coebergh</surname>
+							<given-names>JW</given-names>
+						</name>
+						<name>
+							<surname>Lacour</surname>
+							<given-names>B</given-names>
+						</name>
+						<name>
+							<surname>Parkin</surname>
+							<given-names>M</given-names>
+						</name>
+					</person-group>
+					<article-title>Geographical patterns and time trends of cancer incidence and survival among children and adolescents in Europe since the 1970s (the ACCIS project): an epidemiological study</article-title>
+					<source>Lancet</source>
+					<year>2004</year>
+					<volume>364</volume>
+					<issue>9451</issue>
+					<fpage>2097</fpage>
+					<lpage>2105</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B31">
+				<label>31</label>
+				<mixed-citation>31. Stiller CA, Desandes E, Danon SE, Izarzugaza I, Ratiu A, Vassileva-Valerianova Z, Steliarova-Foucher E. Cancer incidence and survival in European adolescents (1978-1997). European Journal of Cancer. 2006;42(13):2006-2018.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Stiller</surname>
+							<given-names>CA</given-names>
+						</name>
+						<name>
+							<surname>Desandes</surname>
+							<given-names>E</given-names>
+						</name>
+						<name>
+							<surname>Danon</surname>
+							<given-names>SE</given-names>
+						</name>
+						<name>
+							<surname>Izarzugaza</surname>
+							<given-names>I</given-names>
+						</name>
+						<name>
+							<surname>Ratiu</surname>
+							<given-names>A</given-names>
+						</name>
+						<name>
+							<surname>Vassileva-Valerianova</surname>
+							<given-names>Z</given-names>
+						</name>
+						<name>
+							<surname>Steliarova-Foucher</surname>
+							<given-names>E</given-names>
+						</name>
+					</person-group>
+					<article-title>Cancer incidence and survival in European adolescents (1978-1997)</article-title>
+					<source>European Journal of Cancer</source>
+					<year>2006</year>
+					<volume>42</volume>
+					<issue>13</issue>
+					<fpage>2006</fpage>
+					<lpage>2018</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B32">
+				<label>32</label>
+				<mixed-citation>32. Braga PE, Latorre MRDO, Curado MP. Childhood cancer: a comparative analysis of incidence, mortality, and survival in Goiania (Brazil) and other countries. Cadernos de Saúde Pública. 2002;18(1):33-44.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Braga</surname>
+							<given-names>PE</given-names>
+						</name>
+						<name>
+							<surname>Latorre</surname>
+							<given-names>MRDO</given-names>
+						</name>
+						<name>
+							<surname>Curado</surname>
+							<given-names>MP</given-names>
+						</name>
+					</person-group>
+					<article-title>Childhood cancer: a comparative analysis of incidence, mortality, and survival in Goiania (Brazil) and other countries</article-title>
+					<source>Cadernos de Saúde Pública</source>
+					<year>2002</year>
+					<volume>18</volume>
+					<issue>1</issue>
+					<fpage>33</fpage>
+					<lpage>44</lpage>
+				</element-citation>
+			</ref>
+			<ref id="B33">
+				<label>33</label>
+				<mixed-citation>33. Balmant NV, Reis RDS, Oliveira JFP, Ferman S, Santos MDO, Camargo BD. Cancer incidence among adolescents and young adults (15 to 29 years) in Brazil. Pediatric Hematology and Oncology. 2016;8(3):e88-96.</mixed-citation>
+				<element-citation publication-type="journal">
+					<person-group person-group-type="author">
+						<name>
+							<surname>Balmant</surname>
+							<given-names>NV</given-names>
+						</name>
+						<name>
+							<surname>Reis</surname>
+							<given-names>RDS</given-names>
+						</name>
+						<name>
+							<surname>Oliveira</surname>
+							<given-names>JFP</given-names>
+						</name>
+						<name>
+							<surname>Ferman</surname>
+							<given-names>S</given-names>
+						</name>
+						<name>
+							<surname>Santos</surname>
+							<given-names>MDO</given-names>
+						</name>
+						<name>
+							<surname>Camargo</surname>
+							<given-names>BD</given-names>
+						</name>
+					</person-group>
+					<article-title>Cancer incidence among adolescents and young adults (15 to 29 years) in Brazil</article-title>
+					<source>Pediatric Hematology and Oncology</source>
+					<year>2016</year>
+					<volume>8</volume>
+					<issue>3</issue>
+					<fpage>e88</fpage>
+					<lpage>e96</lpage>
+				</element-citation>
+			</ref>
+		</ref-list>
+	</back>
+	<sub-article article-type="translation" id="s1" xml:lang="en">
+		<front-stub>
+			<article-categories>
+				<subj-group subj-group-type="heading">
+					<subject>ARTICLES</subject>
+				</subj-group>
+			</article-categories>
+			<title-group>
+				<article-title>Childhood cancer: incidence and spatial patterns in the city of Campinas, Brazil, 1996-2005</article-title>
+			</title-group>
+			<contrib-group>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">0000-0002-5432-9560</contrib-id>
+					<name>
+						<surname>Oliveira Friestino</surname>
+						<given-names>Jane Kelly</given-names>
+					</name>
+					<xref ref-type="aff" rid="aff6"><sup>1</sup></xref>
+				</contrib>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">0000-0003-4835-8944</contrib-id>
+					<name>
+						<surname>Mendonça</surname>
+						<given-names>Denisa</given-names>
+					</name>
+					<xref ref-type="aff" rid="aff7"><sup>2</sup></xref>
+				</contrib>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">http://orcid.org/0000-0002-2470-0795</contrib-id>
+					<name>
+						<surname>Oliveira</surname>
+						<given-names>Pedro</given-names>
+					</name>
+					<xref ref-type="aff" rid="aff8"><sup>3</sup></xref>
+				</contrib>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">0000-0002-4594-1723</contrib-id>
+					<name>
+						<surname>Oliveira</surname>
+						<given-names>Carla M</given-names>
+					</name>
+					<xref ref-type="aff" rid="aff9"><sup>4</sup></xref>
+				</contrib>
+				<contrib contrib-type="author">
+					<contrib-id contrib-id-type="orcid">0000-0002-7943-0868</contrib-id>
+					<name>
+						<surname>de Carvalho Moreira</surname>
+						<given-names>Djalma</given-names>
+						<suffix>Filho</suffix>
+					</name>
+					<xref ref-type="aff" rid="aff10"><sup>5</sup></xref>
+				</contrib>
+			</contrib-group>
+			<aff id="aff6">
+				<label>1</label>
+				<institution content-type="original">PhD in Collective Health. Professor, Universidade Federal da Fronteira Sul, Chapecó, Brazil. jane.friestino@uffs.edu.br</institution>
+			</aff>
+			<aff id="aff7">
+				<label>2</label>
+				<institution content-type="original">PhD in Biostatistics, Professor, Epidemiology Research Unit, Instituto de Saúde Pública, Instituto de Ciências Biomédicas Abel Salazar, Universidade do Porto, Portugal. dvmendon@icbas.up.pt</institution>
+			</aff>
+			<aff id="aff8">
+				<label>3</label>
+				<institution content-type="original">PhD in Biostatistics. Profesor, Epidemiology Research Unit, Instituto de Saúde Pública, Instituto de Ciências Biomédicas Abel Salazar, Universidade do Porto, Portugal. pnoliveira@icbas.up.pt</institution>
+			</aff>
+			<aff id="aff9">
+				<label>4</label>
+				<institution content-type="original">PhD in Public Health. Invited Assistant Professor, Escola Superior de Saúde, Instituto Politécnico do Porto. Researcher, Instituto de Investigação e Inovação em Saúde (i3s), Instituto de Engenharia Biomédica, Universidade do Porto, Portugal. carlaoliver@gmail.com</institution>
+			</aff>
+			<aff id="aff10">
+				<label>5</label>
+				<institution content-type="original">PhD in Preventive Medicine. Professor, Universidade Estadual de Campinas, Brazil. djalmore@unicamp.br</institution>
+			</aff>
+			<abstract>
+				<title>ABSTRACT </title>
+				<p>This article analyzes cancer incidence and spatial patterns in children and adolescents (0-19 years of age) residing in the city of Campinas in Southeastern Brazil who were diagnosed from 1996-2005. Cancers were classified according to the Third International Classification of Childhood Cancer (ICCC-3) Groups. The four most common groups were studied: leukemias, lymphomas, and central nervous system and soft tissue neoplasms. Age-standardized incidence rates were calculated using the world standard population. A spatial Bayesian hierarchical regression model (controlling for data heterogeneity and spatial autocorrelation) was fitted, assuming that the number of cancer cases follows a Poisson distribution. A total of 180 cases were diagnosed during the study period. Overall, the crude incidence rate was 54.2 per million and the age-standardized incidence rate was 56.5 per million. Although some regions present higher incidence rates, considering the spatial heterogeneity and the spatial autocorrelation, no statistically significant differences in the relative risks were observed. </p>
+			</abstract>
+			<kwd-group xml:lang="en">
+				<title>KEY WORDS: </title>
+				<kwd>Spatial Analysis</kwd>
+				<kwd>Neoplasms</kwd>
+				<kwd>Child Health</kwd>
+				<kwd>Adolescent Health</kwd>
+				<kwd>Medical Geography</kwd>
+				<kwd>Brazil</kwd>
+			</kwd-group>
+		</front-stub>
+		<body>
+			<sec>
+				<title>BACKGROUND</title>
+				<p>The Unified Health System (SUS), as an integral part of the Brazilian system of social protection, has among its objectives to identify health factors and determinants and to use indicators to describe the situations of health and wellbeing of the population.<xref ref-type="bibr" rid="B1"><sup>1</sup></xref>
+				</p>
+				<p>In this scenario, collective health in Brazil has undergone some restructuring since the health reform that occurred in the mid-1970s. Based on conceptions of social medicine, collective health is currently constituted as a scientific field that contributes to studies of the health-disease-care process in diverse population groups inserted into specific geographical, historical and social contexts.<xref ref-type="bibr" rid="B2"><sup>2</sup></xref>
+				</p>
+				<p>Present-day epidemiology, particularly social epidemiology, has moved beyond the explanatory models of the health-disease process of the 1970s. Epidemiology now includes in its research methods expertise from other areas of knowledge, and therefore contemplates important elements such as the complexity existing in the various cycles of human life, which brings together the space and time in which individuals are inserted.<xref ref-type="bibr" rid="B3"><sup>3</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B4"><sup>4</sup></xref>
+				</p>
+				<p>From the perspective of social epidemiology, health is considered a relevant component of the well-being of not only the individual but also of society, as an essential condition for the enjoyment of life and an inalienable right of people regardless of where they live. Shifts in the overall structure of society, climate change, the aging of the population, the growth of inequality, and access to health care are some of the issues that have motivated the awakening of a new awareness of the importance of the territory and geography in the analysis of health conditions, prompting this area of knowledge to gain relevance in the field of collective health.</p>
+				<p>According to Barcellos,<xref ref-type="bibr" rid="B5"><sup>5</sup></xref><sup>)</sup> the geography of health </p>
+				<disp-quote>
+					<p>...is a field of knowledge that must integrate specialists and professionals interested in studying health-disease-care processes in geographic space, so as to intervene.</p>
+				</disp-quote>
+				<p>Currently in the literature it is possible to find a large number of studies that analyze chronic and non-communicable diseases, in particular the occurrence of neoplasms.<xref ref-type="bibr" rid="B4"><sup>4</sup></xref>
+				</p>
+				<p>As they are considered multifactorial diseases, various factors influence the geographic distribution of neoplasms, especially social determinants, the environment and access to health services. An essential tool for the epidemiological surveillance of cancer incidence involves the use of population-based cancer registries (PBCR); such registries are fundamental sources for the development of epidemiological research and clinics, as well as for the planning and evaluation of actions to cancer control.</p>
+				<p>Given the importance of knowing the incidence of cancer in the population, since the 1980s the National Institute of Cancer [<italic>Instituto Nacional de Câncer</italic>] has promoted the establishment of cancer registries in Brazil, such that there are now 20 population-based cancer registries distributed in major cities of all regions of the country.<xref ref-type="bibr" rid="B6"><sup>6</sup></xref> The majority of research is geared towards the types of neoplasms with greatest incidence, perhaps because of the ease in obtaining the data or because of the large amount of information needed for contingency planning; studies of rare cases are therefore scarce in the literature.<xref ref-type="bibr" rid="B7"><sup>7</sup></xref>
+				</p>
+				<p>Campinas, a large Brazilian city located in the southwest of the country, has had a population-based cancer registry operating since 1990. Although population-based studies concerning childhood cancer incidence and survival are important to evaluate local health services, studies are rarely available for the region.</p>
+				<p>Childhood cancer (diagnosed between the ages of 0-19 years) includes a variety of malignancies, with incidence varying worldwide by age, gender, ethnicity and geography, a variation which could provide insights into cancer etiology.<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B9"><sup>9</sup></xref> This type of cancer is considered rare when compared to cancer in adults, representing approximately 2.5-3% of all types of cancer in Latin America and the Caribbean.<xref ref-type="bibr" rid="B6"><sup>6</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B10"><sup>10</sup></xref>
+				</p>
+				<p>Despite this low incidence, the number of new cases in this age group represents a major public health impact due to the frequently high rates of mortality, with the severe consequences due to treatment and the neoplasms themselves aggravated by the suffering experienced by the family.<xref ref-type="bibr" rid="B11"><sup>11</sup></xref>
+				</p>
+				<p>In Brazil, 32.9% of the population is under 19 years of age<xref ref-type="bibr" rid="B12"><sup>12</sup></xref> and although cancer in this age group is rare, it is estimated that there were 11,530 cases among Brazilian children in 2012. According to a report using 14 of the Brazilian population-based cancer registries for all their years of coverage, the average incidence is 154.3 per million children.<xref ref-type="bibr" rid="B6"><sup>6</sup></xref>
+				</p>
+				<p>Cancer has specific behaviors in this age group, therefore the implementation of monitoring is measure for prevention as well as for knowledge production, providing greater visibility to the issue.</p>
+				<p>It is known that in Brazil there are inequities in access to health services for the treatment of cancer in children, and in this sense, the country has features similar to those found in other developing countries, in which the magnitude of cancer is still poorly known. This situation impedes the planning of health actions and the implementation of strategies for prevention and care in the whole population.<xref ref-type="bibr" rid="B13"><sup>13</sup></xref>
+				</p>
+				<p>Given the special features of childhood cancer, epidemiological studies are of great important. They analyze the distribution of cases in the community and construct indicators and weights to generate greater knowledge of the events, which are essential in identifying the affected population and the demands for care.<xref ref-type="bibr" rid="B14"><sup>14</sup></xref>
+				</p>
+				<p>Scott<xref ref-type="bibr" rid="B15"><sup>15</sup></xref> evaluated the use of geographic information systems (GIS) positively in the creation of a health information system about cancer. Even with the incomplete data that had been recorded in South Africa, the technique had the potential to add value to the information system, contributing knowledge regarding a demand which until then had not been considered.</p>
+				<p>Even in the presence of population-based cancer registries, the collection of information about childhood cancer is often unknown in many low-income and middle-income countries, where data on the incidence of cancer are not collected. Additional data sources might be required, and the resulting statistics must be subjected to meticulous quality control. Regarding the worldwide incidence of childhood cancer, only three publications from the years 1988, 1998, and, more recently, 2017 are available. The distances between these dates highlight the complexity existing in the records of cases of childhood cancer, as they are more sensitive to imprecision or missing information.<xref ref-type="bibr" rid="B7"><sup>7</sup></xref>
+				</p>
+				<p>A better understanding of the incidence and spatial patterns of childhood cancer in the local area may help in targeting health services and provide clues for planning in the healthcare system.<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B16"><sup>16</sup></xref> Although geographic analysis can be innovative when it comes to information on cancer incidence, it is known that there is a gap in the scientific literature regarding this issue. Therefore, this study analyses spatial patterns of cancer incidence among children (0-14 years) and adolescents (15-19 years) who are residents of Campinas and were diagnosed in the 1996-2005 period. This study is part of a doctoral dissertation defended in 2015 entitled “Overview of cancer among children and adolescents in the perspective of Collective Health”<italic>.</italic><xref ref-type="bibr" rid="B17"><sup>17</sup></xref>
+				</p>
+			</sec>
+			<sec sec-type="materials|methods">
+				<title>MATERIAL AND METHODS</title>
+				<p>A retrospective observational study of cancer among children and adolescents (0-19 years of age) in Campinas, São Paulo, Brazil, diagnosed in the period from 1996-2005 was conducted.</p>
+				<p>Campinas is an industrial city located in the state of São Paulo, Brazil, with approximately 1.1 million inhabitants. About 30% of the population living in Campinas is under the age of 19 years. During the study period there was an increase of 8.34% in the population under 19 years.<xref ref-type="bibr" rid="B12"><sup>12</sup></xref>
+				</p>
+				<p>In 2000, Campinas was divided by the Municipal Health Department into 47 health care unit coverage areas, which are the geographic units used in the spatial analysis. The population under 19 years in these areas ranged from 1,099 to 7,036, with a median of 3,429. </p>
+				<p>The main cancer care for children and adolescents occurs in the High Complexity Care Unit for Pediatric Oncology, and according to an assessment of the population-based cancer registry of Campinas, this unit has an 85% coverage of incident cases in the city for this age group.<xref ref-type="bibr" rid="B18"><sup>18</sup></xref>
+				</p>
+				<p>Although Campinas has a population-based cancer registry, no data were available for the time period considered in this research. Therefore, this study was conducted in the mentioned High Complexity Care Unit in Pediatric Oncology. This study used all data collection steps already validated for population-based cancer registries and the main procedure for gathering data was active notification of cases.</p>
+				<p>The present study was conducted in accordance with Resolution 196/96 of the Brazilian National Health Council and was approved by the Human Research Ethics Committee. The overarching study in which this article was based was approved by the Human Research Ethics Committee of the Boldrini Children’s Center (CEP-Boldrini) (CAAE 0566.0.000.144-11) No. 06/2011, on May 13, 2011.</p>
+				<sec>
+					<title>Case definition</title>
+					<p>Data were retrieved for all children and adolescents residing in Campinas aged 0-19 years who were diagnosed between January 1, 1996 and December 31, 2005. Confirmed diagnosis of cancer was obtained from medical records, using the date of diagnosis of the first primary tumor.</p>
+					<p>To avoid the inclusion of cases not from the population at risk, a data check was performed manually, comparing the home address of cases with the covered geographical area.</p>
+					<p>Cancers were classified according to the International Classification for Childhood Cancer, third edition (ICCC-3).<xref ref-type="bibr" rid="B19"><sup>19</sup></xref> Benign tumors were excluded. By design, just the most common 4 groups were studied: Group I, Leukemias; Group II, Lymphomas and reticuloendothelial neoplasms; Group III, Central nervous system and miscellaneous intracranial and intraspinal neoplasms; and Group IX, Soft tissue and other extraosseous sarcomas. </p>
+				</sec>
+				<sec>
+					<title>Cancer Incidence</title>
+					<p>The person-years for the period under analysis were obtained from population estimates from the Brazilian Institute of Geography and Statistics [<italic>Instituto Brasileiro de Geografia e Estatística</italic>] (IBGE).<xref ref-type="bibr" rid="B12"><sup>12</sup></xref> Average annual crude and standardized incidence rates, calculated per 1,000,000 inhabitants, express the risk of new cases. The population denominators used for calculation of the incidence rates were based on the population census in 2000 and estimated projected numbers for the remaining years.<xref ref-type="bibr" rid="B12"><sup>12</sup></xref> Age-specific incidence rates per million inhabitants were calculated for children and adolescents in the corresponding age group, resident in the city of Campinas.<xref ref-type="bibr" rid="B12"><sup>12</sup></xref> Age-standardized incidence rates (ASIR) were calculated by the direct method, using the World standard population,<xref ref-type="bibr" rid="B20"><sup>20</sup></xref> in order to control for differences that may exist in the age and sex structure between regions and to compare the incidence rates between regions. In other words, considering that <italic>yijk</italic> represents the number of cancer cases (between 1996 and 2005) in health care unit area <italic>i</italic> (<italic>i=</italic>1,...,47), in sex <italic>j</italic> (<italic>j</italic>=1,2) and age group <italic>k</italic> (<italic>k=</italic>1,...,4 respectively for age groups 0-4, 5-9, 10-14 and 15-19 years-old) and <italic>Nijk</italic> the number of individuals at risk in area <italic>i</italic>, sex <italic>j</italic> and age group <italic>k</italic>, the ASIR were estimated by:</p>
+					<p>
+						<disp-formula id="e13">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e13.jpg"/>
+						</disp-formula>
+					</p>
+					<p>Where</p>
+					<p>
+						<disp-formula id="e14">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e14.jpg"/>
+						</disp-formula>
+					</p>
+					<p>represents the number of expected cases for each region <italic>i</italic>, <italic>NPjk</italic> represents the number of individuals in the standard population of sex <italic>j</italic> and age group <italic>k</italic>, and <italic>CIRijk=yijk/ Nijk</italic> represents the crude incidence of region <italic>i</italic>, in sex <italic>j</italic> and age group <italic>k</italic>. The confidence interval was calculated based on the exact method based on the Poisson distribution (appropriate for small numbers).</p>
+				</sec>
+				<sec>
+					<title>Spatial analysis</title>
+					<p>The digital maps of administrative limits were produced by the IBGE. We used the health care unit areas, which correspond to the coverage area of health centers in the city and their respective population.</p>
+					<p>The conventional measure used in disease mapping is the standardized morbidity ratio (SMR) that refers to the incidence in this period. For each area <italic>i</italic>, the SMR is defined as the ratio of observed cases <italic>yi</italic> to expected cases <italic>ei</italic>. The <italic>ei</italic> were calculated based on the indirect standardization was used to control the effect of sex and age.<xref ref-type="bibr" rid="B21"><sup>21</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B22"><sup>22</sup></xref> The expected cases were calculated as follows: considering <italic>i</italic> the health care unit area index, <italic>j</italic> the sex index and <italic>k</italic> the age group index, then <italic>yijk</italic> represents the number of events of sex <italic>j</italic> and age group <italic>k</italic> in the area <italic>i</italic>, and <italic>Nijk</italic> the number of people at risk by sex <italic>j</italic> and age <italic>k</italic> in the area <italic>i</italic>. </p>
+					<p>The overall rate for the city by age group and sex was given by the following expression: </p>
+					<p>
+						<disp-formula id="e15">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e15.jpg"/>
+						</disp-formula>
+					</p>
+					<p>Then the expression:</p>
+					<p>
+						<disp-formula id="e16">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e16.jpg"/>
+						</disp-formula>
+					</p>
+					<p>represents the expected number of events in the area <italic>i</italic>, sex <italic>j</italic> and age group <italic>k</italic>. Therefore, the expected number of events in the area <italic>i</italic>, assuming constant risk within each age and sex class, was given by, </p>
+					<p>
+						<disp-formula id="e17">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e17.jpg"/>
+						</disp-formula>
+					</p>
+					<p>that is, the sum of expected values in the area over age and sex classes. Consequently, the SMR adjusted by age group and sex for each health care unit area <italic>i</italic> (<italic>i</italic>=1,...,47), assuming that the risk is constant in each area, is given by:</p>
+					<p>
+						<disp-formula id="e18">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e18.jpg"/>
+						</disp-formula>
+					</p>
+					<p>In order to control for data heterogeneity and spatial autocorrelation between areas, a spatial Bayesian hierarchical regression model was fitted. The parameters of interest were estimated by the following model:</p>
+					<p>
+						<disp-formula id="e19">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e19.jpg"/>
+						</disp-formula>
+					</p>
+					<p>where</p>
+					<p>
+						<disp-formula id="e20">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e20.jpg"/>
+						</disp-formula>
+					</p>
+					<p>
+						<disp-formula id="e21">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e21.jpg"/>
+						</disp-formula>
+					</p>
+					<p>The inclusion of random effects <italic>Øi</italic> introduces a latent effect into the model to capture the impact of unknown/unobserved confounding area-level factors. These spatially unstructured random effects can help to account for overdispersion (presence of greater variability in the data) in the distribution of childhood cancer incidence counts <italic>yi</italic>. However, this does not allow for explicit spatial dependence between <italic>yi</italic>. This dependence was included by adding a spatially structured random effect <italic>vi</italic>. To allow for spatial dependence, a Conditionally Auto-Regressive (CAR) model<xref ref-type="bibr" rid="B21"><sup>21</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B22"><sup>22</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B23"><sup>23</sup></xref><sup>)</sup> is assumed for <italic>vi</italic>, defined by: </p>
+					<p>
+						<disp-formula id="e22">
+							<graphic xlink:href="1851-8265-scol-14-01-51-e22.jpg"/>
+						</disp-formula>
+					</p>
+					<p>where <italic>wij</italic> are the adjacency weights for the areas. In this study <italic>wij</italic> were taken as simple binary values: <italic>wij</italic>=1 if area <italic>i</italic> has common boundary with area <italic>j</italic> and <italic>wij</italic>=0 otherwise; <italic>σv</italic> was the hyperparameter that controls the strength of local spatial dependence. </p>
+					<p>Uninformative prior distributions were assumed for the model parameters. Parameter was given a Gaussian prior with 0 mean and large variance (1,000) whereas the inverse of <inline-graphic xlink:href="1851-8265-scol-14-01-51-i011.jpg"/> and <inline-graphic xlink:href="1851-8265-scol-14-01-51-i012.jpg"/> priors were assumed to be Gamma distributed (0.5; 0.0005).<xref ref-type="bibr" rid="B24"><sup>24</sup></xref>
+					</p>
+					<p>The relative risk (RR) and the 95% credible intervals were estimated using the mean and the 2.5% and 97.5% empirical quantiles, respectively, of the posterior samples from each parameter of interest. These samples are based on two Markov chains with the Monte Carlo method (MCMC) with 100,000 iterations each and a burn-in period of 10,000. All cut-off points used in the maps correspond to the quartiles of the measurements that we are presenting.</p>
+					<p>The analyses were performed using the following software: SPSS, Geoda, Winbugs (WinBUGS14, Cambridge, UK)<xref ref-type="bibr" rid="B25"><sup>25</sup></xref> and R version 2.14.1 (Project for Statistical Computing),<xref ref-type="bibr" rid="B26"><sup>26</sup></xref> using R2WinBUGS package to connect the last two tools. WinBUGS uses Gibbs sampling, a specific MCMC method, to produce samples from the posterior distribution of each parameter. </p>
+				</sec>
+			</sec>
+			<sec sec-type="results">
+				<title>RESULTS</title>
+				<p>A total of 180 cases were diagnosed, 154 in children and 26 in adolescents. <xref ref-type="table" rid="t2">Table 1</xref> shows the absolute frequency distribution of tumor cases by diagnostic groups as well as the incidence rates per million by age - stratified into two groups, 0-14 and 15-19 years - and diagnostic groups.</p>
+				<p>
+					<table-wrap id="t2">
+						<label>Table 1</label>
+						<caption>
+							<title>Frequency, male to female ratio, and incidence rates per million inhabitants according to cancer diagnostic group and age group in people 0-19 years of age. Campinas, São Paulo, Brazil. 1996-2005.</title>
+						</caption>
+						<graphic xlink:href="1851-8265-scol-14-01-51-gt2.jpg"/>
+						<table-wrap-foot>
+							<fn id="TFN2">
+								<p>Source: Own elaboration based on the High Complexity Care Unit in Pediatric Oncology and the Brazilian Institute of Geography and Statistics [<italic>Instituto Brasileiro de Geografia e Estatística</italic>] (IBGE). ASIR = Age-standardized incidence rates.</p>
+							</fn>
+						</table-wrap-foot>
+					</table-wrap>
+				</p>
+				<p>The most frequent neoplasms were: acute lymphoblastic leukemia (children: 37.7%; adolescents: 15.4%), acute non-lymphoblastic leukemia (children: 13%; adolescents: 23.1%), astrocytomas (children: 11%) and Hodgkin lymphomas (adolescents: 19.2%) (<xref ref-type="table" rid="t1">Table 1</xref>).</p>
+				<p>Among children, the most frequent tumors were in Group I, which accounted for 52% of the overall number of incident neoplasms, followed by Group III (22.7%), and Group II (18.1%). Among adolescents, the diagnostic Group II represented 42.2% of the diagnoses, followed by Group I (38.5%), and Group III (11.5%). Pronounced differences in the male/female ratio were observed for Group II. </p>
+				<p>Overall crude incidence rates (cases per million) was 54.2 [CI95% (46.2-62.1)]; 64.2 in children [CI95% (54.0-74.3)], and 28.2 in adolescents [CI95% (17.3-39.0)]. The overall age-standardized incidence rate (cases per million) in people 0-19 years was 56.5 [CI95% (48.1-64.9)], and ASIR per group were as follows: Group I, 28.8 [CI95% (22.7-34.8)]; Group II, 11.6 [CI95% (7.85-15.2)]; Group III, 11.9 [CI95% (8.08-5.7)] and Group IX, 4.3 [CI95% (1.94-6.74)] (<xref ref-type="table" rid="t1">Table 1</xref>).</p>
+				<p>The geographical pattern of incidence rates was analyzed and higher crude incidence rates were present in some of the southern and western health care unit areas. The age-standardized incidence rates of cancer among children and adolescents for the period, according to health care unit area, were also calculated. An accentuated geographic pattern was found, with the lowest incidence rates in the north and east of Campinas. <xref ref-type="fig" rid="f4">Figure 1</xref> shows the map of SMR. The highest SMR are concentrated in the southwest and southeast regions of the municipality.</p>
+				<p>
+					<fig id="f4">
+						<label>Figure 1</label>
+						<caption>
+							<title>Standardized morbidity ratio (SMR) for cancer among people 0-19 years of age, by health care unit area. Campinas, São Paulo, Brazil, 1996-2005</title>
+						</caption>
+						<graphic xlink:href="1851-8265-scol-14-01-51-gf4.jpg"/>
+						<attrib>Source: Own elaboration based on the High Complexity Care Unit in Pediatric Oncology and the Brazilian Institute of Geography and Statistics [<italic>Instituto Brasileiro de Geografia e Estatística</italic>] (IBGE)</attrib>
+					</fig>
+				</p>
+				<p>Considering the model described above, there is an accentuated geographic pattern, with a lower distribution in the north area of city. The relative risks (RR) were not statistically significant among the health care unit areas. <xref ref-type="fig" rid="f5">Figure 2</xref> and <xref ref-type="fig" rid="f6">Figure 3</xref> show the modeled RR for childhood cancer and the 95% credible intervals. Although some health care unit areas to the south and west present higher crude incidence rates, no statistically significant differences in the RR were observed. </p>
+				<p>
+					<fig id="f5">
+						<label>Figure 2</label>
+						<caption>
+							<title>Estimated relative risk of cancer incidence among people 0-19 years of age according to health care unit area. Campinas, São Paulo, Brazil, 1996-2005</title>
+						</caption>
+						<graphic xlink:href="1851-8265-scol-14-01-51-gf5.jpg"/>
+						<attrib>Source: Own elaboration based on the High Complexity Care Unit in Pediatric Oncology and the Brazilian Institute of Geography and Statistics [<italic>Instituto Brasileiro de Geografia e Estatística</italic>] (IBGE)</attrib>
+					</fig>
+				</p>
+				<p>
+					<fig id="f6">
+						<label>Figure 3</label>
+						<caption>
+							<title>Estimated relative risk and 95% credible intervals of cancer incidence among people 0-19 years of age according to health care unit area. Campinas, São Paulo, Brazil, 1996-2005</title>
+						</caption>
+						<graphic xlink:href="1851-8265-scol-14-01-51-gf6.jpg"/>
+						<attrib>Source: Own elaboration based on the High Complexity Care Unit in Pediatric Oncology and the Brazilian Institute of Geography and Statistics [<italic>Instituto Brasileiro de Geografia e Estatística</italic>] (IBGE)</attrib>
+					</fig>
+				</p>
+			</sec>
+			<sec sec-type="discussion">
+				<title>DISCUSSION</title>
+				<p>This study analyses the childhood cancer in Campinas and uses spatial analysis to examine the incidence pattern and distribution in the city. The most frequent childhood cancer adjusted by age was Group I (Leukemia, 28.8 per million), followed by Group III (Central nervous system and miscellaneous intracranial and intraspinal neoplasm, 11.9 per million). </p>
+				<p>Considering that characteristics, frequency and cancer type distribution in children and adolescents are unique and different from those observed at any other age-group, it has been recommended that epidemiological studies of childhood cancer be performed separately from other age groups.<xref ref-type="bibr" rid="B8"><sup>8</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B27"><sup>27</sup></xref>
+				</p>
+				<p>In Campinas, similarly to results from previous reports using European registries, the most frequent childhood cancer is Group I, representing age-standardized incidence rates lower than those of the majority of European countries but similar to Portugal (28 per million), Poland (29.9 per million) and Romania (28.3 per million).<xref ref-type="bibr" rid="B28"><sup>28</sup></xref> It has been suggested that such rates among childhood cancers might reflect the socioeconomic development of the society, with the more affluent societies exhibiting higher rates.<xref ref-type="bibr" rid="B29"><sup>29</sup></xref>
+				</p>
+				<p>In this regard, we found that in Campinas the highest values of SMR are concentrated in the southwest and southeast regions of the municipality, corresponding to the major areas of social inequalities in this city; however, this may be related to unobserved variables, and future research is needed. The problem of childhood cancer cannot be evaluated separately from the level of development and health conditions of each region. Population growth, poverty, poor hygiene, lack of education, and a multitude health problems impede the development of pediatric oncology and the success of the management of childhood cancer in developing countries.<xref ref-type="bibr" rid="B29"><sup>29</sup></xref>
+				</p>
+				<p>In addition, the distribution of cases by sex, age and the four most common groups of disease are similar to those found in other Brazilian studies based on 14 Brazilian population-based cancer registries.<xref ref-type="bibr" rid="B6"><sup>6</sup></xref> Comparing the present data analysis with previous Brazilian publications on childhood cancer, tumors of the central nervous system were also the second common childhood tumor observed.<xref ref-type="bibr" rid="B6"><sup>6</sup></xref>
+				</p>
+				<p>Leukemias are the most common cancer in children worldwide and have the largest impact on total cancer incidence. Comparatively, the incidence that most resembled our study was that found in North Africa (28.2 per million).<xref ref-type="bibr" rid="B7"><sup>7</sup></xref> Acute lymphoblastic leukemia, Acute non-lymphoblastic leukemia, Astrocytomas, and Hodgkin lymphomas were the most frequent diagnoses in Campinas, both in children and adolescents, facts already reported in the literature.<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B30"><sup>30</sup></xref>
+				</p>
+				<p>Regarding the records found for South America, only Group II incidence was similar to the findings in the present study (11.6 per million); for the other three groups studied, the incidence was higher in the other countries of South America.<xref ref-type="bibr" rid="B7"><sup>7</sup></xref>
+				</p>
+				<p>Compared to European countries, the largest differences in incidences were observed for Group III and Group IX. In European countries the standardized incidence rates for Group III (29.5 per million) and for Group IX (9.4 per million) are more than twice as great as those found in Campinas (Group II incidence, 11.9 per million and Group IX incidence, 4.3 per million). However, in relation to Group IX, the incidence resembles those found in South Africa and Native Americans in the US.<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B28"><sup>28</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B31"><sup>31</sup></xref>
+				</p>
+				<p>These differences may be explained by the type of tumor (solid) affecting mainly adolescents, who could have been treated elsewhere or regarded as young adult cases and not referred to the High Complexity Care Unit in Pediatric Oncology.</p>
+				<p>Although incidence rates in the four diagnostic groups studied differ from the observations of the population-based cancer registries from developed countries, they are similar to those found in the literature for developing countries, including Brazil.<xref ref-type="bibr" rid="B7"><sup>7</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B32"><sup>32</sup></xref><sup>,</sup><xref ref-type="bibr" rid="B33"><sup>33</sup></xref>
+				</p>
+				<p>A limitation of the study results from the data source, as records were obtained from only one childhood oncology service. Although the population-based cancer registry affirms that there was 85% coverage of the cases in city residents, it is possible that the profile of patients not included in the analysis differs from that seen in our results. </p>
+				<p>The creation of efficient monitoring systems for cancer, in particular for rare cases of childhood cancer, is necessary across healthcare networks. In addition, their creation would greatly potentiate the value of spatial analysis by permitting more precise results. Future steps should investigate the relationship between geography and childhood cancer incidence rates for a wider range of health measures and outcomes.<xref ref-type="bibr" rid="B16"><sup>16</sup></xref>
+				</p>
+				<p>In conclusion, our results are in agreement with previous reports from other cancer registries. The present application to cancer incidence in a Brazilian region produced evidence of similar distribution of cancer among children and adolescents. This study of the cancer incidence rates and the analysis of the SMR spatial patterns can be paramount in the definition of intervention programs in the region. Therefore, it can help in the development of health care programs for the reduction of morbidity and mortality in childhood cancer and, concomitantly, in the planning of interventions as well as in the structuration of the health care network.</p>
+			</sec>
+		</body>
+		<back>
+			<ack>
+				<title>ACKNOWLEDGEMENTS</title>
+				<p>We thank the Brazilian Coordenação de Aperfeiçoamento de Pessoal de Nivel Superior (CAPES) for the financial support (No. 99999.007495/2014-05) as well as the important contribution of researchers from the Universideade do Porto and the population-based cancer registry of Campinas. </p>
+			</ack>
+		</back>
+	</sub-article>
+</article>

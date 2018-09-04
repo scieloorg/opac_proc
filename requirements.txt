@@ -29,3 +29,5 @@ feedparser==5.2.1
 Flask-Login==0.4.0
 Flask-Mail==0.9.1
 articlemetaapi==1.26.2
+beautifulsoup4==4.6.3
+mock==2.0.0
