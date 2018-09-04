@@ -1,4 +1,5 @@
 # coding: utf-8
+import itertools
 import os
 import re
 import json
