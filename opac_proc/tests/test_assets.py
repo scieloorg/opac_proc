@@ -185,6 +185,15 @@ class TestAssets(BaseTestCase):
         self.assertEqual(len(medias), 3)
         self.assertEqual(medias, expected)
 
+    @patch.object(AssetXML, '_get_content')
+    def test_extract_media_error_if_article_version_xml(self, mocked_get_content):
+        mocked_get_content.return_value = self.xml_content
+        asset = AssetXML(self.mocked_xylose_article)
+        with self.assertRaises(TypeError) as exc_info:
+            asset._extract_media()
+        self.assertEqual(
+            exc_info.exception.message, "Método não deve ser usado para XMLs.")
+
     def test_normalize_media_path_html_exclude_medias(self):
         asset = Assets(self.mocked_xylose_article)
         media_path = '/img/revistas/gs/v29n4/seta.jpg'
@@ -298,6 +307,40 @@ class TestAssets(BaseTestCase):
                 <graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf05.doc"/>
                 <graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf06.avi"/>
                 <graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf07.xls"/>
+            </body>
+        </article>"""
+        mocked_get_content.return_value = etree.fromstring(
+            xml_test_content, etree.XMLParser(remove_blank_text=True))
+
+        asset = AssetXML(self.mocked_xylose_article)
+        expected = [
+            "1414-431X-bjmbr-1414-431X20176177-gf01.tif",
+            "1414-431X-bjmbr-1414-431X20176177-gf02.jpg",
+            "1414-431X-bjmbr-1414-431X20176177-gf03.gif",
+            "1414-431X-bjmbr-1414-431X20176177-gf06.avi",
+        ]
+        medias = [
+            element.attrib[attrib_key]
+            for element, attrib_key in asset._get_media()
+        ]
+        self.assertEqual(len(medias), 4)
+        self.assertEqual(medias, expected)
+
+    @patch.object(AssetXML, '_get_content')
+    def test_xml_get_media_doenst_return_external_links(
+        self,
+        mocked_get_content
+    ):
+        xml_test_content = """<?xml version="1.0" encoding="utf-8"?>
+        <article xmlns:xlink="http://www.w3.org/1999/xlink">
+            <body>
+                <graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf01.tif"/>
+                <graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf02.jpg"/>
+                <graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf03.gif"/>
+                <graphic xlink:href="https://external.link.com/img.png"/>
+                <graphic xlink:href="ftp://external.link.com/img.png"/>
+                <graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf06.avi"/>
+                <graphic xlink:href="http://external.link.com/img.png"/>
             </body>
         </article>"""
         mocked_get_content.return_value = etree.fromstring(

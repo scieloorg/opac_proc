@@ -74,6 +74,13 @@ class Assets(object):
 
                 self._content = self._content.replace(media_name, url)
 
+    def _is_external_link(self, path):
+        ext_link_indicators = config.MEDIA_EXT_LINKS_IND.split(',')
+        return any(
+            map(lambda ext_link_ind: path.startswith(ext_link_ind),
+                ext_link_indicators)
+        )
+
     def _extract_media(self):
         """
         Return a list of media to be collect from content
@@ -92,17 +99,10 @@ class Assets(object):
             for tag in soup.find_all(src=True)
         ]
 
-        def _is_external_link(src_tag):
-            ext_link_indicators = config.MEDIA_EXT_LINKS_IND.split(',')
-            return any(
-                map(lambda ext_link_ind: src_tag.startswith(ext_link_ind),
-                    ext_link_indicators)
-            )
-
         medias = [
             src_tag
             for src_tag in src_tags
-            if not _is_external_link(src_tag)
+            if not self._is_external_link(src_tag)
         ]
 
         return medias
@@ -540,7 +540,8 @@ class AssetXML(Assets):
         return (
             (element, attrib_key)
             for element in itertools.chain(*attrib_iters)
-            if os.path.splitext(element.attrib[attrib_key])[-1] in ext_files_list
+            if (os.path.splitext(element.attrib[attrib_key])[-1] in ext_files_list
+                and not self._is_external_link(element.attrib[attrib_key]))
         )
 
     def _register_ssm_media(self, pfile, media_path, file_type, metadata):
