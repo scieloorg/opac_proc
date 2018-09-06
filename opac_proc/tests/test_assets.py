@@ -317,13 +317,14 @@ class TestAssets(BaseTestCase):
             "1414-431X-bjmbr-1414-431X20176177-gf01.tif",
             "1414-431X-bjmbr-1414-431X20176177-gf02.jpg",
             "1414-431X-bjmbr-1414-431X20176177-gf03.gif",
+            "1414-431X-bjmbr-1414-431X20176177-gf04",
             "1414-431X-bjmbr-1414-431X20176177-gf06.avi",
         ]
         medias = [
             element.attrib[attrib_key]
             for element, attrib_key in asset._get_media()
         ]
-        self.assertEqual(len(medias), 4)
+        self.assertEqual(len(medias), 5)
         self.assertEqual(medias, expected)
 
     @patch.object(AssetXML, '_get_content')
@@ -364,8 +365,9 @@ class TestAssets(BaseTestCase):
         asset_xml = AssetXML(self.mocked_xylose_article)
         input_expected = [
             ("graphic.tif", "graphic.jpg"),
+            ("graphic.tiff", "graphic.jpg"),
             ("image.gif", "image.gif"),
-            ("table", "table"),
+            ("table", "table.jpg"),
             ("abc/v21n4/graphic.tif", "abc/v21n4/graphic.jpg")
         ]
         for input, expected in input_expected:
