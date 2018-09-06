@@ -1,4 +1,5 @@
 # coding: utf-8
+import imghdr
 import itertools
 import json
 import os
@@ -537,6 +538,7 @@ class AssetXML(Assets):
             '.' + extension
             for extension in config.MEDIA_EXTENSION_FILES.split(',')
         ]
+        ext_files_list.append('')   # arquivos sem extensão
         return (
             (element, attrib_key)
             for element in itertools.chain(*attrib_iters)
@@ -572,8 +574,16 @@ class AssetXML(Assets):
 
     def _normalize_media_path(self, media_path):
         root, ext = os.path.splitext(media_path)
-        if ext == '.tif':
+        if ext == '.tif' or ext == '.tiff':
             ext = '.jpg'
+        elif not ext:
+            try:
+                guessed_ext = imghdr.what(root)
+            except Exception:
+                guessed_ext = 'jpg'
+            if guessed_ext == 'jpeg':
+                guessed_ext = 'jpg'
+            ext = '.' + guessed_ext
         return root + ext
 
     def _register_xml_medias(self):
