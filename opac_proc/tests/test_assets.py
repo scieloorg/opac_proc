@@ -813,6 +813,18 @@ class TestAssets(BaseTestCase):
         self.assertEqual(generated_htmls[1]['type'], 'html')
         self.assertEqual(generated_htmls[1]['lang'], 'en')
 
+    @patch.object(AssetXML, '_get_path')
+    @patch.object(AssetXML, '_get_content')
+    def test_register_returns_none_if_no_content(
+        self,
+        mocked_get_content,
+        mocked_get_path
+    ):
+        mocked_get_content.return_value = None
+        asset_xml = AssetXML(self.mocked_xylose_article)
+        xml_url = asset_xml.register()
+        self.assertIsNone(xml_url)
+
     @skip("LOCAL TEST ONLY")
     @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
     @patch.object(AssetXML, '_get_path')
@@ -821,8 +833,7 @@ class TestAssets(BaseTestCase):
         article_json = json.loads(self._article_json)
         document = Article(article_json)
         asset_xml = AssetXML(document)
-        uuid, xml_url = asset_xml.register()
-        self.assertIsNotNone(uuid)
+        xml_url = asset_xml.register()
         self.assertIsNotNone(xml_url)
         self.assertEqual(uuid, '123456789-123456789')
         generated_htmls = asset_xml.register_htmls()

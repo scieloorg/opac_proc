@@ -176,10 +176,8 @@ class ArticleTransformer(BaseTransformer):
         # Versão XML do artigo
         if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
             asset_xml = AssetXML(xylose_article)
-
-            uuid, xml_url = asset_xml.register()
-
-            if xml_url and uuid:
+            xml_url = asset_xml.register()
+            if xml_url:
                 self.transform_model_instance['xml'] = xml_url
                 self.transform_model_instance['htmls'] = asset_xml.register_htmls()
 
