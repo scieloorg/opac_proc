@@ -638,11 +638,11 @@ class AssetXML(Assets):
                                xml_declaration=True,
                                encoding='utf-8')
             )
-            uuid, xml_url = self._register_ssm_asset(content_as_bytes,
-                                                     self._file_name,
-                                                     self._file_type,
-                                                     self.get_metadata())
-            return uuid, xml_url
+            __, xml_url = self._register_ssm_asset(content_as_bytes,
+                                                   self._file_name,
+                                                   self._file_type,
+                                                   self.get_metadata())
+            return xml_url
 
     def register_htmls(self):
         """
