@@ -28,7 +28,7 @@ class LoadedData(DynamicEmbeddedDocument):
 class BaseMixin(object):
     # campos comuns a todos os modelos ETL
     _id = UUIDField(primary_key=True, required=True, default=uuid.uuid4)
-    uuid = UUIDField(required=True, default=uuid.uuid4)
+    uuid = UUIDField(required=True, default=uuid.uuid4, unique=True)
 
     metadata = EmbeddedDocumentField(ProcessMetada)
 

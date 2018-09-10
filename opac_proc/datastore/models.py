@@ -8,6 +8,7 @@ from mongoengine import (
     StringField,
     DateTimeField,
     BooleanField,
+    URLField
 )
 from base_mixin import BaseMixin, LoadedData
 
@@ -24,6 +25,8 @@ from opac_proc.source_sync.utils import (
 
 
 class ExtractCollection(BaseMixin, DynamicDocument):
+    acronym = StringField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -57,7 +60,11 @@ class ExtractCollection(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'e_collection'
+        'collection': 'e_collection',
+        'indexes': [
+            'uuid',
+            'acronym',
+        ]
     }
 
 
@@ -66,6 +73,8 @@ signals.post_save.connect(ExtractCollection.post_save, sender=ExtractCollection)
 
 
 class ExtractJournal(BaseMixin, DynamicDocument):
+    code = StringField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -99,7 +108,11 @@ class ExtractJournal(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'e_journal'
+        'collection': 'e_journal',
+        'indexes': [
+            'uuid',
+            'code',
+        ]
     }
 
 
@@ -108,6 +121,9 @@ signals.post_save.connect(ExtractJournal.post_save, sender=ExtractJournal)
 
 
 class ExtractIssue(BaseMixin, DynamicDocument):
+    code = StringField(required=True)
+    collection = StringField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -142,7 +158,12 @@ class ExtractIssue(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'e_issue'
+        'collection': 'e_issue',
+        'indexes': [
+            'uuid',
+            'code',
+            ('code', 'collection'),
+        ]
     }
 
 
@@ -151,6 +172,9 @@ signals.post_save.connect(ExtractIssue.post_save, sender=ExtractIssue)
 
 
 class ExtractArticle(BaseMixin, DynamicDocument):
+    code = StringField(required=True)
+    collection = StringField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -186,7 +210,12 @@ class ExtractArticle(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'e_article'
+        'collection': 'e_article',
+        'indexes': [
+            'uuid',
+            'code',
+            ('code', 'collection'),
+        ]
     }
 
 
@@ -195,6 +224,8 @@ signals.post_save.connect(ExtractArticle.post_save, sender=ExtractArticle)
 
 
 class ExtractPressRelease(BaseMixin, DynamicDocument):
+    url_id = StringField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -229,7 +260,11 @@ class ExtractPressRelease(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'e_press_release'
+        'collection': 'e_press_release',
+        'indexes': [
+            'uuid',
+            'url_id',
+        ]
     }
 
 
@@ -238,6 +273,8 @@ signals.post_save.connect(ExtractPressRelease.post_save, sender=ExtractPressRele
 
 
 class ExtractNews(BaseMixin, DynamicDocument):
+    url_id = StringField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -272,7 +309,11 @@ class ExtractNews(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'e_news'
+        'collection': 'e_news',
+        'indexes': [
+            'uuid',
+            'url_id',
+        ]
     }
 
 
@@ -284,6 +325,8 @@ signals.post_save.connect(ExtractNews.post_save, sender=ExtractNews)
 
 
 class TransformCollection(BaseMixin, DynamicDocument):
+    acronym = StringField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -317,7 +360,11 @@ class TransformCollection(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 't_collection'
+        'collection': 't_collection',
+        'indexes': [
+            'uuid',
+            'acronym',
+        ]
     }
 
 
@@ -326,6 +373,10 @@ signals.post_save.connect(TransformCollection.post_save, sender=TransformCollect
 
 
 class TransformJournal(BaseMixin, DynamicDocument):
+    acronym = StringField(required=True)
+    print_issn = StringField()
+    eletronic_issn = StringField()
+    scielo_issn = StringField()
 
     @property
     def get_issn(self):
@@ -372,7 +423,14 @@ class TransformJournal(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 't_journal'
+        'collection': 't_journal',
+        'indexes': [
+            'uuid',
+            'acronym',
+            'print_issn',
+            'eletronic_issn',
+            'scielo_issn',
+        ]
     }
 
 
@@ -381,6 +439,8 @@ signals.post_save.connect(TransformJournal.post_save, sender=TransformJournal)
 
 
 class TransformIssue(BaseMixin, DynamicDocument):
+    pid = StringField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -415,7 +475,11 @@ class TransformIssue(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 't_issue'
+        'collection': 't_issue',
+        'indexes': [
+            'uuid',
+            'pid',
+        ]
     }
 
 
@@ -424,6 +488,8 @@ signals.post_save.connect(TransformIssue.post_save, sender=TransformIssue)
 
 
 class TransformArticle(BaseMixin, DynamicDocument):
+    pid = StringField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -460,7 +526,11 @@ class TransformArticle(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 't_article'
+        'collection': 't_article',
+        'indexes': [
+            'uuid',
+            'pid',
+        ]
     }
 
 
@@ -469,6 +539,8 @@ signals.post_save.connect(TransformArticle.post_save, sender=TransformArticle)
 
 
 class TransformPressRelease(BaseMixin, DynamicDocument):
+    url = URLField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -502,7 +574,11 @@ class TransformPressRelease(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 't_press_release'
+        'collection': 't_press_release',
+        'indexes': [
+            'uuid',
+            'url',
+        ]
     }
 
 
@@ -511,6 +587,8 @@ signals.post_save.connect(TransformPressRelease.post_save, sender=TransformPress
 
 
 class TransformNews(BaseMixin, DynamicDocument):
+    url = URLField(required=True)
+
     def update_reprocess_field(self, uuid):
         """
         Notificamos o modelos com este uuid que tem que ser reprocessado
@@ -545,7 +623,11 @@ class TransformNews(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 't_news'
+        'collection': 't_news',
+        'indexes': [
+            'uuid',
+            'url',
+        ]
     }
 
 
@@ -582,7 +664,10 @@ class LoadCollection(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'l_collection'
+        'collection': 'l_collection',
+        'indexes': [
+            'uuid',
+        ]
     }
 
 
@@ -637,7 +722,10 @@ class LoadJournal(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'l_journal'
+        'collection': 'l_journal',
+        'indexes': [
+            'uuid',
+        ]
     }
 
 
@@ -675,7 +763,10 @@ class LoadIssue(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'l_issue'
+        'collection': 'l_issue',
+        'indexes': [
+            'uuid',
+        ]
     }
 
 
@@ -715,7 +806,10 @@ class LoadArticle(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'l_article'
+        'collection': 'l_article',
+        'indexes': [
+            'uuid',
+        ]
     }
 
 
@@ -751,7 +845,10 @@ class LoadPressRelease(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'l_press_release'
+        'collection': 'l_press_release',
+        'indexes': [
+            'uuid',
+        ]
     }
 
 
@@ -787,7 +884,10 @@ class LoadNews(BaseMixin, DynamicDocument):
         }
 
     meta = {
-        'collection': 'l_news'
+        'collection': 'l_news',
+        'indexes': [
+            'uuid',
+        ]
     }
 
 
