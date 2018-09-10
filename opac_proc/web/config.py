@@ -24,6 +24,13 @@ ARTICLE_META_THRIFT_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_THRIFT_PORT',
     11621))
 
+ARTICLE_META_REST_DOMAIN = os.environ.get(
+    'OPAC_PROC_ARTICLE_META_REST_DOMAIN',
+    'articlemeta.scielo.org')
+ARTICLE_META_REST_PORT = int(os.environ.get(
+    'OPAC_PROC_ARTICLE_META_REST_PORT',
+    80))
+
 # WEBAPP config: ----------------------------------------------------
 DEBUG = os.environ.get('OPAC_PROC_DEBUG', 'False') == 'True'
 TESTING = os.environ.get('OPAC_PROC_TESTING', 'False') == 'True'
