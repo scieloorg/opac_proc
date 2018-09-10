@@ -68,7 +68,9 @@ class CollectionExtractor(BaseExtractor):
         issues = self._get_json_metrics('issues', url, params)
 
         # jornals:
-        url = 'http://{0}/{1}'.format(config.ARTICLE_META_REST_DOMAIN, ARTICLE_META_COLLECTION_ENDPOINT)
+        url = 'http://{0}:{1}/{2}'.format(config.ARTICLE_META_REST_DOMAIN,
+                                          config.ARTICLE_META_REST_PORT,
+                                          ARTICLE_META_COLLECTION_ENDPOINT)
         journals = self._get_json_metrics('journals', url, params)
 
         metrics = {
