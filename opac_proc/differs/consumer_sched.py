@@ -254,16 +254,19 @@ class ConsumeTransformNewsDeleteSched(ConsumeDeleteDifferBase):
 
 class ConsumeLoadCollectionAddSched(ConsumeAddDifferBase):
     model_name = 'collection'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'collection']
 
 
 class ConsumeLoadCollectionUpdateSched(ConsumeUpdateDifferBase):
     model_name = 'collection'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'collection']
 
 
 class ConsumeLoadCollectionDeleteSched(ConsumeDeleteDifferBase):
     model_name = 'collection'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'collection']
 
 
@@ -272,16 +275,19 @@ class ConsumeLoadCollectionDeleteSched(ConsumeDeleteDifferBase):
 
 class ConsumeLoadJournalAddSched(ConsumeAddDifferBase):
     model_name = 'journal'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'journal']
 
 
 class ConsumeLoadJournalUpdateSched(ConsumeUpdateDifferBase):
     model_name = 'journal'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'journal']
 
 
 class ConsumeLoadJournalDeleteSched(ConsumeDeleteDifferBase):
     model_name = 'journal'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'journal']
 
 
@@ -290,16 +296,19 @@ class ConsumeLoadJournalDeleteSched(ConsumeDeleteDifferBase):
 
 class ConsumeLoadIssueAddSched(ConsumeAddDifferBase):
     model_name = 'issue'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'issue']
 
 
 class ConsumeLoadIssueUpdateSched(ConsumeUpdateDifferBase):
     model_name = 'issue'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'issue']
 
 
 class ConsumeLoadIssueDeleteSched(ConsumeDeleteDifferBase):
     model_name = 'issue'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'issue']
 
 
@@ -308,16 +317,19 @@ class ConsumeLoadIssueDeleteSched(ConsumeDeleteDifferBase):
 
 class ConsumeLoadArticleAddSched(ConsumeAddDifferBase):
     model_name = 'article'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'article']
 
 
 class ConsumeLoadArticleUpdateSched(ConsumeUpdateDifferBase):
     model_name = 'article'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'article']
 
 
 class ConsumeLoadArticleDeleteSched(ConsumeDeleteDifferBase):
     model_name = 'article'
+    cron_string = '0,30 0-23 * * 1,4'  # “At minute 0 and 30 past every hour from 0 through 23 on Monday and Thursday.”
     task_args = ['load', 'article']
 
 
