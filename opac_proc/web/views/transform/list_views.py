@@ -351,7 +351,7 @@ class TransformArticleListView(TransformBaseListView):
         processor = self.process_class()
         list_of_all_uuids = self.model_class.objects.filter(data_model_version='xml').values_list('uuid')
         SLICE_SIZE = 1000
-        count_xml_articles = len(len(list_of_all_uuids))
+        count_xml_articles = len(list_of_all_uuids)
         try:
             if len(list_of_all_uuids) <= SLICE_SIZE:
                 uuid_as_string_list = [str(uuid) for uuid in list_of_all_uuids]
