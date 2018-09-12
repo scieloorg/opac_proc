@@ -6,6 +6,7 @@ from bson.objectid import ObjectId
 from opac_proc.datastore import models
 from opac_proc.web.views.generics.list_views import ListView
 from opac_proc.datastore.mongodb_connector import register_connections, get_opac_logs_db_name
+from opac_proc.source_sync.utils import chunks
 from opac_proc.transformers.process import (
     ProcessTransformCollection,
     ProcessTransformJournal,
@@ -341,22 +342,31 @@ class TransformArticleListView(TransformBaseListView):
         {
             'method_name': 'do_reprocess_xml_only',    # nome de função python que implementa a ação
             'label': 'Reprocessar XMLs',             # nome da ação para mostrar pro usuário
-            'icon_class': 'fa fa-user',     # class CSS para o icone. ex: 'fa fa-gear'
+            'icon_class': 'fa fa-refresh',     # class CSS para o icone. ex: 'fa fa-gear'
             'can_select_rows': False,        # boolean, se permite ou não a opção "All/Selected" ou não
         },
     ]
 
     def do_reprocess_xml_only(self):
+        processor = self.process_class()
+        list_of_all_uuids = self.model_class.objects.filter(data_model_version='xml').values_list('uuid')
+        SLICE_SIZE = 1000
+        count_xml_articles = len(list_of_all_uuids)
         try:
-            processor = self.process_class()
-            # melhorar: caso a query seja muito lenta pode dar timout no request
-            ids = [article._id for article in self.model_class.objects.filter(data_model_version='xml')]
-            processor.update(ids)
+            if len(list_of_all_uuids) <= SLICE_SIZE:
+                uuid_as_string_list = [str(uuid) for uuid in list_of_all_uuids]
+                processor.selected(uuid_as_string_list)
+            else:
+                list_of_list_of_uuids = list(chunks(list_of_all_uuids, SLICE_SIZE))
+                for list_of_uuids in list_of_list_of_uuids:
+                    uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
+                    processor.selected(uuid_as_string_list)
+
         except Exception as e:
             traceback_str = traceback.format_exc()
-            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=len(ids))
+            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=count_xml_articles)
         else:
-            self._trigger_messages(items_count=len(ids))
+            self._trigger_messages(items_count=count_xml_articles)
 
 
 class TransformPressReleaseListView(TransformBaseListView):
