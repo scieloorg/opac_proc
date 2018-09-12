@@ -14,6 +14,7 @@ else:
     logger = getMongoLogger(__name__, "INFO", "extract")
 
 PUBLICATION_SIZE_ENDPOINT = 'ajx/publication/size'
+ARTICLE_META_COLLECTION_ENDPOINT = 'api/v1/collection/'
 
 
 class CollectionExtractor(BaseExtractor):
@@ -62,15 +63,14 @@ class CollectionExtractor(BaseExtractor):
         issues = self._get_json_metrics('issues', url, params)
 
         # jornals:
-        params['field'] = 'issn'
-        url = '{0}/{1}'.format(config.OPAC_METRICS_URL, PUBLICATION_SIZE_ENDPOINT)
-        journals = self._get_json_metrics('jornals', url, params)
+        url = 'http://{0}/{1}'.format(config.ARTICLE_META_REST_DOMAIN, ARTICLE_META_COLLECTION_ENDPOINT)
+        journals = self._get_json_metrics('journals', url, params)
 
         metrics = {
             'total_citation': int(references.get('total', 0)),
             'total_article': int(articles.get('total', 0)),
             'total_issue': int(issues.get('total', 0)),
-            'total_journal': int(journals.get('total', 0)),
+            'total_journal': int(journals.get('journal_count', {}).get('current', 0))
         }
         return metrics
 
