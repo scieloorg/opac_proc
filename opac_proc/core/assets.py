@@ -350,6 +350,40 @@ class Assets(object):
 
         return registered_medias
 
+    def _get_file_name(self, file_type, lang=None):
+        original_lang = self.xylose.original_language()
+        file_code = self.xylose.file_code()
+        prefix = ''
+        if lang and lang != original_lang:
+            prefix = '%s_' % lang
+
+        return u'{}{}.{}'.format(prefix, file_code, file_type)
+
+    def _register_ssm_asset(self, pfile, file_name, file_type, metadata):
+        ssm_asset = SSMHandler(pfile, file_name, file_type, metadata,
+                               self.bucket_name)
+        code, assets = ssm_asset.exists()
+        if code == 2:
+            # Existe o Asset mas não é identico
+            logger.info(
+                "Já existe {} com PID {} cadastrado mas não é identico".format(
+                    file_type.upper(), self.xylose.publisher_id))
+            for asset in assets:
+                ssm_asset.remove(asset['uuid'])
+        if code == 0 or code == 2:
+            # Asset não cadastrado ou deletado no passo anterior
+            uuid = ssm_asset.register()
+            logger.info("UUID: {} para {} do artigo com PID: {}".format(
+                    uuid, file_type.upper(), self.xylose.publisher_id))
+            logger.info("{} cadastrado".format(file_name))
+            return (uuid, ssm_asset.get_urls()['url_path'])
+        elif code == 1:
+            # Existe o Asset e é identico
+            logger.info("Já existe um {} com PID {} cadastrado".format(
+                    file_type.upper(), self.xylose.publisher_id))
+            if assets:
+                return (assets[0]['uuid'], assets[0]['full_absolute_url'])
+
     def register(self):
         raise NotImplementedError()
 
@@ -464,15 +498,6 @@ class AssetXML(Assets):
         self._file_type = self.xylose.data_model_version
         self._file_name = self._get_file_name(self._file_type)
         self._content = self._get_content()
-
-    def _get_file_name(self, file_type, lang=None):
-        original_lang = self.xylose.original_language()
-        file_code = self.xylose.file_code()
-        prefix = ''
-        if lang and lang != original_lang:
-            prefix = '%s_' % lang
-
-        return u'{}{}.{}'.format(prefix, file_code, file_type)
 
     def _get_content(self):
         """
@@ -605,31 +630,6 @@ class AssetXML(Assets):
                     pfile, media_path, file_type, metadata)
                 element.attrib[attrib] = ssm_asset_url
 
-    def _register_ssm_asset(self, pfile, file_name, file_type, metadata):
-        ssm_asset = SSMHandler(pfile, file_name, file_type, metadata,
-                               self.bucket_name)
-        code, assets = ssm_asset.exists()
-        if code == 2:
-            # Existe o Asset mas não é identico
-            logger.info(
-                "Já existe {} com PID {} cadastrado mas não é identico".format(
-                    file_type.upper(), self.xylose.publisher_id))
-            for asset in assets:
-                ssm_asset.remove(asset['uuid'])
-        if code == 0 or code == 2:
-            # Asset não cadastrado ou deletado no passo anterior
-            uuid = ssm_asset.register()
-            logger.info("UUID: {} para {} do artigo com PID: {}".format(
-                    uuid, file_type.upper(), self.xylose.publisher_id))
-            logger.info("{} cadastrado".format(file_name))
-            return (uuid, ssm_asset.get_urls()['url_path'])
-        elif code == 1:
-            # Existe o XML e é identico
-            logger.info("Já existe um {} com PID {} cadastrado".format(
-                    file_type.upper(), self.xylose.publisher_id))
-            if assets:
-                return (assets[0]['uuid'], assets[0]['full_absolute_url'])
-
     def register(self):
         """
         Method to register the XML(s) of the asset.
@@ -699,6 +699,110 @@ class AssetXML(Assets):
                 })
 
         return registered_htmls
+
+
+class AssetHTMLS2(Assets):
+
+    def _normalize_media_path(self, media_path):
+        root, ext = os.path.splitext(media_path)
+        if ext == '.tif' or ext == '.tiff':
+            ext = '.jpg'
+        elif not ext:
+            try:
+                guessed_ext = imghdr.what(root)
+            except Exception:
+                guessed_ext = 'jpg'
+            if guessed_ext == 'jpeg':
+                guessed_ext = 'jpg'
+            ext = '.' + guessed_ext
+        return root + ext
+
+    def _register_html_media_assets(self, parsed_html):
+        """
+        Get each media assets from parsed_html, normalize the media path,
+        register them in SSM and update the parsed_html content with given
+        SSM/GRPC urls.
+        Returns the updated parsed_html.
+        """
+        for src_tag in parsed_html.find_all(src=True):
+            original_path = src_tag.get('src').strip()
+            media_path = self._normalize_media_path(original_path)
+
+    def _add_htmls(self, htmls):
+        """
+        Register media assets from HTML content, set a template and register the
+        content to SSM.
+        Returns a list of dicts with registered htmls.
+        Ex.
+        [
+            {
+                'type': 'html',
+                'lang': 'en',
+                'url': 'https://ssm.scielo.br/media/assets/aa/v1n1/en_11.html'
+            },
+            {
+                'type': 'html',
+                'lang': 'pt',
+                'url': 'https://ssm.scielo.br/media/assets/aa/v1n1/pt_11.html'
+            },
+        ]
+        """
+        directory = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                 'templates')
+        registered_htmls = []
+        for lang, html in htmls.items():
+            parsed_html = BeautifulSoup(html, "html.parser")
+            updated_html = self._register_html_media_assets(parsed_html)
+            html_with_template = utils.render_from_template(
+                directory,
+                'article.html',
+                {
+                    'html': str(updated_html).encode('utf-8'),
+                    'css': config.OPAC_PROC_ARTICLE_CSS_URL,
+                    'css_print': config.OPAC_PROC_ARTICLE_PRINT_CSS_URL
+                }
+            )
+            if isinstance(html_with_template, unicode):
+                html_with_template = html_with_template.encode('utf-8')
+
+            metadata = self.get_metadata()
+            metadata.update({'bucket_name': self.bucket_name,
+                             'type': 'html',
+                             'version': 'html'})
+            __, html_url = self._register_ssm_asset(
+                BytesIO(html_with_template),
+                self._get_file_name('html', lang),
+                'html',
+                metadata
+            )
+            registered_htmls.append({
+                'type': 'html',
+                'lang': lang,
+                'url': html_url
+            })
+
+        return registered_htmls
+
+    def register(self):
+        """
+        Method to register the HTML(s) of the asset from HTML version.
+        """
+        htmls = {}
+        original_html = self.xylose.original_html()
+        translated_htmls = self.xylose.translated_htmls()
+
+        if original_html:
+            htmls.update({self.xylose.original_language(): original_html})
+
+        if translated_htmls:
+            htmls.update(translated_htmls)
+
+        if htmls:
+            self._add_htmls(htmls)
+        else:
+            logger.error(
+                u"Artigo com o PID: %s, não tem HTML", self.xylose.publisher_id
+            )
 
 
 class AssetHTMLS(Assets):
