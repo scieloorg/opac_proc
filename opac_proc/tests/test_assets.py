@@ -1,4 +1,5 @@
 # coding: utf-8
+import inspect
 import json
 import os
 from datetime import datetime
@@ -11,7 +12,8 @@ from mock import patch, call
 from xylose.scielodocument import Article
 
 from base import BaseTestCase
-from opac_proc.core.assets import Assets, AssetXML, AssetHTMLS
+from opac_proc.core import utils
+from opac_proc.core.assets import Assets, AssetXML, AssetHTMLS, AssetHTMLS2
 from opac_proc.core.ssm_handler import SSMHandler
 from opac_proc.web import config
 
@@ -28,6 +30,22 @@ XML_TEST_CONTENT = """<?xml version="1.0" encoding="utf-8"?>
     	<graphic mimetype="image" xlink:href="1414-431X-bjmbr-1414-431X20176177-gf07.tif"/>
     </body>
 </article>"""
+
+HTML_TEST_CONTENT = """<!--version=html-->
+<p>&nbsp;</p>
+<p align="center">
+    <img src="http:/img/fbpe/test/v1n2/01fig01.jpg"></p>
+    <img src="/img/fbpe/test/v1n2/01fig02.gif"></p>
+    <a href="/img/fbpe/test/v1n2/html/01tab01.htm">Tabela 1</a></p>
+    <img src="img/fbpe/test/v1n2/01fig03.mp4"></p>
+    <a href="/img/revistas/test/v1n2/01fig04.png"></p>
+    <img src="img/revistas/test/v1n2/01fig05.png"></p>
+    <img src="img/revistas/test/v1n2/01fig06.tif"></p>
+    <img src="img/revistas/test/v1n2/01fig07.tiff"></p>
+<p>&nbsp;</p>
+<p align="center"><strong>Legenda Teste</strong></p>
+"""
+
 
 ssm_in_memory = {}
 
@@ -55,6 +73,31 @@ class MockedXyloseArticle:
 
     def file_code(self, *kwargs):
         return u'xml_file'
+
+
+class MockedXyloseArticleHTML:
+    def __init__(self):
+        self.collection_acronym = u'scl'
+        self.journal = MockedXyloseJournal()
+        self.assets_code = u'v1n2'
+        self.data_model_version = 'html'
+        self.doi = u'10.2564/0101-01012018000100001'
+        self.publisher_id = u'S0101-01012018000100001'
+
+    def original_language(self, iso_format=None):
+        return u'es'
+
+    def original_html(self, iso_format=None):
+        return HTML_TEST_CONTENT
+
+    def translated_htmls(self, iso_format=None):
+        return {
+            u'pt': '{}\n<p>Portugues</p>'.format(HTML_TEST_CONTENT),
+            u'en': '{}\n<p>English</p>'.format(HTML_TEST_CONTENT),
+        }
+
+    def file_code(self, *kwargs):
+        return u'html_file'
 
 
 class SSMHandlerStub(SSMHandler):
@@ -843,3 +886,179 @@ class TestAssets(BaseTestCase):
         self.assertEqual(generated_htmls[0]['lang'], 'es')
         self.assertEqual(generated_htmls[1]['type'], 'html')
         self.assertEqual(generated_htmls[1]['lang'], 'en')
+
+
+class TestAssetHTMLS(BaseTestCase):
+
+    def setUp(self):
+        self.mocked_xylose_article = MockedXyloseArticleHTML()
+        self.htmls = {
+            self.mocked_xylose_article.original_language():
+                self.mocked_xylose_article.original_html()
+        }
+        self.htmls.update(self.mocked_xylose_article.translated_htmls())
+        self.template_directory = os.path.join(
+            os.path.dirname(inspect.getmodule(AssetHTMLS2).__file__),
+            'templates'
+        )
+        ssm_in_memory.clear()
+
+    def test_AssetHTMLS2(self):
+        asset_xml = AssetHTMLS2(self.mocked_xylose_article)
+        self.assertEqual(
+            asset_xml.xylose,
+            self.mocked_xylose_article)
+        self.assertIsNone(asset_xml._content)
+
+    @patch.object(AssetHTMLS2, '_add_htmls')
+    def test_AssetHTMLS2_register_must_call_add_htmls(
+        self,
+        mocked_add_htmls
+    ):
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        asset_htmls.register()
+        mocked_add_htmls.assert_called_once_with(self.htmls)
+
+    @patch.object(AssetHTMLS2, '_add_htmls')
+    @patch.object(MockedXyloseArticleHTML, 'original_html')
+    def test_AssetHTMLS2_register_no_article_original_html(
+        self,
+        mocked_original_html,
+        mocked_add_htmls
+    ):
+        mocked_original_html.return_value = None
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        asset_htmls.register()
+        mocked_add_htmls.assert_called_once_with(
+            self.mocked_xylose_article.translated_htmls())
+
+    @patch.object(AssetHTMLS2, '_add_htmls')
+    @patch('opac_proc.core.assets.logger.error')
+    @patch.object(MockedXyloseArticleHTML, 'original_html')
+    @patch.object(MockedXyloseArticleHTML, 'translated_htmls')
+    def test_AssetHTMLS2_register_no_htmls(
+        self,
+        mocked_translated_htmls,
+        mocked_original_html,
+        mocked_logger_error,
+        mocked_add_htmls
+    ):
+        mocked_original_html.return_value = None
+        mocked_translated_htmls.return_value = None
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        asset_htmls.register()
+        mocked_logger_error.assert_called_once_with(
+            u"Artigo com o PID: %s, não tem HTML",
+            self.mocked_xylose_article.publisher_id
+        )
+        mocked_add_htmls.assert_not_called()
+
+    @patch('opac_proc.core.assets.BeautifulSoup')
+    def test_AssetHTMLS2_add_htmls_must_create_soup_objects(
+        self,
+        MockedBeautifulSoup
+    ):
+        expected = [
+            call(html, 'html.parser')
+            for html in self.htmls.values()
+        ]
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        asset_htmls._add_htmls(self.htmls)
+        MockedBeautifulSoup.assert_has_calls(expected, any_order=True)
+
+    @patch('opac_proc.core.assets.BeautifulSoup')
+    @patch.object(AssetHTMLS2, '_register_html_media_assets')
+    def test_AssetHTMLS2_add_htmls_must_call_register_html_media_assets_with_parsed_html(
+        self,
+        mocked_register_html_media_assets,
+        MockedBeautifulSoup
+    ):
+        parsed_htmls = [
+            BeautifulSoup('<b class="boldest">Extremely bold 1</b>', 'html.parser'),
+            BeautifulSoup('<b class="boldest">Extremely bold 2</b>', 'html.parser'),
+            BeautifulSoup('<b class="boldest">Extremely bold 3</b>', 'html.parser'),
+        ]
+        MockedBeautifulSoup.side_effect = parsed_htmls
+        expected = [
+            call(parsed_html)
+            for parsed_html in parsed_htmls
+        ]
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        asset_htmls._add_htmls(self.htmls)
+        mocked_register_html_media_assets.assert_has_calls(
+            expected, any_order=True)
+
+    @patch('opac_proc.core.assets.utils.render_from_template')
+    @patch.object(AssetHTMLS2, '_register_html_media_assets')
+    def test_AssetHTMLS2_add_htmls_must_call_utils_render_from_template_with_updated_html(
+        self,
+        mocked_register_html_media_assets,
+        mocked_render_from_template
+    ):
+        mocked_register_html_media_assets.side_effect = self.htmls.values()
+        mocked_render_from_template.side_effect = self.htmls.values()
+        expected = [
+            call(
+                self.template_directory,
+                'article.html',
+                {
+                    'html': html,
+                    'css': config.OPAC_PROC_ARTICLE_CSS_URL,
+                    'css_print': config.OPAC_PROC_ARTICLE_PRINT_CSS_URL
+                }
+            )
+            for html in self.htmls.values()
+        ]
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        asset_htmls._add_htmls(self.htmls)
+        self.assertEqual(mocked_render_from_template.mock_calls, expected)
+
+    @patch.object(AssetHTMLS2, '_register_ssm_asset')
+    def test_AssetHTMLS2_add_htmls_must_call_register_ssm_asset_for_each_html(
+        self,
+        mocked_register_ssm_asset
+    ):
+        mocked_register_ssm_asset.side_effect = [(1, ''), (2, ''), (3, '')]
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        asset_htmls._add_htmls(self.htmls)
+        self.assertEqual(
+            len(mocked_register_ssm_asset.mock_calls), len(self.htmls))
+
+    @patch.object(AssetHTMLS2, '_register_ssm_asset')
+    def test_AssetHTMLS2_add_htmls_returns_registered_htmls(
+        self,
+        mocked_register_ssm_asset
+    ):
+        test_urls = [
+            ('uuid' + lang,
+             'http://ssm.scielo.br/assets/test/v1n2/{}.html'.format(lang))
+            for lang in self.htmls.keys()
+        ]
+        expected = [
+            {
+                'type': 'html',
+                'lang': lang,
+                'url': html_url
+            }
+            for lang, html_url in zip(self.htmls.keys(),
+                                      [x[1] for x in test_urls])
+        ]
+        mocked_register_ssm_asset.side_effect = test_urls
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        result = asset_htmls._add_htmls(self.htmls)
+        self.assertIsNotNone(result)
+        self.assertEqual(result, expected)
+
+    @patch.object(AssetHTMLS2, '_normalize_media_path')
+    def test_AssetHTMLS2_register_html_media_assets_must_call_normalize_media_path(
+        self,
+        mocked_normalize_media_path
+    ):
+        parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
+        expected = [
+            call(src_tag.get("src"))
+            for src_tag in parsed_html.find_all(src=True)
+        ]
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        asset_htmls._register_html_media_assets(parsed_html)
+        mocked_normalize_media_path.assert_has_calls(expected)
