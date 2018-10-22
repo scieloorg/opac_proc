@@ -34,6 +34,24 @@ ARTICLE_META_REST_PORT = int(os.environ.get(
     'OPAC_PROC_ARTICLE_META_REST_PORT',
     80))
 
+# CONEXÃO MONGO ARTICLEMETA  --------------------------------------------
+AM_MONGODB_NAME = os.environ.get('OPAC_PROC_AM_MONGODB_NAME', 'articlemeta')
+AM_MONGODB_HOST = os.environ.get('OPAC_PROC_AM_MONGODB_HOST', None)
+AM_MONGODB_PORT = os.environ.get('OPAC_PROC_AM_MONGODB_PORT', 27017)
+AM_MONGODB_USER = os.environ.get('OPAC_PROC_AM_MONGODB_USER', None)
+AM_MONGODB_PASS = os.environ.get('OPAC_PROC_AM_MONGODB_PASS', None)
+
+AM_MONGODB_SETTINGS = {
+    'db': AM_MONGODB_NAME,
+    'host': AM_MONGODB_HOST,
+    'port': int(AM_MONGODB_PORT),
+}
+
+if AM_MONGODB_USER and AM_MONGODB_PASS:
+    AM_MONGODB_SETTINGS['username'] = AM_MONGODB_USER
+    AM_MONGODB_SETTINGS['password'] = AM_MONGODB_PASS
+
+
 ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT = os.environ.get('OPAC_PROC_ARTICLE_META_THRIFT_DEFAULT_ARTICLE_FMT', 'opac')
 
 # WEBAPP config: ----------------------------------------------------
@@ -178,8 +196,8 @@ OPAC_PROC_ARTICLE_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_CSS_URL', 'https:/
 OPAC_PROC_ARTICLE_PRINT_CSS_URL = os.environ.get('OPAC_PROC_ARTICLE_PRINT_CSS_URL', 'https://ssm.scielo.org/media/assets/css/scielo-print.css')
 OPAC_PROC_ARTICLE_JS_URL = os.environ.get('OPAC_PROC_ARTICLE_JS_URL', 'https://ssm.scielo.org/media/assets/js/scielo-article.js')
 
-OPAC_PROC_MEDIA_XML_MATCH_REGEX = os.environ.get('OPAC_PROC_IMG_XML_MATCH_REGEX', 'href="([^/\s]+\.(?:tiff|tif|jpg|jpeg|gif|webp|png|svg|mp3|mp4|wav|wma|avi))"')
-OPAC_PROC_MEDIA_HTML_MATCH_REGEX = os.environ.get('OPAC_PROC_IMG_HTML_MATCH_REGEX', 'src="([^"]+)"')
+MEDIA_EXTENSION_FILES = os.environ.get('OPAC_PROC_MEDIA_EXTENSION_FILES', 'tiff,tif,jpg,jpeg,gif,webp,png,svg,mp3,mp4,wav,wma,avi')
+MEDIA_EXT_LINKS_IND = os.environ.get('OPAC_PROC_MEDIA_EXT_LINKS_IND', 'http,ftp,sft,sft')
 OPAC_PROC_MEDIA_ARROW_MATCH_REGEXS = os.environ.get('OPAC_PROC_MEDIA_ARROW_MATCH_REGEXS', '<a href="#top">(.*?)</a>,<a href="#enda">(.*?)</a>,<a href="#up">(.*?)</a>')
 OPAC_PROC_MEDIA_ARROW_REPLACE = os.environ.get('OPAC_PROC_MEDIA_ARROW_REPLACE', '<a href="#top">&#9650;</a>')
 
@@ -205,7 +223,7 @@ MAIL_MAX_EMAILS = None
 MAIL_ASCII_ATTACHMENTS = False
 
 # Processamento parcial:
-DEFAULT_DIFF_SPAN = int(os.environ.get('OPAC_PROC_DEFAULT_DIFF_SPAN_DAYS', 7))
+DEFAULT_DIFF_SPAN = int(os.environ.get('OPAC_PROC_DEFAULT_DIFF_SPAN_DAYS', 30))
 
 # Prometheus settings:
 PROMETHEUS_ENABLED = os.environ.get('OPAC_PROMETHEUS_ENABLED', 'False') == 'True'
@@ -218,6 +236,7 @@ PROMPG_URL = '%s://%s:%s' % (PROMPG_SCHEME, PROMPG_HOST, PROMPG_PORT)
 # Static files
 OPAC_PROC_STATIC_CATALOG = os.path.join(HERE, 'static', 'catalog')
 PDF_CATALOG_CRON_STRING = os.environ.get('OPAC_PROC_PDF_CATALOG_CRON_STRING',
-                                         '0 0 * * 0')
+                                         '0 2 1-31 * *')
 XML_CATALOG_CRON_STRING = os.environ.get('OPAC_PROC_XML_CATALOG_CRON_STRING',
-                                         '0 0 * * 0')
+                                         '0 2 1-31 * *')
+DEFAULT_SCHEDULER_TIMEOUT = int(os.environ.get('OPAC_PROC_DEFAULT_SCHEDULER_TIMEOUT', 2000))

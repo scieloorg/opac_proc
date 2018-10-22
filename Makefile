@@ -61,7 +61,7 @@ dev_compose_up: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) up -d
 
 dev_compose_logs: get_opac_mongo_info get_opac_grpc_info
-	@docker-compose -f $(COMPOSE_FILE_DEV) logs -f $1
+	@docker-compose -f $(COMPOSE_FILE_DEV) logs -f $(SERVICE)
 
 dev_compose_stop: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) stop
@@ -83,7 +83,7 @@ dev_compose_top:
 
 
 dev_compose_scale_workers: dev_compose_up
-	@docker-compose -f $(COMPOSE_FILE_DEV) scale rq-worker=8
+	@docker-compose -f $(COMPOSE_FILE_DEV) scale rq-worker=6
 
 test:
 	@python opac_proc/manage.py test
@@ -144,6 +144,13 @@ release_docker_build: get_opac_mongo_info get_build_info
 	--build-arg OPAC_PROC_BUILD_DATE=$(OPAC_PROC_BUILD_DATE) \
 	--build-arg OPAC_PROC_VCS_REF=$(OPAC_PROC_VCS_REF) \
 	--build-arg OPAC_PROC_WEBAPP_VERSION=$(OPAC_PROC_WEBAPP_VERSION) .
+
+# release_docker_tag_latest:
+# 	@echo "[Tagging] Target image -> $(TRAVIS_REPO_SLUG):$(COMMIT)"
+# 	@echo "[Tagging] Image name:latest -> $(TRAVIS_REPO_SLUG):latest"
+# 	@docker tag $(TRAVIS_REPO_SLUG):$(COMMIT) $(TRAVIS_REPO_SLUG):latest
+# 	@echo "[Tagging] Image name:latest -> $(TRAVIS_REPO_SLUG):travis-$(TRAVIS_BUILD_NUMBER)"
+# 	@docker tag $(TRAVIS_REPO_SLUG):$(COMMIT) $(TRAVIS_REPO_SLUG):travis-$(TRAVIS_BUILD_NUMBER)
 
 release_docker_push: get_opac_mongo_info get_build_info
 	@echo "[Pushing] pushing image: $(TRAVIS_REPO_SLUG)"

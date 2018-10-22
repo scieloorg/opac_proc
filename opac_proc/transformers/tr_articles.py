@@ -114,8 +114,10 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['doi'] = xylose_article.doi
 
         # is_aop
-        if hasattr(xylose_article, 'is_aop'):
-            self.transform_model_instance['is_aop'] = xylose_article.is_aop
+        if hasattr(xylose_article, 'publisher_ahead_id'):
+            if xylose_article.publisher_ahead_id:
+                self.transform_model_instance['is_aop'] = True
+                self.transform_model_instance['aop_pid'] = xylose_article.publisher_ahead_id
 
         # created
         self.transform_model_instance['created'] = datetime.now()
@@ -175,12 +177,10 @@ class ArticleTransformer(BaseTransformer):
         # Versão XML do artigo
         if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version == 'xml':
             asset_xml = AssetXML(xylose_article)
-
-            uuid, xml_url = asset_xml.register()
-
-            if xml_url and uuid:
+            xml_url = asset_xml.register()
+            if xml_url:
                 self.transform_model_instance['xml'] = xml_url
-                self.transform_model_instance['htmls'] = asset_html.register_from_xml(uuid)
+                self.transform_model_instance['htmls'] = asset_xml.register_htmls()
 
         # Versão HTML do artigo
         if hasattr(xylose_article, 'data_model_version') and xylose_article.data_model_version != 'xml':
@@ -214,6 +214,11 @@ class ArticleTransformer(BaseTransformer):
         # fpage
         if hasattr(xylose_article, 'start_page'):
             self.transform_model_instance['fpage'] = xylose_article.start_page
+
+        # fpage_sequence
+        if hasattr(xylose_article, 'start_page_sequence'):
+            self.transform_model_instance['fpage_sequence'] = \
+                                            xylose_article.start_page_sequence
 
         # lpage
         if hasattr(xylose_article, 'end_page'):

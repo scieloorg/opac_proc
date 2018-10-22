@@ -780,92 +780,92 @@
             <tr>
               <td>Collection:</td>
               {# extract #}
-              <td>{{ diff_ex_add_collection_count }}</td>
-              <td>{{ diff_ex_upd_collection_count }}</td>
-              <td>{{ diff_ex_del_collection_count }}</td>
+              <td {% if diff_ex_add_collection_count %} class="warning" {% endif %}>{{ diff_ex_add_collection_count }}</td>
+              <td {% if diff_ex_upd_collection_count %} class="warning" {% endif %}>{{ diff_ex_upd_collection_count }}</td>
+              <td {% if diff_ex_del_collection_count %} class="warning" {% endif %}>{{ diff_ex_del_collection_count }}</td>
               {# transform #}
-              <td>{{ diff_tr_add_collection_count }}</td>
-              <td>{{ diff_tr_upd_collection_count }}</td>
-              <td>{{ diff_tr_del_collection_count }}</td>
+              <td {% if diff_tr_add_collection_count %} class="warning" {% endif %}>{{ diff_tr_add_collection_count }}</td>
+              <td {% if diff_tr_upd_collection_count %} class="warning" {% endif %}>{{ diff_tr_upd_collection_count }}</td>
+              <td {% if diff_tr_del_collection_count %} class="warning" {% endif %}>{{ diff_tr_del_collection_count }}</td>
               {# load #}
-              <td>{{ diff_lo_add_collection_count }}</td>
-              <td>{{ diff_lo_upd_collection_count }}</td>
-              <td>{{ diff_lo_del_collection_count }}</td>
+              <td {% if diff_lo_add_collection_count %} class="warning" {% endif %}>{{ diff_lo_add_collection_count }}</td>
+              <td {% if diff_lo_upd_collection_count %} class="warning" {% endif %}>{{ diff_lo_upd_collection_count }}</td>
+              <td {% if diff_lo_del_collection_count %} class="warning" {% endif %}>{{ diff_lo_del_collection_count }}</td>
             </tr>
             <tr>
               <td>Journal:</td>
               {# extract #}
-              <td>{{ diff_ex_add_journal_count }}</td>
-              <td>{{ diff_ex_upd_journal_count }}</td>
-              <td>{{ diff_ex_del_journal_count }}</td>
+              <td {% if diff_ex_add_journal_count %} class="warning" {% endif %}>{{ diff_ex_add_journal_count }}</td>
+              <td {% if diff_ex_upd_journal_count %} class="warning" {% endif %}>{{ diff_ex_upd_journal_count }}</td>
+              <td {% if diff_ex_del_journal_count %} class="warning" {% endif %}>{{ diff_ex_del_journal_count }}</td>
               {# transform #}
-              <td>{{ diff_tr_add_journal_count }}</td>
-              <td>{{ diff_tr_upd_journal_count }}</td>
-              <td>{{ diff_tr_del_journal_count }}</td>
+              <td {% if diff_tr_add_journal_count %} class="warning" {% endif %}>{{ diff_tr_add_journal_count }}</td>
+              <td {% if diff_tr_upd_journal_count %} class="warning" {% endif %}>{{ diff_tr_upd_journal_count }}</td>
+              <td {% if diff_tr_del_journal_count %} class="warning" {% endif %}>{{ diff_tr_del_journal_count }}</td>
               {# load #}
-              <td>{{ diff_lo_add_journal_count }}</td>
-              <td>{{ diff_lo_upd_journal_count }}</td>
-              <td>{{ diff_lo_del_journal_count }}</td>
+              <td {% if diff_lo_add_journal_count %} class="warning" {% endif %}>{{ diff_lo_add_journal_count }}</td>
+              <td {% if diff_lo_upd_journal_count %} class="warning" {% endif %}>{{ diff_lo_upd_journal_count }}</td>
+              <td {% if diff_lo_del_journal_count %} class="warning" {% endif %}>{{ diff_lo_del_journal_count }}</td>
             </tr>
             <tr>
               <td>Issue:</td>
               {# extract #}
-              <td>{{ diff_ex_add_issue_count }}</td>
-              <td>{{ diff_ex_upd_issue_count }}</td>
-              <td>{{ diff_ex_del_issue_count }}</td>
+              <td {% if diff_ex_add_issue_count %} class="warning" {% endif %}>{{ diff_ex_add_issue_count }}</td>
+              <td {% if diff_ex_upd_issue_count %} class="warning" {% endif %}>{{ diff_ex_upd_issue_count }}</td>
+              <td {% if diff_ex_del_issue_count %} class="warning" {% endif %}>{{ diff_ex_del_issue_count }}</td>
               {# transform #}
-              <td>{{ diff_tr_add_issue_count }}</td>
-              <td>{{ diff_tr_upd_issue_count }}</td>
-              <td>{{ diff_tr_del_issue_count }}</td>
+              <td {% if diff_tr_add_issue_count %} class="warning" {% endif %}>{{ diff_tr_add_issue_count }}</td>
+              <td {% if diff_tr_upd_issue_count %} class="warning" {% endif %}>{{ diff_tr_upd_issue_count }}</td>
+              <td {% if diff_tr_del_issue_count %} class="warning" {% endif %}>{{ diff_tr_del_issue_count }}</td>
               {# load #}
-              <td>{{ diff_lo_add_issue_count }}</td>
-              <td>{{ diff_lo_upd_issue_count }}</td>
-              <td>{{ diff_lo_del_issue_count }}</td>
+              <td {% if diff_lo_add_issue_count %} class="warning" {% endif %}>{{ diff_lo_add_issue_count }}</td>
+              <td {% if diff_lo_upd_issue_count %} class="warning" {% endif %}>{{ diff_lo_upd_issue_count }}</td>
+              <td {% if diff_lo_del_issue_count %} class="warning" {% endif %}>{{ diff_lo_del_issue_count }}</td>
             </tr>
             <tr>
               <td>Article:</td>
               {# extract #}
-              <td>{{ diff_ex_add_article_count }}</td>
-              <td>{{ diff_ex_upd_article_count }}</td>
-              <td>{{ diff_ex_del_article_count }}</td>
+              <td {% if diff_ex_add_article_count %} class="warning" {% endif %}>{{ diff_ex_add_article_count }}</td>
+              <td {% if diff_ex_upd_article_count %} class="warning" {% endif %}>{{ diff_ex_upd_article_count }}</td>
+              <td {% if diff_ex_del_article_count %} class="warning" {% endif %}>{{ diff_ex_del_article_count }}</td>
               {# transform #}
-              <td>{{ diff_tr_add_article_count }}</td>
-              <td>{{ diff_tr_upd_article_count }}</td>
-              <td>{{ diff_tr_del_article_count }}</td>
+              <td {% if diff_tr_add_article_count %} class="warning" {% endif %}>{{ diff_tr_add_article_count }}</td>
+              <td {% if diff_tr_upd_article_count %} class="warning" {% endif %}>{{ diff_tr_upd_article_count }}</td>
+              <td {% if diff_tr_del_article_count %} class="warning" {% endif %}>{{ diff_tr_del_article_count }}</td>
               {# load #}
-              <td>{{ diff_lo_add_article_count }}</td>
-              <td>{{ diff_lo_upd_article_count }}</td>
-              <td>{{ diff_lo_del_article_count }}</td>
+              <td {% if diff_lo_add_article_count %} class="warning" {% endif %}>{{ diff_lo_add_article_count }}</td>
+              <td {% if diff_lo_upd_article_count %} class="warning" {% endif %}>{{ diff_lo_upd_article_count }}</td>
+              <td {% if diff_lo_del_article_count %} class="warning" {% endif %}>{{ diff_lo_del_article_count }}</td>
             </tr>
             <tr>
               <td>Press Releases:</td>
               {# extract #}
-              <td>{{ diff_ex_add_press_release_count }}</td>
-              <td>{{ diff_ex_upd_press_release_count }}</td>
-              <td>{{ diff_ex_del_press_release_count }}</td>
+              <td {% if diff_ex_add_press_release_count %} class="warning" {% endif %}>{{ diff_ex_add_press_release_count }}</td>
+              <td {% if diff_ex_upd_press_release_count %} class="warning" {% endif %}>{{ diff_ex_upd_press_release_count }}</td>
+              <td {% if diff_ex_del_press_release_count %} class="warning" {% endif %}>{{ diff_ex_del_press_release_count }}</td>
               {# transform #}
-              <td>{{ diff_tr_add_press_release_count }}</td>
-              <td>{{ diff_tr_upd_press_release_count }}</td>
-              <td>{{ diff_tr_del_press_release_count }}</td>
+              <td {% if diff_tr_add_press_release_count %} class="warning" {% endif %}>{{ diff_tr_add_press_release_count }}</td>
+              <td {% if diff_tr_upd_press_release_count %} class="warning" {% endif %}>{{ diff_tr_upd_press_release_count }}</td>
+              <td {% if diff_tr_del_press_release_count %} class="warning" {% endif %}>{{ diff_tr_del_press_release_count }}</td>
               {# load #}
-              <td>{{ diff_lo_add_press_release_count }}</td>
-              <td>{{ diff_lo_upd_press_release_count }}</td>
-              <td>{{ diff_lo_del_press_release_count }}</td>
+              <td {% if diff_lo_add_press_release_count %} class="warning" {% endif %}>{{ diff_lo_add_press_release_count }}</td>
+              <td {% if diff_lo_upd_press_release_count %} class="warning" {% endif %}>{{ diff_lo_upd_press_release_count }}</td>
+              <td {% if diff_lo_del_press_release_count %} class="warning" {% endif %}>{{ diff_lo_del_press_release_count }}</td>
             </tr>
             <tr>
               <td>News:</td>
               {# extract #}
-              <td>{{ diff_ex_add_news_count }}</td>
-              <td>{{ diff_ex_upd_news_count }}</td>
-              <td>{{ diff_ex_del_news_count }}</td>
+              <td {% if diff_ex_add_news_count %} class="warning" {% endif %}>{{ diff_ex_add_news_count }}</td>
+              <td {% if diff_ex_upd_news_count %} class="warning" {% endif %}>{{ diff_ex_upd_news_count }}</td>
+              <td {% if diff_ex_del_news_count %} class="warning" {% endif %}>{{ diff_ex_del_news_count }}</td>
               {# transform #}
-              <td>{{ diff_tr_add_news_count }}</td>
-              <td>{{ diff_tr_upd_news_count }}</td>
-              <td>{{ diff_tr_del_news_count }}</td>
+              <td {% if diff_tr_add_news_count %} class="warning" {% endif %}>{{ diff_tr_add_news_count }}</td>
+              <td {% if diff_tr_upd_news_count %} class="warning" {% endif %}>{{ diff_tr_upd_news_count }}</td>
+              <td {% if diff_tr_del_news_count %} class="warning" {% endif %}>{{ diff_tr_del_news_count }}</td>
               {# load #}
-              <td>{{ diff_lo_add_news_count }}</td>
-              <td>{{ diff_lo_upd_news_count }}</td>
-              <td>{{ diff_lo_del_news_count }}</td>
+              <td {% if diff_lo_add_news_count %} class="warning" {% endif %}>{{ diff_lo_add_news_count }}</td>
+              <td {% if diff_lo_upd_news_count %} class="warning" {% endif %}>{{ diff_lo_upd_news_count }}</td>
+              <td {% if diff_lo_del_news_count %} class="warning" {% endif %}>{{ diff_lo_del_news_count }}</td>
             </tr>
           </tbody>
         </table>

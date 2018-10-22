@@ -73,15 +73,15 @@ def task_extract_all_collections():
             r_queues.enqueue(stage, model, task_extract_selected_collections, uuid_as_string_list)
 
 
-def task_delete_selected_collections(selected_ids):
+def task_delete_selected_collections(selected_uuids):
     """
         Task para apagar Coleções Extaidas.
         @param:
-        - selected_ids: lista de pk dos documentos a serem removidos
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
 
-        Se a lista `selected_ids` for maior a SLICE_SIZE
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
             A lista será fatiada em listas de tamanho: SLICE_SIZE
-        Se a lista `selected_ids` for < a SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
             Será feito uma delete direto no queryset
     """
 
@@ -92,13 +92,13 @@ def task_delete_selected_collections(selected_ids):
     r_queues = RQueues()
     SLICE_SIZE = 1000
 
-    if len(selected_ids) > SLICE_SIZE:
-        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_delete_selected_collections, uuid_as_string_list)
     else:
-        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
         documents_to_delete.delete()
 
 
@@ -156,15 +156,15 @@ def task_extract_all_journals():
             r_queues.enqueue(stage, model, task_extract_selected_journals, uuid_as_string_list)
 
 
-def task_delete_selected_journals(selected_ids):
+def task_delete_selected_journals(selected_uuids):
     """
         Task para apagar Journals Extaidaos.
         @param:
-        - selected_ids: lista de pk dos documentos a serem removidos
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
 
-        Se a lista `selected_ids` for maior a SLICE_SIZE
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
             A lista será fatiada em listas de tamanho: SLICE_SIZE
-        Se a lista `selected_ids` for < a SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
             Será feito uma delete direto no queryset
     """
 
@@ -175,13 +175,13 @@ def task_delete_selected_journals(selected_ids):
     r_queues = RQueues()
     SLICE_SIZE = 1000
 
-    if len(selected_ids) > SLICE_SIZE:
-        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_delete_selected_journals, uuid_as_string_list)
     else:
-        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
         documents_to_delete.delete()
 
 
@@ -238,15 +238,15 @@ def task_extract_all_issues():
             r_queues.enqueue(stage, model, task_extract_selected_issues, uuid_as_string_list)
 
 
-def task_delete_selected_issues(selected_ids):
+def task_delete_selected_issues(selected_uuids):
     """
         Task para apagar Issues Extaidaos.
         @param:
-        - selected_ids: lista de pk dos documentos a serem removidos
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
 
-        Se a lista `selected_ids` for maior a SLICE_SIZE
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
             A lista será fatiada em listas de tamanho: SLICE_SIZE
-        Se a lista `selected_ids` for < a SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
             Será feito uma delete direto no queryset
     """
 
@@ -257,13 +257,13 @@ def task_delete_selected_issues(selected_ids):
     r_queues = RQueues()
     SLICE_SIZE = 1000
 
-    if len(selected_ids) > SLICE_SIZE:
-        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_delete_selected_issues, uuid_as_string_list)
     else:
-        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
         documents_to_delete.delete()
 
 
@@ -322,15 +322,15 @@ def task_extract_all_articles(uuids=None):
             r_queues.enqueue(stage, model, task_extract_selected_articles, uuid_as_string_list)
 
 
-def task_delete_selected_articles(selected_ids):
+def task_delete_selected_articles(selected_uuids):
     """
         Task para apagar Articles Extaidaos.
         @param:
-        - selected_ids: lista de pk dos documentos a serem removidos
+        - selected_uuids: lista de UUIDs dos documentos a serem removidos
 
-        Se a lista `selected_ids` for maior a SLICE_SIZE
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
             A lista será fatiada em listas de tamanho: SLICE_SIZE
-        Se a lista `selected_ids` for < a SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
             Será feito uma delete direto no queryset
     """
 
@@ -341,13 +341,13 @@ def task_delete_selected_articles(selected_ids):
     r_queues = RQueues()
     SLICE_SIZE = 1000
 
-    if len(selected_ids) > SLICE_SIZE:
-        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_delete_selected_articles, uuid_as_string_list)
     else:
-        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
         documents_to_delete.delete()
 
 
@@ -412,15 +412,15 @@ def task_extract_all_press_releases():
                              j_acronym, feed_url_by_lang, lang)
 
 
-def task_delete_selected_press_releases(selected_ids):
+def task_delete_selected_press_releases(selected_uuids):
     """
         Task para apagar Press Releases Extaidaos.
         @param:
-        - selected_ids: lista de pk dos documentos a serem removidos
+        - selected_uuids: lista de UUID dos documentos a serem removidos
 
-        Se a lista `selected_ids` for maior a SLICE_SIZE
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
             A lista será fatiada em listas de tamanho: SLICE_SIZE
-        Se a lista `selected_ids` for < a SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
             Será feito uma delete direto no queryset
     """
 
@@ -431,13 +431,13 @@ def task_delete_selected_press_releases(selected_ids):
     r_queues = RQueues()
     SLICE_SIZE = 1000
 
-    if len(selected_ids) > SLICE_SIZE:
-        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_delete_selected_press_releases, uuid_as_string_list)
     else:
-        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
         documents_to_delete.delete()
 
 
@@ -494,15 +494,15 @@ def task_extract_all_news():
             url, lang)
 
 
-def task_delete_selected_news(selected_ids):
+def task_delete_selected_news(selected_uuids):
     """
         Task para apagar News Extaidaos.
         @param:
-        - selected_ids: lista de pk dos documentos a serem removidos
+        - selected_uuids: lista de UUID dos documentos a serem removidos
 
-        Se a lista `selected_ids` for maior a SLICE_SIZE
+        Se a lista `selected_uuids` for maior a SLICE_SIZE
             A lista será fatiada em listas de tamanho: SLICE_SIZE
-        Se a lista `selected_ids` for < a SLICE_SIZE
+        Se a lista `selected_uuids` for < a SLICE_SIZE
             Será feito uma delete direto no queryset
     """
 
@@ -513,13 +513,13 @@ def task_delete_selected_news(selected_ids):
     r_queues = RQueues()
     SLICE_SIZE = 1000
 
-    if len(selected_ids) > SLICE_SIZE:
-        list_of_list_of_uuids = list(chunks(selected_ids, SLICE_SIZE))
+    if len(selected_uuids) > SLICE_SIZE:
+        list_of_list_of_uuids = list(chunks(selected_uuids, SLICE_SIZE))
         for list_of_uuids in list_of_list_of_uuids:
             uuid_as_string_list = [str(uuid) for uuid in list_of_uuids]
             r_queues.enqueue(stage, model, task_delete_selected_news, uuid_as_string_list)
     else:
-        documents_to_delete = model_class.objects.filter(pk__in=selected_ids)
+        documents_to_delete = model_class.objects.filter(uuid__in=selected_uuids)
         documents_to_delete.delete()
 
 

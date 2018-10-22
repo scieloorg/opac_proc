@@ -41,7 +41,7 @@ def get_db_connection():
     else:
         db_name = get_opac_proc_db_name()
         msg = u"Conexão establecida com banco: %s!" % db_name
-        logger.info(msg)
+        logger.debug(msg)
         return db
 
 

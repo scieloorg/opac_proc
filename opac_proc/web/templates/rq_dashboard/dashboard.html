@@ -7,13 +7,15 @@
         <div class="col-md-6">
             <div class="section">
 
-                <h1>Queues</h1>
-                <p class="fixed intro">
-                    This list below contains all the registered queues with the
-                    number of jobs currently in the queue. Select a queue
-                    from above to view all jobs currently pending on the queue.
-                </p>
-
+                <h1>
+                    Queues
+                    <small>
+                        <a id="queues-list-toggle" href="#" data-status="expandend">
+                            <i id="queues-list-collapse" class="fa fa-chevron-up" style="display:none;"></i>
+                            <i id="queues-list-expand" class="fa fa-chevron-down"></i>
+                        </a>
+                    </small>
+                </h1>
                 <table id="queues" class="table table-striped">
                     <thead>
                         <tr>
@@ -52,9 +54,15 @@
         <div class="col-md-6">
             <div class="section">
 
-                <h1>Workers</h1>
-                <p class="fixed intro">This list below contains all the registered workers.</p>
-
+                <h1>
+                    Workers
+                    <small>
+                        <a id="workers-list-toggle" href="#" data-status="expandend">
+                            <i id="workers-list-collapse" class="fa fa-chevron-up" style="display:none;"></i>
+                            <i id="workers-list-expand" class="fa fa-chevron-down"></i>
+                        </a>
+                    </small>
+                </h1>
                 <table id="workers" class="table table-striped">
                     <thead>
                         <tr>
@@ -121,9 +129,11 @@
                         <i class="glyphicon glyphicon-trash glyphicon-white"></i> Empty
                     </a>
                 </div>
+
                 <p class="intro">
                     This list below contains all the registered jobs on queue <span class="label label-default">{{ queue.name }}</span>, sorted by age (oldest on top).
                 </p>
+
                 <table id="jobs" class="table table-striped">
                     <thead>
                         <tr>
@@ -232,6 +242,42 @@
     clipboard.on('success', function(e) {
         alert('Os args do job foram copiados!');
         e.clearSelection();
+    });
+
+    $('#workers-list-toggle').click(function(event){
+        event.preventDefault();
+        var current_status = $(this).data('status');
+        if (current_status === "expandend") {
+            // novo status: "collapsed"
+            $('#workers-list-collapse').show();
+            $('#workers-list-expand').hide()
+            $('table#workers').hide();
+            $(this).data('status', "collapsed");
+        } else {
+            // novo status: "expandend"
+            $('#workers-list-collapse').hide();
+            $('#workers-list-expand').show()
+            $('table#workers').show();
+            $(this).data('status', "expandend");
+        }
+    });
+
+    $('#queues-list-toggle').click(function(event){
+        event.preventDefault();
+        var current_status = $(this).data('status');
+        if (current_status === "expandend") {
+            // novo status: "collapsed"
+            $('#queues-list-collapse').show();
+            $('#queues-list-expand').hide()
+            $('table#queues').hide();
+            $(this).data('status', "collapsed");
+        } else {
+            // novo status: "expandend"
+            $('#queues-list-collapse').hide();
+            $('#queues-list-expand').show()
+            $('table#queues').show();
+            $(this).data('status', "expandend");
+        }
     });
 
 

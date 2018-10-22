@@ -90,13 +90,11 @@ var ActionToolbar = {
     }
 
     if (custom_action_definition == null) {
-      console.log('ação não definida');
       self.notify_invalid_action();
       return;
     }
 
     action_field.val('custom_action__' + method_name + '__' + action_type);
-    console.log('action_field.value: ', action_field.val());
     form.attr('method', 'POST');
     form.attr('action', '.');
     if (action_type === 'selected') {
@@ -166,7 +164,6 @@ var ActionToolbar = {
     ActionToolbar.submit_action_form('delete_selected');
   },
   submit_custom_action: function(method_name, action_type) {
-    console.log('Here call: "ActionToolbar.submit_action_form("method_name");" with method_name: ', method_name);
     ActionToolbar.submit_custom_action_form(method_name, action_type);
   },
   register_custom_action: function(method_name, label, can_select_rows){

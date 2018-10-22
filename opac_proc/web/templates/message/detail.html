@@ -166,7 +166,6 @@
         }).done(function(data) {
           window.location = data.location;
         }).fail(function(jqXHR, textStatus, errorThrown){
-          console.log('AJAX error', jqXHR, textStatus, errorThrown);
           var msg = 'Não foi possível processar sua ação! Erro: ' + jqXHR.responseText;
           MessageActions.show_error_box(msg);
         });
@@ -183,7 +182,6 @@
         }).done(function(data) {
           window.location = data.location;
         }).fail(function(jqXHR, textStatus, errorThrown){
-          console.log('AJAX error', jqXHR, textStatus, errorThrown);
           var msg = 'Não foi possível processar sua ação! Erro: ' + jqXHR.responseText;
           MessageActions.show_error_box(msg);
         });
@@ -200,7 +198,6 @@
         }).done(function(data) {
           window.location = data.location;
         }).fail(function(jqXHR, textStatus, errorThrown){
-          console.log('AJAX error', jqXHR, textStatus, errorThrown);
           var msg = 'Não foi possível processar sua ação! Erro: ' + jqXHR.responseText;
           MessageActions.show_error_box(msg);
         });

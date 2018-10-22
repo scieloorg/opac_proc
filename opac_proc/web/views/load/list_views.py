@@ -21,6 +21,7 @@ class LoadBaseListView(ListView):
     stage = 'load'
     can_process = True
     can_delete = True
+    convert_pk_to_uuid = True
 
 
 class LoadCollectionListView(LoadBaseListView):
@@ -282,7 +283,7 @@ class LoadArticleListView(LoadBaseListView):
         },
         {
             'field_label': u'PID',
-            'field_name': 'pid',
+            'field_name': 'loaded_data.pid',
             'field_type': 'string'
         },
         {
@@ -310,7 +311,7 @@ class LoadArticleListView(LoadBaseListView):
         },
         {
             'field_label': u'PID',
-            'field_name': 'pid',
+            'field_name': 'loaded_data.pid',
             'field_type': 'string'
         },
         {

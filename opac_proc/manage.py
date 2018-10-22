@@ -58,6 +58,21 @@ from opac_proc.datastore.identifiers_models import (
     IssueIdModel,
     ArticleIdModel)
 
+from opac_proc.source_sync.sched import SCHED_ID_BY_MODEL_NAME
+from opac_proc.source_sync.utils import MODEL_NAME_LIST
+from opac_proc.differs.producer_sched import PRODUCER_SCHEDS
+from opac_proc.differs.consumer_sched import CONSUMER_SCHEDS
+from opac_proc.differs.utils import (
+    ETL_STAGE_LIST,
+    ETL_MODEL_NAME_LIST,
+    ACTION_LIST
+)
+
+from opac_proc.utils import (
+    clean_idsync_scheduler_params,
+    clean_differ_scheduler_params
+)
+
 app = create_app()
 manager = Manager(app)
 
@@ -496,6 +511,161 @@ def clear_setup_scheduler_queue(queue):
     print u'\n Limpando fila %s' % queue
     clear_setup_scheduler_jobs(queue)
     print u'\n Sem jobs em fila %s!' % queue
+
+
+@manager.command
+@manager.option('-m', '--model', dest='model_name')
+def setup_idsync_scheduler(model_name='all'):
+    """
+    Instala os schedulers para recuperar os identificadores do modelo indicado
+    pelo param model_name.
+    Por padrão será executado para todos os modelos
+    """
+
+    models_selected = clean_idsync_scheduler_params(model_name)
+    for model_name_ in models_selected:
+        sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
+        sched_instance = sched_class()
+        print "instalando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_)
+        sched_instance.setup()
+
+
+@manager.command
+@manager.option('-m', '--model', dest='model_name')
+def clear_idsync_scheduler(model_name='all'):
+    """
+    Removo todos os jobs enfilerados na fila dos schedulers
+    indicados pelos param model_name.
+    Por padrão será executado para todos os modelos
+    """
+
+    models_selected = clean_idsync_scheduler_params(model_name)
+    for model_name_ in models_selected:
+        sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
+        sched_instance = sched_class()
+        print "limpando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_)
+        sched_instance.clear_jobs()
+
+
+@manager.command
+@manager.option('-s', '--stage', dest='stage')
+@manager.option('-m', '--model', dest='model_name')
+@manager.option('-a', '--action', dest='action')
+def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
+    """
+    instala os schedulers para producir a diferencia nos modelos de ETL.
+    Por padrão aplica para todas as fases, todos os modelos e todas as açoes
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        stage, model_name, action)
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
+                sched_instance = sched_class()
+                print "[%s][%s][%s] instalando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name)
+                sched_instance.setup()
+
+
+@manager.command
+@manager.option('-s', '--stage', dest='stage')
+@manager.option('-m', '--model', dest='model_name')
+@manager.option('-a', '--action', dest='action')
+def clear_produce_differ_scheduler(stage='all', model_name='all', action='all'):
+    """
+    remove os jobs enfilerados nas filas usadas pelos schedulers de
+    producir as diferencias
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        stage, model_name, action)
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
+                sched_instance = sched_class()
+                print "[%s][%s][%s] limpando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name)
+                sched_instance.clear_jobs()
+
+
+@manager.command
+@manager.option('-s', '--stage', dest='stage')
+@manager.option('-m', '--model', dest='model_name')
+@manager.option('-a', '--action', dest='action')
+def setup_consume_differ_scheduler(stage='all', model_name='all', action='all'):
+    """
+    instala os schedulers para consumir a diferencia nos modelos de ETL.
+    Por padrão aplica para todas as fases, todos os modelos e todas as açoes
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        stage, model_name, action)
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                sched_class = CONSUMER_SCHEDS[stage_][model_][action_]
+                sched_instance = sched_class()
+                print "[%s][%s][%s] instalando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name)
+                sched_instance.setup()
+
+
+@manager.command
+@manager.option('-s', '--stage', dest='stage')
+@manager.option('-m', '--model', dest='model_name')
+@manager.option('-a', '--action', dest='action')
+def clear_consume_differ_scheduler(stage='all', model_name='all', action='all'):
+    """
+    remove os jobs enfilerados nas filas usadas pelos schedulers de
+    consumir as diferencias
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        stage, model_name, action)
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                sched_class = CONSUMER_SCHEDS[stage_][model_][action_]
+                sched_instance = sched_class()
+                print "[%s][%s][%s] limpando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name)
+                sched_instance.clear_jobs()
+
+
+@manager.command
+def clear_and_setup_all_schedulers():
+    """
+    Comando utilitario para limpar todas filas usadas pelos schedulers e
+    instalar todos os schedulers.
+    """
+    # qxml_catalog e qpdf_catalog
+    print('[limpando] filas de schedulers do catalog')
+    catalog_queues = ['qxml_catalog', 'qpdf_catalog']
+    for queue_name in catalog_queues:
+        clear_setup_scheduler_queue(queue_name)
+
+    # qss_* para identificadores
+    print('[limpando] filas de schedulers do identificadores')
+    clear_idsync_scheduler()
+
+    # qss_* para produzir diff
+    print('[limpando] filas de schedulers do produce diff')
+    clear_produce_differ_scheduler()
+
+    # qss_* para consumir diff
+    print('[limpando] filas de schedulers do consume diff')
+    clear_consume_differ_scheduler()
+
+    print('[instalando] schedulers do catalog')
+    setup_static_catalog_scheduler(all_formats=True)
+
+    print('[instalando] schedulers do identificadores')
+    setup_idsync_scheduler()
+
+    print('[instalando] schedulers do produzir a diff')
+    setup_produce_differ_scheduler()
+
+    print('[instalando] schedulers do consumir a diff')
+    setup_consume_differ_scheduler()
 
 
 if __name__ == "__main__":

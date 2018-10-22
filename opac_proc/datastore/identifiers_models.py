@@ -14,7 +14,7 @@ from opac_proc.web import config
 
 class BaseIdModel(object):
     _id = UUIDField(primary_key=True, required=True, default=uuid.uuid4)
-    uuid = UUIDField(required=True, default=uuid.uuid4)
+    uuid = UUIDField(required=True, default=uuid.uuid4, unique=True)
     collection_acronym = StringField(max_length=5, required=True, default=config.OPAC_PROC_COLLECTION)
     # campos de controle:
     created_at = DateTimeField()

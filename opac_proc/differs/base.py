@@ -1,8 +1,6 @@
 # coding: utf-8
 import sys
 import os
-import logging
-import logging.config
 
 from datetime import datetime, timedelta
 
@@ -10,18 +8,10 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(PROJECT_PATH)
 
 from opac_proc.datastore.mongodb_connector import get_db_connection
-from opac_proc.datastore import models as proc_models
-from opac_proc.datastore import identifiers_models as id_models
-from opac_proc.datastore import diff_models as diff_models
 from opac_proc.web import config
 from opac_proc.source_sync.utils import (
-    MODEL_NAME_LIST,
     STAGE_LIST,
     ACTION_LIST,
-    parse_journal_issn_from_issue_code,
-    parse_journal_issn_from_article_code,
-    parse_issue_pid_from_article_code,
-    parse_date_str_to_datetime_obj,
 )
 from opac_proc.extractors.process import (
     ProcessExtractCollection,
@@ -48,10 +38,6 @@ from opac_proc.loaders.process import (
     ProcessLoadNews
 )
 
-logger = logging.getLogger(__name__)
-logger_ini = os.path.join(os.path.dirname(__file__), 'logging.ini')
-logging.config.fileConfig(logger_ini, disable_existing_loggers=False)
-
 
 DIFF_APPLY_PROCESSORS = {
     'add': {
@@ -76,8 +62,8 @@ DIFF_APPLY_PROCESSORS = {
             'journal': ProcessLoadJournal,
             'issue': ProcessLoadIssue,
             'article': ProcessLoadArticle,
-            'news': ProcessLoadPressRelease,
-            'press_release': ProcessLoadNews,
+            'news': ProcessLoadNews,
+            'press_release': ProcessLoadPressRelease,
         }
     },
     'update': {
@@ -287,7 +273,7 @@ class DifferBase(object):
         elif stage == 'load':
             is_transformed = self.is_transformed(target_uuid)
             is_loaded = self.is_loaded(target_uuid)
-            if is_transformed and not is_loaded:
+            if is_transformed and is_loaded:
                 tr_model_instance = self.tr_model_class.objects.get(uuid=target_uuid)
                 lo_model_instance = self.lo_model_class.objects.get(uuid=target_uuid)
                 return tr_model_instance.metadata.updated_at > lo_model_instance.metadata.updated_at
@@ -412,13 +398,16 @@ class DifferBase(object):
         if stage in STAGE_LIST:
             if stage == 'extract':
                 identifiers_uuids = self.id_model_class.objects.all().values_list('uuid')
-                return self.ex_model_class.objects.filter(uuid__nin=identifiers_uuids).values_list('uuid')
+                return self.ex_model_class.objects.filter(
+                    uuid__nin=identifiers_uuids).values_list('uuid')
             elif stage == 'transform':
                 extracted_uuids = self.ex_model_class.objects.all().values_list('uuid')
-                return self.tr_model_class.objects.filter(uuid__nin=extracted_uuids).values_list('uuid')
+                return self.tr_model_class.objects.filter(
+                    uuid__nin=extracted_uuids).values_list('uuid')
             elif stage == 'load':
                 transformed_uuids = self.tr_model_class.objects.all().values_list('uuid')
-                return self.lo_model_class.objects.filter(uuid__nin=transformed_uuids).values_list('uuid')
+                return self.lo_model_class.objects.filter(
+                    uuid__nin=transformed_uuids).values_list('uuid')
         else:
             raise ValueError(u'Parametro: "stage" inválido! Valores esperados: "extract" ou "transform" ou "load"!')
 
@@ -468,111 +457,30 @@ class DifferBase(object):
             raise ValueError(u'Parametro: "stage" inválido! Valores esperados: "extract" ou "transform" ou "load"!')
 
     def get_uuids_unapplied(self, stage, action):
-        return self.diff_model_class.objects.filter(stage=stage, action=action, done_at=None).values_list('uuid')
+        return self.diff_model_class.objects.filter(
+            stage=stage, action=action, done_at=None).values_list('uuid')
 
-    def apply_diff_record(self, stage, action, target_uuid):
-        logger.info(
-            "Aplicando o diff model para: stage: %s, action: %s, modelo: %s, UUID: %s" % (
-                stage, action, self.model_name, target_uuid))
+    def apply_diff_record(self, stage, action, target_uuids):
         # get processor
         processor_class = DIFF_APPLY_PROCESSORS[action][stage][self.model_name]
         processor_instance = processor_class()
-        logger.info('Processor: %s' % processor_class)
 
         if action in ACTION_LIST:
             if action == 'add' or action == 'update':
-                processor_instance.selected([target_uuid])
+                if stage == 'extract' and action == 'add' and self.model_name in ['news', 'press_release']:
+                    processor_instance.all()
+                else:
+                    processor_instance.selected(target_uuids)
             elif action == 'delete':
-                raise NotImplementedError('Precisa implementar ainda!')
+                processor_instance.delete_selected(target_uuids)
 
             # atualizo registro diff como feito
-            diff_model_instance = self.diff_model_class.objects.filter(
-                uuid=target_uuid, action=action, stage=stage, done_at=None).first()
-            diff_model_instance.done_at = datetime.now()
-            diff_model_instance.save()
+            self.diff_model_class.objects.filter(
+                uuid__in=target_uuids,
+                action=action,
+                stage=stage,
+                done_at=None).update(
+                    set__done_at=datetime.now())
         else:
             raise ValueError(u'Param action com valor inesperado: %s' % action)
 
-
-# --------------------------------------------------- #
-#                   COLLECTION                        #
-# --------------------------------------------------- #
-
-
-class CollectionDiffer(DifferBase):
-    model_name = 'collection'
-    ex_model_class = proc_models.ExtractCollection
-    tr_model_class = proc_models.TransformCollection
-    lo_model_class = proc_models.LoadCollection
-    id_model_class = id_models.CollectionIdModel
-    diff_model_class = diff_models.CollectionDiffModel
-
-
-# --------------------------------------------------- #
-#                   JOURNALS                          #
-# --------------------------------------------------- #
-
-
-class JournalDiffer(DifferBase):
-    model_name = 'journal'
-    ex_model_class = proc_models.ExtractJournal
-    tr_model_class = proc_models.TransformJournal
-    lo_model_class = proc_models.LoadJournal
-    id_model_class = id_models.JournalIdModel
-    diff_model_class = diff_models.JournalDiffModel
-
-
-# --------------------------------------------------- #
-#                   ISSUES                            #
-# --------------------------------------------------- #
-
-
-class IssueDiffer(DifferBase):
-    model_name = 'issue'
-    ex_model_class = proc_models.ExtractIssue
-    tr_model_class = proc_models.TransformIssue
-    lo_model_class = proc_models.LoadIssue
-    id_model_class = id_models.IssueIdModel
-    diff_model_class = diff_models.IssueDiffModel
-
-
-# --------------------------------------------------- #
-#                   ARTICLE                           #
-# --------------------------------------------------- #
-
-
-class ArticleDiffer(DifferBase):
-    model_name = 'article'
-    ex_model_class = proc_models.ExtractArticle
-    tr_model_class = proc_models.TransformArticle
-    lo_model_class = proc_models.LoadArticle
-    id_model_class = id_models.ArticleIdModel
-    diff_model_class = diff_models.ArticleDiffModel
-
-
-# --------------------------------------------------- #
-#               PRESS RELEASES                        #
-# --------------------------------------------------- #
-
-
-class PressReleaseDiffer(DifferBase):
-    model_name = 'press_release'
-    ex_model_class = proc_models.ExtractPressRelease
-    tr_model_class = proc_models.TransformPressRelease
-    lo_model_class = proc_models.LoadPressRelease
-    id_model_class = id_models.PressReleaseIdModel
-    diff_model_class = diff_models.PressReleaseDiffModel
-
-
-# --------------------------------------------------- #
-#                    NEWS                             #
-# --------------------------------------------------- #
-
-
-class NewsDiffer(DifferBase):
-    model_name = 'news'
-    ex_model_class = proc_models.ExtractNews
-    tr_model_class = proc_models.TransformNews
-    lo_model_class = proc_models.LoadNews
-    id_model_class = id_models.NewsIdModel
-    diff_model_class = diff_models.NewsDiffModel
