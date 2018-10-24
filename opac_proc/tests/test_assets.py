@@ -880,7 +880,6 @@ class TestAssets(BaseTestCase):
         asset_xml = AssetXML(document)
         xml_url = asset_xml.register()
         self.assertIsNotNone(xml_url)
-        self.assertEqual(uuid, '123456789-123456789')
         generated_htmls = asset_xml.register_htmls()
         self.assertEqual(generated_htmls[0]['type'], 'html')
         self.assertEqual(generated_htmls[0]['lang'], 'es')
@@ -911,7 +910,7 @@ class TestAssetHTMLS(BaseTestCase):
         self.assertIsNone(asset_xml._content)
 
     @patch.object(AssetHTMLS2, '_add_htmls')
-    def test_AssetHTMLS2_register_must_call_add_htmls(
+    def test_register_must_call_add_htmls(
         self,
         mocked_add_htmls
     ):
@@ -921,7 +920,7 @@ class TestAssetHTMLS(BaseTestCase):
 
     @patch.object(AssetHTMLS2, '_add_htmls')
     @patch.object(MockedXyloseArticleHTML, 'original_html')
-    def test_AssetHTMLS2_register_no_article_original_html(
+    def test_register_no_article_original_html(
         self,
         mocked_original_html,
         mocked_add_htmls
@@ -936,7 +935,7 @@ class TestAssetHTMLS(BaseTestCase):
     @patch('opac_proc.core.assets.logger.error')
     @patch.object(MockedXyloseArticleHTML, 'original_html')
     @patch.object(MockedXyloseArticleHTML, 'translated_htmls')
-    def test_AssetHTMLS2_register_no_htmls(
+    def test_register_no_htmls(
         self,
         mocked_translated_htmls,
         mocked_original_html,
@@ -954,10 +953,18 @@ class TestAssetHTMLS(BaseTestCase):
         mocked_add_htmls.assert_not_called()
 
     @patch('opac_proc.core.assets.BeautifulSoup')
-    def test_AssetHTMLS2_add_htmls_must_create_soup_objects(
+    @patch.object(AssetHTMLS2, '_register_html_media_assets')
+    @patch.object(AssetHTMLS2, '_register_ssm_asset')
+    def test_add_htmls_must_create_soup_objects(
         self,
+        mocked_register_ssm_asset,
+        mocked_register_html_media_assets,
         MockedBeautifulSoup
     ):
+        mocked_register_ssm_asset.return_value = (
+            None,
+            '/aaj/v1n1/{}.html'.format(self.mocked_xylose_article.file_code())
+        )
         expected = [
             call(html, 'html.parser')
             for html in self.htmls.values()
@@ -968,17 +975,22 @@ class TestAssetHTMLS(BaseTestCase):
 
     @patch('opac_proc.core.assets.BeautifulSoup')
     @patch.object(AssetHTMLS2, '_register_html_media_assets')
-    def test_AssetHTMLS2_add_htmls_must_call_register_html_media_assets_with_parsed_html(
+    @patch.object(AssetHTMLS2, '_register_ssm_asset')
+    def test_add_htmls_must_call_register_html_media_assets_with_parsed_html(
         self,
+        mocked_register_ssm_asset,
         mocked_register_html_media_assets,
         MockedBeautifulSoup
     ):
         parsed_htmls = [
-            BeautifulSoup('<b class="boldest">Extremely bold 1</b>', 'html.parser'),
-            BeautifulSoup('<b class="boldest">Extremely bold 2</b>', 'html.parser'),
-            BeautifulSoup('<b class="boldest">Extremely bold 3</b>', 'html.parser'),
+            BeautifulSoup(html, 'html.parser')
+            for html in self.htmls.values()
         ]
         MockedBeautifulSoup.side_effect = parsed_htmls
+        mocked_register_ssm_asset.return_value = (
+            None,
+            '/aaj/v1n1/{}.html'.format(self.mocked_xylose_article.file_code())
+        )
         expected = [
             call(parsed_html)
             for parsed_html in parsed_htmls
@@ -988,9 +1000,10 @@ class TestAssetHTMLS(BaseTestCase):
         mocked_register_html_media_assets.assert_has_calls(
             expected, any_order=True)
 
+    @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
     @patch('opac_proc.core.assets.utils.render_from_template')
     @patch.object(AssetHTMLS2, '_register_html_media_assets')
-    def test_AssetHTMLS2_add_htmls_must_call_utils_render_from_template_with_updated_html(
+    def test_add_htmls_must_call_utils_render_from_template_with_updated_html(
         self,
         mocked_register_html_media_assets,
         mocked_render_from_template
@@ -1014,7 +1027,7 @@ class TestAssetHTMLS(BaseTestCase):
         self.assertEqual(mocked_render_from_template.mock_calls, expected)
 
     @patch.object(AssetHTMLS2, '_register_ssm_asset')
-    def test_AssetHTMLS2_add_htmls_must_call_register_ssm_asset_for_each_html(
+    def test_add_htmls_must_call_register_ssm_asset_for_each_html(
         self,
         mocked_register_ssm_asset
     ):
@@ -1025,7 +1038,7 @@ class TestAssetHTMLS(BaseTestCase):
             len(mocked_register_ssm_asset.mock_calls), len(self.htmls))
 
     @patch.object(AssetHTMLS2, '_register_ssm_asset')
-    def test_AssetHTMLS2_add_htmls_returns_registered_htmls(
+    def test_add_htmls_returns_registered_htmls(
         self,
         mocked_register_ssm_asset
     ):
@@ -1050,7 +1063,7 @@ class TestAssetHTMLS(BaseTestCase):
         self.assertEqual(result, expected)
 
     @patch.object(AssetHTMLS2, '_normalize_media_path')
-    def test_AssetHTMLS2_register_html_media_assets_must_call_normalize_media_path(
+    def test_register_html_media_assets_must_call_normalize_media_path(
         self,
         mocked_normalize_media_path
     ):
@@ -1061,4 +1074,102 @@ class TestAssetHTMLS(BaseTestCase):
         ]
         asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
         asset_htmls._register_html_media_assets(parsed_html)
-        mocked_normalize_media_path.assert_has_calls(expected)
+        for expected_call in expected:
+            self.assertIn(
+                expected_call, mocked_normalize_media_path.mock_calls)
+
+    @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
+    @patch.object(AssetHTMLS2, '_open_asset')
+    def test_register_html_media_assets_must_open_asset_with_media_path(
+        self,
+        mocked_open_asset
+    ):
+        parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        media_paths = [
+            asset_htmls._normalize_media_path(src_tag.get("src").strip())
+            for src_tag in parsed_html.find_all(src=True)
+        ]
+        expected = [
+            call(asset_htmls._get_media_path(media_path))
+            for media_path in media_paths
+        ]
+        mocked_open_asset.return_value = None
+        asset_htmls._register_html_media_assets(parsed_html)
+        self.assertEqual(mocked_open_asset.mock_calls, expected)
+
+    @patch.object(AssetHTMLS2, '_open_asset')
+    @patch.object(AssetHTMLS2, '_register_ssm_media')
+    def test_register_html_media_assets_no_register_sss_media_if_open_asset_error(
+        self,
+        mocked_register_ssm_media,
+        mocked_open_asset
+    ):
+        parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        mocked_open_asset.side_effect = Exception()
+        with self.assertRaises(Exception):
+            asset_htmls._register_html_media_assets(parsed_html)
+            mocked_register_ssm_media.assert_not_called()
+
+    @patch.object(AssetHTMLS2, '_open_asset')
+    @patch.object(AssetHTMLS2, '_register_ssm_media')
+    def test_register_html_media_assets_no_register_sss_media_if_open_asset_none(
+        self,
+        mocked_register_ssm_media,
+        mocked_open_asset
+    ):
+        parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        mocked_open_asset.return_value = None
+        asset_htmls._register_html_media_assets(parsed_html)
+        mocked_register_ssm_media.assert_not_called()
+
+    @patch.object(AssetHTMLS2, '_open_asset')
+    @patch.object(AssetHTMLS2, '_register_ssm_media')
+    def test_register_html_media_assets_register_sss_media_if_open_asset_ok(
+        self,
+        mocked_register_ssm_media,
+        mocked_open_asset
+    ):
+        parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        mocked_open_asset.return_value = BytesIO(b'12345')
+        asset_htmls._register_html_media_assets(parsed_html)
+        self.assertEqual(
+            len(mocked_register_ssm_media.mock_calls),
+            len(parsed_html.find_all(src=True))
+        )
+
+    @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
+    @patch.object(AssetHTMLS2, '_open_asset')
+    def test_register_html_media_assets_returns_updated_html(
+        self,
+        mocked_open_asset
+    ):
+        parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        mocked_open_asset.return_value = BytesIO(b'12345')
+        result = asset_htmls._register_html_media_assets(parsed_html)
+        self.assertIsNotNone(result)
+        self.assertNotEqual(result, parsed_html)
+
+    def test_normalize_media_path_tif_to_jpg(self):
+        asset = AssetHTMLS2(self.mocked_xylose_article)
+        media_path = '/img/revistas/gs/v29n4/asset.tif'
+        expected = '%s/gs/v29n4/asset.jpg' % (
+            config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
+        )
+        new_media_path = asset._normalize_media_path(media_path)
+        self.assertIsNotNone(new_media_path)
+        self.assertEqual(new_media_path, expected)
+
+    def test_normalize_media_path_replace_to_source_media_path(self):
+        asset = AssetHTMLS2(self.mocked_xylose_article)
+        media_path = '/img/fbpe/gs/v29n4/asset.gif'
+        expected = '%s/gs/v29n4/asset.gif' % (
+            config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
+        )
+        new_media_path = asset._normalize_media_path(media_path)
+        self.assertIsNotNone(new_media_path)
+        self.assertEqual(new_media_path, expected)
