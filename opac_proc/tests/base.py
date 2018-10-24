@@ -12,4 +12,5 @@ class BaseTestCase(TestCase):
     def create_app(self):
         app = current_app
         app.config['TESTING'] = True
+        app.config['DEBUG'] = False
         return app

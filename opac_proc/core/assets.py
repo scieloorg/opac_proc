@@ -4,6 +4,7 @@ import itertools
 import json
 import os
 import re
+from copy import copy
 from io import BytesIO, open as io_open
 
 from bs4 import BeautifulSoup
@@ -359,6 +360,46 @@ class Assets(object):
 
         return u'{}{}.{}'.format(prefix, file_code, file_type)
 
+    def _normalize_media_path(self, media_path):
+        root, ext = os.path.splitext(media_path)
+        if ext == '.tif' or ext == '.tiff':
+            ext = '.jpg'
+        elif not ext:
+            try:
+                guessed_ext = imghdr.what(root)
+            except Exception:
+                guessed_ext = 'jpg'
+            if guessed_ext == 'jpeg':
+                guessed_ext = 'jpg'
+            ext = '.' + guessed_ext
+        return root + ext
+
+    def _register_ssm_media(self, pfile, media_path, file_type, metadata):
+        ssm_asset = SSMHandler(pfile, media_path, file_type, metadata,
+                               self.bucket_name)
+        code, existing_asset = ssm_asset.exists()
+        # Existe mas não é idêntico (existe com o mesmo nome)
+        if code == 2:
+            logger.info(u"Já existe um media com PID: {}".format(
+                        self.xylose.publisher_id))
+            for asset in existing_asset:
+                ssm_asset.remove(asset['uuid'])
+        # Existe mas não é identico code=2, removido no passo anterior deve ser
+        # recadastrado, também deve ser cadastrado caso não exista, code=0.
+        if code == 2 or code == 0:
+            uuid = ssm_asset.register()
+            logger.info(u"UUID: {} para media do artigo com PID: {}".format(
+                        uuid, self.xylose.publisher_id))
+            ssm_asset_url = ssm_asset.get_urls()['url_path']
+            logger.info(u"Media cadastrada para o artigo: {}".format(
+                ssm_asset_url))
+        # Existe e o ativo é idêntico
+        elif code == 1:
+            for asset in existing_asset:
+                ssm_asset_url = asset['absolute_url']
+            logger.info(u"Medias já existente no SSM: {}".format(ssm_asset_url))
+        return ssm_asset_url
+
     def _register_ssm_asset(self, pfile, file_name, file_type, metadata):
         ssm_asset = SSMHandler(pfile, file_name, file_type, metadata,
                                self.bucket_name)
@@ -571,46 +612,6 @@ class AssetXML(Assets):
                 and not self._is_external_link(element.attrib[attrib_key]))
         )
 
-    def _register_ssm_media(self, pfile, media_path, file_type, metadata):
-        ssm_asset = SSMHandler(pfile, media_path, file_type, metadata,
-                               self.bucket_name)
-        code, existing_asset = ssm_asset.exists()
-        # Existe mas não é idêntico (existe com o mesmo nome)
-        if code == 2:
-            logger.info(u"Já existe um media com PID: {}".format(
-                        self.xylose.publisher_id))
-            for asset in existing_asset:
-                ssm_asset.remove(asset['uuid'])
-        # Existe mas não é identico code=2, removido no passo anterior deve ser
-        # recadastrado, também deve ser cadastrado caso não exista, code=0.
-        if code == 2 or code == 0:
-            uuid = ssm_asset.register()
-            logger.info(u"UUID: {} para media do artigo com PID: {}".format(
-                        uuid, self.xylose.publisher_id))
-            ssm_asset_url = ssm_asset.get_urls()['url_path']
-            logger.info(u"Media cadastrada para o artigo: {}".format(
-                ssm_asset_url))
-        # Existe e o ativo é idêntico
-        elif code == 1:
-            for asset in existing_asset:
-                ssm_asset_url = asset['absolute_url']
-            logger.info(u"Medias já existente no SSM: {}".format(ssm_asset_url))
-        return ssm_asset_url
-
-    def _normalize_media_path(self, media_path):
-        root, ext = os.path.splitext(media_path)
-        if ext == '.tif' or ext == '.tiff':
-            ext = '.jpg'
-        elif not ext:
-            try:
-                guessed_ext = imghdr.what(root)
-            except Exception:
-                guessed_ext = 'jpg'
-            if guessed_ext == 'jpeg':
-                guessed_ext = 'jpg'
-            ext = '.' + guessed_ext
-        return root + ext
-
     def _register_xml_medias(self):
         file_type = 'img'  # Not all are images
 
@@ -703,19 +704,32 @@ class AssetXML(Assets):
 
 class AssetHTMLS2(Assets):
 
-    def _normalize_media_path(self, media_path):
-        root, ext = os.path.splitext(media_path)
-        if ext == '.tif' or ext == '.tiff':
-            ext = '.jpg'
-        elif not ext:
-            try:
-                guessed_ext = imghdr.what(root)
-            except Exception:
-                guessed_ext = 'jpg'
-            if guessed_ext == 'jpeg':
-                guessed_ext = 'jpg'
-            ext = '.' + guessed_ext
-        return root + ext
+    def _normalize_media_path(self, original_path):
+        """
+        Normalize media path to be according to the following rules:
+        - Tif media paths must be replaced with jpg
+        - Media paths like:
+          - img/fbpe
+          - img/revistas
+          - videos
+          must be replaced with OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
+        - ../ or ./ must be replaced with /
+        Return a tuple with original path and normalized path
+        """
+        media_path = super(AssetHTMLS2, self)._normalize_media_path(
+            original_path)
+        source_media_path = config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
+        change_media_path = [('../', '/'), ('./', '/'),
+                             ('/img/fbpe', source_media_path),
+                             ('img/fbpe', source_media_path),
+                             ('/img/revistas', source_media_path),
+                             ('img/revistas', source_media_path),
+                             ('/videos', source_media_path),
+                             ('videos', source_media_path)]
+        for _from, _to in change_media_path:
+            media_path = media_path.replace(_from, _to.lower())
+
+        return media_path
 
     def _register_html_media_assets(self, parsed_html):
         """
@@ -724,9 +738,23 @@ class AssetHTMLS2(Assets):
         SSM/GRPC urls.
         Returns the updated parsed_html.
         """
-        for src_tag in parsed_html.find_all(src=True):
+        file_type = 'img'  # Not all are images
+        updated_html = copy(parsed_html)
+        for src_tag in updated_html.find_all(src=True):
             original_path = src_tag.get('src').strip()
             media_path = self._normalize_media_path(original_path)
+            pfile = self._open_asset(self._get_media_path(media_path))
+            if pfile:
+                metadata = self.get_metadata()
+                metadata.update({
+                    'bucket_name': self.bucket_name,
+                    'type': file_type,
+                    'version': 'html'
+                })
+                ssm_asset_url = self._register_ssm_media(
+                    pfile, media_path, file_type, metadata)
+                src_tag['src'] = ssm_asset_url
+        return updated_html
 
     def _add_htmls(self, htmls):
         """
@@ -757,7 +785,7 @@ class AssetHTMLS2(Assets):
                 directory,
                 'article.html',
                 {
-                    'html': str(updated_html).encode('utf-8'),
+                    'html': updated_html,
                     'css': config.OPAC_PROC_ARTICLE_CSS_URL,
                     'css_print': config.OPAC_PROC_ARTICLE_PRINT_CSS_URL
                 }
