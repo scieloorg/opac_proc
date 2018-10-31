@@ -6,6 +6,7 @@ import re
 import json
 from copy import copy
 from io import BytesIO, open as io_open
+from urlparse import urlsplit, urlunsplit
 
 from bs4 import BeautifulSoup
 from lxml import etree
@@ -360,6 +361,16 @@ class Assets(object):
 
         return u'{}{}.{}'.format(prefix, file_code, file_type)
 
+    def _is_valid_media_file(self, parsed_url):
+        if parsed_url.scheme and parsed_url.netloc:
+            return False
+        ext_files_list = [
+            '.' + extension
+            for extension in config.MEDIA_EXTENSION_FILES.split(',')
+        ]
+        ext_files_list.append('')   # arquivos sem extensão
+        return os.path.splitext(parsed_url.path)[-1] in ext_files_list
+
     def _normalize_media_path(self, media_path):
         root, ext = os.path.splitext(media_path)
         if ext == '.tif' or ext == '.tiff':
@@ -711,7 +722,6 @@ class AssetHTMLS2(Assets):
         - Media paths like:
           - img/fbpe
           - img/revistas
-          - videos
           must be replaced with OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
         - ../ or ./ must be replaced with /
         Return a tuple with original path and normalized path
@@ -738,22 +748,43 @@ class AssetHTMLS2(Assets):
         SSM/GRPC urls.
         Returns the updated parsed_html.
         """
+
+        def _find_all_media_paths(parsed_html):
+            return updated_html.find_all(src=True) +\
+                updated_html.find_all(href=True)
+
         file_type = 'img'  # Not all are images
         updated_html = copy(parsed_html)
-        for src_tag in updated_html.find_all(src=True):
-            original_path = src_tag.get('src').strip()
-            media_path = self._normalize_media_path(original_path)
-            pfile = self._open_asset(self._get_media_path(media_path))
-            if pfile:
-                metadata = self.get_metadata()
-                metadata.update({
-                    'bucket_name': self.bucket_name,
-                    'type': file_type,
-                    'version': 'html'
-                })
-                ssm_asset_url = self._register_ssm_media(
-                    pfile, media_path, file_type, metadata)
-                src_tag['src'] = ssm_asset_url
+        for tag in _find_all_media_paths(parsed_html):
+            tag_attr = 'src' if tag.get('src') else 'href'
+            original_path = tag[tag_attr].strip()
+            splited_url = urlsplit(original_path)
+            metadata = self.get_metadata()
+            metadata.update({'bucket_name': self.bucket_name,
+                             'type': file_type,
+                             'origin_path': original_path})
+            if self._is_valid_media_file(splited_url):
+                media_path = self._normalize_media_path(splited_url.path)
+                pfile = self._open_asset(media_path)
+                if pfile:
+                    metadata.update({'file_path': media_path})
+                    ssm_asset_url = self._register_ssm_media(
+                        pfile,
+                        os.path.basename(media_path),
+                        file_type,
+                        metadata)
+                    tag[tag_attr] = urlunsplit((
+                        '',
+                        '',
+                        ssm_asset_url,
+                        splited_url.query,
+                        splited_url.fragment))
+            elif os.path.splitext(splited_url.path)[-1].startswith('.htm'):
+                # O ativo digital é um HTML. É preciso fazer a transformação e
+                # o registro dos ativos digitais dentro dele.
+                html_media_path = self._normalize_media_path(splited_url.path)
+                html_file = self._open_asset(html_media_path)
+
         return updated_html
 
     def _add_htmls(self, htmls):

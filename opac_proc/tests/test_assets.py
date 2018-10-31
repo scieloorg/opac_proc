@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from io import BytesIO
 from unittest import skip
+from urlparse import urlsplit
 
 from bs4 import BeautifulSoup
 from lxml import etree
@@ -31,19 +32,23 @@ XML_TEST_CONTENT = """<?xml version="1.0" encoding="utf-8"?>
     </body>
 </article>"""
 
+
 HTML_TEST_CONTENT = """<!--version=html-->
-<p>&nbsp;</p>
-<p align="center">
-    <img src="http:/img/fbpe/test/v1n2/01fig01.jpg"></p>
-    <img src="/img/fbpe/test/v1n2/01fig02.gif"></p>
-    <a href="/img/fbpe/test/v1n2/html/01tab01.htm">Tabela 1</a></p>
-    <img src="img/fbpe/test/v1n2/01fig03.mp4"></p>
-    <a href="/img/revistas/test/v1n2/01fig04.png"></p>
-    <img src="img/revistas/test/v1n2/01fig05.png"></p>
-    <img src="img/revistas/test/v1n2/01fig06.tif"></p>
-    <img src="img/revistas/test/v1n2/01fig07.tiff"></p>
-<p>&nbsp;</p>
-<p align="center"><strong>Legenda Teste</strong></p>
+<body>
+    <p align="center">
+        <img src="http:/img/fbpe/test/v1n2/01fig01.jpg">
+    </p>
+    <p align="center">
+        <a href="/img/revistas/test/v1n2/01fig04.png">
+    </p>
+    <p align="center">
+        <img src="img/revistas/test/v1n2/01fig05.png">
+    </p>
+    <p align="center">
+        <embed src="videos/test/v1n2/01fig10.avi">
+    </p>
+    <p align="center"><strong>Legenda Teste</strong></p>
+</body>
 """
 
 
@@ -1062,45 +1067,74 @@ class TestAssetHTMLS(BaseTestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result, expected)
 
+    @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
+    @patch.object(AssetHTMLS2, '_open_asset')
     @patch.object(AssetHTMLS2, '_normalize_media_path')
     def test_register_html_media_assets_must_call_normalize_media_path(
         self,
-        mocked_normalize_media_path
+        mocked_normalize_media_path,
+        mocked_open_asset
     ):
-        parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
-        expected = [
-            call(src_tag.get("src"))
-            for src_tag in parsed_html.find_all(src=True)
-        ]
+        html_test_content = """<!--version=html-->
+        <p>&nbsp;</p>
+        <p align="center">
+            <img src="img/revistas/test/v1n2/01fig05.png"></p>
+        <p>&nbsp;</p>
+        <p align="center"><strong>Legenda Teste</strong></p>
+        """
+        mocked_open_asset.return_value = BytesIO(b'12345')
+        parsed_html = BeautifulSoup(html_test_content, 'html.parser')
         asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        expected = "img/revistas/test/v1n2/01fig05.png"
         asset_htmls._register_html_media_assets(parsed_html)
-        for expected_call in expected:
-            self.assertIn(
-                expected_call, mocked_normalize_media_path.mock_calls)
+        mocked_normalize_media_path.assert_called_once_with(expected)
 
     @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
     @patch.object(AssetHTMLS2, '_open_asset')
-    def test_register_html_media_assets_must_open_asset_with_media_path(
+    @patch.object(AssetHTMLS2, '_normalize_media_path')
+    def test_register_html_media_assets_must_no_normalize_media_path_call_if_invalid_file(
         self,
+        mocked_normalize_media_path,
         mocked_open_asset
     ):
-        parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
+        html_test_content = """<!--version=html-->
+        <p>&nbsp;</p>
+        <p align="center">
+            <embed src="img/revistas/test/v1n2/01fig08.3gp"></p>
+        <p>&nbsp;</p>
+        <p align="center"><strong>Legenda Teste</strong></p>
+        """
+        mocked_open_asset.return_value = BytesIO(b'12345')
+        parsed_html = BeautifulSoup(html_test_content, 'html.parser')
         asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
-        media_paths = [
-            asset_htmls._normalize_media_path(src_tag.get("src").strip())
-            for src_tag in parsed_html.find_all(src=True)
-        ]
-        expected = [
-            call(asset_htmls._get_media_path(media_path))
-            for media_path in media_paths
-        ]
-        mocked_open_asset.return_value = None
         asset_htmls._register_html_media_assets(parsed_html)
-        self.assertEqual(mocked_open_asset.mock_calls, expected)
+        mocked_normalize_media_path.assert_not_called()
+
+    @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
+    @patch.object(AssetHTMLS2, '_register_ssm_media')
+    @patch.object(AssetHTMLS2, '_open_asset')
+    def test_register_html_media_assets_must_open_asset_with_media_path(
+        self,
+        mocked_open_asset,
+        mocked_register_ssm_media
+    ):
+        html_test_content = """<!--version=html-->
+        <p>&nbsp;</p>
+        <p align="center">
+            <img src="img/revistas/test/v1n2/01fig05.png"></p>
+        <p>&nbsp;</p>
+        <p align="center"><strong>Legenda Teste</strong></p>
+        """
+        parsed_html = BeautifulSoup(html_test_content, 'html.parser')
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        expected = asset_htmls._normalize_media_path(
+            "img/revistas/test/v1n2/01fig05.png")
+        asset_htmls._register_html_media_assets(parsed_html)
+        mocked_open_asset.assert_called_once_with(expected)
 
     @patch.object(AssetHTMLS2, '_open_asset')
     @patch.object(AssetHTMLS2, '_register_ssm_media')
-    def test_register_html_media_assets_no_register_sss_media_if_open_asset_error(
+    def test_register_html_media_assets_no_register_ssm_media_if_open_asset_error(
         self,
         mocked_register_ssm_media,
         mocked_open_asset
@@ -1114,7 +1148,7 @@ class TestAssetHTMLS(BaseTestCase):
 
     @patch.object(AssetHTMLS2, '_open_asset')
     @patch.object(AssetHTMLS2, '_register_ssm_media')
-    def test_register_html_media_assets_no_register_sss_media_if_open_asset_none(
+    def test_register_html_media_assets_no_register_ssm_media_if_open_asset_none(
         self,
         mocked_register_ssm_media,
         mocked_open_asset
@@ -1127,19 +1161,101 @@ class TestAssetHTMLS(BaseTestCase):
 
     @patch.object(AssetHTMLS2, '_open_asset')
     @patch.object(AssetHTMLS2, '_register_ssm_media')
-    def test_register_html_media_assets_register_sss_media_if_open_asset_ok(
+    def test_register_html_media_assets_register_ssm_media_if_open_asset_ok(
         self,
         mocked_register_ssm_media,
         mocked_open_asset
     ):
-        parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
+        pfile = BytesIO(b'12345')
+        mocked_open_asset.return_value = pfile
+        html_test_content = """<!--version=html-->
+        <p>&nbsp;</p>
+        <p align="center">
+            <img src="img/revistas/test/v1n2/01fig05.png"></p>
+        <p>&nbsp;</p>
+        <p align="center"><strong>Legenda Teste</strong></p>
+        """
+        parsed_html = BeautifulSoup(html_test_content, 'html.parser')
         asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
-        mocked_open_asset.return_value = BytesIO(b'12345')
+        metadata = asset_htmls.get_metadata()
+        metadata.update({'file_path': u"/app/data/img/test/v1n2/01fig05.png",
+                         'bucket_name': asset_htmls.bucket_name,
+                         'type': "img",
+                         'origin_path': u"img/revistas/test/v1n2/01fig05.png"})
         asset_htmls._register_html_media_assets(parsed_html)
-        self.assertEqual(
-            len(mocked_register_ssm_media.mock_calls),
-            len(parsed_html.find_all(src=True))
+        mocked_register_ssm_media.assert_called_once_with(
+            pfile, u"01fig05.png", "img", metadata)
+
+    def test_normalize_media_path_tif_to_jpg(self):
+        asset = AssetHTMLS2(self.mocked_xylose_article)
+        media_path = 'img/revistas/gs/v29n4/asset.tif'
+        expected = '%s/gs/v29n4/asset.jpg' % (
+            config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
         )
+        new_media_path = asset._normalize_media_path(media_path)
+        self.assertIsNotNone(new_media_path)
+        self.assertEqual(new_media_path, expected)
+        new_media_path = asset._normalize_media_path('/' + media_path)
+        self.assertIsNotNone(new_media_path)
+        self.assertEqual(new_media_path, expected)
+
+    def test_normalize_media_path_replace_to_source_media_path(self):
+        asset = AssetHTMLS2(self.mocked_xylose_article)
+        media_path = 'img/fbpe/gs/v29n4/asset.gif'
+        expected = '%s/gs/v29n4/asset.gif' % (
+            config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
+        )
+        new_media_path = asset._normalize_media_path(media_path)
+        self.assertIsNotNone(new_media_path)
+        self.assertEqual(new_media_path, expected)
+        new_media_path = asset._normalize_media_path('/' + media_path)
+        self.assertIsNotNone(new_media_path)
+        self.assertEqual(new_media_path, expected)
+
+    @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
+    @patch.object(AssetHTMLS2, '_normalize_media_path')
+    @patch.object(AssetHTMLS2, '_open_asset')
+    def test_register_html_media_assets_calls_normalize_media_path(
+        self,
+        mocked_open_asset,
+        mocked_normalize_media_path
+    ):
+        file_test = BytesIO(b'12345')
+        mocked_open_asset.return_value = file_test
+        html_test_content = """<!--version=html-->
+        <p>&nbsp;</p>
+        <p align="center">
+            <a href="/img/fbpe/test/v1n2/html/01tab01.htm">Tabela 1</a></p>
+        <p>&nbsp;</p>
+        <p align="center"><strong>Legenda Teste</strong></p>
+        """
+        parsed_html = BeautifulSoup(html_test_content, 'html.parser')
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        expected = "/img/fbpe/test/v1n2/html/01tab01.htm"
+        asset_htmls._register_html_media_assets(parsed_html)
+        mocked_normalize_media_path.assert_called_once_with(expected)
+
+    @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
+    @patch('opac_proc.core.assets.BeautifulSoup')
+    @patch.object(AssetHTMLS2, '_open_asset')
+    def test_register_html_media_assets_creates_bsoup_if_html_media_asset(
+        self,
+        mocked_open_asset,
+        MockedBeautifulSoup
+    ):
+        file_test = BytesIO(b'12345')
+        mocked_open_asset.return_value = file_test
+        html_test_content = """<!--version=html-->
+        <p>&nbsp;</p>
+        <p align="center">
+            <a href="/img/fbpe/test/v1n2/html/01tab01.htm">Tabela 1</a></p>
+        <p>&nbsp;</p>
+        <p align="center"><strong>Legenda Teste</strong></p>
+        """
+        parsed_html = BeautifulSoup(html_test_content, 'html.parser')
+        asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
+        asset_htmls._register_html_media_assets(parsed_html)
+        MockedBeautifulSoup.assert_called_once_with(file_test, 'html.parser')
 
     @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
     @patch.object(AssetHTMLS2, '_open_asset')
@@ -1147,29 +1263,51 @@ class TestAssetHTMLS(BaseTestCase):
         self,
         mocked_open_asset
     ):
+        HTML_EXTRAS = [
+            ('img', "/img/fbpe/test/v1n2/01fig02.gif"),
+            ('img', "img/fbpe/test/v1n2/01fig03.mp4"),
+            ('img', "img/revistas/test/v1n2/01fig06.tif"),
+            ('img', "img/revistas/test/v1n2/01fig07.tiff"),
+            ('img', "https://www.revista.com/img/revistas/test/v1n2/01fig07.jpg"),
+            ('embed', "img/revistas/test/v1n2/01fig08.3gp"),
+            ('embed', "img/revistas/test/v1n2/01fig09.avi"),
+        ]
         parsed_html = BeautifulSoup(HTML_TEST_CONTENT, 'html.parser')
+        for attr, url in HTML_EXTRAS:
+            p_tag = parsed_html.new_tag("p", align="center")
+            media_tag = parsed_html.new_tag(attr, src=url)
+            p_tag.append(media_tag)
+            parsed_html.body.append(p_tag)
+        p_tag = parsed_html.new_tag("p", align="center")
+        media_tag = parsed_html.new_tag(
+            "a", href="/img/fbpe/test/v1n2/html/01tab01.htm")
+        media_tag.string = "Tabela 1"
+        p_tag.append(media_tag)
+        parsed_html.body.append(p_tag)
         asset_htmls = AssetHTMLS2(self.mocked_xylose_article)
-        mocked_open_asset.return_value = BytesIO(b'12345')
+        tags = [
+            ('src', tag)
+            for tag in parsed_html.find_all(src=True)
+            if asset_htmls._is_valid_media_file(urlsplit(tag['src']))
+        ]
+        tags = tags + [
+            ('href', tag)
+            for tag in parsed_html.find_all(href=True)
+        ]
+        changed_urls = [
+            asset_htmls._normalize_media_path(
+                'media/assets/test/v1n2/' + os.path.split(tag[attr])[-1]
+            )
+            for attr, tag in tags
+        ]
+        tmp_files = [
+            BytesIO(changed_url.encode('utf-8'))
+            for changed_url in changed_urls
+        ]
+        import pdb; pdb.set_trace()
+        mocked_open_asset.side_effect = tmp_files
         result = asset_htmls._register_html_media_assets(parsed_html)
         self.assertIsNotNone(result)
         self.assertNotEqual(result, parsed_html)
-
-    def test_normalize_media_path_tif_to_jpg(self):
-        asset = AssetHTMLS2(self.mocked_xylose_article)
-        media_path = '/img/revistas/gs/v29n4/asset.tif'
-        expected = '%s/gs/v29n4/asset.jpg' % (
-            config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
-        )
-        new_media_path = asset._normalize_media_path(media_path)
-        self.assertIsNotNone(new_media_path)
-        self.assertEqual(new_media_path, expected)
-
-    def test_normalize_media_path_replace_to_source_media_path(self):
-        asset = AssetHTMLS2(self.mocked_xylose_article)
-        media_path = '/img/fbpe/gs/v29n4/asset.gif'
-        expected = '%s/gs/v29n4/asset.gif' % (
-            config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
-        )
-        new_media_path = asset._normalize_media_path(media_path)
-        self.assertIsNotNone(new_media_path)
-        self.assertEqual(new_media_path, expected)
+        for expected in changed_urls:
+            self.assertIn(expected.encode('utf-8'), str(result))
