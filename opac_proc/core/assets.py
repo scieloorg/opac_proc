@@ -713,7 +713,7 @@ class AssetXML(Assets):
         return registered_htmls
 
 
-class AssetHTMLS2(Assets):
+class AssetHTMLS(Assets):
 
     def _normalize_media_path(self, original_path):
         """
@@ -726,7 +726,7 @@ class AssetHTMLS2(Assets):
         - ../ or ./ must be replaced with /
         Return a tuple with original path and normalized path
         """
-        media_path = super(AssetHTMLS2, self)._normalize_media_path(
+        media_path = super(AssetHTMLS, self)._normalize_media_path(
             original_path)
         source_media_path = config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
         change_media_path = [('../', '/'), ('./', '/'),
@@ -740,6 +740,26 @@ class AssetHTMLS2(Assets):
             media_path = media_path.replace(_from, _to.lower())
 
         return media_path
+
+    def _register_html_media_asset(
+        self,
+        splited_url,
+        pfile,
+        file_name,
+        file_type,
+        metadata
+    ):
+        ssm_asset_url = self._register_ssm_media(
+            pfile,
+            file_name,
+            file_type,
+            metadata)
+        return urlunsplit((
+            '',
+            '',
+            ssm_asset_url,
+            splited_url.query,
+            splited_url.fragment))
 
     def _register_html_media_assets(self, parsed_html):
         """
@@ -768,23 +788,30 @@ class AssetHTMLS2(Assets):
                 pfile = self._open_asset(media_path)
                 if pfile:
                     metadata.update({'file_path': media_path})
-                    ssm_asset_url = self._register_ssm_media(
+                    url = self._register_html_media_asset(
+                        splited_url,
                         pfile,
                         os.path.basename(media_path),
                         file_type,
                         metadata)
-                    tag[tag_attr] = urlunsplit((
-                        '',
-                        '',
-                        ssm_asset_url,
-                        splited_url.query,
-                        splited_url.fragment))
+                    tag[tag_attr] = url
             elif os.path.splitext(splited_url.path)[-1].startswith('.htm'):
                 # O ativo digital é um HTML. É preciso fazer a transformação e
                 # o registro dos ativos digitais dentro dele.
                 html_media_path = self._normalize_media_path(splited_url.path)
                 html_file = self._open_asset(html_media_path)
-
+                if html_file:
+                    parsed_html_asset = BeautifulSoup(html_file, "html.parser")
+                    updated_html_asset = self._register_html_media_assets(
+                        parsed_html_asset)
+                    metadata.update({'file_path': html_media_path})
+                    url = self._register_html_media_asset(
+                        splited_url,
+                        BytesIO(updated_html_asset.encode('utf-8')),
+                        os.path.basename(html_media_path),
+                        file_type,
+                        metadata)
+                    tag[tag_attr] = url
         return updated_html
 
     def _add_htmls(self, htmls):
@@ -857,14 +884,14 @@ class AssetHTMLS2(Assets):
             htmls.update(translated_htmls)
 
         if htmls:
-            self._add_htmls(htmls)
+            return self._add_htmls(htmls)
         else:
             logger.error(
                 u"Artigo com o PID: %s, não tem HTML", self.xylose.publisher_id
             )
 
 
-class AssetHTMLS(Assets):
+class AssetHTMLSOld(Assets):
 
     def _get_name(self, lang):
 
