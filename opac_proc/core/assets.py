@@ -38,6 +38,11 @@ class Assets(object):
     def __init__(self, xylose):
         self.xylose = xylose
         self._content = None
+        self._ext_files_list = [
+            '.' + extension
+            for extension in config.MEDIA_EXTENSION_FILES.split(',')
+        ]
+        self._ext_files_list.append('')   # arquivos sem extensão
 
     def _open_asset(self, file_path, mode='rb', encoding=None):
         """
@@ -202,15 +207,17 @@ class Assets(object):
 
         return u'{}{}.{}'.format(prefix, file_code, file_type)
 
-    def _is_valid_media_file(self, parsed_url):
-        if parsed_url.scheme and parsed_url.netloc:
+    def _is_valid_media_url(self, parsed_url):
+        """
+        Return True if parsed_url is valid. Otherwise, return False.
+        It is valid if:
+        - SplitResult with scheme and and netloc args are not present
+        - SplitResult path extension file is in config.MEDIA_EXTENSION_FILES
+          list
+        """
+        if parsed_url and parsed_url.scheme and parsed_url.netloc:
             return False
-        ext_files_list = [
-            '.' + extension
-            for extension in config.MEDIA_EXTENSION_FILES.split(',')
-        ]
-        ext_files_list.append('')   # arquivos sem extensão
-        return os.path.splitext(parsed_url.path)[-1] in ext_files_list
+        return os.path.splitext(parsed_url.path)[-1] in self._ext_files_list
 
     def _normalize_media_path(self, media_path):
         root, ext = os.path.splitext(media_path)
@@ -219,11 +226,12 @@ class Assets(object):
         elif not ext:
             try:
                 guessed_ext = imghdr.what(root)
-            except Exception:
+            except IOError:
                 guessed_ext = 'jpg'
-            if guessed_ext == 'jpeg':
-                guessed_ext = 'jpg'
-            ext = '.' + guessed_ext
+            else:
+                if guessed_ext == 'jpeg':
+                    guessed_ext = 'jpg'
+                ext = '.' + guessed_ext
         return root + ext
 
     def _register_ssm_media(self, pfile, media_path, file_type, metadata):
@@ -452,15 +460,10 @@ class AssetXML(Assets):
             for attrib in attribs
         ]
         attrib_key = '{http://www.w3.org/1999/xlink}href'
-        ext_files_list = [
-            '.' + extension
-            for extension in config.MEDIA_EXTENSION_FILES.split(',')
-        ]
-        ext_files_list.append('')   # arquivos sem extensão
         return (
             (element, attrib_key)
             for element in itertools.chain(*attrib_iters)
-            if (os.path.splitext(element.attrib[attrib_key])[-1] in ext_files_list
+            if (os.path.splitext(element.attrib[attrib_key])[-1] in self._ext_files_list
                 and not self._is_external_link(element.attrib[attrib_key]))
         )
 
@@ -564,8 +567,8 @@ class AssetHTMLS(Assets):
           - img/fbpe
           - img/revistas
           must be replaced with OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
-        - ../ or ./ must be replaced with /
-        Return a tuple with original path and normalized path
+        - ../ or ./ path start must be replaced with /
+        Return normalized path
         """
         media_path = super(AssetHTMLS, self)._normalize_media_path(
             original_path)
@@ -626,7 +629,7 @@ class AssetHTMLS(Assets):
             metadata = self.get_metadata()
             metadata.update({'bucket_name': self.bucket_name,
                              'origin_path': original_path})
-            if self._is_valid_media_file(splited_url):
+            if self._is_valid_media_url(splited_url):
                 media_path = self._normalize_media_path(splited_url.path)
                 pfile = self._open_asset(media_path)
                 if pfile:
