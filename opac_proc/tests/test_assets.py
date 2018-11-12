@@ -336,7 +336,7 @@ class TestAssets(BaseTestCase):
             ("graphic.tif", "graphic.jpg"),
             ("graphic.tiff", "graphic.jpg"),
             ("image.gif", "image.gif"),
-            ("table", "table.jpg"),
+            ("table", "table"),
             ("abc/v21n4/graphic.tif", "abc/v21n4/graphic.jpg")
         ]
         for input, expected in input_expected:
@@ -1335,7 +1335,7 @@ class TestAssetHTMLS(BaseTestCase):
         tags = [
             ('src', tag)
             for tag in parsed_html.find_all(src=True)
-            if asset_htmls._is_valid_media_file(urlsplit(tag['src']))
+            if asset_htmls._is_valid_media_url(urlsplit(tag['src']))
         ]
         tags = tags + [
             ('href', tag)
