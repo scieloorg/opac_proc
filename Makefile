@@ -72,11 +72,14 @@ dev_compose_ps: get_opac_mongo_info get_opac_grpc_info
 dev_compose_rm: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) rm -f $<
 
-dev_compose_exec_shell_webapp: dev_compose_up
+dev_compose_exec_shell_webapp: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec webapp sh
 
-dev_compose_make_test: dev_compose_up
+dev_compose_make_test: get_opac_mongo_info get_opac_grpc_info
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec webapp python opac_proc/manage.py test
+
+dev_compose_make_test_pattern: get_opac_mongo_info get_opac_grpc_info
+	@docker-compose -f $(COMPOSE_FILE_DEV) exec webapp python opac_proc/manage.py test -p $(pattern)
 
 dev_compose_top:
 	@docker-compose -f $(COMPOSE_FILE_DEV) top
