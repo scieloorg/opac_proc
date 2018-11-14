@@ -215,7 +215,8 @@ class Assets(object):
         - SplitResult path extension file is in config.MEDIA_EXTENSION_FILES
           list
         """
-        if parsed_url and parsed_url.scheme and parsed_url.netloc:
+        if parsed_url and (
+                parsed_url.scheme or parsed_url.netloc or not parsed_url.path):
             return False
         return os.path.splitext(parsed_url.path)[-1] in self._ext_files_list
 
