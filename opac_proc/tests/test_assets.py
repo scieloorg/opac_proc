@@ -1185,6 +1185,31 @@ class TestAssetHTMLS(BaseTestCase):
         self.assertIsNotNone(new_media_path)
         self.assertEqual(new_media_path, expected)
 
+    def test_is_valid_media_url_invalid_url(self):
+        asset = AssetHTMLS(self.mocked_xylose_article)
+        invalid_urls = [
+            "http://www.google.com/img.gif",
+            "https://www.server.com/img.jpg",
+            "//www.portal.com/img.tif",
+            "/img.doc",
+            "#anchor",
+        ]
+        for invalid_url in invalid_urls:
+            splited_url = urlsplit(invalid_url)
+            self.assertFalse(asset._is_valid_media_url(splited_url))
+
+    def test_is_valid_media_url_valid_url(self):
+        asset = AssetHTMLS(self.mocked_xylose_article)
+        invalid_urls = [
+            "/img.gif",
+            "img/fbpe/img.jpg",
+            "/img/revistas/test/v1n2/img.tif",
+            "/img/revistas/test/v1n2/seta.gif#anchor",
+        ]
+        for invalid_url in invalid_urls:
+            splited_url = urlsplit(invalid_url)
+            self.assertTrue(asset._is_valid_media_url(splited_url))
+
     @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
     @patch.object(AssetHTMLS, '_normalize_media_path')
     @patch.object(AssetHTMLS, '_open_asset')
