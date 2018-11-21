@@ -215,8 +215,7 @@ class Assets(object):
         - SplitResult path extension file is in config.MEDIA_EXTENSION_FILES
           list
         """
-        if parsed_url and (
-                parsed_url.scheme or parsed_url.netloc or not parsed_url.path):
+        if parsed_url and (parsed_url.netloc or not parsed_url.path):
             return False
         return os.path.splitext(parsed_url.path)[-1] in self._ext_files_list
 
@@ -568,13 +567,14 @@ class AssetHTMLS(Assets):
           - img/fbpe
           - img/revistas
           must be replaced with OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
-        - ../ or ./ path start must be replaced with /
+        - ../, ./ or PDFs file path start must try to get media path
         Return normalized path
         """
         media_path = super(AssetHTMLS, self)._normalize_media_path(
             original_path)
         source_media_path = config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH
-        if re.findall(r'^\.[/|./]+', media_path):
+        if (re.findall(r'^\.[/|./]+', media_path) or
+                os.path.splitext(media_path)[-1].lower() == '.pdf'):
             media_path = self._get_media_path(os.path.basename(media_path))
         else:
             change_media_path = [('/img/fbpe', source_media_path),
