@@ -1185,6 +1185,31 @@ class TestAssetHTMLS(BaseTestCase):
         self.assertIsNotNone(new_media_path)
         self.assertEqual(new_media_path, expected)
 
+    def test_normalize_media_path_replace_relative_path(self):
+        acronym = self.mocked_xylose_article.journal.acronym.lower()
+        issue = self.mocked_xylose_article.assets_code
+        media_path = '../asset.gif'
+        expected = '%s/%s/%s/asset.gif' % (
+            config.OPAC_PROC_ASSETS_SOURCE_MEDIA_PATH, acronym, issue)
+        asset = AssetHTMLS(self.mocked_xylose_article)
+        new_media_path = asset._normalize_media_path(media_path)
+        self.assertIsNotNone(new_media_path)
+        self.assertEqual(new_media_path, expected)
+
+    def test_normalize_media_path_replace_to_source_pdf_path(self):
+        acronym = self.mocked_xylose_article.journal.acronym.lower()
+        issue = self.mocked_xylose_article.assets_code
+        media_path = 'pdf/%s/%s/a01.pdf' % (acronym, issue)
+        expected = '%s/%s/%s/a01.pdf' % (
+            config.OPAC_PROC_ASSETS_SOURCE_PDF_PATH, acronym, issue)
+        asset = AssetHTMLS(self.mocked_xylose_article)
+        new_media_path = asset._normalize_media_path(media_path)
+        self.assertIsNotNone(new_media_path)
+        self.assertEqual(new_media_path, expected)
+        new_media_path = asset._normalize_media_path('/' + media_path)
+        self.assertIsNotNone(new_media_path)
+        self.assertEqual(new_media_path, expected)
+
     def test_is_valid_media_url_invalid_url(self):
         asset = AssetHTMLS(self.mocked_xylose_article)
         invalid_urls = [
@@ -1203,8 +1228,11 @@ class TestAssetHTMLS(BaseTestCase):
         invalid_urls = [
             "/img.gif",
             "img/fbpe/img.jpg",
+            "http:/img/fbpe/img.tif",
+            "https:/pdf/fbpe/a01.pdf",
             "/img/revistas/test/v1n2/img.tif",
             "/img/revistas/test/v1n2/seta.gif#anchor",
+            "../img02a.avi",
         ]
         for invalid_url in invalid_urls:
             splited_url = urlsplit(invalid_url)
