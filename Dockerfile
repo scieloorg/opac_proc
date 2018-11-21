@@ -26,6 +26,7 @@ RUN apt-get update \
 
 # COPY ./requirements.txt /app/requirements.txt
 COPY . /app
+RUN pip --no-cache-dir install --upgrade pip
 RUN pip --no-cache-dir install -r /app/requirements.txt
 
 COPY ./start_worker.sh /start_worker.sh
