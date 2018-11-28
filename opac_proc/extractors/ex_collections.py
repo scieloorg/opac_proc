@@ -89,12 +89,7 @@ class CollectionExtractor(BaseExtractor):
         logger.info(u'Inicia CollectionExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))
 
-        for col in self.articlemeta.get_collections():
-            if col['acronym'] == self.acronym:
-                logger.info(u"Adicionado a coleção: %s" % self.acronym)
-                self._raw_data = col
-                break
-
+        self._raw_data = self.articlemeta.get_collection(code=self.acronym)
         if not self._raw_data:
             msg = u"Não foi possível recuperar a Coleção (acronym: %s). A informação é vazía" % self.acronym
             logger.error(msg)
