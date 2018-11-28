@@ -153,6 +153,15 @@ class ArticleMeta(object):
             collection=collection, issn=issn,
             from_date=from_date, until_date=until_date)
 
+    def get_collection(self, code):
+        """
+        methods to get one single COLLECTION as dict()
+        @params:
+        - code: collection code ('spa', 'scl', etc)
+        """
+        collection = self.client.collection(code=code)
+        return collection.__dict__
+
     def get_journal(self, code, collection):
         """
         methods to get one single JOURNAL as dict()
