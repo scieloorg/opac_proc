@@ -14,7 +14,7 @@ xylose==1.34.1
 legendarium==2.0.2
 -e git+https://git@github.com/scieloorg/opac_schema@v2.48#egg=opac_schema
 scieloh5m5==1.11.0
-requests==2.20.1
+requests==2.21.0
 Flask-DebugToolbar==0.10.1
 Flask-WTF==0.14.2
 gunicorn==19.8.1
