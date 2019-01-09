@@ -548,16 +548,16 @@ def clear_idsync_scheduler(model_name='all'):
 
 
 @manager.command
-@manager.option('-s', '--stage', dest='stage')
-@manager.option('-m', '--model', dest='model_name')
-@manager.option('-a', '--action', dest='action')
-def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
+def setup_produce_delete_article_differs():
     """
-    instala os schedulers para producir a diferencia nos modelos de ETL.
-    Por padrão aplica para todas as fases, todos os modelos e todas as açoes
+    Configura os schedulers para produzir a diferença de deleção nos modelos de ETL
+    SOMENTE para artigos.
+    Caso necessite aplicar para os demais modelos e operações, utilizar o comando
+    setup_produce_differ_scheduler().
     """
     stages_list, models_list, actions_list = clean_differ_scheduler_params(
-        stage, model_name, action)
+        'all', 'article', 'delete')
+
     for stage_ in stages_list:
         for model_ in models_list:
             for action_ in actions_list:
@@ -566,6 +566,34 @@ def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
                 print "[%s][%s][%s] instalando scheduler na fila: %s" % (
                     stage_, model_, action_, sched_instance.queue_name)
                 sched_instance.setup()
+
+
+@manager.command
+@manager.option('-s', '--stage', dest='stage')
+@manager.option('-m', '--model', dest='model_name')
+@manager.option('-a', '--action', dest='action')
+def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
+    """
+    instala os schedulers para produzir a diferença nos modelos de ETL.
+    Por padrão aplica para todas as fases, todos os modelos e todas as açoes, EXCETO
+    para artigo.
+    Caso necessite aplicar para artigo, utilizar o comando manual
+    setup_produce_delete_article_differs().
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        stage, model_name, action)
+
+    print "ESTE PROCESSO NÃO CRIA TAREFAS DE DELEÇÃO DE REGISTROS DE ARTIGO!"
+    "UTILIZE O COMANDO setup_produce_delete_article_differs"
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                if not (model_ == 'article' and action_ == 'delete'):
+                    sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
+                    sched_instance = sched_class()
+                    print "[%s][%s][%s] instalando scheduler na fila: %s" % (
+                        stage_, model_, action_, sched_instance.queue_name)
+                    sched_instance.setup()
 
 
 @manager.command
