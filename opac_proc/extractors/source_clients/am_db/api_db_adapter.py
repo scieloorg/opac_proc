@@ -116,13 +116,10 @@ class AMDBAPI:
         docs = [doc for doc in results]
         return docs
 
-    def get_issues_identifiers(self, since_date=None):
+    def get_issues_identifiers(self):
         """
         retorna os identifiers de issues filtrando pela coleção definida
         pela configuração e a data de corte.
-
-        @param: since_date (datetime|opcional) - data de corte. se não for
-        definida será usada a data retornada pela property: get_since_date
 
         returna uma lista de dict()
         cada dict contém:
@@ -131,14 +128,8 @@ class AMDBAPI:
         - processing_date: retornada pelo AM
         """
 
-        if since_date is None:
-            since_date = self._since_date
-
         query_filter = {
             'collection': OPAC_PROC_COLLECTION,
-            'processing_date': {
-                '$gte': since_date,
-            }
         }
         projection = self._projection_by_model['issue']
         results = self._db.issues.find(query_filter, projection)
