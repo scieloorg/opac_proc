@@ -321,14 +321,19 @@ class DifferBase(object):
         """
         if stage in STAGE_LIST:
             if stage == 'extract':
-                extracted_uuids = self.ex_model_class.objects.all().values_list('uuid')
-                return self.id_model_class.objects.filter(uuid__nin=extracted_uuids).values_list('uuid')
+                return self.id_model_class.objects.filter(extract_execution_date=None).values_list('uuid')
             elif stage == 'transform':
-                transformed_uuids = self.tr_model_class.objects.all().values_list('uuid')
-                return self.ex_model_class.objects.filter(uuid__nin=transformed_uuids).values_list('uuid')
+                extracted_uuids = self.id_model_class.objects.filter(
+                    extract_execution_date__ne=None, transform_execution_date=None
+                ).values_list('uuid')
+                return self.ex_model_class.objects.filter(uuid__in=extracted_uuids).values_list('uuid')
             elif stage == 'load':
-                loaded_uuids = self.lo_model_class.objects.all().values_list('uuid')
-                return self.tr_model_class.objects.filter(uuid__nin=loaded_uuids).values_list('uuid')
+                transformed_uuids = self.id_model_class.objects.filter(
+                    extract_execution_date__ne=None,
+                    transform_execution_date__ne=None,
+                    load_execution_date=None
+                ).values_list('uuid')
+                return self.tr_model_class.objects.filter(uuid__in=transformed_uuids).values_list('uuid')
         else:
             raise ValueError(u'Parametro: "stage" inválido! Valores esperados: "extract" ou "transform" ou "load"!')
 
