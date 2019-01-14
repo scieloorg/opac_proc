@@ -336,7 +336,7 @@ class TestAssets(BaseTestCase):
             ("graphic.tif", "graphic.jpg"),
             ("graphic.tiff", "graphic.jpg"),
             ("image.gif", "image.gif"),
-            ("table", "table"),
+            ("table", "table.jpg"),
             ("abc/v21n4/graphic.tif", "abc/v21n4/graphic.jpg")
         ]
         for input, expected in input_expected:

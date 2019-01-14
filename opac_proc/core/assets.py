@@ -231,7 +231,7 @@ class Assets(object):
             else:
                 if guessed_ext == 'jpeg':
                     guessed_ext = 'jpg'
-                ext = '.' + guessed_ext
+            ext = '.' + guessed_ext
         return root + ext
 
     def _register_ssm_media(self, pfile, media_path, file_type, metadata):
