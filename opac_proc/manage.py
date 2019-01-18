@@ -569,6 +569,27 @@ def setup_produce_delete_article_differs():
 
 
 @manager.command
+def setup_produce_delete_issue_differs():
+    """
+    Configura os schedulers para produzir a diferença de deleção nos modelos de ETL
+    SOMENTE para fascículos.
+    Caso necessite aplicar para os demais modelos e operações, utilizar o comando
+    setup_produce_differ_scheduler().
+    """
+    stages_list, models_list, actions_list = clean_differ_scheduler_params(
+        'all', 'issue', 'delete')
+
+    for stage_ in stages_list:
+        for model_ in models_list:
+            for action_ in actions_list:
+                sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
+                sched_instance = sched_class()
+                print "[%s][%s][%s] instalando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name)
+                sched_instance.setup()
+
+
+@manager.command
 @manager.option('-s', '--stage', dest='stage')
 @manager.option('-m', '--model', dest='model_name')
 @manager.option('-a', '--action', dest='action')
@@ -583,12 +604,12 @@ def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
     stages_list, models_list, actions_list = clean_differ_scheduler_params(
         stage, model_name, action)
 
-    print "ESTE PROCESSO NÃO CRIA TAREFAS DE DELEÇÃO DE REGISTROS DE ARTIGO!"
-    "UTILIZE O COMANDO setup_produce_delete_article_differs"
+    print "ESTE PROCESSO NÃO CRIA TAREFAS DE DELEÇÃO DE REGISTROS DE FASCÍCULO E ARTIGO!"
+    "UTILIZE O COMANDO setup_produce_delete_article_differs e setup_produce_delete_issue_differs"
     for stage_ in stages_list:
         for model_ in models_list:
             for action_ in actions_list:
-                if not (model_ == 'article' and action_ == 'delete'):
+                if not ((model_ == 'article' or model_ == 'issue') and action_ == 'delete'):
                     sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
                     sched_instance = sched_class()
                     print "[%s][%s][%s] instalando scheduler na fila: %s" % (
