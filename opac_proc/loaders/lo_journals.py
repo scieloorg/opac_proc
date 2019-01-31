@@ -46,6 +46,7 @@ class JournalLoader(BaseLoader):
         'social_networks',
         'title',
         'title_iso',
+        'next_title',
         'short_title',
         'title_slug',
         'created',

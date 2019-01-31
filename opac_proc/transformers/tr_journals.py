@@ -110,6 +110,10 @@ class JournalTransformer(BaseTransformer):
         if hasattr(xylose_journal, 'abbreviated_iso_title'):
             self.transform_model_instance['title_iso'] = xylose_journal.abbreviated_iso_title
 
+        # next_title
+        if hasattr(xylose_journal, 'next_title'):
+            self.transform_model_instance['next_title'] = xylose_journal.next_title
+
         # mission
         if hasattr(xylose_journal, 'mission'):
             missions = []
