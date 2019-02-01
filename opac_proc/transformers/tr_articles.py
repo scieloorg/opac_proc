@@ -110,9 +110,12 @@ class ArticleTransformer(BaseTransformer):
             self.transform_model_instance['doi'] = xylose_article.doi
 
         # is_aop
+        if xylose_article.issue.is_ahead_of_print:
+            self.transform_model_instance['is_aop'] = True
+
+        # is_ex_aop
         if hasattr(xylose_article, 'publisher_ahead_id'):
             if xylose_article.publisher_ahead_id:
-                self.transform_model_instance['is_aop'] = True
                 self.transform_model_instance['aop_pid'] = xylose_article.publisher_ahead_id
 
         # created
