@@ -311,7 +311,7 @@ class LoadArticleListView(LoadBaseListView):
         },
         {
             'field_label': u'PID',
-            'field_name': 'loaded_data.pid',
+            'field_name': 'loaded_data__pid',
             'field_type': 'string'
         },
         {
@@ -321,12 +321,12 @@ class LoadArticleListView(LoadBaseListView):
         },
         {
             'field_label': u'Process completed?',
-            'field_name': 'metadata.process_completed',
+            'field_name': 'metadata__process_completed',
             'field_type': 'boolean'
         },
         {
             'field_label': u'Reprocess?',
-            'field_name': 'metadata.must_reprocess',
+            'field_name': 'metadata__must_reprocess',
             'field_type': 'boolean'
         },
     ]

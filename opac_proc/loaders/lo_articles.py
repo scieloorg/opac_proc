@@ -1,14 +1,18 @@
 # coding: utf-8
 from mongoengine.context_managers import switch_db
 from mongoengine import DoesNotExist
+from mongoengine.queryset.visitor import Q
 
 from opac_proc.datastore.mongodb_connector import get_opac_webapp_db_name
 from opac_proc.datastore.identifiers_models import ArticleIdModel
 
 from opac_proc.loaders.base import BaseLoader
 from opac_proc.datastore.models import (
+    LoadIssue,
     LoadArticle,
-    TransformArticle)
+    ExtractArticle,
+    TransformArticle,
+)
 from opac_schema.v1.models import Article as OpacArticle
 from opac_schema.v1.models import Issue as OpacIssue
 from opac_schema.v1.models import Journal as OpacJournal
@@ -16,6 +20,7 @@ from opac_schema.v1.models import TranslatedTitle as OpacTranslatedTitle
 from opac_schema.v1.models import TranslatedSection as OpacTranslatedSection
 from opac_schema.v1.models import ArticleKeyword as OpacArticleKeywords
 from opac_schema.v1.models import Abstract as OpacTranslatedAbstracts
+from opac_schema.v1.models import AOPUrlSegments as OpacAOPUrlSegments
 
 
 from opac_proc.web import config
@@ -74,7 +79,45 @@ class ArticleLoader(BaseLoader):
         'type',
         'publication_date',
         'xml',
+        'aop_url_segs',
     ]
+
+    def remove_aop_records(self):
+        logger.debug(u"iniciando remove_aop_records")
+        if not hasattr(self.transform_model_instance, 'aop_pid'):
+            logger.debug(u"Artigo %s não é ex-ahead"
+                         % self.transform_model_instance.pid)
+            return
+        aop_pid = self.transform_model_instance.aop_pid
+        model_class_queryset = [
+            (self.ids_model_class, Q(article_pid=aop_pid)),
+            (ExtractArticle, Q(code=aop_pid)),
+            (self.transform_model_class, Q(pid=aop_pid)),
+            (self.load_model_class, Q(loaded_data__pid=aop_pid)),
+        ]
+        for model_class, queryset in model_class_queryset:
+            result = model_class.objects(queryset)
+            if not result:
+                logger.debug(u"AOP %s não registrado no PROC" % aop_pid)
+            else:
+                model_instance = result[0]
+                logger.info(
+                    "Deletando registro do AOP %s, já publicado em fascículo regular"
+                    % model_instance.uuid
+                )
+                model_instance.delete()
+
+        logger.info(
+            u"Deletando AOP %s do OPAC, já publicado em fascículo regular"
+            % aop_pid
+        )
+        with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
+            try:
+                opac_article = self.opac_model_class.objects.get(pid=aop_pid)
+            except DoesNotExist:
+                logger.debug(u"AOP %s não registrado no PROC" % aop_pid)
+            else:
+                opac_article.delete()
 
     def prepare_issue(self):
         logger.debug(u"iniciando prepare_issue")
@@ -161,3 +204,41 @@ class ArticleLoader(BaseLoader):
 
         logger.debug(u"palavras chaves criadss: %s" % len(keywords))
         return keywords
+
+    def prepare_aop_url_segs(self):
+        logger.debug(u"iniciando prepare_aop_url_segs")
+        if not hasattr(self.transform_model_instance, 'aop_pid'):
+            logger.info(u"Artigo não é ex-ahead. uuid: %s"
+                        % self.transform_model_instance.uuid)
+            return None
+
+        logger.debug(u"Artigo é ex-ahead. uuid: %s"
+                     % self.transform_model_instance.uuid)
+
+        if hasattr(self.load_model_instance.loaded_data, 'aop_url_segs'):
+            logger.debug(u"Ex-ahead com aop_url_segs: %s"
+                         % self.load_model_instance.loaded_data.aop_url_segs)
+            return OpacAOPUrlSegments(
+                **self.load_model_instance.loaded_data.aop_url_segs)
+
+        aop_load_article = self.load_model_class.objects.filter(
+            loaded_data__pid=self.transform_model_instance.aop_pid)
+        if not aop_load_article:
+            logger.info(u"AOP não carregado no sistema. PID: %s"
+                        % self.transform_model_instance.aop_pid)
+            return None
+
+        url_segs = {
+            'url_seg_article': aop_load_article[0].loaded_data.url_segment,
+        }
+        try:
+            opac_issue = LoadIssue.objects.get(
+                loaded_data__iid=aop_load_article[0].loaded_data.issue)
+        except LoadIssue.DoesNotExist, e:
+            logger.error(u"OPAC Issue (_id: %s) não encontrado"
+                         % aop_load_article[0].loaded_data.issue)
+        else:
+            url_segs['url_seg_issue'] = opac_issue.loaded_data.url_segment
+
+        logger.debug(u"OpacAOPUrlSegments: %s" % repr(url_segs))
+        return OpacAOPUrlSegments(**url_segs)
