@@ -86,7 +86,7 @@ class JournalTransformer(BaseTransformer):
 
         # previous_title
         if hasattr(xylose_journal, 'previous_title'):
-            self.transform_model_instance['previous_title'] = xylose_journal.previous_title
+            self.transform_model_instance['previous_journal_ref'] = xylose_journal.previous_title
 
         # title
         if hasattr(xylose_journal, 'title'):
