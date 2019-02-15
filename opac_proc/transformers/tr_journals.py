@@ -49,12 +49,12 @@ class JournalTransformer(BaseTransformer):
         self.transform_model_instance['collection'] = transform_col.uuid
 
         # subject_categories
-        if hasattr(xylose_journal, 'subject_areas'):
-            self.transform_model_instance['subject_categories'] = xylose_journal.subject_areas
+        if hasattr(xylose_journal, 'wos_subject_areas'):
+            self.transform_model_instance['subject_categories'] = xylose_journal.wos_subject_areas
 
         # study_areas
-        if hasattr(xylose_journal, 'wos_subject_areas'):
-            self.transform_model_instance['study_areas'] = xylose_journal.wos_subject_areas
+        if hasattr(xylose_journal, 'subject_areas'):
+            self.transform_model_instance['study_areas'] = xylose_journal.subject_areas
 
         # current_status
         if hasattr(xylose_journal, 'current_status'):
