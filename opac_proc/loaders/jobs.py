@@ -331,6 +331,7 @@ def task_load_one_article(uuid):
     a_loader = ArticleLoader(uuid)
     a_loader.prepare()
     a_loader.load()
+    a_loader.remove_aop_records()
 
 
 def task_load_selected_articles(selected_uuids):
