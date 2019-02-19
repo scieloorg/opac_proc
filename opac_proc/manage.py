@@ -33,17 +33,23 @@ from opac_proc.extractors.jobs import (
     task_collection_create as ex_task_collection_create,
     task_journal_create as ex_task_journal_create,
     task_extract_issue as ex_task_extract_issue,
-    task_extract_article as ex_task_extract_article)
+    task_extract_article as ex_task_extract_article,
+    task_press_release_create as ex_task_press_release_create,
+    task_news_create as ex_task_news_create)
 from opac_proc.transformers.jobs import (
     task_collection_create as tr_task_collection_create,
     task_journal_create as tr_task_journal_create,
     task_transform_issue as tr_task_transform_issue,
-    task_transform_article as tr_task_transform_article)
+    task_transform_article as tr_task_transform_article,
+    task_press_release_create as tr_task_press_release_create,
+    task_news_create as tr_task_news_create)
 from opac_proc.loaders.jobs import (
     task_collection_create as lo_task_collection_create,
     task_journal_create as lo_task_journal_create,
     task_load_issue as lo_task_load_issue,
-    task_load_article as lo_task_load_article)
+    task_load_article as lo_task_load_article,
+    task_press_release_create as lo_task_press_release_create,
+    task_news_create as lo_task_news_create)
 
 
 app = create_app()
@@ -273,6 +279,10 @@ def process_extract(issns=None, acrons=None, file=None):
 
     ex_task_journal_create()
 
+    ex_task_press_release_create()
+
+    ex_task_news_create()
+
     issn_list = []
 
     if acrons:
@@ -321,6 +331,10 @@ def process_transform(issns=None, acrons=None, file=None):
 
     tr_task_journal_create()
 
+    tr_task_press_release_create()
+
+    tr_task_news_create()
+
     issn_list = []
 
     if acrons:
@@ -368,6 +382,10 @@ def process_load(issns=None, acrons=None, file=None):
     lo_task_collection_create()
 
     lo_task_journal_create()
+
+    lo_task_press_release_create()
+
+    lo_task_news_create()
 
     issn_list = []
 
