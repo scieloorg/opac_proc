@@ -36,4 +36,5 @@ class NewsLoader(BaseLoader):
         'title',
         'description',
         'language',
+        'image_url',
     ]

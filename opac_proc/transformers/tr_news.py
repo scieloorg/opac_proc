@@ -44,6 +44,7 @@ class NewsTransformer(BaseTransformer):
         title -> self.extract_model_instance['title']
         description -> self.extract_model_instance['summary']
         language -> self.extract_model_instance['feed_lang']
+        image_url -> self.extract_model_instance['media_content'][0]['url']
         """
 
         # UUID:
@@ -63,5 +64,11 @@ class NewsTransformer(BaseTransformer):
 
         # LANGUAGE:
         self.transform_model_instance['language'] = self.extract_model_instance.feed_lang
+
+        # MEDIA CONTENT:
+        if hasattr(self.extract_model_instance, 'media_content'):
+            media_content = self.extract_model_instance.media_content
+            if len(media_content) > 0 and media_content[0].get('url'):
+                self.transform_model_instance['image_url'] = media_content[0]['url']
 
         return self.transform_model_instance
