@@ -31,3 +31,4 @@ Flask-Mail==0.9.1
 articlemetaapi==1.26.2
 beautifulsoup4==4.6.3
 mock==2.0.0
+redis==2.10.6
