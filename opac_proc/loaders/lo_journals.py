@@ -81,6 +81,7 @@ class JournalLoader(BaseLoader):
         'last_issue',
         'metrics',
         'editor_email',
+        'is_public',
     ]
 
     def prepare_collection(self):
@@ -168,9 +169,14 @@ class JournalLoader(BaseLoader):
         """
         logger.debug(u"iniciando: prepare_last_issue")
         t_journal_uuid = self.transform_model_instance.uuid
-        t_issue = TransformIssue.objects.filter(
-            journal=t_journal_uuid).order_by('-year', '-order').first().select_related()
+        t_issues = TransformIssue.objects.filter(
+            journal=t_journal_uuid).order_by('-year', '-order')
 
+        if not t_issues:
+            logger.info(u"Não existem issues para journal uuid: %s" % t_journal_uuid)
+            return None
+
+        t_issue = t_issues.first().select_related()
         logger.debug(u"last issue: t_issue encontrado (iid: %s)" % t_issue.iid)
         last_issue_sections = []
         if hasattr(t_issue, 'sections'):
@@ -231,3 +237,18 @@ class JournalLoader(BaseLoader):
 
         logger.debug(u"metrics criadas: %s", metrics_dict)
         return metrics_doc
+
+    def prepare_is_public(self):
+        """
+        metodo chamado na preparação dos dados a carregar no opac_schema
+        deve retornar um valor válido para Journal.is_public
+        """
+        logger.debug(u"iniciando: prepare_is_public")
+        if self.opac_model_instance and hasattr(self.opac_model_instance, 'is_public'):
+            logger.debug(u"is_public configurado: %s" % getattr(self.opac_model_instance, 'is_public'))
+            return self.opac_model_instance.is_public
+        issue_count = TransformIssue.objects.filter(
+            journal=self.transform_model_instance.uuid).count()
+        is_public = True if issue_count > 0 else False
+        logger.info(u"Periódico público: %s" % is_public)
+        return is_public
