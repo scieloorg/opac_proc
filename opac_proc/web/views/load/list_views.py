@@ -108,7 +108,7 @@ class LoadJournalListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Aconym',
+            'field_label': u'Acronym',
             'field_name': 'loaded_data.acronym',
             'field_type': 'string'
         },
@@ -146,18 +146,18 @@ class LoadJournalListView(LoadBaseListView):
             'field_type': 'uuid'
         },
         {
-            'field_label': u'Aconym',
-            'field_name': 'loaded_data.acronym',
+            'field_label': u'Acronym',
+            'field_name': 'loaded_data__acronym',
             'field_type': 'string'
         },
         {
             'field_label': u'Print ISSN',
-            'field_name': 'loaded_data.print_issn',
+            'field_name': 'loaded_data__print_issn',
             'field_type': 'string'
         },
         {
             'field_label': u'SciELO ISSN',
-            'field_name': 'loaded_data.scielo_issn',
+            'field_name': 'loaded_data__scielo_issn',
             'field_type': 'string'
         },
         {
@@ -238,18 +238,23 @@ class LoadIssueListView(LoadBaseListView):
             'field_type': 'uuid'
         },
         {
-            'field_label': u'Aconym',
-            'field_name': 'loaded_data.acronym',
+            'field_label': u'PID',
+            'field_name': 'loaded_data__pid',
             'field_type': 'string'
         },
         {
-            'field_label': u'Print ISSN',
-            'field_name': 'loaded_data.print_issn',
+            'field_label': u'Volume',
+            'field_name': 'loaded_data__volume',
             'field_type': 'string'
         },
         {
-            'field_label': u'SciELO ISSN',
-            'field_name': 'loaded_data.scielo_issn',
+            'field_label': u'Number',
+            'field_name': 'loaded_data__number',
+            'field_type': 'string'
+        },
+        {
+            'field_label': u'Type',
+            'field_name': 'loaded_data__type',
             'field_type': 'string'
         },
         {
