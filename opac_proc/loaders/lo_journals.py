@@ -252,3 +252,17 @@ class JournalLoader(BaseLoader):
         is_public = True if issue_count > 0 else False
         logger.info(u"Periódico público: %s" % is_public)
         return is_public
+
+    def prepare_logo_url(self):
+        """
+        metodo chamado na preparação dos dados a carregar no opac_schema
+        deve retornar um valor válido para Journal.logo_url
+        """
+        logger.debug(u"iniciando: prepare_logo_url")
+        if self.opac_model_instance and hasattr(self.opac_model_instance, 'logo_url'):
+            logger.debug(u"logo_url configurado: %s" % getattr(self.opac_model_instance, 'logo_url'))
+            return self.opac_model_instance.logo_url
+        if hasattr(self.transform_model_instance, 'logo_url'):
+            logo_url = getattr(self.transform_model_instance, 'logo_url')
+            logger.info(u"URL Logo Periódico: %s" % logo_url)
+            return logo_url
