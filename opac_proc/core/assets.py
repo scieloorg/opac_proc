@@ -510,52 +510,6 @@ class AssetXML(Assets):
                                                    self.get_metadata())
             return xml_url
 
-    def register_htmls(self):
-        """
-        Register HTML contents from XML for all the text languages.
-        """
-        try:
-            generator = HTMLGenerator.parse(
-                self._content,
-                valid_only=False,
-                css=config.OPAC_PROC_ARTICLE_CSS_URL,
-                print_css=config.OPAC_PROC_ARTICLE_PRINT_CSS_URL,
-                js=config.OPAC_PROC_ARTICLE_JS_URL
-            )
-        except ValueError as e:
-            logger.error('Error getting htmlgenerator: {}.'.format(e.message))
-            return None
-
-        registered_htmls = []
-        for lang, trans_result in generator:
-            html_as_bytes = None
-            try:
-                html = etree.tostring(trans_result, pretty_print=True,
-                                      encoding='utf-8', method='html',
-                                      doctype="<!DOCTYPE html>")
-                html_as_bytes = BytesIO(html)
-            except Exception as e:
-                logger.error(
-                    'Error converting etree {} to string. '.format(lang))
-            else:
-                metadata = self.get_metadata()
-                metadata.update({'bucket_name': self.bucket_name,
-                                 'type': 'html',
-                                 'version': 'xml'})
-                __, html_url = self._register_ssm_asset(
-                    html_as_bytes,
-                    self._get_file_name('html', lang),
-                    'html',
-                    metadata
-                )
-                registered_htmls.append({
-                    'type': 'html',
-                    'lang': lang,
-                    'url': html_url
-                })
-
-        return registered_htmls
-
 
 class AssetHTMLS(Assets):
 
