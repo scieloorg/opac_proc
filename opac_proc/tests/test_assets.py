@@ -692,98 +692,6 @@ class TestAssets(BaseTestCase):
             etree.tostring(asset_xml._content.getroottree(), xml_declaration=True, encoding='utf-8')
         )
 
-    @patch('opac_proc.core.assets.HTMLGenerator.parse')
-    @patch.object(AssetXML, '_get_content')
-    def test_register_htmls_calls_packtools_html_generator_parse(
-        self,
-        mocked_get_content,
-        mocked_html_generator_parse
-    ):
-        mocked_get_content.return_value = self.xml_content
-        asset_xml = AssetXML(self.mocked_xylose_article)
-        asset_xml.register_htmls()
-        mocked_html_generator_parse.assert_called_once_with(
-            self.xml_content,
-            valid_only=False,
-            css=config.OPAC_PROC_ARTICLE_CSS_URL,
-            print_css=config.OPAC_PROC_ARTICLE_PRINT_CSS_URL,
-            js=config.OPAC_PROC_ARTICLE_JS_URL
-        )
-
-    @patch('opac_proc.core.assets.HTMLGenerator.parse')
-    @patch('opac_proc.core.assets.logger.error')
-    @patch.object(AssetXML, '_get_content')
-    def test_register_htmls_log_error_if_packtools_html_generator_error(
-        self,
-        mocked_get_content,
-        mocked_logger_error,
-        mocked_html_generator_parse
-    ):
-        mocked_get_content.return_value = self.xml_content
-        mocked_html_generator_parse.side_effect = ValueError('invalid XML')
-        asset_xml = AssetXML(self.mocked_xylose_article)
-        asset_xml.register_htmls()
-        mocked_logger_error.assert_called_once_with(
-            'Error getting htmlgenerator: invalid XML.')
-
-    @patch('opac_proc.core.assets.etree.tostring')
-    @patch('opac_proc.core.assets.logger.error')
-    @patch.object(AssetXML, '_get_path')
-    def test_register_htmls_error_if_etree_tostring_error(
-        self,
-        mocked_get_path,
-        mocked_logger_error,
-        mocked_etree_tostring
-    ):
-        mocked_get_path.return_value = self._article_xml
-        mocked_etree_tostring.side_effect = Exception()
-        # Article in 'es' translated to 'en'
-        article_json = json.loads(self._article_json)
-        document = Article(article_json)
-        asset_xml = AssetXML(document)
-        asset_xml.register_htmls()
-        logger_calls = [
-            call('Error converting etree {} to string. '.format(lang))
-            for lang in ('es', 'en')
-        ]
-        self.assertEqual(
-            mocked_logger_error.mock_calls,
-            logger_calls
-        )
-
-    @patch('opac_proc.core.assets.logger.error')
-    @patch.object(AssetXML, '_get_path')
-    @patch.object(AssetXML, '_register_ssm_asset')
-    def test_register_htmls_error_if_register_ssm_error(
-        self,
-        mocked_register_ssm_asset,
-        mocked_get_path,
-        mocked_logger_error
-    ):
-        mocked_get_path.return_value = self._article_xml
-        mocked_register_ssm_asset.side_effect = Exception()
-        # Article in 'es' translated to 'en'
-        article_json = json.loads(self._article_json)
-        document = Article(article_json)
-        asset_xml = AssetXML(document)
-        with self.assertRaises(Exception):
-            asset_xml.register_htmls()
-
-    @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
-    @patch.object(AssetXML, '_get_path')
-    def test_register_htmls_generates_translated_htmls(self, mocked_get_path):
-        # Article in 'es' translated to 'en'
-        mocked_get_path.return_value = self._article_xml
-        article_json = json.loads(self._article_json)
-        document = Article(article_json)
-        asset_xml = AssetXML(document)
-        generated_htmls = asset_xml.register_htmls()
-        self.assertEqual(len(generated_htmls), 2)
-        self.assertEqual(generated_htmls[0]['type'], 'html')
-        self.assertEqual(generated_htmls[0]['lang'], 'es')
-        self.assertEqual(generated_htmls[1]['type'], 'html')
-        self.assertEqual(generated_htmls[1]['lang'], 'en')
-
     @patch.object(AssetXML, '_get_path')
     @patch.object(AssetXML, '_get_content')
     def test_register_returns_none_if_no_content(
@@ -796,7 +704,6 @@ class TestAssets(BaseTestCase):
         xml_url = asset_xml.register()
         self.assertIsNone(xml_url)
 
-    @skip("LOCAL TEST ONLY")
     @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
     @patch.object(AssetXML, '_get_path')
     def test_register_success(self, mocked_get_path):
@@ -806,11 +713,6 @@ class TestAssets(BaseTestCase):
         asset_xml = AssetXML(document)
         xml_url = asset_xml.register()
         self.assertIsNotNone(xml_url)
-        generated_htmls = asset_xml.register_htmls()
-        self.assertEqual(generated_htmls[0]['type'], 'html')
-        self.assertEqual(generated_htmls[0]['lang'], 'es')
-        self.assertEqual(generated_htmls[1]['type'], 'html')
-        self.assertEqual(generated_htmls[1]['lang'], 'en')
 
 
 class TestAssetHTMLS(BaseTestCase):
