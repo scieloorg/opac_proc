@@ -102,7 +102,7 @@ class ListView(View):
     ]
 
     def _valid_uuid(self, uuid):
-        regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+        regex = re.compile(r'^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
         match = regex.match(uuid)
         return bool(match)
 
@@ -227,7 +227,7 @@ class ListView(View):
                         {exception_msg}
                         """.format(user=user, stage=self.stage, model=self.model_name, exception_msg=exception_msg, qty=qty)
             app_msg = create_error_msg(msg_subject, msg_body, self.stage, self.model_name)
-            msg_link = url_for('default.message_detail', app_msg.pk, _external=True)
+            msg_link = url_for('default.message_detail', object_id=app_msg.pk, _external=True)
             flask_msg = u'{msg}. Descrição completa do erro <a href="{url}">aqui</a>'.format(msg=msg_subject, url=msg_link)
             flash(flask_msg, 'error')
             app_msg.send_email()

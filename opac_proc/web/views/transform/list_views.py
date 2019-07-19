@@ -341,22 +341,36 @@ class TransformArticleListView(TransformBaseListView):
         {
             'method_name': 'do_reprocess_xml_only',    # nome de função python que implementa a ação
             'label': 'Reprocessar XMLs',             # nome da ação para mostrar pro usuário
-            'icon_class': 'fa fa-user',     # class CSS para o icone. ex: 'fa fa-gear'
+            'icon_class': 'fa fa-refresh',     # class CSS para o icone. ex: 'fa fa-gear'
             'can_select_rows': False,        # boolean, se permite ou não a opção "All/Selected" ou não
         },
     ]
 
     def do_reprocess_xml_only(self):
+        def chunks(l, n):
+            """Yield successive n-sized chunks from l."""
+            for i in range(0, len(l), n):
+                yield l[i:i + n]
+
+        processor = self.process_class()
+        list_of_all_ids = self.model_class.objects.filter(data_model_version='xml').values_list('_id')
+        SLICE_SIZE = 1000
+        count_xml_articles = len(list_of_all_ids)
         try:
-            processor = self.process_class()
-            # melhorar: caso a query seja muito lenta pode dar timout no request
-            ids = [article._id for article in self.model_class.objects.filter(data_model_version='xml')]
-            processor.update(ids)
+            if len(list_of_all_ids) <= SLICE_SIZE:
+                id_as_string_list = [str(_id) for _id in list_of_all_ids]
+                processor.update(id_as_string_list)
+            else:
+                list_of_list_of_ids = list(chunks(list_of_all_ids, SLICE_SIZE))
+                for list_of_ids in list_of_list_of_ids:
+                    id_as_string_list = [str(_id) for _id in list_of_ids]
+                    processor.update(id_as_string_list)
+
         except Exception as e:
             traceback_str = traceback.format_exc()
-            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=len(ids))
+            self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str, items_count=count_xml_articles)
         else:
-            self._trigger_messages(items_count=len(ids))
+            self._trigger_messages(items_count=count_xml_articles)
 
 
 class TransformPressReleaseListView(TransformBaseListView):
