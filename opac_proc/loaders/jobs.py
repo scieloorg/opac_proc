@@ -152,6 +152,7 @@ def task_load_article(uuid):
     a_loader = ArticleLoader(uuid)
     a_loader.prepare()
     a_loader.load()
+    a_loader.remove_aop_records()
 
 
 def task_article_update(ids=None):

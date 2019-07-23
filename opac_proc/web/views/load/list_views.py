@@ -233,7 +233,7 @@ class LoadArticleListView(LoadBaseListView):
         },
         {
             'field_label': u'PID',
-            'field_name': 'pid',
+            'field_name': 'loaded_data__pid',
             'field_type': 'string'
         },
         {
