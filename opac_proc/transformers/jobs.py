@@ -81,9 +81,9 @@ def task_journal_update(ids=None):
     if ids is None:  # update all collections
         models.TransformJournal.objects.all().update(must_reprocess=True)
         for journal in models.TransformJournal.objects.all():
-            issn = journal.get('scielo_issn', False) or \
-                   journal.get('print_issn', False) or \
-                   journal.get('eletronic_issn', False)
+            issn = getattr(journal, 'scielo_issn', False) or \
+                   getattr(journal, 'print_issn', False) or \
+                   getattr(journal, 'eletronic_issn', False)
             if not issn:
                 raise ValueError(u'Journal sem issn')
             r_queues.enqueue(
@@ -95,9 +95,9 @@ def task_journal_update(ids=None):
                 obj = models.TransformJournal.objects.get(pk=oid)
                 obj.update(must_reprocess=True)
                 obj.reload()
-                issn = obj.get('scielo_issn', False) or \
-                    obj.get('print_issn', False) or \
-                    obj.get('eletronic_issn', False)
+                issn = getattr(obj, 'scielo_issn', False) or \
+                    getattr(obj, 'print_issn', False) or \
+                    getattr(obj, 'eletronic_issn', False)
                 if not issn:
                     raise ValueError(u'Journal sem issn')
                 r_queues.enqueue(
