@@ -84,7 +84,6 @@ class ArticleLoader(BaseLoader):
             return
         aop_pid = self.transform_model_instance.aop_pid
         model_class_queryset = [
-            (self.ids_model_class, Q(article_pid=aop_pid)),
             (ExtractArticle, Q(code=aop_pid)),
             (self.transform_model_class, Q(pid=aop_pid)),
             (self.load_model_class, Q(loaded_data__pid=aop_pid)),
@@ -209,11 +208,11 @@ class ArticleLoader(BaseLoader):
         logger.debug(u"Artigo é ex-ahead. uuid: %s"
                      % self.transform_model_instance.uuid)
 
-        if hasattr(self.load_model_instance.loaded_data, 'aop_url_segs'):
+        if self.load_model_instance.loaded_data.get('aop_url_segs'):
             logger.debug(u"Ex-ahead com aop_url_segs: %s"
-                         % self.load_model_instance.loaded_data.aop_url_segs)
+                         % self.load_model_instance.loaded_data['aop_url_segs'])
             return OpacAOPUrlSegments(
-                **self.load_model_instance.loaded_data.aop_url_segs)
+                **self.load_model_instance.loaded_data['aop_url_segs'])
 
         aop_load_article = self.load_model_class.objects.filter(
             loaded_data__pid=self.transform_model_instance.aop_pid)
@@ -223,16 +222,16 @@ class ArticleLoader(BaseLoader):
             return None
 
         url_segs = {
-            'url_seg_article': aop_load_article[0].loaded_data.url_segment,
+            'url_seg_article': aop_load_article[0].loaded_data.get('url_segment'),
         }
         try:
             opac_issue = LoadIssue.objects.get(
-                loaded_data__iid=aop_load_article[0].loaded_data.issue)
+                loaded_data__iid=aop_load_article[0].loaded_data.get('issue'))
         except LoadIssue.DoesNotExist, e:
             logger.error(u"OPAC Issue (_id: %s) não encontrado"
-                         % aop_load_article[0].loaded_data.issue)
+                         % aop_load_article[0].loaded_data.get('issue'))
         else:
-            url_segs['url_seg_issue'] = opac_issue.loaded_data.url_segment
+            url_segs['url_seg_issue'] = opac_issue.loaded_data.get('url_segment')
 
         logger.debug(u"OpacAOPUrlSegments: %s" % repr(url_segs))
         return OpacAOPUrlSegments(**url_segs)

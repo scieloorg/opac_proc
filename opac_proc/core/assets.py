@@ -586,7 +586,7 @@ class AssetHTMLS(Assets):
             for _from, _to in change_media_path:
                 media_path = media_path.replace(_from, _to.lower())
 
-        logger.info("Path - original: {}, normalized: {}".format(
+        logger.info(u"Path - original: {}, normalized: {}".format(
                     original_path, media_path))
         return media_path
 
