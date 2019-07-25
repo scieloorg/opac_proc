@@ -108,7 +108,7 @@ class LoadJournalListView(LoadBaseListView):
             'field_type': 'string'
         },
         {
-            'field_label': u'Aconym',
+            'field_label': u'Acronym',
             'field_name': 'acronym',
             'field_type': 'string'
         },
@@ -136,8 +136,8 @@ class LoadJournalListView(LoadBaseListView):
             'field_type': 'uuid'
         },
         {
-            'field_label': u'Aconym',
-            'field_name': 'acronym',
+            'field_label': u'Acronym',
+            'field_name': 'loaded_data__acronym',
             'field_type': 'string'
         },
         {
