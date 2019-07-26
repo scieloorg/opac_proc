@@ -510,6 +510,20 @@ class AssetXML(Assets):
                                                    self.get_metadata())
             return xml_url
 
+    def html_languages(self):
+        """
+        Extract all the HTML languages in XML content.
+        """
+        try:
+            generator = HTMLGenerator.parse(self._content, valid_only=False)
+        except ValueError as e:
+            logger.error('Error getting htmlgenerator: {}.'.format(e.message))
+        else:
+            return [
+                {'type': 'html', 'lang': lang}
+                for lang, __ in generator
+            ]
+
 
 class AssetHTMLS(Assets):
 

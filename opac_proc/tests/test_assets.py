@@ -692,6 +692,52 @@ class TestAssets(BaseTestCase):
             etree.tostring(asset_xml._content.getroottree(), xml_declaration=True, encoding='utf-8')
         )
 
+    @patch('opac_proc.core.assets.HTMLGenerator.parse')
+    @patch.object(AssetXML, '_get_content')
+    def test_html_languages_calls_packtools_html_generator_parse(
+        self,
+        mocked_get_content,
+        mocked_html_generator_parse
+    ):
+        mocked_get_content.return_value = self.xml_content
+        asset_xml = AssetXML(self.mocked_xylose_article)
+        asset_xml.html_languages()
+        mocked_html_generator_parse.assert_called_once_with(
+            self.xml_content,
+            valid_only=False
+        )
+
+    @patch('opac_proc.core.assets.HTMLGenerator.parse')
+    @patch('opac_proc.core.assets.logger.error')
+    @patch.object(AssetXML, '_get_content')
+    def test_html_languages_log_error_if_packtools_html_generator_error(
+        self,
+        mocked_get_content,
+        mocked_logger_error,
+        mocked_html_generator_parse
+    ):
+        mocked_get_content.return_value = self.xml_content
+        mocked_html_generator_parse.side_effect = ValueError('invalid XML')
+        asset_xml = AssetXML(self.mocked_xylose_article)
+        asset_xml.html_languages()
+        mocked_logger_error.assert_called_once_with(
+            'Error getting htmlgenerator: invalid XML.')
+
+    @patch('opac_proc.core.assets.SSMHandler', new=SSMHandlerStub)
+    @patch.object(AssetXML, '_get_path')
+    def test_html_languages_generates_translated_htmls(self, mocked_get_path):
+        # Article in 'es' translated to 'en'
+        mocked_get_path.return_value = self._article_xml
+        article_json = json.loads(self._article_json)
+        document = Article(article_json)
+        asset_xml = AssetXML(document)
+        generated_htmls = asset_xml.html_languages()
+        self.assertEqual(len(generated_htmls), 2)
+        self.assertEqual(generated_htmls[0]['type'], 'html')
+        self.assertEqual(generated_htmls[0]['lang'], 'es')
+        self.assertEqual(generated_htmls[1]['type'], 'html')
+        self.assertEqual(generated_htmls[1]['lang'], 'en')
+
     @patch.object(AssetXML, '_get_path')
     @patch.object(AssetXML, '_get_content')
     def test_register_returns_none_if_no_content(
