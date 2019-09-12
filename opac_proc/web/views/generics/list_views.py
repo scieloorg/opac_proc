@@ -116,9 +116,6 @@ class ListView(View):
                 f_field_type = list_filter['field_type']
                 f_field_label = list_filter['field_label']
 
-                if '.' in f_field_name:
-                    f_field_name = f_field_name.replace('.', '__')
-
                 qs_filter_value = request.args.get('filter__value__%s' % f_field_name, None)
                 qs_filter_from = request.args.get('filter__value__from__%s' % f_field_name, None)
                 qs_filter_until = request.args.get('filter__value__until__%s' % f_field_name, None)
@@ -193,7 +190,11 @@ class ListView(View):
         else:
             filters = self.get_filters()
             if self.list_filters and filters:
-                return self.model_class.objects.filter(**filters)
+                _filters = {
+                    field.replace('.', '__'): value
+                    for field, value in filters.items()
+                }
+                return self.model_class.objects.filter(**_filters)
             else:
                 return self.model_class.objects()
 
