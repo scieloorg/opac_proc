@@ -79,8 +79,8 @@ window.FilterToolbar = {
       if (fdata['type'] == 'date_time') {
         var from_opts = Object.create(this._datepicker_default_opts);
         var until_opts = Object.create(this._datepicker_default_opts);
-        var from_dt = $('#' + fdata['datetimepicker_from_id']);
-        var until_td = $('#' + fdata['datetimepicker_until_id']);
+        var from_dt = $('#' + fdata['datetimepicker_from_id'].replace(/\./g, "\\."));
+        var until_td = $('#' + fdata['datetimepicker_until_id'].replace(/\./g, "\\."));
 
         if (fdata['param_value_from'] !== "") {
           from_opts['defaultDate'] = fdata['param_value_from'];
