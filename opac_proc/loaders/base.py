@@ -102,7 +102,7 @@ class BaseLoader(object):
         # caso não exista, levantamos uma exeção por não ter o dado fonte
         with switch_db(self.transform_model_class, OPAC_PROC_DB_NAME) as transform_model_class:
             logger.debug(u'recuperando modelo: %s' % self.transform_model_name)
-            self.transform_model_instance = transform_model_class.objects(**query_dict).first()
+            self.transform_model_instance = transform_model_class.objects(**query_dict).order_by('-updated_at').first()
             logger.debug(u'modelo %s encontrado. query_dict: %s' % (self.transform_model_name, query_dict))
 
     def get_opac_model_instance(self, query_dict):
