@@ -33,3 +33,4 @@ prometheus-client==0.4.2
 beautifulsoup4==4.6.3
 mock==2.0.0
 redis==2.10.6
+email-validator==1.1.1
