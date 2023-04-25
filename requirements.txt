@@ -1,5 +1,5 @@
 Werkzeug==0.14.1
-Flask==0.12.4
+Flask==2.3.1
 mongoengine==0.16.3
 flask-mongoengine==0.9.5
 thriftpy==0.3.9
