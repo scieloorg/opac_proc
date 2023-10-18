@@ -33,3 +33,4 @@ articlemetaapi==1.26.4
 prometheus-client==0.5.0
 beautifulsoup4==4.6.3
 mock==2.0.0
+urllib3>=1.26.18 # not directly required, pinned by Snyk to avoid a vulnerability
