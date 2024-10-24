@@ -1,5 +1,5 @@
-Werkzeug==0.14.1
-Flask==0.12.4
+Werkzeug==3.0.3
+Flask==2.2.5
 mongoengine==0.16.3
 flask-mongoengine==0.9.5
 thriftpy==0.3.9
@@ -33,3 +33,6 @@ articlemetaapi==1.26.4
 prometheus-client==0.5.0
 beautifulsoup4==4.6.3
 mock==2.0.0
+certifi>=2024.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
+jinja2>=3.1.4 # not directly required, pinned by Snyk to avoid a vulnerability
+pymongo>=4.6.3 # not directly required, pinned by Snyk to avoid a vulnerability
