@@ -6,7 +6,7 @@ thriftpy==0.3.9
 redis==2.10.6
 rq==0.12.0
 rq-dashboard==0.3.12
-rq-scheduler==0.8.3
+rq-scheduler==0.14.0
 rq-scheduler-dashboard==0.0.2
 blinker==1.4
 mongolog==0.1.1
