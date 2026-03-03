@@ -1,5 +1,5 @@
 # coding: utf-8
-from base import BaseTestCase
+from .base import BaseTestCase
 from flask import current_app
 
 

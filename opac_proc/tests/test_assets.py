@@ -5,14 +5,14 @@ import os
 from datetime import datetime
 from io import BytesIO
 from unittest import skip
-from urlparse import urlsplit
+from urllib.parse import urlsplit
 
 from bs4 import BeautifulSoup
 from lxml import etree
-from mock import patch, call
+from unittest.mock import patch, call
 from xylose.scielodocument import Article
 
-from base import BaseTestCase
+from .base import BaseTestCase
 from opac_proc.core import utils
 from opac_proc.core.assets import Assets, AssetXML, AssetHTMLS
 from opac_proc.core.ssm_handler import SSMHandler
@@ -189,7 +189,7 @@ class TestAssets(BaseTestCase):
     def setUp(self):
         self.mocked_xylose_article = MockedXyloseArticle()
         self.xml_content = etree.fromstring(
-            XML_TEST_CONTENT,
+            XML_TEST_CONTENT.encode('utf-8'),
             etree.XMLParser(remove_blank_text=True)
         )
         ssm_in_memory.clear()
@@ -279,7 +279,8 @@ class TestAssets(BaseTestCase):
             </body>
         </article>"""
         mocked_get_content.return_value = etree.fromstring(
-            xml_test_content, etree.XMLParser(remove_blank_text=True))
+            xml_test_content.encode('utf-8'),
+            etree.XMLParser(remove_blank_text=True))
 
         asset = AssetXML(self.mocked_xylose_article)
         expected = [
@@ -314,7 +315,8 @@ class TestAssets(BaseTestCase):
             </body>
         </article>"""
         mocked_get_content.return_value = etree.fromstring(
-            xml_test_content, etree.XMLParser(remove_blank_text=True))
+            xml_test_content.encode('utf-8'),
+            etree.XMLParser(remove_blank_text=True))
 
         asset = AssetXML(self.mocked_xylose_article)
         expected = [
@@ -344,7 +346,7 @@ class TestAssets(BaseTestCase):
             self.assertEqual(media_path, expected)
 
     def setup_register_xml_medias_tests(self):
-        self.medias_bytes = [BytesIO(str(n)) for n in range(7)]
+        self.medias_bytes = [BytesIO(str(n).encode('utf-8')) for n in range(7)]
         self.filenames = [
             "1414-431X-bjmbr-1414-431X20176177-gf0{}.jpg".format(count)
             for count in range(1, 8)
@@ -398,7 +400,7 @@ class TestAssets(BaseTestCase):
         }
         asset_xml = AssetXML(self.mocked_xylose_article)
         result = asset_xml._register_ssm_media(
-            BytesIO('1'),
+            BytesIO(b'1'),
             'image.jpg',
             'img',
             self.generate_metadata('image.jpg', asset_xml)
@@ -427,7 +429,7 @@ class TestAssets(BaseTestCase):
             }])
         asset_xml = AssetXML(self.mocked_xylose_article)
         result = asset_xml._register_ssm_media(
-            BytesIO('1'),
+            BytesIO(b'1'),
             'image.jpg',
             'img',
             self.generate_metadata('image.jpg', asset_xml)
@@ -456,7 +458,7 @@ class TestAssets(BaseTestCase):
         }
         asset_xml = AssetXML(self.mocked_xylose_article)
         result = asset_xml._register_ssm_media(
-            BytesIO('1'),
+            BytesIO(b'1'),
             'image.jpg',
             'img',
             self.generate_metadata('image.jpg', asset_xml)
@@ -483,7 +485,7 @@ class TestAssets(BaseTestCase):
         instance = MockedSSMHandler.return_value
         instance.exists.return_value = (0, [])
         asset_xml = AssetXML(self.mocked_xylose_article)
-        pfile = BytesIO('1')
+        pfile = BytesIO(b'1')
         asset_xml._register_ssm_asset(
             pfile,
             'article.xml',
@@ -527,7 +529,7 @@ class TestAssets(BaseTestCase):
         }
         asset_xml = AssetXML(self.mocked_xylose_article)
         result = asset_xml._register_ssm_asset(
-            BytesIO('1'),
+            BytesIO(b'1'),
             'article.xml',
             'xml',
             asset_xml.get_metadata()
@@ -556,7 +558,7 @@ class TestAssets(BaseTestCase):
             }])
         asset_xml = AssetXML(self.mocked_xylose_article)
         result = asset_xml._register_ssm_asset(
-            BytesIO('1'),
+            BytesIO(b'1'),
             'article.xml',
             'xml',
             asset_xml.get_metadata()
@@ -587,7 +589,7 @@ class TestAssets(BaseTestCase):
         }
         asset_xml = AssetXML(self.mocked_xylose_article)
         result = asset_xml._register_ssm_asset(
-            BytesIO('1'),
+            BytesIO(b'1'),
             'article.xml',
             'xml',
             asset_xml.get_metadata()
@@ -683,8 +685,10 @@ class TestAssets(BaseTestCase):
             	<graphic mimetype="image" xlink:href="data/1414-431X-bjmbr-1414-431X20176177-gf07.jpg"/>
             </body>
         </article>"""
-        expected = etree.fromstring(expected_xml,
-                                    etree.XMLParser(remove_blank_text=True))
+        expected = etree.fromstring(
+            expected_xml.encode('utf-8'),
+            etree.XMLParser(remove_blank_text=True)
+        )
         asset_xml = AssetXML(self.mocked_xylose_article)
         asset_xml._register_xml_medias()
         self.assertEqual(
@@ -1039,6 +1043,7 @@ class TestAssetHTMLS(BaseTestCase):
         mocked_open_asset,
         mocked_register_ssm_media
     ):
+        mocked_register_ssm_media.return_value = 'media/assets/test/v1n2/01fig05.png'
         html_test_content = """<!--version=html-->
         <p>&nbsp;</p>
         <p align="center">
@@ -1089,6 +1094,7 @@ class TestAssetHTMLS(BaseTestCase):
     ):
         pfile = BytesIO(b'12345')
         mocked_open_asset.return_value = pfile
+        mocked_register_ssm_media.return_value = 'media/assets/test/v1n2/01fig05.png'
         html_test_content = """<!--version=html-->
         <p>&nbsp;</p>
         <p align="center">
@@ -1293,7 +1299,7 @@ class TestAssetHTMLS(BaseTestCase):
                 ssm_file = ssm_asset['pfile']
                 ssm_file.seek(0)
                 ssm_content = ssm_file.read()
-                self.assertEqual('a01tab01.gif', ssm_content)
+                self.assertEqual(b'a01tab01.gif', ssm_content)
             else:
                 ssm_file_soup = BeautifulSoup(
                     ssm_asset['pfile'],
@@ -1357,4 +1363,4 @@ class TestAssetHTMLS(BaseTestCase):
         self.assertIsNotNone(result)
         self.assertNotEqual(result, parsed_html)
         for expected in changed_urls:
-            self.assertIn(expected.encode('utf-8'), str(result))
+            self.assertIn(expected, str(result))
