@@ -5,7 +5,7 @@ import os
 import re
 from copy import copy
 from io import BytesIO, open as io_open
-from urlparse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
 from bs4 import BeautifulSoup
 from lxml import etree
@@ -14,7 +14,7 @@ from packtools import HTMLGenerator
 from opac_proc.core import utils
 from opac_proc.logger_setup import getMongoLogger
 from opac_proc.web import config
-from ssm_handler import SSMHandler
+from .ssm_handler import SSMHandler
 
 if config.DEBUG:
     logger = getMongoLogger(__name__, "DEBUG", "transform")
@@ -55,7 +55,7 @@ class Assets(object):
                 return io_open(file_path, mode, encoding=encoding)
 
         except IOError as e:
-            msg_error = u'Erro ao tentar abri o ativo: %s, erro: %s' % (file_path, e)
+            msg_error = 'Erro ao tentar abri o ativo: %s, erro: %s' % (file_path, e)
             logger.error(msg_error)
 
             if config.OPAC_PROC_RAISE_ERROR:
@@ -66,8 +66,7 @@ class Assets(object):
     def _is_external_link(self, path):
         ext_link_indicators = config.MEDIA_EXT_LINKS_IND.split(',')
         return any(
-            map(lambda ext_link_ind: path.startswith(ext_link_ind),
-                ext_link_indicators)
+            [path.startswith(ext_link_ind) for ext_link_ind in ext_link_indicators]
         )
 
     def _get_media_path(self, name):
@@ -105,12 +104,12 @@ class Assets(object):
                     langs.add(lang)
         else:
             if hasattr(self.xylose, 'fulltexts') and \
-                    'pdf' in self.xylose.fulltexts().keys():
+                    'pdf' in list(self.xylose.fulltexts().keys()):
 
-                for lang in self.xylose.fulltexts().get('pdf').keys():
+                for lang in list(self.xylose.fulltexts().get('pdf').keys()):
                     langs.add(lang)
 
-        msg_info = u"Artigo com PID: %s, tem os seguintes idiomas: %s" % (
+        msg_info = "Artigo com PID: %s, tem os seguintes idiomas: %s" % (
             self.xylose.publisher_id, langs)
         logger.info(msg_info)
 
@@ -159,7 +158,7 @@ class Assets(object):
 
         file_code = self.xylose.file_code()
 
-        msg_info = u"Idioma original do artigo PID: %s, original lang: %s" % (
+        msg_info = "Idioma original do artigo PID: %s, original lang: %s" % (
             self.xylose.publisher_id, original_lang)
         logger.info(msg_info)
 
@@ -167,11 +166,11 @@ class Assets(object):
 
             prefix = '' if lang == original_lang else '%s_' % lang
 
-            pdf_lang.append({lang: u'{}{}.pdf'.format(prefix, file_code)})
+            pdf_lang.append({lang: '{}{}.pdf'.format(prefix, file_code)})
             assets['pdf'] = pdf_lang
 
         if self.xylose.data_model_version == 'xml':
-            assets['xml'] = u'{0}.xml'.format(file_code)
+            assets['xml'] = '{0}.xml'.format(file_code)
         else:
             # importante verificar se é o xylose devolve uma URL
             pass
@@ -205,7 +204,7 @@ class Assets(object):
         if lang and lang != original_lang:
             prefix = '%s_' % lang
 
-        return u'{}{}.{}'.format(prefix, file_code, file_type)
+        return '{}{}.{}'.format(prefix, file_code, file_type)
 
     def _is_valid_media_url(self, parsed_url):
         """
@@ -240,7 +239,7 @@ class Assets(object):
         code, existing_asset = ssm_asset.exists()
         # Existe mas não é idêntico (existe com o mesmo nome)
         if code == 2:
-            logger.info(u"Já existe um media com PID: {}".format(
+            logger.info("Já existe um media com PID: {}".format(
                         self.xylose.publisher_id))
             for asset in existing_asset:
                 ssm_asset.remove(asset['uuid'])
@@ -248,16 +247,16 @@ class Assets(object):
         # recadastrado, também deve ser cadastrado caso não exista, code=0.
         if code == 2 or code == 0:
             uuid = ssm_asset.register()
-            logger.info(u"UUID: {} para media do artigo com PID: {}".format(
+            logger.info("UUID: {} para media do artigo com PID: {}".format(
                         uuid, self.xylose.publisher_id))
             ssm_asset_url = ssm_asset.get_urls()['url_path']
-            logger.info(u"Media cadastrada para o artigo: {}".format(
+            logger.info("Media cadastrada para o artigo: {}".format(
                 ssm_asset_url))
         # Existe e o ativo é idêntico
         elif code == 1:
             for asset in existing_asset:
                 ssm_asset_url = asset['absolute_url']
-            logger.info(u"Medias já existente no SSM: {}".format(ssm_asset_url))
+            logger.info("Medias já existente no SSM: {}".format(ssm_asset_url))
         return ssm_asset_url
 
     def _register_ssm_asset(self, pfile, file_name, file_type, metadata):
@@ -305,14 +304,14 @@ class AssetPDF(Assets):
         """
         Method to register the PDF(s) of the asset.
         """
-        logger.info(u"Iniciando o cadastro do(s) PDF(s) do artigo PID: %s",
+        logger.info("Iniciando o cadastro do(s) PDF(s) do artigo PID: %s",
                     self.xylose.publisher_id)
 
         pdfs = []
         file_type = 'pdf'
 
         if 'pdf' not in self.get_assets():
-            msg_error = u"Não existe PDF para o artigo PID: %s" % self.xylose.publisher_id
+            msg_error = "Não existe PDF para o artigo PID: %s" % self.xylose.publisher_id
 
             logger.error(msg_error)
 
@@ -320,14 +319,14 @@ class AssetPDF(Assets):
                 raise Exception(msg_error)
 
         else:
-            logger.info(u"Lista de PDF(s) existente para o artigo PID: %s",
+            logger.info("Lista de PDF(s) existente para o artigo PID: %s",
                         self.get_assets().get('pdf'))
 
             for item in self.get_assets().get('pdf'):
-                for lang, pdf_name in item.items():
+                for lang, pdf_name in list(item.items()):
                     file_path = self._get_path(pdf_name)
 
-                    logger.info(u"Caminho do PDF do artigo PID: %s, idioma: %s, %s",
+                    logger.info("Caminho do PDF do artigo PID: %s, idioma: %s, %s",
                                 self.xylose.publisher_id, lang, file_path)
 
                     pfile = self._open_asset(file_path)
@@ -336,7 +335,7 @@ class AssetPDF(Assets):
                     if not pfile:
                         continue
 
-                    logger.info(u"Bucket name: %s do PDF: %s", self.bucket_name,
+                    logger.info("Bucket name: %s do PDF: %s", self.bucket_name,
                                 file_path)
 
                     metadata = self.get_metadata()
@@ -350,11 +349,11 @@ class AssetPDF(Assets):
 
                     code, assets = ssm_asset.exists()
 
-                    logger.info(u"Código de existência do PDF: %s", code)
+                    logger.info("Código de existência do PDF: %s", code)
 
                     # Existe e o ativo é idêntico
                     if code == 1:
-                        logger.info(u"Já existe um PDF idêntico com PID: %s e coleção: %s, cadastrado!",
+                        logger.info("Já existe um PDF idêntico com PID: %s e coleção: %s, cadastrado!",
                                     self.xylose.publisher_id, self.xylose.collection_acronym)
 
                         pdfs.append({
@@ -365,7 +364,7 @@ class AssetPDF(Assets):
 
                     # Existe mas não é idêntico (existe com o mesmo nome)
                     if code == 2:
-                        logger.info(u"Já existe um PDF não idêntico com PID: %s e coleção: %s, cadastrado!",
+                        logger.info("Já existe um PDF não idêntico com PID: %s e coleção: %s, cadastrado!",
                                     self.xylose.publisher_id, self.xylose.collection_acronym)
 
                         for asset in assets:
@@ -376,7 +375,7 @@ class AssetPDF(Assets):
                     if code == 2 or code == 0:
                         uuid = ssm_asset.register()
 
-                        logger.info(u"UUID: %s para o PDF do artigo com PID: %s",
+                        logger.info("UUID: %s para o PDF do artigo com PID: %s",
                                     uuid, self.xylose.publisher_id)
 
                         pdfs.append({
@@ -385,7 +384,7 @@ class AssetPDF(Assets):
                             'url': ssm_asset.get_urls()['url']
                         })
 
-                logger.info(u"PDF(s): %s cadastrado(s) para o artigo com PID: %s",
+                logger.info("PDF(s): %s cadastrado(s) para o artigo com PID: %s",
                             pdfs, self.xylose.publisher_id)
 
         if pdfs:
@@ -493,7 +492,7 @@ class AssetXML(Assets):
         To register the xml we must replace the path of the image to paths
         valid and registered in SSM.
         """
-        logger.info(u"Iniciando o cadasto do XML do artigo PID: {}".format(
+        logger.info("Iniciando o cadasto do XML do artigo PID: {}".format(
                     self.xylose.publisher_id))
         if self._content:
             self._register_xml_medias()     # change self._content
@@ -517,7 +516,7 @@ class AssetXML(Assets):
         try:
             generator = HTMLGenerator.parse(self._content, valid_only=False)
         except ValueError as e:
-            logger.error('Error getting htmlgenerator: {}.'.format(e.message))
+            logger.error('Error getting htmlgenerator: {}.'.format(str(e)))
         else:
             return [
                 {'type': 'html', 'lang': lang}
@@ -659,7 +658,7 @@ class AssetHTMLS(Assets):
         directory = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                  'templates')
         registered_htmls = []
-        for lang, html in htmls.items():
+        for lang, html in list(htmls.items()):
             parsed_html = BeautifulSoup(html, "html.parser")
             updated_html = self._register_html_media_assets(parsed_html)
             html_with_template = utils.render_from_template(
@@ -671,7 +670,7 @@ class AssetHTMLS(Assets):
                     'css_print': config.OPAC_PROC_ARTICLE_PRINT_CSS_URL
                 }
             )
-            if isinstance(html_with_template, unicode):
+            if isinstance(html_with_template, str):
                 html_with_template = html_with_template.encode('utf-8')
 
             metadata = self.get_metadata()
@@ -710,5 +709,5 @@ class AssetHTMLS(Assets):
             return self._add_htmls(htmls)
         else:
             logger.error(
-                u"Artigo com o PID: %s, não tem HTML", self.xylose.publisher_id
+                "Artigo com o PID: %s, não tem HTML", self.xylose.publisher_id
             )

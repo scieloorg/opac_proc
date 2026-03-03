@@ -89,16 +89,16 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection
         """
-        logger.debug(u"iniciando: prepare_collection")
+        logger.debug("iniciando: prepare_collection")
         transformed_coll_uuid_str = str(self.transform_model_instance.collection).replace("-", "")
 
         try:
             with switch_db(Collection, OPAC_WEBAPP_DB_NAME) as OPAC_Collection:
                 opac_collection = OPAC_Collection.objects.get(_id=transformed_coll_uuid_str)
                 return opac_collection
-        except DoesNotExist, e:
+        except DoesNotExist as e:
             logger.error(
-                u"collection (_id: %s) não encontrada. Já fez o Load Collection?",
+                "collection (_id: %s) não encontrada. Já fez o Load Collection?",
                 transformed_coll_uuid_str)
             raise e
 
@@ -107,16 +107,16 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection do
         """
-        logger.debug(u"iniciando: prepare_timeline")
+        logger.debug("iniciando: prepare_timeline")
         timeline_docs = []
         if hasattr(self.transform_model_instance, 'timeline'):
             for tl_dict in self.transform_model_instance.timeline:
                 timeline_doc = Timeline(**tl_dict)
                 timeline_docs.append(timeline_doc)
         else:
-            logger.info(u"Não existem Timelines transformados. uuid: %s" % self.transform_model_instance.uuid)
+            logger.info("Não existem Timelines transformados. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"timeline criadas: %s" % len(timeline_docs))
+        logger.debug("timeline criadas: %s" % len(timeline_docs))
         return timeline_docs
 
     def prepare_social_networks(self):
@@ -125,7 +125,7 @@ class JournalLoader(BaseLoader):
         deve retornar um valor válido para Journal.collection do
         """
         # ainda não processmos esta infomação desde o AM/Xylose/Extract
-        logger.debug(u"iniciando: prepare_social_networks")
+        logger.debug("iniciando: prepare_social_networks")
         return []
 
     def prepare_other_titles(self):
@@ -133,16 +133,16 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection do
         """
-        logger.debug(u"iniciando: prepare_other_titles")
+        logger.debug("iniciando: prepare_other_titles")
         other_titles_docs = []
         if hasattr(self.transform_model_instance, 'other_titles'):
             for otitle_dict in self.transform_model_instance.other_titles:
                 other_titles_doc = OtherTitle(**otitle_dict)
                 other_titles_docs.append(other_titles_doc)
         else:
-            logger.info(u"Não existem Other Titles transformados. uuid: %s" % self.transform_model_instance.uuid)
+            logger.info("Não existem Other Titles transformados. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"other_titles criados: %s" % len(other_titles_docs))
+        logger.debug("other_titles criados: %s" % len(other_titles_docs))
         return other_titles_docs
 
     def prepare_mission(self):
@@ -150,16 +150,16 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection do
         """
-        logger.debug(u"iniciando: prepare_mission")
+        logger.debug("iniciando: prepare_mission")
         mission_docs = []
         if hasattr(self.transform_model_instance, 'mission'):
             for mission_dict in self.transform_model_instance.mission:
                 mission_doc = Mission(**mission_dict)
                 mission_docs.append(mission_doc)
         else:
-            logger.info(u"Não existem Missions transformados. uuid: %s" % self.transform_model_instance.uuid)
+            logger.info("Não existem Missions transformados. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"Missions criados: %s" % len(mission_docs))
+        logger.debug("Missions criados: %s" % len(mission_docs))
         return mission_docs
 
     def prepare_last_issue(self):
@@ -167,22 +167,22 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.collection do
         """
-        logger.debug(u"iniciando: prepare_last_issue")
+        logger.debug("iniciando: prepare_last_issue")
         t_journal_uuid = self.transform_model_instance.uuid
         t_issues = TransformIssue.objects.filter(
             journal=t_journal_uuid).order_by('-year', '-order')
 
         if not t_issues:
-            logger.info(u"Não existem issues para journal uuid: %s" % t_journal_uuid)
+            logger.info("Não existem issues para journal uuid: %s" % t_journal_uuid)
             return None
 
         t_issue = t_issues.first().select_related()
-        logger.debug(u"last issue: t_issue encontrado (iid: %s)" % t_issue.iid)
+        logger.debug("last issue: t_issue encontrado (iid: %s)" % t_issue.iid)
         last_issue_sections = []
         if hasattr(t_issue, 'sections'):
             last_issue_sections = t_issue.sections
         else:
-            logger.info(u"Não existem Issue.sections transformados. uuid: %s" % t_issue.uuid)
+            logger.info("Não existem Issue.sections transformados. uuid: %s" % t_issue.uuid)
 
         last_issue_data = {
             'iid': str(t_issue.uuid).replace("-", ""),
@@ -213,14 +213,14 @@ class JournalLoader(BaseLoader):
         if hasattr(t_issue, 'suppl_text'):
             last_issue_data['suppl_text'] = t_issue.suppl_text
 
-        logger.debug(u"criando documento LastIssue: %s" % last_issue_data)
+        logger.debug("criando documento LastIssue: %s" % last_issue_data)
         return LastIssue(**last_issue_data)
 
     def prepare_issue_count(self):
-        logger.debug(u"iniciando: prepare_issue_count")
+        logger.debug("iniciando: prepare_issue_count")
         issue_count = TransformIssue.objects.filter(
             journal=self.transform_model_instance.uuid).count()
-        logger.debug(u"Quantidade de issues encontradas: %s" % issue_count)
+        logger.debug("Quantidade de issues encontradas: %s" % issue_count)
         return issue_count
 
     def prepare_metrics(self):
@@ -228,14 +228,14 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.metrics
         """
-        logger.debug(u"iniciando: prepare_metrics")
+        logger.debug("iniciando: prepare_metrics")
         if hasattr(self.transform_model_instance, 'metrics'):
             metrics_dict = self.transform_model_instance.metrics
             metrics_doc = JounalMetrics(**metrics_dict)
         else:
-            logger.info(u"Não existem 'metrics' transformados. uuid: %s" % self.transform_model_instance.uuid)
+            logger.info("Não existem 'metrics' transformados. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"metrics criadas: %s", metrics_dict)
+        logger.debug("metrics criadas: %s", metrics_dict)
         return metrics_doc
 
     def prepare_is_public(self):
@@ -243,14 +243,14 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.is_public
         """
-        logger.debug(u"iniciando: prepare_is_public")
+        logger.debug("iniciando: prepare_is_public")
         if self.opac_model_instance and hasattr(self.opac_model_instance, 'is_public'):
-            logger.debug(u"is_public configurado: %s" % getattr(self.opac_model_instance, 'is_public'))
+            logger.debug("is_public configurado: %s" % getattr(self.opac_model_instance, 'is_public'))
             return self.opac_model_instance.is_public
         issue_count = TransformIssue.objects.filter(
             journal=self.transform_model_instance.uuid).count()
         is_public = True if issue_count > 0 else False
-        logger.info(u"Periódico público: %s" % is_public)
+        logger.info("Periódico público: %s" % is_public)
         return is_public
 
     def prepare_logo_url(self):
@@ -258,11 +258,11 @@ class JournalLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para Journal.logo_url
         """
-        logger.debug(u"iniciando: prepare_logo_url")
+        logger.debug("iniciando: prepare_logo_url")
         if self.opac_model_instance and hasattr(self.opac_model_instance, 'logo_url'):
-            logger.debug(u"logo_url configurado: %s" % getattr(self.opac_model_instance, 'logo_url'))
+            logger.debug("logo_url configurado: %s" % getattr(self.opac_model_instance, 'logo_url'))
             return self.opac_model_instance.logo_url
         if hasattr(self.transform_model_instance, 'logo_url'):
             logo_url = getattr(self.transform_model_instance, 'logo_url')
-            logger.info(u"URL Logo Periódico: %s" % logo_url)
+            logger.info("URL Logo Periódico: %s" % logo_url)
             return logo_url

@@ -7,9 +7,9 @@ from flask_login import (
     logout_user
 )
 
-import forms
-from mixins import User
-from utils import get_timed_serializer
+from . import forms
+from .mixins import User
+from .utils import get_timed_serializer
 from . import accounts  # accounts blueprint
 
 
@@ -25,23 +25,23 @@ def login():
             user_obj = User()
             user = user_obj.get_by_email_w_password(email)
             if user is None:
-                flash(u"User with this email Does Not Exists", "error")
+                flash("User with this email Does Not Exists", "error")
             elif not user.active:
-                flash(u"This user is inactive", "warning")
+                flash("This user is inactive", "warning")
             elif current_app.config['ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION'] and not user.email_confirmed:
-                flash(u"This user has unconfirmed email", "warning")
+                flash("This user has unconfirmed email", "warning")
             else:
                 password_is_valid = user_obj.check_password_hash(password_as_plain_text)
                 if password_is_valid:
                     if login_user(user, remember=remember):
-                        flash(u"Logged in!", "success")
+                        flash("Logged in!", "success")
                         return redirect(next_url)
                     else:
-                        flash(u"unable to log you in", "error")
+                        flash("unable to log you in", "error")
                 else:
-                    flash(u"Wrong password", "error")
+                    flash("Wrong password", "error")
         else:
-            flash(u"Fix form errors", "error")
+            flash("Fix form errors", "error")
 
     context = {
         'form': form
@@ -74,25 +74,25 @@ def register():
                     if current_app.config['ACCOUNTS_REQUIRES_EMAIL_CONFIRMATION']:
                         msg_sent, msg_error = user.send_confirmation_email()
                         if msg_sent:
-                            flash(u"Email sent with a link for confirmation (%s)!" % email, "success")
+                            flash("Email sent with a link for confirmation (%s)!" % email, "success")
                         else:
-                            flash(u"Can't sent the email (to: %s) with confirmation link! Error: %s" % (email, msg_error), "error")
+                            flash("Can't sent the email (to: %s) with confirmation link! Error: %s" % (email, msg_error), "error")
                     else:
                         # se não é requerido, já deixamos o email como confirmado
                         user.set_email_confirmed()
 
                     if user.email_confirmed:
                         if login_user(user, remember="no"):
-                            flash(u"Logged in!", "success")
+                            flash("Logged in!", "success")
                             return redirect(next_url)
                         else:
-                            flash(u"Unable to log you in", "error")
+                            flash("Unable to log you in", "error")
                     else:
                         return render_template("accounts/unconfirm_email.html")
                 except Exception as e:
-                    flash(u"Unable to register with that email address: %s. Error: %s" % (email, unicode(e)), "error")
+                    flash("Unable to register with that email address: %s. Error: %s" % (email, str(e)), "error")
             else:
-                flash(u"Fix form errors", "error")
+                flash("Fix form errors", "error")
 
         context = {
             'form': form
@@ -106,7 +106,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    flash(u"Logged out.")
+    flash("Logged out.")
     return redirect(url_for('accounts.login'))
 
 
@@ -136,10 +136,10 @@ def reset_password_with_token(token):
                     return render_template("accounts/unconfirm_email.html")
                 else:
                     user.set_new_password(new_password)
-                    flash(u"New password saved successfully!", "success")
+                    flash("New password saved successfully!", "success")
                     return redirect(url_for('accounts.login'))
             else:
-                flash(u"Fix form errors")
+                flash("Fix form errors")
     context = {
         'form': form,
         'token': token,
@@ -166,12 +166,12 @@ def reset_password():
             else:
                 msg_sent, msg_error = user.send_reset_password_email()
                 if msg_sent:
-                    flash(u"Email sent (to: %s) with the instructions to reset your password!" % email, "success")
+                    flash("Email sent (to: %s) with the instructions to reset your password!" % email, "success")
                 else:
-                    flash(u"Can't sent the email (to: %s) with instructions! Error: %s" % (email, msg_error), "error")
+                    flash("Can't sent the email (to: %s) with instructions! Error: %s" % (email, msg_error), "error")
                 return redirect(url_for('accounts.login'))
         else:
-            flash(u"Fix form errors", "error")
+            flash("Fix form errors", "error")
 
     context = {
         'form': form
@@ -194,7 +194,7 @@ def confirm_email(token):
     user = User().get_by_email(email)
     if user:
         user.set_email_confirmed()
-        flash(u'Email: %s confirmed successfully! Now you can login!' % user.email, 'success')
+        flash('Email: %s confirmed successfully! Now you can login!' % user.email, 'success')
         return redirect(url_for('accounts.login'))
     else:
-        abort(404, u"User not found")
+        abort(404, "User not found")

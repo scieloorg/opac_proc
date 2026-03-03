@@ -57,9 +57,9 @@ class IssueTransformer(BaseTransformer):
         acronym = xylose_issue.journal.acronym
         try:
             journal = TransformJournal.objects.get(acronym=acronym)
-        except Exception, e:
+        except Exception as e:
             # se não for encontrado, salvamos o code do Issue para processar depois
-            logger.error(u"TransformJournal (acronym: %s) não encontrado!")
+            logger.error("TransformJournal (acronym: %s) não encontrado!")
             raise e
         else:
             self.transform_model_instance['journal'] = journal.uuid
@@ -110,7 +110,7 @@ class IssueTransformer(BaseTransformer):
             try:
                 self.transform_model_instance['order'] = int(xylose_issue.order)
             except ValueError:
-                msg_error = u'Erro ao tentar converter o campo order para inteiro, PID: %s' % xylose_issue.publisher_id
+                msg_error = 'Erro ao tentar converter o campo order para inteiro, PID: %s' % xylose_issue.publisher_id
                 logger.error(msg_error)
 
                 if config.OPAC_PROC_RAISE_ERROR:
@@ -124,9 +124,9 @@ class IssueTransformer(BaseTransformer):
         if hasattr(xylose_issue, 'sections') and xylose_issue.sections:
             xylose_sections = xylose_issue.sections
             t_issue_sections = []
-            for _, items in xylose_sections.iteritems():
+            for _, items in xylose_sections.items():
                 if items:
-                    for name, lang in items.iteritems():
+                    for name, lang in items.items():
                         t_issue_sections.append({
                             'name': name,
                             'language': lang

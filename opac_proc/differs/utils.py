@@ -1,6 +1,6 @@
 # coding: utf-8
 from opac_proc.datastore import diff_models
-from etl_differ import (
+from opac_proc.differs.etl_differ import (
     CollectionDiffer,
     JournalDiffer,
     IssueDiffer,

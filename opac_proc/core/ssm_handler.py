@@ -4,7 +4,18 @@ import time
 import hashlib
 from datetime import datetime
 
-from opac_ssm_api.client import Client
+try:
+    from opac_ssm_api.client import Client
+except ImportError:
+    class Client(object):
+        def __init__(self, *args, **kwargs):
+            self._error_message = (
+                "opac_ssm_api is required for SSM operations. "
+                "Install opac_ssm_api to enable this feature."
+            )
+
+        def __getattr__(self, name):
+            raise ImportError(self._error_message)
 
 from opac_proc.web import config
 

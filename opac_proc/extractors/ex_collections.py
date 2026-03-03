@@ -40,8 +40,8 @@ class CollectionExtractor(BaseExtractor):
 
         try:
             response = requests.get(url, params=params)
-        except Exception, e:
-            logger.error(u'Erro recuperando as metricas: %s (url=%s, msg=%s)' % (metric_name, url, str(e)))
+        except Exception as e:
+            logger.error('Erro recuperando as metricas: %s (url=%s, msg=%s)' % (metric_name, url, str(e)))
         else:
             if response.status_code == 200:
                 json_data = response.json()
@@ -86,19 +86,19 @@ class CollectionExtractor(BaseExtractor):
         """
         Conecta com a fonte (AM) e extrai todos os dados (coleção).
         """
-        logger.info(u'Inicia CollectionExtractor.extract(%s) %s' % (
+        logger.info('Inicia CollectionExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))
 
         self._raw_data = self.articlemeta.get_collection(code=self.acronym)
         if not self._raw_data:
-            msg = u"Não foi possível recuperar a Coleção (acronym: %s). A informação é vazía" % self.acronym
+            msg = "Não foi possível recuperar a Coleção (acronym: %s). A informação é vazía" % self.acronym
             logger.error(msg)
             raise Exception(msg)
 
-        logger.info(u'Extração de ISSNs da coleção: %s - %s' % (self.acronym, datetime.now()))
+        logger.info('Extração de ISSNs da coleção: %s - %s' % (self.acronym, datetime.now()))
         # extração de metricas
         if self._raw_data['has_analytics']:
             self._raw_data['metrics'] = self._extract_metrics()
 
-        logger.info(u'Fim CollectionExtractor.extract(%s) %s' % (
+        logger.info('Fim CollectionExtractor.extract(%s) %s' % (
             self.acronym, datetime.now()))

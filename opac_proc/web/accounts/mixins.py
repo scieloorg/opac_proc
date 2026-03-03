@@ -7,8 +7,8 @@ from flask_login import (
     current_user, login_required, logout_user,
     UserMixin, AnonymousUserMixin,
     confirm_login, fresh_login_required)
-import models
-import notifications
+from . import models
+from . import notifications
 
 logger = logging.getLogger(__name__)
 

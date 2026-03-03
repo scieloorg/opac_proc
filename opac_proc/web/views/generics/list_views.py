@@ -29,22 +29,22 @@ class ListView(View):
     per_page = 20
     list_columns = [
         {
-            'field_label': u'UUID',
+            'field_label': 'UUID',
             'field_name': 'uuid',
             'field_type': 'string'
         },
         {
-            'field_label': u'Last update',
+            'field_label': 'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Process completed?',
+            'field_label': 'Process completed?',
             'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
-            'field_label': u'Must reprocess?',
+            'field_label': 'Must reprocess?',
             'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
@@ -55,22 +55,22 @@ class ListView(View):
 
     list_filters = [
         {
-            'field_label': u'UUID',
+            'field_label': 'UUID',
             'field_name': 'uuid',
             'field_type': 'uuid'
         },
         {
-            'field_label': u'Last update',
+            'field_label': 'Last update',
             'field_name': 'metadata.updated_at',
             'field_type': 'date_time'
         },
         {
-            'field_label': u'Process completed?',
+            'field_label': 'Process completed?',
             'field_name': 'metadata.process_completed',
             'field_type': 'boolean'
         },
         {
-            'field_label': u'Must reprocess?',
+            'field_label': 'Must reprocess?',
             'field_name': 'metadata.must_reprocess',
             'field_type': 'boolean'
         },
@@ -107,7 +107,7 @@ class ListView(View):
 
     def get_filters(self):
         qs_filters = {}
-        filter_string_lookups = dict(self.filter_string_options).keys()
+        filter_string_lookups = list(dict(self.filter_string_options).keys())
 
         if request.method == 'GET':
             for list_filter in self.list_filters:
@@ -192,7 +192,7 @@ class ListView(View):
             if self.list_filters and filters:
                 _filters = {
                     field.replace('.', '__'): value
-                    for field, value in filters.items()
+                    for field, value in list(filters.items())
                 }
                 return self.model_class.objects.filter(**_filters)
             else:
@@ -216,15 +216,15 @@ class ListView(View):
     def _trigger_messages(self, is_error=False, exception_obj=None, traceback_str='', items_count=None):
         user = current_user.email
         if is_error:
-            exception_msg = u"{exception_str} {traceback_str}".format(
-                            exception_str=unicode(exception_obj),
+            exception_msg = "{exception_str} {traceback_str}".format(
+                            exception_str=str(exception_obj),
                             traceback_str=traceback_str)
 
-            msg_subject = u"ERRO: Após o usuário: {user} iniciar o processo de: {stage} para o modelo: {model} via web".format(
+            msg_subject = "ERRO: Após o usuário: {user} iniciar o processo de: {stage} para o modelo: {model} via web".format(
                 user=user, stage=self.stage, model=self.model_name)
 
             qty = items_count or 'todos os'
-            msg_body = u"""
+            msg_body = """
                         <strong>ERRO:</strong><br />
                         Ocorreu um erro após o usuário: <strong>{user}</strong> iniciar o processo de: <strong>{stage}</strong>
                         para {qty} registro(s) de: <strong>{model}</strong> via web <br /><br />
@@ -232,21 +232,21 @@ class ListView(View):
                         """.format(user=user, stage=self.stage, model=self.model_name, exception_msg=exception_msg, qty=qty)
             app_msg = create_error_msg(msg_subject, msg_body, self.stage, self.model_name)
             msg_link = url_for('default.message_detail', object_id=app_msg.pk, _external=True)
-            flask_msg = u'{msg}. Descrição completa do erro <a href="{url}">aqui</a>'.format(msg=msg_subject, url=msg_link)
+            flask_msg = '{msg}. Descrição completa do erro <a href="{url}">aqui</a>'.format(msg=msg_subject, url=msg_link)
             flash(flask_msg, 'error')
             app_msg.send_email()
         else:
-            msg_subject = u"Usuário: {user} iniciou o processo de: {stage} para o modelo: {model} via web".format(
+            msg_subject = "Usuário: {user} iniciou o processo de: {stage} para o modelo: {model} via web".format(
                           user=user, stage=self.stage,
                           model=self.model_name)
             qty = items_count or 'todos os'
-            msg_body = u"""
+            msg_body = """
                         Usuário: <strong>{user}</strong> iniciar o processo de: <strong>{stage}</strong>
                         para {qty} registros de <strong>{model}</strong>, via web.
                         """.format(user=user, stage=self.stage, model=self.model_name, qty=qty)
             app_msg = create_info_msg(msg_subject, msg_body, self.stage, self.model_name)
             msg_link = url_for('default.message_detail', object_id=app_msg.pk, _external=True)
-            flask_msg = u'{msg}. Descrição completa <a href="{url}">aqui</a>'.format(msg=msg_subject, url=msg_link)
+            flask_msg = '{msg}. Descrição completa <a href="{url}">aqui</a>'.format(msg=msg_subject, url=msg_link)
             flash(flask_msg, 'info')
             app_msg.send_email()
 
@@ -254,7 +254,7 @@ class ListView(View):
         try:
             processor = self.process_class()
             processor.all()
-        except Exception, e:
+        except Exception as e:
             traceback_str = traceback.format_exc()
             self._trigger_messages(is_error=True, exception_obj=e, traceback_str=traceback_str)
         else:
@@ -293,7 +293,7 @@ class ListView(View):
     def get_selected_ids(self, return_as_uuid_str=False):
         pks = request.form.getlist('rowid')
         if not pks:
-            raise ValueError(u"Não selecionou registros!")
+            raise ValueError("Não selecionou registros!")
         elif isinstance(pks, list):
             pks = [_id.strip() for _id in pks]
             if return_as_uuid_str:
@@ -310,9 +310,9 @@ class ListView(View):
                 _, custom_action_method_name, custom_action_target = action_name.split('__')
                 custom_methods_defined = [c_actions['method_name'] for c_actions in self.custom_actions]
                 if custom_action_method_name not in custom_methods_defined:
-                    flash(u'Ação inválida: %s. Nenhum registro foi alterado.' % custom_action_method_name, 'error')
+                    flash('Ação inválida: %s. Nenhum registro foi alterado.' % custom_action_method_name, 'error')
                 elif not hasattr(self, custom_action_method_name):
-                    flash(u'O método: %s não foi implementado, na ListView. Nenhum registro foi alterado.' % custom_action_method_name, 'error')
+                    flash('O método: %s não foi implementado, na ListView. Nenhum registro foi alterado.' % custom_action_method_name, 'error')
                 else:
                     if custom_action_target == 'selected':
                         try:
@@ -321,15 +321,15 @@ class ListView(View):
                                 concrete_method = getattr(self, custom_action_method_name)
                                 concrete_method(ids)
                             else:
-                                flash(u'Seleção inválida de registros. Nenhum registro foi alterado.', 'error')
+                                flash('Seleção inválida de registros. Nenhum registro foi alterado.', 'error')
                         except Exception as e:
-                            flash(u'ERRO: %s' % str(e), 'error')
+                            flash('ERRO: %s' % str(e), 'error')
                     else:
                         try:
                             concrete_method = getattr(self, custom_action_method_name)
                             concrete_method()
                         except Exception as e:
-                            flash(u'ERRO: %s' % str(e), 'error')
+                            flash('ERRO: %s' % str(e), 'error')
 
             elif action_name in self._allowed_POST_action_names:
                 if action_name == 'process_all':
@@ -337,9 +337,9 @@ class ListView(View):
                         try:
                             self.do_process_all()
                         except Exception as e:
-                            flash(u'ERRO: %s' % str(e), 'error')
+                            flash('ERRO: %s' % str(e), 'error')
                     else:
-                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
+                        flash('Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
                 elif action_name == 'process_selected':
                     if self.can_process:
                         try:
@@ -347,19 +347,19 @@ class ListView(View):
                             if ids:
                                 self.do_process_selected(ids)
                             else:
-                                flash(u'Seleção inválida de registros. Nenhum registro foi alterado.', 'error')
+                                flash('Seleção inválida de registros. Nenhum registro foi alterado.', 'error')
                         except Exception as e:
-                            flash(u'ERRO: %s' % str(e), 'error')
+                            flash('ERRO: %s' % str(e), 'error')
                     else:
-                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
+                        flash('Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
                 elif action_name == 'delete_all':
                     if self.can_delete:
                         try:
                             self.do_delete_all()
                         except Exception as e:
-                            flash(u'ERRO: %s' % str(e), 'error')
+                            flash('ERRO: %s' % str(e), 'error')
                     else:
-                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
+                        flash('Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
                 elif action_name == 'delete_selected':
                     if self.can_delete:
                         try:
@@ -367,13 +367,13 @@ class ListView(View):
                             if ids:
                                 self.do_delete_selected(ids)
                             else:
-                                flash(u'Seleção inválida de registros', 'error')
+                                flash('Seleção inválida de registros', 'error')
                         except Exception as e:
-                            flash(u'ERRO: %s' % str(e), 'error')
+                            flash('ERRO: %s' % str(e), 'error')
                     else:
-                        flash(u'Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
+                        flash('Esta ação não esta habilitada. Nenhum registro foi alterado.', 'error')
             else:
-                flash(u'Ação inválida: %s. Nenhum registro foi alterado.' % action_name)
+                flash('Ação inválida: %s. Nenhum registro foi alterado.' % action_name)
         # listamos os registros
         page = request.args.get('page', 1, type=int)
 

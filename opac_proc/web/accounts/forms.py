@@ -1,10 +1,9 @@
 # coding: utf-8
-import models
+from . import models
 from flask_wtf import FlaskForm
 from flask_mongoengine.wtf import model_form
 from flask_mongoengine.wtf.orm import validators
-from wtforms.fields import PasswordField, BooleanField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import PasswordField, BooleanField, EmailField
 
 
 UserForm = model_form(models.User, exclude=[
@@ -20,7 +19,7 @@ class RegisterForm(UserForm):
     password = PasswordField(
         'password',
         validators=[
-            validators.Required(),
+            validators.DataRequired(),
             validators.EqualTo('confirm', message='Passwords must match')
         ])
     confirm = PasswordField('repeat password')
@@ -30,7 +29,7 @@ class RegisterForm(UserForm):
 class LoginForm(UserForm):
     password = PasswordField(
         'password',
-        validators=[validators.Required()])
+        validators=[validators.DataRequired()])
     remember = BooleanField(
         'remember')
 
@@ -47,4 +46,4 @@ class EmailForm(FlaskForm):
 class PasswordForm(FlaskForm):
     password = PasswordField(
         'password',
-        validators=[validators.Required()])
+        validators=[validators.DataRequired()])

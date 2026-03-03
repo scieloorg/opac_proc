@@ -10,7 +10,7 @@ from mongoengine import (
     BooleanField,
     URLField
 )
-from base_mixin import BaseMixin, LoadedData
+from opac_proc.datastore.base_mixin import BaseMixin, LoadedData
 
 from opac_proc.web import config
 from opac_proc.datastore import identifiers_models

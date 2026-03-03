@@ -55,16 +55,16 @@ class PopulateBase(object):
 
     def __init__(self):
         if self.model_name is None:
-            raise AttributeError(u'Falta definir atributo: model_name')
+            raise AttributeError('Falta definir atributo: model_name')
 
         if self.id_model_class is None:
-            raise AttributeError(u'Falta definir atributo: id_model_class')
+            raise AttributeError('Falta definir atributo: id_model_class')
 
         if self.ex_model_class is None:
-            raise AttributeError(u'Falta definir atributo: ex_model_class')
+            raise AttributeError('Falta definir atributo: ex_model_class')
 
         if self.tr_model_class is None:
-            raise AttributeError(u'Falta definir atributo: tr_model_class')
+            raise AttributeError('Falta definir atributo: tr_model_class')
 
         if self._db is None:
             self._db = get_db_connection()
@@ -80,13 +80,13 @@ class PopulateBase(object):
         - news:         {'collection_acronym': 'spa', 'url_id': 'http://123/?p=1'}
         - press_release:{'collection_acronym': 'spa', 'url_id': 'http://345/?p=2'}
         """
-        raise NotImplementedError(u'deve ser implementada na subclase')
+        raise NotImplementedError('deve ser implementada na subclase')
 
     def prepare_data_to_identifier_data(self, extract_model_instance):
         """
         metodo que retorna um dicionario pronto para salvar como modelo de identificador (idsmodels instance)
         """
-        raise NotImplementedError(u'deve ser implementada na subclase')
+        raise NotImplementedError('deve ser implementada na subclase')
 
     def _get_model_instance_by_uuid(self, model_class, uuid):
         """
@@ -101,7 +101,7 @@ class PopulateBase(object):
         elif obj_count == 1:
             return obj.first()
         else:
-            raise ValueError(u'%s objetos retornado. Esperava 1 docuemnto só.Modelo: %s UUID: %s' % (
+            raise ValueError('%s objetos retornado. Esperava 1 docuemnto só.Modelo: %s UUID: %s' % (
                 obj_count, self.model_name, uuid))
 
     def _get_tranform_execution_date_by_uuid(self, uuid):
@@ -141,7 +141,7 @@ class PopulateBase(object):
         elif obj.count() == 1:
             return obj.first()
         else:
-            error_msg = u'Muitos documentos retornados (modelo: %s) com a query: %s' % (
+            error_msg = 'Muitos documentos retornados (modelo: %s) com a query: %s' % (
                 self.model_name, id_model_selector_filter_dict)
             raise Exception(error_msg)
 
@@ -407,7 +407,7 @@ def get_populator_class(model_name):
     elif model_name == 'press_release':
         populator_class = PopulatePressRelease()
     else:
-        raise RuntimeError(u'model_name inválido')
+        raise RuntimeError('model_name inválido')
     return populator_class
 
 
@@ -418,17 +418,17 @@ def main(model_name):
     if process_all:
         for model in MODEL_NAME_LIST:
             populator = get_populator_class(model)
-            logger.info(u"executando retrieve do modelo: %s" % model)
+            logger.info("executando retrieve do modelo: %s" % model)
             populator.run_serial_for_all()
-            logger.info(u"finalizada retrieve do modelo: %s" % model)
+            logger.info("finalizada retrieve do modelo: %s" % model)
     else:
         populator = get_populator_class(model_name)
-        logger.info(u"executando retrieve do modelo: %s" % model_name)
+        logger.info("executando retrieve do modelo: %s" % model_name)
         populator.run_serial_for_all()
-        logger.info(u"finalizada retrieve do modelo: %s" % model_name)
+        logger.info("finalizada retrieve do modelo: %s" % model_name)
 
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "erro: falta indicar o modulo"
+        print("erro: falta indicar o modulo")
     main(sys.argv[1])

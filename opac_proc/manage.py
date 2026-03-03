@@ -3,7 +3,19 @@ import os
 import sys
 import itertools
 import unittest
+import inspect
+from collections import namedtuple
 from flask_script import Manager, Shell
+
+
+if not hasattr(inspect, "getargspec"):
+    ArgSpec = namedtuple("ArgSpec", "args varargs keywords defaults")
+
+    def _compat_getargspec(func):
+        spec = inspect.getfullargspec(func)
+        return ArgSpec(spec.args, spec.varargs, spec.varkw, spec.defaults)
+
+    inspect.getargspec = _compat_getargspec
 
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(PROJECT_PATH)
@@ -159,7 +171,7 @@ def issue_labels_to_ids(collection, items):
 
     cl = ThriftClient(domain, timeout=ARTICLE_META_THRIFT_TIMEOUT)
 
-    for issn, labels in items.items():
+    for issn, labels in list(items.items()):
         d = data_dict.setdefault(issn, set())
         for label in labels:
             code = cl.get_issue_code_from_label(label, issn, collection)
@@ -185,7 +197,7 @@ def issue_ids_to_article_ids(collection, items):
 
     cl = ThriftClient(domain, timeout=ARTICLE_META_THRIFT_TIMEOUT)
 
-    for issn, icodes in items.items():
+    for issn, icodes in list(items.items()):
         d = data_dict.setdefault(issn, [])
         for icode in icodes:
             for code in cl.documents(collection=collection,
@@ -215,13 +227,13 @@ def process_ids():
 def process_extract(issns=None, acrons=None, file=None):
 
     if bool(issns) == bool(acrons) == bool(file):
-        sys.exit(u'Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
+        sys.exit('Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
 
     task_extract_one_collection()
 
     collection = OPAC_PROC_COLLECTION
 
-    print u'Colecão que será carregada: %s' % collection
+    print('Colecão que será carregada: %s' % collection)
 
     issn_list = []
 
@@ -235,38 +247,38 @@ def process_extract(issns=None, acrons=None, file=None):
         issn_list = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
 
     if issns or acrons:
-        print u'Processando o(s) ISSN(s): %s' % issn_list
+        print('Processando o(s) ISSN(s): %s' % issn_list)
 
         journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
         task_extract_selected_journals(journal_uuids)
 
         issue_uuids = IssueIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
-        print u'Processando %s issues' % len(issue_uuids)
+        print('Processando %s issues' % len(issue_uuids))
         task_extract_selected_issues(issue_uuids)
 
         article_uuids = ArticleIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
-        print u'Processando %s artigos' % len(article_uuids)
+        print('Processando %s artigos' % len(article_uuids))
         task_extract_selected_articles(article_uuids)
 
     if file:
 
         items = get_file_items(collection, file)
         ids_issue_dict = issue_labels_to_ids(collection, items)
-        issn_list = ids_issue_dict.keys()
-        print u'Processando o(s) ISSN(s): %s' % issn_list
+        issn_list = list(ids_issue_dict.keys())
+        print('Processando o(s) ISSN(s): %s' % issn_list)
 
         journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
         task_extract_selected_journals(journal_uuids)
 
-        issue_ids = list(itertools.chain(*ids_issue_dict.values()))
+        issue_ids = list(itertools.chain(*list(ids_issue_dict.values())))
         issue_uuids = IssueIdModel.objects.filter(issue_pid__in=issue_ids).values_list('uuid')
-        print u'Processando %s issues' % len(issue_uuids)
+        print('Processando %s issues' % len(issue_uuids))
         task_extract_selected_issues(issue_uuids)
 
         ids_article_dict = issue_ids_to_article_ids(collection, ids_issue_dict)
-        article_ids = list(itertools.chain(*ids_article_dict.values()))
+        article_ids = list(itertools.chain(*list(ids_article_dict.values())))
         article_uuids = ArticleIdModel.objects.filter(article_pid__in=article_ids).values_list('uuid')
-        print u'Processando %s artigos' % len(article_uuids)
+        print('Processando %s artigos' % len(article_uuids))
         task_extract_selected_articles(article_uuids)
 
 
@@ -277,13 +289,13 @@ def process_extract(issns=None, acrons=None, file=None):
 def process_transform(issns=None, acrons=None, file=None):
 
     if bool(issns) == bool(acrons) == bool(file):
-        sys.exit(u'Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
+        sys.exit('Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
 
     task_transform_one_collection()
 
     collection = OPAC_PROC_COLLECTION
 
-    print u'Colecão que será carregada: %s' % collection
+    print('Colecão que será carregada: %s' % collection)
 
     issn_list = []
 
@@ -297,38 +309,38 @@ def process_transform(issns=None, acrons=None, file=None):
         issn_list = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
 
     if issns or acrons:
-        print u'Processando o(s) ISSN(s): %s' % issn_list
+        print('Processando o(s) ISSN(s): %s' % issn_list)
 
         journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
         task_transform_selected_journals(journal_uuids)
 
         issue_uuids = IssueIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
-        print u'Processando %s issues' % len(issue_uuids)
+        print('Processando %s issues' % len(issue_uuids))
         task_transform_selected_issues(issue_uuids)
 
         article_uuids = ArticleIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
-        print u'Processando %s artigos' % len(article_uuids)
+        print('Processando %s artigos' % len(article_uuids))
         task_transform_selected_articles(article_uuids)
 
     if file:
 
         items = get_file_items(collection, file)
         ids_issue_dict = issue_labels_to_ids(collection, items)
-        issn_list = ids_issue_dict.keys()
-        print u'Processando o(s) ISSN(s): %s' % issn_list
+        issn_list = list(ids_issue_dict.keys())
+        print('Processando o(s) ISSN(s): %s' % issn_list)
 
         journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
         task_transform_selected_journals(journal_uuids)
 
-        issue_ids = list(itertools.chain(*ids_issue_dict.values()))
+        issue_ids = list(itertools.chain(*list(ids_issue_dict.values())))
         issue_uuids = IssueIdModel.objects.filter(issue_pid__in=issue_ids).values_list('uuid')
-        print u'Processando %s issues' % len(issue_uuids)
+        print('Processando %s issues' % len(issue_uuids))
         task_transform_selected_issues(issue_uuids)
 
         ids_article_dict = issue_ids_to_article_ids(collection, ids_issue_dict)
-        article_ids = list(itertools.chain(*ids_article_dict.values()))
+        article_ids = list(itertools.chain(*list(ids_article_dict.values())))
         article_uuids = ArticleIdModel.objects.filter(article_pid__in=article_ids).values_list('uuid')
-        print u'Processando %s artigos' % len(article_uuids)
+        print('Processando %s artigos' % len(article_uuids))
         task_transform_selected_articles(article_uuids)
 
 
@@ -339,7 +351,7 @@ def process_transform(issns=None, acrons=None, file=None):
 def process_load(issns=None, acrons=None, file=None):
 
     if bool(issns) == bool(acrons) == bool(file):
-        sys.exit(u'Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
+        sys.exit('Utilizar apenas ``issns`` ou apenas ``acrônimos`` ou apenas ``file``, param: -a ou -i ou -f')
 
     collection = OPAC_PROC_COLLECTION
 
@@ -347,7 +359,7 @@ def process_load(issns=None, acrons=None, file=None):
 
     task_load_one_collection(collection_uuid)
 
-    print u'Colecão que será carregada: %s' % collection
+    print('Colecão que será carregada: %s' % collection)
 
     issn_list = []
 
@@ -361,38 +373,38 @@ def process_load(issns=None, acrons=None, file=None):
         issn_list = [i.strip() for i in issns.split(',')]  # Gerando a lista com ISSNs
 
     if issns or acrons:
-        print u'Processando o(s) ISSN(s): %s' % issn_list
+        print('Processando o(s) ISSN(s): %s' % issn_list)
 
         journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
         task_load_selected_journals(journal_uuids)
 
         issue_uuids = IssueIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
-        print u'Processando %s issues' % len(issue_uuids)
+        print('Processando %s issues' % len(issue_uuids))
         task_load_selected_issues(issue_uuids)
 
         article_uuids = ArticleIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
-        print u'Processando %s artigos' % len(article_uuids)
+        print('Processando %s artigos' % len(article_uuids))
         task_load_selected_articles(article_uuids)
 
     if file:
 
         items = get_file_items(collection, file)
         ids_issue_dict = issue_labels_to_ids(collection, items)
-        issn_list = ids_issue_dict.keys()
-        print u'Processando o(s) ISSN(s): %s' % issn_list
+        issn_list = list(ids_issue_dict.keys())
+        print('Processando o(s) ISSN(s): %s' % issn_list)
 
         journal_uuids = JournalIdModel.objects.filter(journal_issn__in=issn_list).values_list('uuid')
         task_load_selected_journals(journal_uuids)
 
-        issue_ids = list(itertools.chain(*ids_issue_dict.values()))
+        issue_ids = list(itertools.chain(*list(ids_issue_dict.values())))
         issue_uuids = IssueIdModel.objects.filter(issue_pid__in=issue_ids).values_list('uuid')
-        print u'Processando %s issues' % len(issue_uuids)
+        print('Processando %s issues' % len(issue_uuids))
         task_load_selected_issues(issue_uuids)
 
         ids_article_dict = issue_ids_to_article_ids(collection, ids_issue_dict)
-        article_ids = list(itertools.chain(*ids_article_dict.values()))
+        article_ids = list(itertools.chain(*list(ids_article_dict.values())))
         article_uuids = ArticleIdModel.objects.filter(article_pid__in=article_ids).values_list('uuid')
-        print u'Processando %s artigos' % len(article_uuids)
+        print('Processando %s artigos' % len(article_uuids))
         task_load_selected_articles(article_uuids)
 
 
@@ -423,26 +435,26 @@ def create_superuser():
     user_password = None
 
     while user_email is None:
-        user_email = raw_input(u'Email: ').strip()
+        user_email = input('Email: ').strip()
         if user_email == '':
             user_email = None
-            print u'Email não pode ser vazio'
+            print('Email não pode ser vazio')
         else:
             form = EmailForm(data={'email': user_email}, csrf_enabled=False)
             if not form.validate():
                 user_email = None
-                print u'Deve inserir um email válido!'
+                print('Deve inserir um email válido!')
 
             if UserModel.objects.filter(email=user_email).count() > 0:
                 user_email = None
-                print u'Já existe outro usuário com esse email!'
+                print('Já existe outro usuário com esse email!')
 
     os.system("stty -echo")
     while user_password is None:
-        user_password = raw_input('Senha: ').strip()
+        user_password = input('Senha: ').strip()
         if user_password == '':
             user_password = None
-            print u'Senha não pode ser vazio'
+            print('Senha não pode ser vazio')
     os.system("stty echo")
 
     # criamos o usuario
@@ -451,9 +463,9 @@ def create_superuser():
         user = UserMixin(user_email, password_hash, email_confirmed=True)
         user.save()
     except Exception as e:
-        print u'\n\n!!! Ocorreu um erro na criação do usuário. Erro: %s ***\n' % str(e)
+        print('\n\n!!! Ocorreu um erro na criação do usuário. Erro: %s ***\n' % str(e))
     else:
-        print u'\n\n*** Novo usuário criado com sucesso! ***\n'
+        print('\n\n*** Novo usuário criado com sucesso! ***\n')
 
 
 @manager.command
@@ -466,8 +478,8 @@ def setup_static_catalog_scheduler(all_formats=False,
     def setup_scheduler_format_task(queue_name, format, source_path,
                                     cron_string):
         clear_setup_scheduler_jobs(queue_name)
-        print u'Format %s from %s queue %s cron %s' % (format, source_path,
-                                                       queue_name, cron_string)
+        print('Format %s from %s queue %s cron %s' % (format, source_path,
+                                                       queue_name, cron_string))
         setup_scheduler_jobs(
             task_create_collection_static_catalog,
             [format, source_path],
@@ -479,11 +491,11 @@ def setup_static_catalog_scheduler(all_formats=False,
         'pdf': (OPAC_PROC_ASSETS_SOURCE_PDF_PATH, PDF_CATALOG_CRON_STRING),
         'xml': (OPAC_PROC_ASSETS_SOURCE_XML_PATH, XML_CATALOG_CRON_STRING)
     }
-    print u'Config. Static Catalog Scheduler'
+    print('Config. Static Catalog Scheduler')
 
     all_formats = True if all_formats else False
-    if format and format not in catalog_formats.keys():
-        sys.exit(u'Format "%s" não suportado. Informe "pdf" ou "xml".' % format)
+    if format and format not in list(catalog_formats.keys()):
+        sys.exit('Format "%s" não suportado. Informe "pdf" ou "xml".' % format)
     elif format:
         source_path, catalog_cron_string = catalog_formats[format]
         setup_scheduler_format_task(
@@ -493,7 +505,7 @@ def setup_static_catalog_scheduler(all_formats=False,
             cron_string=cron_string if cron_string else catalog_cron_string
         )
     elif all_formats:
-        for format, catalog_format in catalog_formats.items():
+        for format, catalog_format in list(catalog_formats.items()):
             source_path, catalog_cron_string = catalog_format
             setup_scheduler_format_task(
                 queue_name='q%s_catalog' % format,
@@ -502,15 +514,15 @@ def setup_static_catalog_scheduler(all_formats=False,
                 cron_string=cron_string if cron_string else catalog_cron_string
             )
     else:
-        sys.exit(u'Informe --format ou --all.')
+        sys.exit('Informe --format ou --all.')
 
 
 @manager.command
 @manager.option('-q', '--queue', dest='queue')
 def clear_setup_scheduler_queue(queue):
-    print u'\n Limpando fila %s' % queue
+    print('\n Limpando fila %s' % queue)
     clear_setup_scheduler_jobs(queue)
-    print u'\n Sem jobs em fila %s!' % queue
+    print('\n Sem jobs em fila %s!' % queue)
 
 
 @manager.command
@@ -526,7 +538,7 @@ def setup_idsync_scheduler(model_name='all'):
     for model_name_ in models_selected:
         sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
         sched_instance = sched_class()
-        print "instalando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_)
+        print("instalando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_))
         sched_instance.setup()
 
 
@@ -543,7 +555,7 @@ def clear_idsync_scheduler(model_name='all'):
     for model_name_ in models_selected:
         sched_class = SCHED_ID_BY_MODEL_NAME[model_name_]
         sched_instance = sched_class()
-        print "limpando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_)
+        print("limpando scheduler na fila: %s para o modelo: %s" % (sched_instance.queue_name, model_name_))
         sched_instance.clear_jobs()
 
 
@@ -563,8 +575,8 @@ def setup_produce_delete_article_differs():
             for action_ in actions_list:
                 sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
                 sched_instance = sched_class()
-                print "[%s][%s][%s] instalando scheduler na fila: %s" % (
-                    stage_, model_, action_, sched_instance.queue_name)
+                print("[%s][%s][%s] instalando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name))
                 sched_instance.setup()
 
 
@@ -584,8 +596,8 @@ def setup_produce_delete_issue_differs():
             for action_ in actions_list:
                 sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
                 sched_instance = sched_class()
-                print "[%s][%s][%s] instalando scheduler na fila: %s" % (
-                    stage_, model_, action_, sched_instance.queue_name)
+                print("[%s][%s][%s] instalando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name))
                 sched_instance.setup()
 
 
@@ -604,7 +616,7 @@ def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
     stages_list, models_list, actions_list = clean_differ_scheduler_params(
         stage, model_name, action)
 
-    print "ESTE PROCESSO NÃO CRIA TAREFAS DE DELEÇÃO DE REGISTROS DE FASCÍCULO E ARTIGO!"
+    print("ESTE PROCESSO NÃO CRIA TAREFAS DE DELEÇÃO DE REGISTROS DE FASCÍCULO E ARTIGO!")
     "UTILIZE O COMANDO setup_produce_delete_article_differs e setup_produce_delete_issue_differs"
     for stage_ in stages_list:
         for model_ in models_list:
@@ -612,8 +624,8 @@ def setup_produce_differ_scheduler(stage='all', model_name='all', action='all'):
                 if not ((model_ == 'article' or model_ == 'issue') and action_ == 'delete'):
                     sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
                     sched_instance = sched_class()
-                    print "[%s][%s][%s] instalando scheduler na fila: %s" % (
-                        stage_, model_, action_, sched_instance.queue_name)
+                    print("[%s][%s][%s] instalando scheduler na fila: %s" % (
+                        stage_, model_, action_, sched_instance.queue_name))
                     sched_instance.setup()
 
 
@@ -633,8 +645,8 @@ def clear_produce_differ_scheduler(stage='all', model_name='all', action='all'):
             for action_ in actions_list:
                 sched_class = PRODUCER_SCHEDS[stage_][model_][action_]
                 sched_instance = sched_class()
-                print "[%s][%s][%s] limpando scheduler na fila: %s" % (
-                    stage_, model_, action_, sched_instance.queue_name)
+                print("[%s][%s][%s] limpando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name))
                 sched_instance.clear_jobs()
 
 
@@ -654,8 +666,8 @@ def setup_consume_differ_scheduler(stage='all', model_name='all', action='all'):
             for action_ in actions_list:
                 sched_class = CONSUMER_SCHEDS[stage_][model_][action_]
                 sched_instance = sched_class()
-                print "[%s][%s][%s] instalando scheduler na fila: %s" % (
-                    stage_, model_, action_, sched_instance.queue_name)
+                print("[%s][%s][%s] instalando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name))
                 sched_instance.setup()
 
 
@@ -675,8 +687,8 @@ def clear_consume_differ_scheduler(stage='all', model_name='all', action='all'):
             for action_ in actions_list:
                 sched_class = CONSUMER_SCHEDS[stage_][model_][action_]
                 sched_instance = sched_class()
-                print "[%s][%s][%s] limpando scheduler na fila: %s" % (
-                    stage_, model_, action_, sched_instance.queue_name)
+                print("[%s][%s][%s] limpando scheduler na fila: %s" % (
+                    stage_, model_, action_, sched_instance.queue_name))
                 sched_instance.clear_jobs()
 
 

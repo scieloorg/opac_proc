@@ -51,19 +51,19 @@ class AppMessage(object):
     @property
     def pk(self):
         if self.model_instance is None:
-            raise AttributeError(u'O attr: model_instance não foi definido!')
+            raise AttributeError('O attr: model_instance não foi definido!')
         else:
             return self.model_instance.pk
 
     def save(self):
         if self.model_instance is None:
-            raise AttributeError(u'O attr: model_instance não foi definido!')
+            raise AttributeError('O attr: model_instance não foi definido!')
         else:
             self.model_instance.save()
 
     def send_email(self):
         if self.model_instance is None or not self.model_instance.pk:
-            raise ValueError(u'Antes de enviar email deve salvar a mensagem! Utilize o método save()')
+            raise ValueError('Antes de enviar email deve salvar a mensagem! Utilize o método save()')
         else:
             users = User.objects.filter(active=True, email_confirmed=True)
             for user in users:
@@ -109,11 +109,11 @@ def send_email_unread_single_message(msg_id):
         if msg.model_instance.unread:
             msg.send_email()
         else:
-            raise ValueError(u'A mensagem com id: %s já esta marcada como enviada e não sera enviada novamente!' % msg_id)
+            raise ValueError('A mensagem com id: %s já esta marcada como enviada e não sera enviada novamente!' % msg_id)
     except Message.DoesNotExist:
-        raise ValueError(u'A mensagem com id: %s não existe!' % msg_id)
-    except Exception, e:  # melhorar esta Exception com IOError ou socket.error
-        raise Exception(u'A mensagem com id: %s não pode ser enviada! Erro: %s' % (msg_id, str(e)))
+        raise ValueError('A mensagem com id: %s não existe!' % msg_id)
+    except Exception as e:  # melhorar esta Exception com IOError ou socket.error
+        raise Exception('A mensagem com id: %s não pode ser enviada! Erro: %s' % (msg_id, str(e)))
 
 
 def send_email_unread_mass_messages(msg_ids):

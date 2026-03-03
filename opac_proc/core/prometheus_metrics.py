@@ -1,6 +1,6 @@
 # coding: utf-8
 from functools import wraps
-from urllib2 import URLError
+from urllib.error import URLError
 
 from prometheus_client import (
     Summary, CollectorRegistry, pushadd_to_gateway,

@@ -54,15 +54,15 @@ class PressReleaseLoader(BaseLoader):
         metodo chamado na preparação dos dados a carregar no opac_schema
         deve retornar um valor válido para PressRelease.journal
         """
-        logger.debug(u"iniciando: prepare_journal")
+        logger.debug("iniciando: prepare_journal")
         t_journal_acronym = self.transform_model_instance.journal_acronym
 
         try:
             with switch_db(OpacJournal, OPAC_WEBAPP_DB_NAME) as OPAC_Journal:
                 opac_journal = OPAC_Journal.objects.get(acronym=t_journal_acronym)
                 return opac_journal
-        except DoesNotExist, e:
+        except DoesNotExist as e:
             logger.error(
-                u"Journal (acronym: %s) não foi encontrado. Já fez o Load Journal?",
+                "Journal (acronym: %s) não foi encontrado. Já fez o Load Journal?",
                 t_journal_acronym)
             raise e

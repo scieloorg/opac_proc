@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import unicode_literals
+
 
 import uuid
 from datetime import datetime
@@ -67,4 +67,4 @@ class BaseMixin(object):
                 document.update_reprocess_field(uuid)
 
     def __unicode__(self):
-        return unicode(self._id)
+        return str(self._id)

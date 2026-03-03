@@ -8,8 +8,8 @@ from mongoengine import DoesNotExist, MultipleObjectsReturned
 class DetailView(MethodView):
     model_class = None
     template_name = 'object_detail/base.html'
-    page_title = u'Object Detail'
-    page_subtitle = u''
+    page_title = 'Object Detail'
+    page_subtitle = ''
 
     def get_document_by_id(self, object_id):
         """
@@ -23,25 +23,25 @@ class DetailView(MethodView):
     def get(self, object_id):
         model_class_name = str(self.model_class)
         if object_id is None:
-            abort(400, u'Deve indicar um id (parametro: object_id) válido')
+            abort(400, 'Deve indicar um id (parametro: object_id) válido')
         else:
             try:
                 doc = self.get_document_by_id(object_id)
                 doc_json = doc.to_json()
                 doc_json = json.loads(doc_json)
             except DoesNotExist:
-                abort(404, u'Recurso não existe (%s, %s)' % (
+                abort(404, 'Recurso não existe (%s, %s)' % (
                       model_class_name, object_id))
             except MultipleObjectsReturned:
-                abort(404, u'Existe mais de um recurso com esse id: (%s, %s)' % (
+                abort(404, 'Existe mais de um recurso com esse id: (%s, %s)' % (
                       model_class_name, object_id))
-            except Exception, e:
-                abort(500, u'Exception: %s (%s, %s)' % (
+            except Exception as e:
+                abort(500, 'Exception: %s (%s, %s)' % (
                       e, model_class_name, object_id))
             else:
                 context = {
                     'page_title': self.page_title,
-                    'page_subtitle': u'(%s)' % object_id,
+                    'page_subtitle': '(%s)' % object_id,
                     'object_json': doc_json,
                     'document': doc
                 }

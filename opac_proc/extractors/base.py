@@ -52,7 +52,7 @@ class BaseExtractor(object):
 
         try:
             instance = self.ids_model_class.objects(**self.get_identifier_query)
-        except Exception, e:  # does not exist or multiple objects returned
+        except Exception as e:  # does not exist or multiple objects returned
             # se existe deveria ser só uma instância do modelo
             raise e
         else:
@@ -69,7 +69,7 @@ class BaseExtractor(object):
 
         try:
             instance = self.extract_model_class.objects(**self.get_instance_query)
-        except Exception, e:  # does not exist or multiple objects returned
+        except Exception as e:  # does not exist or multiple objects returned
             # se existe deveria ser só uma instância do modelo
             raise e
         else:
@@ -109,21 +109,21 @@ class BaseExtractor(object):
         """
         Salva os dados coletados no datastore (mongo)
         """
-        logger.debug(u"Inciando metodo save()")
+        logger.debug("Inciando metodo save()")
         if self.extract_model_class is None or self.extract_model_name is None:
-            msg = u"atributos extract_model_class ou extract_model_name não forma definidos na subclasse"
+            msg = "atributos extract_model_class ou extract_model_name não forma definidos na subclasse"
             logger.error(msg)
             raise Exception(msg)
         elif self.metadata['process_start_at'] is None:
-            msg = u"não foi definida o timestamp de inicio, você definiu/invocou o metodo: extract() na subclasse?"
+            msg = "não foi definida o timestamp de inicio, você definiu/invocou o metodo: extract() na subclasse?"
             logger.error(msg)
             raise Exception(msg)
         elif not self._raw_data:
-            msg = u"os dados coletados estão vazios, você definiu/invocou o metodo: extract() na subclasse?"
+            msg = "os dados coletados estão vazios, você definiu/invocou o metodo: extract() na subclasse?"
             logger.error(msg)
             raise Exception(msg)
         elif not isinstance(self._raw_data, dict):
-            msg = u"os dados extraidos, não são do tipo esperado: dict()"
+            msg = "os dados extraidos, não são do tipo esperado: dict()"
             logger.error(msg)
             raise Exception(msg)
         else:
@@ -140,19 +140,19 @@ class BaseExtractor(object):
             # salvamos no mongo
             try:
                 if self.extract_model_instance:
-                    logger.debug(u"extract_model_instance encontrado. Atualizando!")
+                    logger.debug("extract_model_instance encontrado. Atualizando!")
                     self.extract_model_instance.modify(**self._raw_data)
                 else:
-                    logger.debug(u"extract_model_instance NÃO encontrado. Criando novo!")
+                    logger.debug("extract_model_instance NÃO encontrado. Criando novo!")
                     self.extract_model_instance = self.extract_model_class(**self._raw_data)
                     self.extract_model_instance.save()
-            except Exception, e:
-                msg = u"Não foi possível salvar %s. Exceção: %s" % (
+            except Exception as e:
+                msg = "Não foi possível salvar %s. Exceção: %s" % (
                     self.extract_model_name, e)
                 logger.error(msg)
                 raise e
             else:
-                logger.debug(u"Reload de extract_model_instance")
+                logger.debug("Reload de extract_model_instance")
                 self.extract_model_instance.reload()
-                logger.debug(u"Fim metodo save(), retornamos uuid: %s" % self.extract_model_instance.uuid)
+                logger.debug("Fim metodo save(), retornamos uuid: %s" % self.extract_model_instance.uuid)
                 return self.extract_model_instance

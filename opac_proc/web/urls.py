@@ -296,7 +296,7 @@ def add_url_rules(app):
         stage = url_definition['stage']
         models_data = url_definition['models']
 
-        for model_name, view_classes in models_data.iteritems():
+        for model_name, view_classes in models_data.items():
 
             list_view_class = view_classes['list_view_class']
             detail_view_class = view_classes['detail_view_class']

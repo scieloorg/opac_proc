@@ -1,11 +1,17 @@
 # coding: utf-8
 
 import os
-import thriftpy
+try:
+    import thriftpy2 as thriftpy
+except ImportError:  # fallback for older environments
+    import thriftpy
 import json
 import logging
 
-from thriftpy.rpc import make_client
+try:
+    from thriftpy2.rpc import make_client
+except ImportError:  # fallback for older environments
+    from thriftpy.rpc import make_client
 
 LIMIT = 1000
 
@@ -90,7 +96,7 @@ class ArticleMeta(object):
             journal = self.client.get_journal(
                 code=code,
                 collection=collection)
-        except Exception, e:
+        except Exception as e:
             msg = 'Error retrieving journal: %s_%s. Exception: %s' % (
                 collection, code, str(e))
             logger.error(msg)
@@ -99,8 +105,8 @@ class ArticleMeta(object):
             jjournal = None
             try:
                 jjournal = json.loads(journal)
-                logger.info(u'Journal loaded: %s_%s' % (collection, code))
-            except Exception, e:
+                logger.info('Journal loaded: %s_%s' % (collection, code))
+            except Exception as e:
                 msg = 'Fail to load JSON when retrienving Journal: %s_%s. Exception: %s' % (
                     collection, code, str(e))
                 logger.error(msg)
@@ -114,7 +120,7 @@ class ArticleMeta(object):
                 code=code,
                 collection=collection,
                 replace_journal_metadata=True)
-        except Exception, e:
+        except Exception as e:
             msg = 'Error retrieving Issue: %s_%s. Exception: %s' % (
                 collection, code, str(e))
             logger.error(msg)
@@ -123,8 +129,8 @@ class ArticleMeta(object):
             jissue = None
             try:
                 jissue = json.loads(issue)
-                logger.info(u'Issue loaded: %s_%s' % (collection, code))
-            except Exception, e:
+                logger.info('Issue loaded: %s_%s' % (collection, code))
+            except Exception as e:
                 msg = 'Fail to load JSON when retrienving Issue: %s_%s. Exception: %s' % (
                     collection, code, str(e))
                 logger.error(msg)
@@ -140,7 +146,7 @@ class ArticleMeta(object):
                 replace_journal_metadata=True,
                 fmt=fmt,
                 body=body)
-        except Exception, e:
+        except Exception as e:
             msg = 'Error retrieving Article: %s_%s. Exception: %s' % (
                 collection, code, str(e))
             logger.error(msg)
@@ -149,7 +155,7 @@ class ArticleMeta(object):
             jarticle = None
             try:
                 jarticle = json.loads(article)
-            except Exception, e:
+            except Exception as e:
                 msg = 'Fail to load JSON when retrienving Article: %s_%s. Exception: %s' % (
                     collection, code, str(e))
                 logger.error(msg)
@@ -171,7 +177,7 @@ class ArticleMeta(object):
                     'has_analytics': collection.has_analytics,
                 })
             return collections_list
-        except Exception, e:
+        except Exception as e:
             msg = 'Error retrieving Collections. Exception: %s' % (e)
             logger.error(msg)
             raise ServerError(msg)

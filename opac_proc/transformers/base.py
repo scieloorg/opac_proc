@@ -73,14 +73,14 @@ class BaseTransformer(object):
                 extract_model_key)
         except NotImplementedError:
             raise ValueError('subclasse deve definir o método: get_extract_model_instance!')
-        except Exception, e:
+        except Exception as e:
             raise e
 
         if transform_model_uuid:
             try:
                 self.transform_model_instance = self.transform_model_class.objects.get(
                     uuid=transform_model_uuid)
-            except self.transform_model_class.DoesNotExist, e:
+            except self.transform_model_class.DoesNotExist as e:
                 raise ValueError('transform_model_uuid inválido!!')
         else:
             try:
@@ -88,7 +88,7 @@ class BaseTransformer(object):
                 extract_uuid = self.extract_model_instance.uuid
                 self.transform_model_instance = self.transform_model_class.objects.get(
                     uuid=extract_uuid)
-            except self.transform_model_class.DoesNotExist, e:
+            except self.transform_model_class.DoesNotExist as e:
                 # não achamos, teremos que retornar uma instância nova do modelo
                 self.transform_model_instance = self.transform_model_class()
 
@@ -99,14 +99,14 @@ class BaseTransformer(object):
         definida em cada subclase, e retorna um dicionario pronto para criar
         um instância de documento xylose
         """
-        logger.debug(u'iniciando clean_for_xylose')
+        logger.debug('iniciando clean_for_xylose')
         obj_json = self.extract_model_instance.to_json()
         obj_dict = json.loads(obj_json)
         result_dict = {}
-        for k, v in obj_dict.iteritems():
+        for k, v in obj_dict.items():
             if k not in self.exclude_fields:
                 result_dict[k] = v
-        logger.debug(u'finalizado clean_for_xylose')
+        logger.debug('finalizado clean_for_xylose')
         return result_dict
 
     def get_extract_model_instance(self, key):
@@ -118,7 +118,7 @@ class BaseTransformer(object):
 
         try:
             instance = self.ids_model_class.objects(**id_model_lookup_dict)
-        except Exception, e:  # does not exist or multiple objects returned
+        except Exception as e:  # does not exist or multiple objects returned
             # se existe deveria ser só uma instância do modelo
             raise e
         else:
@@ -166,8 +166,8 @@ class BaseTransformer(object):
         }
         self.ids_model_instance = self.get_identifier_model_instance(id_model_lookup_dict)
         if not self.ids_model_instance:
-            raise ValueError(u'Não encontramos um modelo identifier (%s) relaciondo o esta modelo' % self.ids_model_name)
-        logger.debug(u"iniciando save()")
+            raise ValueError('Não encontramos um modelo identifier (%s) relaciondo o esta modelo' % self.ids_model_name)
+        logger.debug("iniciando save()")
         try:
             # setamos o valor do campo UUID:
             self.transform_model_instance.uuid = self.ids_model_instance.uuid
@@ -175,10 +175,10 @@ class BaseTransformer(object):
             self.transform_model_instance['metadata'] = ProcessMetada(**self.metadata)
             self.transform_model_instance.save()
             self.transform_model_instance.reload()
-        except Exception, e:
-            msg = u"Não foi possível salvar %s. Exeção: %s" % (self.transform_model_name, e)
+        except Exception as e:
+            msg = "Não foi possível salvar %s. Exeção: %s" % (self.transform_model_name, e)
             logger.error(msg)
             raise Exception(msg)
         else:
-            logger.debug(u"finalizando save()")
+            logger.debug("finalizando save()")
             return self.transform_model_instance

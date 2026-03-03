@@ -4,7 +4,9 @@ import io
 import csv
 from flask import make_response, flash, redirect, url_for, current_app
 from redis import Redis
-from rq import push_connection, pop_connection, get_failed_queue
+from rq import Queue
+from rq.job import Job
+from rq.registry import FailedJobRegistry
 
 
 def serialize_job(job):
@@ -26,11 +28,12 @@ def export_failed_jobs():
     redis_port = current_app.config['REDIS_PORT']
     redis_pass = current_app.config['REDIS_PASSWORD']
     con = Redis(host=redis_host, port=redis_port, password=redis_pass)
-    push_connection(con)
-    fq = get_failed_queue()
-    fq_jobs = [serialize_job(job) for job in fq.get_jobs()]
-    if fq.count > 0:
-        dest = io.BytesIO()
+    queue = Queue(connection=con)
+    failed_registry = FailedJobRegistry(queue=queue)
+    failed_jobs = [Job.fetch(job_id, connection=con) for job_id in failed_registry.get_job_ids()]
+    fq_jobs = [serialize_job(job) for job in failed_jobs]
+    if len(fq_jobs) > 0:
+        dest = io.StringIO()
         writer = csv.writer(dest)
         headers = [
             u'ID:',
@@ -48,12 +51,10 @@ def export_failed_jobs():
                 job_data['exc_info'],
             ]
             writer.writerow(row_data)
-        pop_connection()
         output = make_response(dest.getvalue())
         output.headers["Content-Disposition"] = "attachment; filename=export_failed.csv"
         output.headers["Content-type"] = "text/csv"
         return output
     else:
-        pop_connection()
         flash('A fila de falhas esta vazia!', 'warning')
         return redirect(url_for('home'))

@@ -5,8 +5,8 @@ from raven.contrib.flask import Sentry
 import logging
 import rq_dashboard
 import rq_scheduler_dashboard
-import custom_jinja_filters
-from werkzeug.contrib.fixers import ProxyFix
+from opac_proc.web import custom_jinja_filters
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, redirect, url_for
 from flask_mongoengine import MongoEngine, MongoEngineSessionInterface
 from flask_debugtoolbar import DebugToolbarExtension
@@ -48,7 +48,8 @@ def load_user(id):
 def register_extensions(app):
     login_manager.init_app(app)
     db.init_app(app)
-    app.session_interface = MongoEngineSessionInterface(db)
+    if not app.config.get('TESTING'):
+        app.session_interface = MongoEngineSessionInterface(db)
     toolbar.init_app(app)
     mail.init_app(app)
     if app.config['SENTRY_DSN']:
@@ -57,8 +58,8 @@ def register_extensions(app):
 
 
 def regiter_bluprints(app):
-    from accounts import accounts
-    from accounts.helpers import check_user_logged_in_or_redirect
+    from opac_proc.web.accounts import accounts
+    from opac_proc.web.accounts.helpers import check_user_logged_in_or_redirect
     rq_scheduler_dashboard.blueprint.before_request(check_user_logged_in_or_redirect)
     rq_dashboard.blueprint.before_request(check_user_logged_in_or_redirect)
     app.register_blueprint(accounts)

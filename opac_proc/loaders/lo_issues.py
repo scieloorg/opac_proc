@@ -57,27 +57,27 @@ class IssueLoader(BaseLoader):
     ]
 
     def prepare_journal(self):
-        logger.debug(u"iniciando prepare_journal")
+        logger.debug("iniciando prepare_journal")
         t_journal_uuid = self.transform_model_instance.journal
         t_journal_uuid_str = str(t_journal_uuid).replace("-", "")
 
         with switch_db(OpacJournal, OPAC_WEBAPP_DB_NAME):
             try:
                 opac_journal = OpacJournal.objects.get(_id=t_journal_uuid_str)
-                logger.debug(u"Journal: %s (_id: %s) encontrado" % (opac_journal.acronym, t_journal_uuid_str))
-            except DoesNotExist, e:
-                logger.error(u"Journal (_id: %s) não encontrado. Já fez o Load Journal?" % t_journal_uuid_str)
+                logger.debug("Journal: %s (_id: %s) encontrado" % (opac_journal.acronym, t_journal_uuid_str))
+            except DoesNotExist as e:
+                logger.error("Journal (_id: %s) não encontrado. Já fez o Load Journal?" % t_journal_uuid_str)
                 raise e
         return opac_journal
 
     def prepare_type(self):
-        logger.debug(u"iniciando prepare_type")
+        logger.debug("iniciando prepare_type")
         if self.transform_model_instance['type'] == 'ahead':
             count_transformed_articles_of_ahead = TransformArticle.objects.filter(
                 issue=self.transform_model_instance.uuid).count()
 
             if count_transformed_articles_of_ahead == 0:
-                logger.debug(u"retorno do prepare_type: para o issue com uuid: %s o tipo: 'outdated_ahead'" %
+                logger.debug("retorno do prepare_type: para o issue com uuid: %s o tipo: 'outdated_ahead'" %
                              self.transform_model_instance.uuid)
                 return 'outdated_ahead'
             else:

@@ -83,9 +83,9 @@ class ArticleLoader(BaseLoader):
     ]
 
     def remove_aop_records(self):
-        logger.debug(u"iniciando remove_aop_records")
+        logger.debug("iniciando remove_aop_records")
         if not hasattr(self.transform_model_instance, 'aop_pid'):
-            logger.debug(u"Artigo %s não é ex-ahead"
+            logger.debug("Artigo %s não é ex-ahead"
                          % self.transform_model_instance.pid)
             return
         aop_pid = self.transform_model_instance.aop_pid
@@ -98,7 +98,7 @@ class ArticleLoader(BaseLoader):
         for model_class, queryset in model_class_queryset:
             result = model_class.objects(queryset)
             if not result:
-                logger.debug(u"AOP %s não registrado no PROC" % aop_pid)
+                logger.debug("AOP %s não registrado no PROC" % aop_pid)
             else:
                 model_instance = result[0]
                 logger.info(
@@ -108,49 +108,49 @@ class ArticleLoader(BaseLoader):
                 model_instance.delete()
 
         logger.info(
-            u"Deletando AOP %s do OPAC, já publicado em fascículo regular"
+            "Deletando AOP %s do OPAC, já publicado em fascículo regular"
             % aop_pid
         )
         with switch_db(self.opac_model_class, OPAC_WEBAPP_DB_NAME):
             try:
                 opac_article = self.opac_model_class.objects.get(pid=aop_pid)
             except DoesNotExist:
-                logger.debug(u"AOP %s não registrado no PROC" % aop_pid)
+                logger.debug("AOP %s não registrado no PROC" % aop_pid)
             else:
                 opac_article.delete()
 
     def prepare_issue(self):
-        logger.debug(u"iniciando prepare_issue")
+        logger.debug("iniciando prepare_issue")
         t_issue_uuid = self.transform_model_instance.issue
         t_issue_uuid_str = str(t_issue_uuid).replace("-", "")
 
         try:
             with switch_db(OpacIssue, OPAC_WEBAPP_DB_NAME):
                 opac_issue = OpacIssue.objects.get(_id=t_issue_uuid_str)
-                logger.debug(u"OPAC Issue: %s (_id: %s) encontrado" % (opac_issue.label, t_issue_uuid_str))
-        except DoesNotExist, e:
-            logger.error(u"OPAC Issue (_id: %s) não encontrado. Já fez o Load Issue?" % t_issue_uuid_str)
+                logger.debug("OPAC Issue: %s (_id: %s) encontrado" % (opac_issue.label, t_issue_uuid_str))
+        except DoesNotExist as e:
+            logger.error("OPAC Issue (_id: %s) não encontrado. Já fez o Load Issue?" % t_issue_uuid_str)
             raise e
         else:
             return opac_issue
 
     def prepare_journal(self):
-        logger.debug(u"iniciando prepare_journal")
+        logger.debug("iniciando prepare_journal")
         t_journal_uuid = self.transform_model_instance.journal
         t_journal_uuid_str = str(t_journal_uuid).replace("-", "")
         opac_journal = None
         try:
             with switch_db(OpacJournal, OPAC_WEBAPP_DB_NAME):
                 opac_journal = OpacJournal.objects.get(_id=t_journal_uuid_str)
-                logger.debug(u"OPAC Journal: %s (_id: %s) encontrado" % (opac_journal.acronym, t_journal_uuid_str))
-        except DoesNotExist, e:
-            logger.error(u"OPAC Journal (_id: %s) não encontrado. Já fez o Load Journal?" % t_journal_uuid_str)
+                logger.debug("OPAC Journal: %s (_id: %s) encontrado" % (opac_journal.acronym, t_journal_uuid_str))
+        except DoesNotExist as e:
+            logger.error("OPAC Journal (_id: %s) não encontrado. Já fez o Load Journal?" % t_journal_uuid_str)
             raise e
         else:
             return opac_journal
 
     def prepare_translated_titles(self):
-        logger.debug(u"iniciando prepare_translated_titles")
+        logger.debug("iniciando prepare_translated_titles")
         translated_titles = []
 
         if hasattr(self.transform_model_instance, 'translated_titles'):
@@ -158,13 +158,13 @@ class ArticleLoader(BaseLoader):
                 translated_title = OpacTranslatedTitle(**ttitle)
                 translated_titles.append(translated_title)
         else:
-            logger.info(u"Não existem Translated Titles transformados. uuid: %s" % self.transform_model_instance.uuid)
+            logger.info("Não existem Translated Titles transformados. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"Translated Titles criados: %s" % len(translated_titles))
+        logger.debug("Translated Titles criados: %s" % len(translated_titles))
         return translated_titles
 
     def prepare_abstracts(self):
-        logger.debug(u"iniciando prepare_abstracts")
+        logger.debug("iniciando prepare_abstracts")
         translated_abstracts = []
 
         if hasattr(self.transform_model_instance, 'abstracts'):
@@ -172,13 +172,13 @@ class ArticleLoader(BaseLoader):
                 translated_abstract = OpacTranslatedAbstracts(**trans)
                 translated_abstracts.append(translated_abstract)
         else:
-            logger.info(u"Não existe resumos transformados para o uuid: %s" % self.transform_model_instance.uuid)
+            logger.info("Não existe resumos transformados para o uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"Resumos adicionados: %s" % len(translated_abstracts))
+        logger.debug("Resumos adicionados: %s" % len(translated_abstracts))
         return translated_abstracts
 
     def prepare_sections(self):
-        logger.debug(u"iniciando prepare_sections")
+        logger.debug("iniciando prepare_sections")
         sections = []
 
         if hasattr(self.transform_model_instance, 'sections'):
@@ -186,13 +186,13 @@ class ArticleLoader(BaseLoader):
                 opac_section = OpacTranslatedSection(**section)
                 sections.append(opac_section)
         else:
-            logger.info(u"Não existem Sections transformadas. uuid: %s" % self.transform_model_instance.uuid)
+            logger.info("Não existem Sections transformadas. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"sections criados: %s" % len(sections))
+        logger.debug("sections criados: %s" % len(sections))
         return sections
 
     def prepare_keywords(self):
-        logger.debug(u"iniciando prepare_keywords")
+        logger.debug("iniciando prepare_keywords")
         keywords = []
 
         if hasattr(self.transform_model_instance, 'keywords'):
@@ -200,23 +200,23 @@ class ArticleLoader(BaseLoader):
                 opac_keyword = OpacArticleKeywords(**keyword)
                 keywords.append(opac_keyword)
         else:
-            logger.info(u"Não existem Keywords transformadas. uuid: %s" % self.transform_model_instance.uuid)
+            logger.info("Não existem Keywords transformadas. uuid: %s" % self.transform_model_instance.uuid)
 
-        logger.debug(u"palavras chaves criadss: %s" % len(keywords))
+        logger.debug("palavras chaves criadss: %s" % len(keywords))
         return keywords
 
     def prepare_aop_url_segs(self):
-        logger.debug(u"iniciando prepare_aop_url_segs")
+        logger.debug("iniciando prepare_aop_url_segs")
         if not hasattr(self.transform_model_instance, 'aop_pid'):
-            logger.info(u"Artigo não é ex-ahead. uuid: %s"
+            logger.info("Artigo não é ex-ahead. uuid: %s"
                         % self.transform_model_instance.uuid)
             return None
 
-        logger.debug(u"Artigo é ex-ahead. uuid: %s"
+        logger.debug("Artigo é ex-ahead. uuid: %s"
                      % self.transform_model_instance.uuid)
 
         if hasattr(self.load_model_instance.loaded_data, 'aop_url_segs'):
-            logger.debug(u"Ex-ahead com aop_url_segs: %s"
+            logger.debug("Ex-ahead com aop_url_segs: %s"
                          % self.load_model_instance.loaded_data.aop_url_segs)
             return OpacAOPUrlSegments(
                 **self.load_model_instance.loaded_data.aop_url_segs)
@@ -224,7 +224,7 @@ class ArticleLoader(BaseLoader):
         aop_load_article = self.load_model_class.objects.filter(
             loaded_data__pid=self.transform_model_instance.aop_pid)
         if not aop_load_article:
-            logger.info(u"AOP não carregado no sistema. PID: %s"
+            logger.info("AOP não carregado no sistema. PID: %s"
                         % self.transform_model_instance.aop_pid)
             return None
 
@@ -234,11 +234,11 @@ class ArticleLoader(BaseLoader):
         try:
             opac_issue = LoadIssue.objects.get(
                 loaded_data__iid=aop_load_article[0].loaded_data.issue)
-        except LoadIssue.DoesNotExist, e:
-            logger.error(u"OPAC Issue (_id: %s) não encontrado"
+        except LoadIssue.DoesNotExist as e:
+            logger.error("OPAC Issue (_id: %s) não encontrado"
                          % aop_load_article[0].loaded_data.issue)
         else:
             url_segs['url_seg_issue'] = opac_issue.loaded_data.url_segment
 
-        logger.debug(u"OpacAOPUrlSegments: %s" % repr(url_segs))
+        logger.debug("OpacAOPUrlSegments: %s" % repr(url_segs))
         return OpacAOPUrlSegments(**url_segs)

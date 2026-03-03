@@ -52,8 +52,8 @@ class ArticleTransformer(BaseTransformer):
         pid = xylose_article.issue.publisher_id
         try:
             issue = TransformIssue.objects.get(pid=pid)
-        except Exception, e:
-            logger.error(u"TransformIssue (pid: %s) não encontrado!")
+        except Exception as e:
+            logger.error("TransformIssue (pid: %s) não encontrado!")
             raise e
         else:
             self.transform_model_instance['issue'] = issue.uuid
@@ -62,8 +62,8 @@ class ArticleTransformer(BaseTransformer):
         acronym = xylose_article.journal.acronym
         try:
             journal = TransformJournal.objects.get(acronym=acronym)
-        except Exception, e:
-            logger.error(u"TransformJournal (acronym: %s) não encontrado!")
+        except Exception as e:
+            logger.error("TransformJournal (acronym: %s) não encontrado!")
             raise e
         else:
             self.transform_model_instance['journal'] = journal.uuid
@@ -74,13 +74,13 @@ class ArticleTransformer(BaseTransformer):
 
         # abstract_languages
         if hasattr(xylose_article, 'abstracts') and xylose_article.abstracts():
-            self.transform_model_instance['abstract_languages'] = xylose_article.abstracts().keys()
+            self.transform_model_instance['abstract_languages'] = list(xylose_article.abstracts().keys())
 
         # translated_sections
         if hasattr(xylose_article, 'translated_section') and xylose_article.translated_section():
             translated_sections = []
 
-            for lang, title in xylose_article.translated_section().items():
+            for lang, title in list(xylose_article.translated_section().items()):
                 translated_sections.append({
                     'language': lang,
                     'name': title,
@@ -95,7 +95,7 @@ class ArticleTransformer(BaseTransformer):
         if xylose_article.translated_titles():
             translated_titles = []
 
-            for lang, title in xylose_article.translated_titles().items():
+            for lang, title in list(xylose_article.translated_titles().items()):
                 translated_titles.append({
                     'language': lang,
                     'name': title,
@@ -106,8 +106,8 @@ class ArticleTransformer(BaseTransformer):
         # order
         try:
             self.transform_model_instance['order'] = int(xylose_article.order)
-        except ValueError, e:
-            logger.error(u'xylose_article.order inválida: %s-%s' % (e, xylose_article.order))
+        except ValueError as e:
+            logger.error('xylose_article.order inválida: %s-%s' % (e, xylose_article.order))
 
         # doi
         if hasattr(xylose_article, 'doi'):
@@ -147,7 +147,7 @@ class ArticleTransformer(BaseTransformer):
 
             translated_abstracts = []
 
-            for lang, text in xylose_article.abstracts().items():
+            for lang, text in list(xylose_article.abstracts().items()):
                 translated_abstracts.append({
                     'language': lang,
                     'text': text,
@@ -204,7 +204,7 @@ class ArticleTransformer(BaseTransformer):
             keywords = []
 
             if xylose_article.keywords():
-                for lang, keys in xylose_article.keywords().iteritems():
+                for lang, keys in xylose_article.keywords().items():
                     keywords.append({'language': lang,
                                      'keywords': keys})
 
