@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:3.12-slim
 ENV PYTHONUNBUFFERED 1
 ENV DEBIAN_FRONTEND noninteractive
 # Build-time metadata as defined at http://label-schema.org
@@ -21,13 +21,12 @@ LABEL org.label-schema.build-date=$OPAC_PROC_BUILD_DATE \
       org.label-schema.schema-version="1.0"
 
 RUN apt-get update \
-    && apt-get install -qqy --no-install-recommends apt-utils libxml2-utils \
+    && apt-get install -qqy --no-install-recommends apt-utils libxml2-utils git build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# COPY ./requirements.txt /app/requirements.txt
 COPY . /app
 RUN pip --no-cache-dir install --upgrade pip
-RUN pip --no-cache-dir install -r /app/requirements.txt
+RUN pip --no-cache-dir install -r /app/requirements-py3.txt
 
 COPY ./start_worker.sh /start_worker.sh
 COPY ./start_scheduler.sh /start_scheduler.sh

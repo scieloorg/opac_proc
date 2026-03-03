@@ -1,0 +1,38 @@
+Werkzeug==1.0.1
+Flask==1.1.4
+Jinja2==2.11.3
+MarkupSafe==2.0.1
+click==7.1.2
+itsdangerous==1.1.0
+mongoengine==0.29.1
+flask-mongoengine==1.0.0
+thriftpy2==0.6.0
+redis==4.6.0
+rq==1.15.1
+rq-dashboard==0.8.6
+rq-scheduler==0.13.1
+rq-scheduler-dashboard==0.0.2
+blinker==1.7.0
+mongolog==0.1.1
+xylose==1.35.0
+-e git+https://git@github.com/scieloorg/legendarium@2.0.4#egg=legendarium
+-e git+https://git@github.com/scieloorg/opac_schema@v2.54#egg=opac_schema
+-e git+https://github.com/scieloorg/scieloh5m5.git@1.9.6#egg=scieloh5m5
+requests==2.32.5
+Flask-DebugToolbar==0.13.1
+Flask-WTF==1.2.1
+gunicorn==21.2.0
+gevent==24.2.1
+python-slugify==8.0.4
+packtools==2.4.3
+raven[flask]==6.10.0
+Flask-Testing==0.8.1
+Flask-Script==2.0.6
+feedparser==6.0.11
+Flask-Login==0.6.3
+Flask-Mail==0.10.0
+articlemetaapi==1.26.7
+prometheus-client==0.20.0
+beautifulsoup4==4.12.3
+setuptools>=70,<81
+pytest==8.3.5

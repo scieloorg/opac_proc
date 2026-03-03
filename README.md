@@ -17,6 +17,18 @@ Processamento que coleta os dados desde o Article Meta e armazena eles no MongoD
 - Acesso a uma instância de MongoDB com permissão de escita.
 - Acesso ao filesystem para escrita de logs
 
+### Python 3
+
+O projeto foi refatorado para sintaxe Python 3 e agora possui um arquivo de dependências dedicado:
+
+- `requirements-py3.txt`
+
+Para instalar localmente (quando houver acesso ao índice do pip):
+
+```bash
+python3 -m pip install -r requirements-py3.txt
+```
+
 ### Pull
 
 Caso você queira baixar a imagem pronta para executar:

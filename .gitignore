@@ -70,3 +70,6 @@ redis-data-dev
 
 # Data folder
 data
+
+# Local editable clones used during dependency migration
+src/

@@ -28,7 +28,7 @@ services:
     restart: always
     hostname: opac-proc-redis
     ports:
-        - "6379:6379"
+      - "6380:6379"
     volumes:
       - ./redis-data-dev:/data
       - /etc/localtime:/etc/localtime:ro
@@ -97,9 +97,9 @@ services:
     hostname: opac-proc-rqscheduler
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /mnt/scielosp_org/htdocs/img/revistas:/app/data/img:ro
-      - /mnt/scielosp_org/bases/xml:/app/data/xml:ro
-      - /mnt/scielosp_org/bases/pdf:/app/data/pdf:ro
+      - ./data/img:/app/data/img:ro
+      - ./data/xml:/app/data/xml:ro
+      - ./data/pdf:/app/data/pdf:ro
     environment:
       - OPAC_PROC_LOG_LEVEL=DEBUG
       - OPAC_PROC_ARTICLE_META_THRIFT_DOMAIN=articlemeta.scielo.org
