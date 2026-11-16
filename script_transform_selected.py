@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from opac_proc.datastore import models
 from opac_proc.datastore.mongodb_connector import get_db_connection
 from opac_proc.datastore.redis_queues import RQueues
@@ -12,7 +13,7 @@ r_queues.create_queues_for_stage(stage)
 # definição de journals a processar
 target_issn_list = [
     # '0034-8910',  # rsp
-    '1726-4634',  # # rpmesp
+    '0102-311X',  # # rpmesp
 ]
 
 collection = models.TransformCollection.objects.all().first()
